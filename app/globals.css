@@ -1,0 +1,66 @@
+@import "tailwindcss";
+
+@font-face {
+  font-family: "Pretendard";
+  src: url("/fonts/PretendardVariable.woff2") format("woff2-variations");
+  font-weight: 100 900;
+  font-display: swap;
+}
+
+@theme inline {
+  --font-sans: "Pretendard", "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
+
+  --color-background: #f0f1f3;
+  --color-foreground: #1a1a1a;
+  --color-card: #ffffff;
+  --color-muted: #f8f8f8;
+  --color-muted-foreground: #6d6d6d;
+  --color-border: #e7e7e7;
+  --color-input: #d1d1d1;
+
+  --color-primary: #fe4e10;
+  --color-primary-hover: #ef3408;
+  --color-primary-foreground: #ffffff;
+  --color-soft: #fff4ed;
+  --color-soft-foreground: #ef3408;
+
+  --color-blue: #0074d9;
+  --color-blue-soft: #e8f3ff;
+  --color-purple: #5f33e1;
+  --color-purple-soft: #efe8ff;
+  --color-green: #247a3d;
+  --color-green-soft: #e5faed;
+  --color-amber: #b45309;
+  --color-amber-soft: #fff0e3;
+
+  --radius: 16px;
+}
+
+html {
+  background-color: var(--color-background);
+}
+
+body {
+  font-family: var(--font-sans);
+  color: var(--color-foreground);
+  -webkit-font-smoothing: antialiased;
+  letter-spacing: -0.02em;
+}
+
+.break-keep {
+  word-break: keep-all;
+}
+
+/* Thin scrollbars inside the device frames */
+.pos-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: #cfcfcf transparent;
+}
+.pos-scroll::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+.pos-scroll::-webkit-scrollbar-thumb {
+  background: #cfcfcf;
+  border-radius: 8px;
+}
