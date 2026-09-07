@@ -90,6 +90,7 @@
       const plannedQuantity = quantity(raw.plannedQuantity, '실제 지급 예정 수량', 1);
       const plannedReturnQuantity = quantity(raw.plannedReturnQuantity ?? plannedQuantity, '회수 예정 수량');
       if (plannedReturnQuantity > plannedQuantity || (category !== 'liftTicket' && plannedReturnQuantity !== plannedQuantity)) fail('INVALID_INPUT', '회수 예정 수량을 확인해 주세요.');
+      if (raw.usage != null && (!Array.isArray(raw.usage) || raw.usage.length > 366)) fail('INVALID_INPUT', '이용일 목록을 확인해 주세요.');
       const usage = (raw.usage ?? []).map(use => {
         keys(use, ['date', 'quantity'], 'usage');
         return { date: date(use.date), quantity: quantity(use.quantity, '이용 수량') };
@@ -98,7 +99,63 @@
       return { id: raw.id, label: text(raw.label, '품목 이름'), category, unit: text(raw.unit ?? (category === 'liftTicket' ? '매' : '개'), '단위', 12), plannedQuantity, plannedReturnQuantity, issuedQuantity: 0, returnTarget: 0, vehicleQuantity: 0, shopQuantity: 0, usage, recoveryValueWon,
         returnPlan: plan(raw.returnPlan, { ...defaultPlan, ...(category === 'equipment' ? {} : { method: 'direct', place: '매장' }) }) };
     });
-    return { schemaVersion: 1, id: orderId, shopId, version: 0, customer: { id: id(input.customer.id, 'customer.id'), name: text(input.customer.name, '고객 이름'), phone: input.customer.phone == null ? null : text(input.customer.phone, '연락처', 40) }, rental, vehicleId: input.vehicleId == null ? null : id(input.vehicleId, 'vehicleId'), items, events: [] };
+    return { schemaVersion: 1, id: orderId, shopId, version: 0, customer: { id: id(input.customer.id, 'customer.id'), name: text(input.customer.name, '고객 이름'), phone: input.customer.phone == null ? null : text(input.customer.phone, '연락처', 40) }, rental, vehicleId: input.vehicleId == null ? null : id(input.vehicleId, 'vehicleId'), items, movements: [], events: [] };
+  }
+  function recalculate(order) {
+    for (const item of order.items) { item.vehicleQuantity = 0; item.shopQuantity = 0; }
+    const collections = new Map();
+    for (const movement of order.movements) {
+      if (movement.type === 'collect') collections.set(movement.id, new Map(movement.items.map(row => [row.itemId, row.quantity])));
+      for (const row of movement.items) {
+        const item = line(order, row.itemId);
+        if (movement.type === 'collect') item.vehicleQuantity += row.quantity;
+        else if (movement.type === 'receiveDirect') item.shopQuantity += row.quantity;
+        else if (movement.type === 'confirmVehicle') {
+          const collection = collections.get(movement.collectionId);
+          const available = collection?.get(row.itemId) ?? 0;
+          if (row.quantity > available) fail('DEPENDENT_RETURN', '해당 차량 인수 건의 미확인 수량을 초과합니다. 매장 확인 내역을 먼저 정정해 주세요.');
+          collection.set(row.itemId, available - row.quantity);
+          item.vehicleQuantity -= row.quantity;
+          item.shopQuantity += row.quantity;
+        }
+        if (item.vehicleQuantity < 0 || item.shopQuantity < 0 || item.vehicleQuantity + item.shopQuantity > item.returnTarget) fail('QUANTITY_EXCEEDED', '고객에게 남은 수량보다 많이 반납할 수 없습니다.');
+      }
+    }
+  }
+  function receive(order, command, actor, at) {
+    const { type, payload } = command;
+    keys(payload, type === 'collect' ? ['items', 'directItemIds'] : type === 'confirmVehicle' ? ['items', 'collectionId'] : ['items'], type);
+    const items = itemRows(order, payload.items, ['itemId', 'quantity'], type === 'collect');
+    const collectionId = type === 'confirmVehicle' ? id(payload.collectionId, 'collectionId') : null;
+    if (collectionId && !order.movements.some(movement => movement.id === collectionId && movement.type === 'collect')) fail('NOT_FOUND', '차량 인수 기록을 찾을 수 없습니다.');
+    order.movements.push({ id: command.requestId, type, at, actor: copy(actor), collectionId, items });
+    recalculate(order);
+    if (type === 'collect' && payload.directItemIds != null) {
+      if (!Array.isArray(payload.directItemIds) || new Set(payload.directItemIds).size !== payload.directItemIds.length) fail('INVALID_INPUT', '직접반납 품목을 확인해 주세요.');
+      for (const itemId of payload.directItemIds) {
+        const item = line(order, itemId);
+        if (!items.some(row => row.itemId === itemId) || !['clothing', 'liftTicket'].includes(item.category) || item.returnTarget - item.vehicleQuantity - item.shopQuantity <= 0) fail('INVALID_INPUT', '고객에게 남은 의류·리프트권만 직접반납으로 전환할 수 있습니다.');
+        item.returnPlan = { ...item.returnPlan, method: 'direct', place: '매장' };
+      }
+    }
+  }
+  // The UI supplies the current job's targets, never the entire order by default.
+  // Missing quantities are button selections, not keyboard input.
+  function prepareVehicleReturn(order, targets, missing = []) {
+    const available = summarize(order);
+    const targetRows = itemRows(order, targets, ['itemId', 'quantity']);
+    if (!Array.isArray(missing)) fail('INVALID_INPUT', '미수거 품목 목록을 확인해 주세요.');
+    const missingRows = missing.length ? itemRows(order, missing, ['itemId', 'quantity'], true) : [];
+    if (missingRows.some(row => !targetRows.some(target => target.itemId === row.itemId))) fail('INVALID_INPUT', '이번 업무에 없는 품목입니다.');
+    const directItemIds = [];
+    const items = targetRows.map(target => {
+      const item = available.items.find(item => item.id === target.itemId);
+      const omitted = missingRows.find(row => row.itemId === target.itemId)?.quantity ?? 0;
+      if (target.quantity > item.customerQuantity || omitted > target.quantity) fail('QUANTITY_EXCEEDED', '수거 예정·미수거 수량을 확인해 주세요.');
+      if (omitted > 0 && ['clothing', 'liftTicket'].includes(item.category)) directItemIds.push(item.id);
+      return { itemId: item.id, quantity: target.quantity - omitted };
+    });
+    return { items, directItemIds };
   }
   function summarize(order) {
     const items = order.items.map(item => ({ ...copy(item), customerQuantity: item.returnTarget - item.vehicleQuantity - item.shopQuantity, unissuedQuantity: item.plannedQuantity - item.issuedQuantity }));
@@ -145,6 +202,19 @@
           item.issuedQuantity += row.quantity;
           item.returnTarget += returnQuantity;
         }
+      } else if (['collect', 'receiveDirect', 'confirmVehicle'].includes(command.type)) receive(order, command, actor, at);
+      else if (command.type === 'planReturn') {
+        keys(command.payload, ['items'], 'planReturn');
+        const seen = new Set();
+        for (const row of list(command.payload.items, 'items')) {
+          keys(row, ['itemId', 'returnPlan'], 'items');
+          const item = line(order, id(row.itemId, 'itemId'));
+          if (seen.has(item.id)) fail('INVALID_INPUT', '같은 품목이 중복되었습니다.');
+          seen.add(item.id);
+          if (item.returnTarget - item.vehicleQuantity - item.shopQuantity === 0 && item.plannedQuantity === item.issuedQuantity) fail('NO_OUTSTANDING', '고객에게 남은 품목이 없습니다.');
+          object(row.returnPlan, 'returnPlan');
+          item.returnPlan = plan(row.returnPlan, item.returnPlan);
+        }
       } else fail('INVALID_INPUT', '지원하지 않는 작업입니다.');
     }
     order.version += 1;
@@ -153,5 +223,5 @@
     return { order, event: copy(event), duplicate: false };
   }
 
-  return { ReturnError, execute, summarize, canonical };
+  return { ReturnError, execute, summarize, prepareVehicleReturn, canonical };
 });

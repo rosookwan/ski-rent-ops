@@ -67,3 +67,63 @@ test('shop boundary, issue permission, invalid dates and duplicate lines are enf
 });
 
 module.exports = { R, ctx, sample, run, create, issued, errorCode };
+
+test('equipment collected in vehicle, clothes returned at store, tickets returned next day', () => {
+  let order = issued(); const rental = JSON.stringify(order.rental);
+  const targets = order.items.map(item => ({ itemId: item.id, quantity: 2 }));
+  const payload = R.prepareVehicleReturn(order, targets, [{ itemId: 'clothes', quantity: 2 }, { itemId: 'ticket', quantity: 2 }]);
+  const collection = run(order, 'collect', payload, {}, { ...ctx, actor: { id: 'driver-1', role: 'driver', vehicleId: 'van-1' } });
+  order = collection.order;
+  assert.equal(R.summarize(order).status, 'partial_return');
+  assert.equal(R.summarize(order).totals.customerQuantity, 4);
+  assert.equal(order.items[0].vehicleQuantity, 2);
+  order = run(order, 'receiveDirect', { items: [{ itemId: 'clothes', quantity: 2 }] }).order;
+  order = run(order, 'planReturn', { items: [{ itemId: 'ticket', returnPlan: { date: '2026-09-09', slot: '오전', method: 'direct' } }] }).order;
+  assert.equal(order.items[0].returnPlan.date, '2026-09-08');
+  assert.equal(order.items[2].returnPlan.date, '2026-09-09');
+  assert.equal(JSON.stringify(order.rental), rental);
+  order = run(order, 'confirmVehicle', { collectionId: collection.event.requestId, items: [{ itemId: 'ski', quantity: 2 }] }).order;
+  assert.equal(R.summarize(order).complete, false);
+  order = run(order, 'receiveDirect', { items: [{ itemId: 'ticket', quantity: 2 }] }, {}, { ...ctx, at: '2026-09-09T01:00:00.000Z' }).order;
+  assert.equal(R.summarize(order).status, 'returned');
+  assert.equal(R.summarize(order).totals.shopQuantity, 6);
+  assert.equal(R.summarize(order).totals.vehicleQuantity, 0);
+});
+test('full vehicle collection is pending shop confirmation, with no double count', () => {
+  const order = issued();
+  const collected = run(order, 'collect', R.prepareVehicleReturn(order, order.items.map(item => ({ itemId: item.id, quantity: 2 }))));
+  assert.equal(R.summarize(collected.order).status, 'awaiting_shop');
+  const confirmed = run(collected.order, 'confirmVehicle', { collectionId: collected.event.requestId, items: [{ itemId: 'ticket', quantity: 1 }] });
+  assert.equal(R.summarize(confirmed.order).totals.customerQuantity, 0);
+  assert.equal(R.summarize(confirmed.order).totals.vehicleQuantity, 5);
+  assert.equal(R.summarize(confirmed.order).totals.shopQuantity, 1);
+  assert.throws(() => run(confirmed.order, 'confirmVehicle', { collectionId: collected.event.requestId, items: [{ itemId: 'ticket', quantity: 2 }] }), errorCode('DEPENDENT_RETURN'));
+  assert.throws(() => run(confirmed.order, 'receiveDirect', { items: [{ itemId: 'ticket', quantity: 1 }] }), errorCode('QUANTITY_EXCEEDED'));
+});
+test('return before issue and wrong vehicle are rejected; failed multi-line return is atomic', () => {
+  const pending = create();
+  assert.throws(() => run(pending, 'collect', { items: [{ itemId: 'ski', quantity: 1 }] }), errorCode('QUANTITY_EXCEEDED'));
+  const order = issued(); const original = JSON.stringify(order);
+  assert.throws(() => run(order, 'collect', { items: [{ itemId: 'ski', quantity: 2 }, { itemId: 'ticket', quantity: 3 }] }), errorCode('QUANTITY_EXCEEDED'));
+  assert.throws(() => run(order, 'collect', { items: [{ itemId: 'ski', quantity: 1 }] }, {}, { ...ctx, actor: { id: 'driver-2', role: 'driver', vehicleId: 'van-2' } }), errorCode('FORBIDDEN'));
+  assert.equal(JSON.stringify(order), original);
+});
+test('vehicle job scope excludes tomorrow tickets; all missing requires no reason or typing', () => {
+  const order = issued();
+  const payload = R.prepareVehicleReturn(order, [{ itemId: 'ski', quantity: 2 }]);
+  assert.deepEqual(payload.items, [{ itemId: 'ski', quantity: 2 }]);
+  assert.throws(() => R.prepareVehicleReturn(order, [{ itemId: 'ski', quantity: 2 }], [{ itemId: 'ticket', quantity: 1 }]), errorCode('INVALID_INPUT'));
+  const allMissing = R.prepareVehicleReturn(order, [{ itemId: 'clothes', quantity: 2 }], [{ itemId: 'clothes', quantity: 2 }]);
+  const result = run(order, 'collect', allMissing).order;
+  assert.equal(result.items[1].returnPlan.method, 'direct');
+  assert.equal(R.summarize(result).totals.customerQuantity, 6);
+});
+test('unissued items prevent premature completion and duplicate taps do not add returns', () => {
+  let order = create();
+  order = run(order, 'issue', { items: [{ itemId: 'ski', quantity: 1 }] }).order;
+  const result = run(order, 'receiveDirect', { items: [{ itemId: 'ski', quantity: 1 }] }, { requestId: 'tap-1' });
+  const retry = R.execute(result.order, { type: 'receiveDirect', orderId: order.id, payload: { items: [{ itemId: 'ski', quantity: 1 }] }, expectedVersion: order.version, requestId: 'tap-1' }, ctx);
+  assert.equal(retry.duplicate, true);
+  assert.equal(R.summarize(retry.order).complete, false);
+  assert.equal(retry.order.items[0].shopQuantity, 1);
+});
