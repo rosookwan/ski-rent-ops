@@ -38,6 +38,16 @@ for(const module of ['settings','partners','closing','preparation','guide','logi
    await test('legacy intake tabs and draft calculation still available',async()=>{
     await nav('intake');await f.locator('[data-days="2"]').click();assert.equal(await f.locator('#ski-total-value').innerText(),'60,000원');await f.locator('[data-product-tab="lift"]').click();assert.equal(await f.locator('[data-lift-date]').isVisible(),true);await f.locator('[data-product-tab="equipment"]').click();await f.locator('[data-action="save"]').click();assert.match(await f.locator('#ski-dialog-title').innerText(),/견적/);await f.locator('#ski-overlay [data-action="close-dialog"]').first().click();
    });
+   await test('intake header keeps the vehicle and store return controls distinct',async()=>{
+    await nav('intake');
+    await f.locator('.so-topbar-right [data-go="vehicle"]').click();
+    await f.locator('.ski-visit').waitFor({state:'visible'});
+    await f.locator('.so-topbar-right [data-go="home"]').click();
+    assert.match(await f.locator('#so-breadcrumb').innerText(),/오늘 현황/);
+    await nav('intake');
+    await f.locator('#so-intake-tools [data-go="dispatch"]').click();
+    assert.match(await f.locator('#so-breadcrumb').innerText(),/배달·수거/);
+   });
    await test('dispatch filters and driver simple detail modes',async()=>{
     await nav('dispatch');await f.locator('[data-subtab="direct"]').click();assert.match(await f.locator('#so-page').innerText(),/매장 직접/);await f.locator('#so-page [data-go="vehicle"]').click();await f.locator('[data-mode="detail"]').click();assert.equal(await f.locator('.ski-job-list').isVisible(),true);await f.locator('[data-mode="simple"]').click();await f.locator('.so-topbar [data-go="home"]').click();
    });

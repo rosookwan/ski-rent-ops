@@ -12,7 +12,7 @@
   function activePage(){return registry.get(state.page)?.parent||state.page;}
   function go(page,params={},replace=false){if(!registry.has(page)){toast('이 화면은 다음 단계에 연결됩니다.');return;}if(!registry.get(page).public&&!state.authenticated&&registry.has('login')){state.afterLogin={page,params};page='login';params={};}close();if(!replace)state.history.push({page:state.page,params:state.params});if(page==='guest-form'&&state.page!==page)state.guest=null;state.page=page;state.params=params;root.classList.remove('so-menu-open');state.menuOpen=false;$('#so-menu-toggle').setAttribute('aria-expanded','false');$('#so-menu-toggle').setAttribute('aria-label','메뉴 펼치기');render();}
   function render(){const config=registry.get(state.page);if(!config)return;root.classList.toggle('so-vehicle',state.page==='vehicle');root.classList.toggle('so-at-entry',!!config.entry);$('#so-navigation').innerHTML=nav();$('#so-breadcrumb').textContent=config.title;$('#so-workspace').hidden=!!config.public;$('#so-public').hidden=!config.public||!!config.entry;$('#so-entry').hidden=!config.entry;
-    const modeButton=$('.so-topbar [data-go]');modeButton.dataset.go=state.page==='vehicle'?'home':'vehicle';modeButton.innerHTML=icon(state.page==='vehicle'?'monitor':'tablet')+(state.page==='vehicle'?'매장 화면':'차량 화면');
+    const modeButton=$('.so-topbar-right [data-go]');modeButton.dataset.go=state.page==='vehicle'?'home':'vehicle';modeButton.innerHTML=icon(state.page==='vehicle'?'monitor':'tablet')+(state.page==='vehicle'?'매장 화면':'차량 화면');
     if(!config.entry)$('#so-entry').replaceChildren();
     if(!config.public||config.entry)$('#so-public').replaceChildren();
     if(config.public)$('#so-page').replaceChildren();

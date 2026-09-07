@@ -43,7 +43,7 @@ npm run test:returns
 npm run test:returns:browser
 ```
 
-브라우저 검사는 위의 로컬 서버가 실행 중이어야 합니다. `npm test`는 클릭 흐름 29개, `npm run test:visual`은 화면 크기·차량 버튼 검사 37개를 수행합니다. 검사 결과와 캡처는 Git에서 제외한 `work/`에 생성됩니다. 배포 주소에서도 `SKI_DEMO_URL=https://rosookwan.github.io/ski-rent-ops/ npm test`로 같은 동작을 확인할 수 있습니다.
+브라우저 검사는 위의 로컬 서버가 실행 중이어야 합니다. `npm test`는 클릭 흐름 30개, `npm run test:visual`은 화면 크기·차량 버튼 검사 37개를 수행합니다. 검사 결과와 캡처는 Git에서 제외한 `work/`에 생성됩니다. 배포 주소에서도 `SKI_DEMO_URL=https://rosookwan.github.io/ski-rent-ops/ npm test`로 같은 동작을 확인할 수 있습니다.
 
 `npm run build` 결과는 `dist/index.html`입니다. `main`에 푸시하면 GitHub Actions가 구문 검사와 빌드 후 Pages를 갱신합니다. Pages 설정의 빌드 소스는 **GitHub Actions**입니다. 자세한 구현 범위와 검증은 [화면 체험과 검증 기록](docs/09-clickable-demo-and-validation.md)에 정리했습니다.
 
