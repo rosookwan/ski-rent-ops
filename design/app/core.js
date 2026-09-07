@@ -17,7 +17,7 @@
     if(legacy){const l=$('#ski-first-look');l.dispatchEvent(new CustomEvent('ski:set-view',{detail:state.page==='vehicle'?'vehicle':'shop'}));}
     else {const target=config.public?$('#so-public'):$('#so-page');target.innerHTML=config.render();config.mount?.();}
     icons();}
-  function close(){if($('#so-dialog').open)$('#so-dialog').close();}
+  function close(){if($('#so-dialog').open)$('#so-dialog').close();$('#so-dialog-body').innerHTML='';}
   function modal(title,body){$('#so-dialog-title').textContent=title;$('#so-dialog-body').innerHTML=body;$('#so-dialog').showModal();icons();}
   let toastTimer;function toast(message){clearTimeout(toastTimer);$('#so-toast').textContent=message;$('#so-toast').hidden=false;toastTimer=setTimeout(()=>{$('#so-toast').hidden=true;},4500);}
   const button=(label,action,id='',kind='')=>'<button type="button" class="so-button '+kind+'" data-action="'+action+'" data-id="'+esc(id)+'">'+label+'</button>';

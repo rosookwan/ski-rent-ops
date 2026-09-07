@@ -5,7 +5,7 @@ js=list((ROOT/'design/app').glob('*.js'))
 for p in js:
     subprocess.run(['node','--check',str(p)],check=True)
     body=p.read_text()
-    assert not re.search(r'\b(fetch\s*\(|XMLHttpRequest|WebSocket|localStorage|sessionStorage|indexedDB)\b',body),p
+    assert not re.search(r'\b(?:fetch\s*\(|XMLHttpRequest\b|WebSocket\b|localStorage\b|sessionStorage\b|indexedDB\b)',body),p
 for p in [ROOT/'README.md',*(ROOT/'docs').glob('*.md')]:
     assert p.read_text().count('```')%2==0,p
 subprocess.run(['python3',str(ROOT/'scripts/build.py')],check=True)

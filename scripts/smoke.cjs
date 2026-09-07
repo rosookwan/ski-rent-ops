@@ -48,7 +48,7 @@ for(const module of ['settings','partners','closing','preparation','guide','logi
   if(suite==='preparation'||suite==='all') await global.runPreparationChecks?.({f,nav,close,test,snap});
   if(suite==='guide'||suite==='all') await global.runGuideChecks?.({f,nav,close,test,snap});
   if(suite==='login'||suite==='all') await global.runLoginChecks?.({f,nav,close,test,snap,page});
-  assert.deepEqual(errors,[]);assert.deepEqual(mutations,[]);
+  assert.ok(checks.length>0,'At least one browser scenario must run');assert.deepEqual(errors,[]);assert.deepEqual(mutations,[]);
   fs.writeFileSync(path.join(root,'work',`smoke-${suite}.json`),JSON.stringify({suite,url,checks,errors,nonGetRequests:mutations},null,2)+'\n');
  } finally {await browser.close();}
 })().catch(e=>{console.error(e);process.exitCode=1;});
