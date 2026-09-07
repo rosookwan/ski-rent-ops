@@ -13,17 +13,20 @@
   function go(page,params={},replace=false){if(!registry.has(page)){toast('이 화면은 다음 단계에 연결됩니다.');return;}if(!registry.get(page).public&&!state.authenticated&&registry.has('login')){state.afterLogin={page,params};page='login';params={};}close();if(!replace)state.history.push({page:state.page,params:state.params});if(page==='guest-form'&&state.page!==page)state.guest=null;state.page=page;state.params=params;root.classList.remove('so-menu-open');state.menuOpen=false;$('#so-menu-toggle').setAttribute('aria-expanded','false');render();}
   function render(){const config=registry.get(state.page);if(!config)return;root.classList.toggle('so-vehicle',state.page==='vehicle');root.classList.toggle('so-at-entry',!!config.entry);$('#so-navigation').innerHTML=nav();$('#so-breadcrumb').textContent=config.title;$('#so-workspace').hidden=!!config.public;$('#so-public').hidden=!config.public||!!config.entry;$('#so-entry').hidden=!config.entry;
     const modeButton=$('.so-topbar [data-go]');modeButton.dataset.go=state.page==='vehicle'?'home':'vehicle';modeButton.innerHTML=icon(state.page==='vehicle'?'monitor':'tablet')+(state.page==='vehicle'?'매장 화면':'차량 화면');
+    if(!config.entry)$('#so-entry').replaceChildren();
+    if(!config.public||config.entry)$('#so-public').replaceChildren();
+    if(config.public)$('#so-page').replaceChildren();
     const legacy=state.page==='intake'||state.page==='vehicle';$('#so-page').hidden=legacy;$('#so-legacy').hidden=!legacy;
     if(legacy){const l=$('#ski-first-look');l.dispatchEvent(new CustomEvent('ski:set-view',{detail:state.page==='vehicle'?'vehicle':'shop'}));}
     else {const target=config.entry?$('#so-entry'):config.public?$('#so-public'):$('#so-page');target.innerHTML=config.render();config.mount?.();}
-    icons();}
+    root.dataset.page=state.page;icons();}
   function close(){if($('#so-dialog').open)$('#so-dialog').close();$('#so-dialog-body').innerHTML='';}
   function modal(title,body){$('#so-dialog-title').textContent=title;$('#so-dialog-body').innerHTML=body;$('#so-dialog').showModal();icons();}
   let toastTimer;function toast(message){clearTimeout(toastTimer);$('#so-toast').textContent=message;$('#so-toast').hidden=false;toastTimer=setTimeout(()=>{$('#so-toast').hidden=true;},4500);}
   const button=(label,action,id='',kind='')=>'<button type="button" class="so-button '+kind+'" data-action="'+action+'" data-id="'+esc(id)+'">'+label+'</button>';
   const link=(label,page,id='',kind='')=>'<button type="button" class="so-button '+kind+'" data-go="'+page+'" data-id="'+esc(id)+'">'+label+'</button>';
   const status=(label,color='grey')=>'<span class="so-status '+color+'">'+esc(label)+'</span>';
-  const head=(title,description='',action='',eyebrow='매장 운영')=>'<div class="so-pagehead"><div><span class="so-eyebrow">'+eyebrow+'</span><h1>'+title+'</h1>'+(description?'<p>'+description+'</p>':'')+'</div><div class="so-actions">'+action+'</div></div>';
+  const head=(title,description='',action='',eyebrow='')=>'<div class="so-pagehead"><div>'+(eyebrow?'<span class="so-eyebrow">'+eyebrow+'</span>':'')+'<h1>'+title+'</h1>'+(description?'<p>'+description+'</p>':'')+'</div><div class="so-actions">'+action+'</div></div>';
   const panel=(title,body,action='')=>'<section class="so-panel"><div class="so-panel-head"><h2>'+title+'</h2>'+action+'</div>'+body+'</section>';
   const tabs=(options,fallback)=>{const selected=state.tabs[state.page]||fallback;return '<div class="so-tabs" aria-label="'+esc(registry.get(state.page)?.title)+' 보기">'+options.map(([id,label])=>'<button type="button" class="so-tab" data-subtab="'+id+'" aria-pressed="'+(selected===id)+'">'+label+'</button>').join('')+'</div>';};
   const field=(label,value='',type='text',attr='')=>'<label class="so-field">'+label+'<input type="'+type+'" value="'+esc(value)+'" '+attr+'></label>';
