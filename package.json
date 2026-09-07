@@ -1,0 +1,16 @@
+{
+  "name": "ski-rent-ops",
+  "version": "0.9.0",
+  "private": true,
+  "description": "Screen-only demo for a ski rental shop and delivery tablet",
+  "scripts": {
+    "dev": "python3 scripts/build.py --serve --port 58148",
+    "build": "python3 scripts/build.py",
+    "check": "python3 scripts/check.py",
+    "test": "node scripts/smoke.cjs all",
+    "test:visual": "node scripts/visual-check.cjs"
+  },
+  "devDependencies": {
+    "playwright": "1.62.1"
+  }
+}

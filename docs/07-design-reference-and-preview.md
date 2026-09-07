@@ -2,6 +2,8 @@
 
 작성일: 2026-09-07
 
+이 문서는 첫 시안의 당시 동작 기록입니다. 현재 통합 시안은 [운영 화면 체험](https://rosookwan.github.io/ski-rent-ops/)에서 확인합니다. 통합 시안에서는 사용자 요청에 따라 저장·발송·완료 처리를 실행하지 않고 화면과 확인창만 보여주며, 구현 범위는 [0.9 검증 기록](09-clickable-demo-and-validation.md)을 기준으로 합니다.
+
 ## 프로젝트 위치
 
 정식 작업 폴더는 `/Users/sookwan/Developer/ski-rent-ops`입니다. 기존 `outputs/ski-rental-ops`는 이 위치를 가리키는 심볼릭 링크로 남겨 이전 대화의 문서와 이미지 링크를 유지합니다.
