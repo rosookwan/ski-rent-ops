@@ -105,6 +105,12 @@
     for (const item of order.items) { item.vehicleQuantity = 0; item.shopQuantity = 0; }
     const collections = new Map();
     for (const movement of order.movements) {
+      const movementVersion = movement.version ?? order.events.find(event => event.requestId === movement.id)?.version;
+      const issuedAtReturn = new Map(order.items.map(item => [item.id, 0]));
+      for (const event of order.events) {
+        if (event.type !== 'issue' || event.version >= movementVersion) continue;
+        for (const row of event.payload.items) issuedAtReturn.set(row.itemId, issuedAtReturn.get(row.itemId) + (row.returnQuantity ?? row.quantity));
+      }
       if (movement.type === 'collect') collections.set(movement.id, new Map(movement.items.map(row => [row.itemId, row.quantity])));
       for (const row of movement.items) {
         const item = line(order, row.itemId);
@@ -118,7 +124,7 @@
           item.vehicleQuantity -= row.quantity;
           item.shopQuantity += row.quantity;
         }
-        if (item.vehicleQuantity < 0 || item.shopQuantity < 0 || item.vehicleQuantity + item.shopQuantity > item.returnTarget) fail('QUANTITY_EXCEEDED', '고객에게 남은 수량보다 많이 반납할 수 없습니다.');
+        if (item.vehicleQuantity < 0 || item.shopQuantity < 0 || item.vehicleQuantity + item.shopQuantity > issuedAtReturn.get(item.id)) fail('QUANTITY_EXCEEDED', '처리 당시 지급한 회수 대상 수량보다 많이 반납할 수 없습니다.');
       }
     }
   }
@@ -128,7 +134,7 @@
     const items = itemRows(order, payload.items, ['itemId', 'quantity'], type === 'collect');
     const collectionId = type === 'confirmVehicle' ? id(payload.collectionId, 'collectionId') : null;
     if (collectionId && !order.movements.some(movement => movement.id === collectionId && movement.type === 'collect')) fail('NOT_FOUND', '차량 인수 기록을 찾을 수 없습니다.');
-    order.movements.push({ id: command.requestId, type, at, actor: copy(actor), collectionId, items });
+    order.movements.push({ id: command.requestId, type, version: order.version + 1, at, actor: copy(actor), collectionId, items });
     recalculate(order);
     if (type === 'collect' && payload.directItemIds != null) {
       if (!Array.isArray(payload.directItemIds) || new Set(payload.directItemIds).size !== payload.directItemIds.length) fail('INVALID_INPUT', '직접반납 품목을 확인해 주세요.');

@@ -165,3 +165,11 @@ test('recovery report uses Korea date, excludes second count at store, restates 
   assert.equal(report.currentCustomerQuantity, 1);
   assert.equal(R.ticketReport([corrected], { shopId: 'shop-2' }).recoveredQuantity, 0);
 });
+
+test('historical correction cannot claim stock that was only issued later', () => {
+  const firstIssue = run(create(), 'issue', { items: [{ itemId: 'ski', quantity: 1 }] }).order;
+  const collected = run(firstIssue, 'collect', { items: [{ itemId: 'ski', quantity: 1 }] });
+  const laterIssue = run(collected.order, 'issue', { items: [{ itemId: 'ski', quantity: 1 }] }).order;
+  assert.throws(() => run(laterIssue, 'correctReturn', { movementId: collected.event.requestId, items: [{ itemId: 'ski', quantity: 2 }] }), errorCode('QUANTITY_EXCEEDED'));
+  assert.equal(laterIssue.items[0].vehicleQuantity, 1);
+});
