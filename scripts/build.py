@@ -2,6 +2,7 @@
 from pathlib import Path
 import argparse
 import importlib.util
+import base64
 
 ROOT = Path(__file__).resolve().parents[1]
 APP = ROOT / 'design/app'
@@ -15,7 +16,11 @@ def build():
     fragment += '\n<style>\n' + (APP / 'styles.css').read_text() + '\n</style>\n'
     for name in MODULES:
         if (APP / name).exists():
-            fragment += '<script>\n' + (APP / name).read_text() + '\n</script>\n'
+            source=(APP/name).read_text()
+            if '__GUIDE_QR_DATA_URI__' in source:
+                encoded=base64.b64encode((APP/'assets/guide-qr.png').read_bytes()).decode()
+                source=source.replace('__GUIDE_QR_DATA_URI__','data:image/png;base64,'+encoded)
+            fragment += '<script>\n' + source + '\n</script>\n'
     fragment += '<script>window.SkiOps.start();</script>\n'
     assert len(fragment.encode()) < 1_000_000
     out = ROOT / 'dist'
@@ -28,6 +33,8 @@ def build():
     renderer = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(renderer)
     document = renderer.render(out/'ops-preview.fragment.html', title='우리 스키샵 · 운영 화면 체험')
+    public_router = "<script>const f=document.querySelector('iframe');f.addEventListener('load',()=>{const view=new URLSearchParams(location.search).get('view');if(['guest-guide','guest-form'].includes(view))f.contentWindow.postMessage({type:'ski-public-route',view},'*');});</script>"
+    document=document.replace('</body>',public_router+'</body>')
     (out / 'index.html').write_text(document)
     return document
 
