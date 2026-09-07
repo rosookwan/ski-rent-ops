@@ -157,6 +157,94 @@
     });
     return { items, directItemIds };
   }
+  function correctReturn(order, command, actor) {
+    const { payload, type } = command;
+    keys(payload, type === 'undoReturn' ? ['movementId'] : ['movementId', 'items'], type);
+    const movement = order.movements.find(entry => entry.id === id(payload.movementId, 'movementId'));
+    if (!movement) fail('NOT_FOUND', '정정할 반납 기록을 찾을 수 없습니다.');
+    if (actor.role === 'driver' && (movement.type !== 'collect' || movement.actor.id !== actor.id)) fail('FORBIDDEN', '본인이 처리한 차량 인수만 정정할 수 있습니다.');
+    const before = copy(movement.items);
+    const changes = type === 'undoReturn' ? before.map(row => ({ ...row, quantity: 0 })) : itemRows(order, payload.items, ['itemId', 'quantity'], true);
+    for (const row of changes) {
+      const original = movement.items.find(item => item.itemId === row.itemId);
+      if (!original) fail('INVALID_INPUT', '원래 반납 내역에 있는 품목만 정정할 수 있습니다.');
+      original.quantity = row.quantity;
+    }
+    if (canonical(before) === canonical(movement.items)) fail('NO_CHANGE', '변경된 수량이 없습니다.');
+    recalculate(order);
+    return { movementId: movement.id, before, after: copy(movement.items) };
+  }
+  function koreanTime(at) {
+    const ms = Date.parse(at);
+    if (!Number.isFinite(ms)) fail('INVALID_INPUT', '조회 기준 시각을 확인해 주세요.');
+    const local = new Date(ms + 9 * 3600000).toISOString();
+    return { date: local.slice(0, 10), time: local.slice(11, 16) };
+  }
+  function pendingConfirmations(order) {
+    return order.movements.filter(movement => movement.type === 'collect').flatMap(movement => movement.items.map(row => {
+      const confirmed = order.movements.filter(other => other.type === 'confirmVehicle' && other.collectionId === movement.id).reduce((sum, other) => sum + (other.items.find(item => item.itemId === row.itemId)?.quantity ?? 0), 0);
+      return { collectionId: movement.id, itemId: row.itemId, quantity: row.quantity - confirmed, collectedAt: movement.at, date: koreanTime(movement.at).date };
+    })).filter(row => row.quantity > 0);
+  }
+  function worklist(orders, options) {
+    keys(options, ['shopId', 'onDate', 'filter', 'now', 'vehicleId'], 'worklist');
+    const shopId = id(options.shopId, 'shopId');
+    const onDate = options.onDate == null ? null : date(options.onDate, 'onDate');
+    const filter = oneOf(options.filter ?? 'all', ['all', 'partial', 'direct', 'vehicle', 'liftUnreturned', 'overdue', 'awaitingShop'], 'filter');
+    const now = koreanTime(options.now ?? new Date().toISOString());
+    const rows = [];
+    for (const order of orders) {
+      if (order.shopId !== shopId || (options.vehicleId != null && order.vehicleId !== options.vehicleId)) continue;
+      const summary = summarize(order);
+      const pending = pendingConfirmations(order).filter(row => !onDate || row.date <= onDate);
+      const dueItems = summary.items.filter(item => item.customerQuantity > 0 && (!onDate || item.returnPlan.date === onDate)).map(item => ({ ...item, overdue: item.returnPlan.date < now.date || (item.returnPlan.date === now.date && item.returnPlan.time != null && item.returnPlan.time < now.time) })).filter(item => {
+        if (filter === 'direct' || filter === 'vehicle') return item.returnPlan.method === filter;
+        if (filter === 'liftUnreturned') return item.category === 'liftTicket';
+        if (filter === 'overdue') return item.overdue;
+        if (filter === 'awaitingShop') return false;
+        return true;
+      });
+      if (filter === 'partial' && summary.status !== 'partial_return') continue;
+      const confirmations = ['all', 'partial', 'awaitingShop'].includes(filter) ? pending : [];
+      if (!dueItems.length && !confirmations.length) continue;
+      rows.push({ ...summary, dueItems, pendingConfirmations: confirmations });
+    }
+    return rows.sort((a, b) => {
+      const key = row => row.dueItems.map(item => item.returnPlan.date + (item.returnPlan.time ?? '23:59')).sort()[0] ?? row.pendingConfirmations[0]?.date ?? '';
+      return key(a).localeCompare(key(b)) || a.id.localeCompare(b.id);
+    });
+  }
+  function ticketReport(orders, options) {
+    keys(options, ['shopId', 'fromDate', 'toDate'], 'ticketReport');
+    const shopId = id(options.shopId, 'shopId');
+    const fromDate = options.fromDate == null ? null : date(options.fromDate, 'fromDate');
+    const toDate = options.toDate == null ? null : date(options.toDate, 'toDate');
+    if (fromDate && toDate && fromDate > toDate) fail('INVALID_INPUT', '집계 기간을 확인해 주세요.');
+    const report = { basis: 'effective_receipt_date', timezone: 'Asia/Seoul', fromDate, toDate, recoveredQuantity: 0, recoveryValueWon: 0, shopConfirmedQuantity: 0, currentIssuedQuantity: 0, currentReturnTarget: 0, currentCustomerQuantity: 0, currentVehicleQuantity: 0, currentShopQuantity: 0 };
+    for (const order of orders) {
+      if (order.shopId !== shopId) continue;
+      const tickets = new Map(order.items.filter(item => item.category === 'liftTicket').map(item => [item.id, item]));
+      for (const item of tickets.values()) {
+        report.currentIssuedQuantity += item.issuedQuantity;
+        report.currentReturnTarget += item.returnTarget;
+        report.currentCustomerQuantity += item.returnTarget - item.vehicleQuantity - item.shopQuantity;
+        report.currentVehicleQuantity += item.vehicleQuantity;
+        report.currentShopQuantity += item.shopQuantity;
+      }
+      for (const movement of order.movements) {
+        const receivedDate = koreanTime(movement.at).date;
+        if ((fromDate && receivedDate < fromDate) || (toDate && receivedDate > toDate)) continue;
+        for (const row of movement.items) {
+          const ticket = tickets.get(row.itemId);
+          if (!ticket) continue;
+          if (movement.type !== 'confirmVehicle') { report.recoveredQuantity += row.quantity; report.recoveryValueWon += row.quantity * ticket.recoveryValueWon; }
+          if (movement.type !== 'collect') report.shopConfirmedQuantity += row.quantity;
+        }
+      }
+    }
+    return report;
+  }
+  const history = order => order.events.map(({ fingerprint, ...event }) => copy(event));
   function summarize(order) {
     const items = order.items.map(item => ({ ...copy(item), customerQuantity: item.returnTarget - item.vehicleQuantity - item.shopQuantity, unissuedQuantity: item.plannedQuantity - item.issuedQuantity }));
     const totals = items.reduce((sum, item) => {
@@ -176,7 +264,7 @@
     const shopId = id(context.shopId, 'shopId');
     const actor = { id: id(context.actor.id, 'actor.id'), role: oneOf(context.actor.role, ['store', 'driver'], 'actor.role'), vehicleId: context.actor.vehicleId == null ? null : id(context.actor.vehicleId, 'actor.vehicleId') };
     if (current && (current.shopId !== shopId || current.id !== orderId)) fail('NOT_FOUND', '접수를 찾을 수 없습니다.');
-    if (actor.role === 'driver' && (!current || !actor.vehicleId || current.vehicleId !== actor.vehicleId || !['collect'].includes(command.type))) fail('FORBIDDEN', '이 작업을 처리할 권한이 없습니다.');
+    if (actor.role === 'driver' && (!current || !actor.vehicleId || current.vehicleId !== actor.vehicleId || !['collect', 'correctReturn', 'undoReturn'].includes(command.type))) fail('FORBIDDEN', '이 작업을 처리할 권한이 없습니다.');
     const fingerprint = canonical({ command, actor });
     const previous = current?.events.find(event => event.requestId === requestId);
     if (previous) {
@@ -186,7 +274,7 @@
     if ((current?.version ?? 0) !== command.expectedVersion) fail('VERSION_CONFLICT', '다른 곳에서 변경했습니다. 최신 내역을 확인해 주세요.');
     const at = context.at ?? new Date().toISOString();
     if (typeof at !== 'string' || !/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/.test(at) || !Number.isFinite(Date.parse(at)) || new Date(at).toISOString() !== at) fail('INVALID_INPUT', '처리 시각이 올바르지 않습니다.');
-    let order;
+    let order, adjustment;
     if (command.type === 'create') {
       if (current) fail('ALREADY_EXISTS', '이미 존재하는 접수입니다.');
       order = createOrder(command.payload, shopId, orderId);
@@ -215,13 +303,14 @@
           object(row.returnPlan, 'returnPlan');
           item.returnPlan = plan(row.returnPlan, item.returnPlan);
         }
-      } else fail('INVALID_INPUT', '지원하지 않는 작업입니다.');
+      } else if (['correctReturn', 'undoReturn'].includes(command.type)) adjustment = correctReturn(order, command, actor);
+      else fail('INVALID_INPUT', '지원하지 않는 작업입니다.');
     }
     order.version += 1;
-    const event = { requestId, type: command.type, version: order.version, at, actor, payload: copy(command.payload), fingerprint };
+    const event = { requestId, type: command.type, version: order.version, at, actor, payload: copy(command.payload), fingerprint, ...(adjustment ? { adjustment } : {}) };
     order.events.push(event);
     return { order, event: copy(event), duplicate: false };
   }
 
-  return { ReturnError, execute, summarize, prepareVehicleReturn, canonical };
+  return { ReturnError, execute, summarize, prepareVehicleReturn, pendingConfirmations, worklist, ticketReport, history, canonical };
 });

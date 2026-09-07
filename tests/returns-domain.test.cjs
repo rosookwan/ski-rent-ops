@@ -127,3 +127,58 @@ test('unissued items prevent premature completion and duplicate taps do not add 
   assert.equal(R.summarize(retry.order).complete, false);
   assert.equal(retry.order.items[0].shopQuantity, 1);
 });
+
+test('correction preserves original audit, recalculates stock and can reopen completed orders', () => {
+  const original = issued();
+  const receipt = run(original, 'receiveDirect', { items: original.items.map(item => ({ itemId: item.id, quantity: 2 })) });
+  assert.equal(R.summarize(receipt.order).complete, true);
+  const corrected = run(receipt.order, 'correctReturn', { movementId: receipt.event.requestId, items: [{ itemId: 'ticket', quantity: 1 }] });
+  assert.equal(R.summarize(corrected.order).status, 'partial_return');
+  assert.equal(R.summarize(corrected.order).totals.customerQuantity, 1);
+  assert.equal(corrected.order.events.find(e => e.requestId === receipt.event.requestId).payload.items[2].quantity, 2);
+  assert.equal(corrected.event.adjustment.before[2].quantity, 2);
+  assert.equal(corrected.event.adjustment.after[2].quantity, 1);
+  assert.equal(R.history(corrected.order).at(-1).actor.id, 'staff-1');
+  assert.ok(!('fingerprint' in R.history(corrected.order)[0]));
+});
+test('driver can undo own collection, but cannot undo store confirmation or another driver receipt', () => {
+  const driver = { ...ctx, actor: { id: 'driver-1', role: 'driver', vehicleId: 'van-1' } };
+  const collected = run(issued(), 'collect', { items: [{ itemId: 'ski', quantity: 2 }] }, {}, driver);
+  const undone = run(collected.order, 'undoReturn', { movementId: collected.event.requestId }, {}, driver);
+  assert.equal(undone.order.items[0].vehicleQuantity, 0);
+  assert.equal(R.summarize(undone.order).totals.customerQuantity, 6);
+  assert.throws(() => run(collected.order, 'undoReturn', { movementId: collected.event.requestId }, {}, { ...driver, actor: { ...driver.actor, id: 'driver-2' } }), errorCode('FORBIDDEN'));
+  const confirmed = run(collected.order, 'confirmVehicle', { collectionId: collected.event.requestId, items: [{ itemId: 'ski', quantity: 1 }] });
+  assert.throws(() => run(confirmed.order, 'undoReturn', { movementId: confirmed.event.requestId }, {}, driver), errorCode('FORBIDDEN'));
+});
+test('confirmed collection cannot be reduced below linked confirmation; undo confirmation first', () => {
+  const collected = run(issued(), 'collect', { items: [{ itemId: 'ski', quantity: 2 }] });
+  const confirmed = run(collected.order, 'confirmVehicle', { collectionId: collected.event.requestId, items: [{ itemId: 'ski', quantity: 2 }] });
+  assert.throws(() => run(confirmed.order, 'correctReturn', { movementId: collected.event.requestId, items: [{ itemId: 'ski', quantity: 1 }] }), errorCode('DEPENDENT_RETURN'));
+  const undo = run(confirmed.order, 'undoReturn', { movementId: confirmed.event.requestId });
+  const corrected = run(undo.order, 'correctReturn', { movementId: collected.event.requestId, items: [{ itemId: 'ski', quantity: 1 }] });
+  assert.equal(corrected.order.items[0].vehicleQuantity, 1);
+  assert.equal(corrected.order.items[0].shopQuantity, 0);
+});
+test('per-day worklist keeps tickets tomorrow and distinguishes overdue, direct and pending shop', () => {
+  const collection = run(issued(), 'collect', { items: [{ itemId: 'ski', quantity: 2 }] });
+  const order = run(collection.order, 'planReturn', { items: [{ itemId: 'ticket', returnPlan: { date: '2026-09-09', time: '09:00' } }] }).order;
+  const options = { shopId: 'shop-1', now: '2026-09-09T00:30:00.000Z' };
+  assert.deepEqual(R.worklist([order], { ...options, onDate: '2026-09-09' })[0].dueItems.map(item => item.id), ['ticket']);
+  assert.deepEqual(R.worklist([order], { ...options, filter: 'overdue' })[0].dueItems.map(item => item.id), ['clothes', 'ticket']);
+  assert.deepEqual(R.worklist([order], { ...options, filter: 'liftUnreturned' })[0].dueItems.map(item => item.id), ['ticket']);
+  assert.equal(R.worklist([order], { ...options, filter: 'awaitingShop' })[0].pendingConfirmations[0].quantity, 2);
+  assert.equal(R.worklist([order], { ...options, shopId: 'shop-2' }).length, 0);
+});
+test('recovery report uses Korea date, excludes second count at store, restates corrected receipt day', () => {
+  const collected = run(issued(), 'collect', { items: [{ itemId: 'ticket', quantity: 2 }] }, {}, { ...ctx, at: '2026-09-07T15:10:00.000Z' });
+  const confirmed = run(collected.order, 'confirmVehicle', { collectionId: collected.event.requestId, items: [{ itemId: 'ticket', quantity: 1 }] }, {}, { ...ctx, at: '2026-09-09T01:00:00.000Z' });
+  let report = R.ticketReport([confirmed.order], { shopId: 'shop-1', fromDate: '2026-09-08', toDate: '2026-09-08' });
+  assert.equal(report.recoveredQuantity, 2); assert.equal(report.recoveryValueWon, 2000); assert.equal(report.shopConfirmedQuantity, 0);
+  assert.equal(report.currentVehicleQuantity, 1); assert.equal(report.currentShopQuantity, 1);
+  const corrected = run(confirmed.order, 'correctReturn', { movementId: collected.event.requestId, items: [{ itemId: 'ticket', quantity: 1 }] }).order;
+  report = R.ticketReport([corrected], { shopId: 'shop-1' });
+  assert.equal(report.recoveredQuantity, 1); assert.equal(report.recoveryValueWon, 1000); assert.equal(report.shopConfirmedQuantity, 1);
+  assert.equal(report.currentCustomerQuantity, 1);
+  assert.equal(R.ticketReport([corrected], { shopId: 'shop-2' }).recoveredQuantity, 0);
+});
