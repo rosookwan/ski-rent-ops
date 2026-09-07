@@ -5,6 +5,7 @@ const path=require('node:path');
 const root=path.resolve(__dirname,'..');
 const suite=process.argv[2]||'rentals';
 const url=process.env.SKI_DEMO_URL||'http://127.0.0.1:58148/';
+for(const module of ['settings','partners','closing','preparation','guide','login']){const p=path.join(__dirname,'smoke-'+module+'.cjs');if(fs.existsSync(p))require(p);}
 (async()=>{
  const browser=await chromium.launch({headless:true,channel:process.env.SKI_CHROME_CHANNEL||'chrome'});
  const page=await browser.newPage({viewport:{width:1440,height:1050},deviceScaleFactor:1});
