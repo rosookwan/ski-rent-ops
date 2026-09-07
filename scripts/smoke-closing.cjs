@@ -1,0 +1,7 @@
+const assert=require('node:assert/strict');
+global.runClosingChecks=async({f,nav,close,test,snap})=>{
+ await test('closing cashflow and receivable totals',async()=>{await nav('closing');const body=await f.locator('#so-page').innerText();assert.match(body,/835,000원/);assert.match(body,/280,000원/);assert.match(body,/415,000원/);await snap('04-daily-closing');});
+ await test('cash reconciliation changes preview only',async()=>{await f.locator('[data-subtab="cash"]').click();await f.locator('[data-cash-count]').fill('235000');await f.locator('[data-action="cash-check"]').click();assert.match(await f.locator('#so-dialog-body').innerText(),/-5,000원/);await close();});
+ await test('closing report and review remain previews',async()=>{await f.locator('[data-subtab="summary"]').click();await f.locator('[data-action="closing-review"]').click();await f.locator('#so-dialog input[type="checkbox"]').first().check();await close();await f.locator('[data-action="closing-report"]').click();assert.match(await f.locator('#so-dialog-body').innerText(),/970,000원/);await close();assert.match(await f.locator('#so-page').innerText(),/마감 전/);});
+ await test('unavailable closing date does not display current totals',async()=>{await f.locator('[data-change="closing-date"]').fill('2020-01-01');assert.match(await f.locator('#so-page').innerText(),/샘플 내역이 없습니다/);assert.equal(await f.locator('.so-metrics').count(),0);await f.locator('[data-action="closing-today"]').click();});
+};
