@@ -1,0 +1,149 @@
+{
+  "description": "문서 검산용 가상 데이터. 실제 매장 가격이나 실제 거래가 아닙니다.",
+  "currency": "KRW",
+  "simple_baskets": [
+    {
+      "id": "one_ski_one_clothing_two_days",
+      "days": 2,
+      "lines": [
+        {"product": "스키", "quantity": 1, "daily_unit_price": 20000, "expected_amount": 40000},
+        {"product": "의류", "quantity": 1, "daily_unit_price": 10000, "expected_amount": 20000}
+      ],
+      "expected_total": 60000,
+      "expected_physical_quantities": {"스키": 1, "의류": 1}
+    },
+    {
+      "id": "one_ski_one_clothing_three_days",
+      "days": 3,
+      "lines": [
+        {"product": "스키", "quantity": 1, "daily_unit_price": 20000, "expected_amount": 60000},
+        {"product": "의류", "quantity": 1, "daily_unit_price": 10000, "expected_amount": 30000}
+      ],
+      "expected_total": 90000,
+      "expected_physical_quantities": {"스키": 1, "의류": 1}
+    }
+  ],
+  "duration_total_case": {
+    "days": 2,
+    "price_for_entire_period_per_item": 36000,
+    "quantity": 2,
+    "expected_total": 72000
+  },
+  "mixed_day_rates_case": {
+    "daily_rates": [20000, 25000],
+    "quantity": 1,
+    "expected_total": 45000
+  },
+  "extension_case": {
+    "original_period_total": 20000,
+    "extended_period_total": 36000,
+    "expected_additional_charge": 16000
+  },
+  "percent_discount_case": {
+    "base_amount": 10001,
+    "discount_basis_points": 1500,
+    "rounding": "floor_to_won",
+    "expected_discount": 1500,
+    "expected_final": 8501
+  },
+  "partner_order": {
+    "days": 3,
+    "rental_lines": [
+      {
+        "product": "스키",
+        "quantity": 2,
+        "list_daily_unit_price": 20000,
+        "partner_daily_unit_price": 16000,
+        "expected_list_total": 120000,
+        "expected_partner_total": 96000,
+        "expected_order_discount_allocation": 2667,
+        "expected_final_total": 93333
+      },
+      {
+        "product": "의류",
+        "quantity": 2,
+        "list_daily_unit_price": 10000,
+        "partner_daily_unit_price": 8000,
+        "expected_list_total": 60000,
+        "expected_partner_total": 48000,
+        "expected_order_discount_allocation": 1333,
+        "expected_final_total": 46667
+      }
+    ],
+    "ticket_lines": [
+      {"use_day": 1, "session": "후야", "quantity": 2, "unit_price": 60000, "expected_total": 120000},
+      {"use_day": 2, "session": "오후", "quantity": 2, "unit_price": 45000, "expected_total": 90000}
+    ],
+    "order_discount_rental_only": 4000,
+    "expected_list_grand_total": 390000,
+    "expected_partner_grand_total": 354000,
+    "expected_plan_discount": 36000,
+    "expected_final_grand_total": 350000,
+    "expected_physical_quantities": {"스키": 2, "의류": 2}
+  },
+  "daily_closings": [
+    {
+      "day": 1,
+      "opening_cash": 50000,
+      "new_confirmed_amount": 350000,
+      "charge_adjustment": 0,
+      "cash_payment": 100000,
+      "card_payment": 200000,
+      "bank_payment": 0,
+      "payment_refund": 0,
+      "cash_deposit_received": 20000,
+      "cash_deposit_returned": 0,
+      "expected_net_payment": 300000,
+      "expected_receivable": 50000,
+      "expected_deposit_balance": 20000,
+      "expected_closing_cash": 170000
+    },
+    {
+      "day": 2,
+      "opening_cash": 170000,
+      "new_confirmed_amount": 0,
+      "charge_adjustment": 0,
+      "cash_payment": 0,
+      "card_payment": 0,
+      "bank_payment": 50000,
+      "payment_refund": 0,
+      "cash_deposit_received": 0,
+      "cash_deposit_returned": 0,
+      "expected_net_payment": 50000,
+      "expected_receivable": 0,
+      "expected_deposit_balance": 20000,
+      "expected_closing_cash": 170000
+    },
+    {
+      "day": 3,
+      "opening_cash": 170000,
+      "new_confirmed_amount": 0,
+      "charge_adjustment": 0,
+      "cash_payment": 0,
+      "card_payment": 0,
+      "bank_payment": 0,
+      "payment_refund": 0,
+      "cash_deposit_received": 0,
+      "cash_deposit_returned": 20000,
+      "expected_net_payment": 0,
+      "expected_receivable": 0,
+      "expected_deposit_balance": 0,
+      "expected_closing_cash": 150000
+    }
+  ],
+  "refund_case": {
+    "original_charge": 100000,
+    "original_payment": 100000,
+    "charge_credit": 10000,
+    "actual_refund": 10000,
+    "expected_refund_due_before_actual_refund": 10000,
+    "expected_balance_after_refund": 0
+  },
+  "partial_collection_case": {
+    "physical_quantity": 2,
+    "driver_collected": 1,
+    "shop_verified": 0,
+    "expected_remaining_at_customer": 1,
+    "expected_waiting_shop_check": 1
+  }
+}

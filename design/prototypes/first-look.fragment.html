@@ -1,0 +1,595 @@
+<div id="ski-first-look" lang="ko" data-screen="shop" aria-label="스키샵 매장과 차량 화면 시안">
+  <header class="ski-header">
+    <div class="ski-brand"><span class="ski-brandmark"><i data-lucide="mountain-snow" aria-hidden="true"></i></span><div><strong>우리 스키샵</strong><span>매장과 차량을 한눈에</span></div></div>
+    <nav class="ski-view-switch" aria-label="시안 기기 전환"><button type="button" data-view="shop" aria-pressed="true"><i data-lucide="monitor" aria-hidden="true"></i>매장 POS</button><button type="button" data-view="vehicle" aria-pressed="false"><i data-lucide="tablet" aria-hidden="true"></i>차량 태블릿</button></nav>
+    <span class="ski-demo">샘플 시안</span>
+  </header>
+  <div class="ski-content" id="ski-content"></div>
+  <div class="ski-notice" id="ski-notice" role="status" aria-live="polite" hidden></div>
+  <div class="ski-overlay" id="ski-overlay" hidden><section class="ski-dialog" role="dialog" aria-modal="true" aria-labelledby="ski-dialog-title"><div class="ski-dialog-head"><h2 id="ski-dialog-title"></h2><button type="button" class="ski-icon-button" data-action="close-dialog" aria-label="창 닫기"><i data-lucide="x" aria-hidden="true"></i></button></div><div id="ski-dialog-content"></div></section></div>
+</div>
+<style>
+#ski-first-look{--ski-accent:#0665ef;--ski-radius:18px;--ski-base:20px;--ski-ink:#182230;--ski-muted:#5f6b7b;--ski-line:#e0e5ed;--ski-bg:#f4f6fa;--ski-white:#fff;--ski-blue-soft:#edf4ff;--ski-orange:#a54d08;--ski-orange-soft:#fff2e4;--ski-green:#197451;--ski-green-soft:#e9f6ef;font-family:Pretendard,"Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;font-size:var(--ski-base);line-height:1.45;color:var(--ski-ink);background:var(--ski-bg);color-scheme:light;border:1px solid var(--ski-line);border-radius:22px;overflow:clip;position:relative;isolation:isolate}
+#ski-first-look *{box-sizing:border-box}
+#ski-first-look h1,#ski-first-look h2,#ski-first-look h3,#ski-first-look p{margin:0}
+#ski-first-look button,#ski-first-look input,#ski-first-look select{font:inherit}
+#ski-first-look button{cursor:pointer;-webkit-tap-highlight-color:transparent}
+#ski-first-look button:disabled{cursor:default;opacity:.5}
+#ski-first-look button:focus-visible,#ski-first-look input:focus-visible,#ski-first-look select:focus-visible{outline:3px solid #83b5ff;outline-offset:3px}
+#ski-first-look button{transition:background .15s,border-color .15s}
+#ski-first-look [hidden]{display:none!important}
+#ski-first-look svg{width:22px;height:22px;flex-shrink:0;stroke-width:1.8}
+#ski-first-look .ski-header{display:flex;align-items:center;gap:20px;flex-wrap:wrap;background:var(--ski-white);padding:20px 24px;border-bottom:1px solid var(--ski-line)}
+#ski-first-look .ski-brand{display:flex;align-items:center;gap:12px;flex:1;min-width:200px}
+#ski-first-look .ski-brandmark{width:46px;height:46px;border-radius:14px;display:grid;place-items:center;background:var(--ski-accent);color:white}
+#ski-first-look .ski-brandmark svg{width:29px;height:29px}
+#ski-first-look .ski-brand strong{display:block;font-size:21px;letter-spacing:-.7px}
+#ski-first-look .ski-brand span:not(.ski-brandmark){display:block;font-size:13px;color:var(--ski-muted);margin-top:2px}
+#ski-first-look .ski-view-switch{display:flex;gap:4px;padding:4px;border-radius:14px;background:#f0f3f7}
+#ski-first-look .ski-view-switch button{display:flex;align-items:center;justify-content:center;gap:8px;border:0;background:transparent;color:var(--ski-muted);border-radius:11px;padding:12px 18px;font-size:17px;font-weight:600;min-height:48px}
+#ski-first-look .ski-view-switch button[aria-pressed=true]{background:var(--ski-white);color:var(--ski-accent);box-shadow:0 2px 5px #1721320a}
+#ski-first-look .ski-demo{font-size:12px;font-weight:600;letter-spacing:.4px;color:var(--ski-muted);padding:5px 9px;border:1px solid var(--ski-line);border-radius:6px;white-space:nowrap}
+#ski-first-look .ski-content{padding:24px}
+#ski-first-look .ski-pagehead{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:24px}
+#ski-first-look .ski-eyebrow{color:var(--ski-muted);font-size:14px;display:block;margin-bottom:4px}
+#ski-first-look h1{font-size:28px;font-weight:750;letter-spacing:-1.1px}
+#ski-first-look h2{font-size:22px;font-weight:700;letter-spacing:-.6px}
+#ski-first-look h3{font-size:19px;font-weight:650;letter-spacing:-.4px}
+#ski-first-look .ski-secondary{color:var(--ski-muted);font-size:15px}
+#ski-first-look .ski-link-button{display:flex;align-items:center;gap:8px;padding:12px 15px;min-height:50px;border:1px solid var(--ski-line);border-radius:12px;background:white;color:var(--ski-ink);font-size:16px;font-weight:600}
+#ski-first-look .ski-grid-shop{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(320px,1fr);gap:22px;align-items:start}
+#ski-first-look .ski-sectionhead{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px}
+#ski-first-look .ski-days{padding:18px;background:var(--ski-white);border:1px solid var(--ski-line);border-radius:var(--ski-radius);margin-bottom:18px}
+#ski-first-look .ski-days-top{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:12px}
+#ski-first-look .ski-segment{display:flex;gap:6px;background:#edf0f5;padding:5px;border-radius:13px}
+#ski-first-look .ski-segment button{border:0;background:transparent;color:var(--ski-muted);border-radius:9px;min-height:50px;padding:9px 18px;font-size:18px;font-weight:600;flex:1;white-space:nowrap}
+#ski-first-look .ski-segment button[aria-pressed=true]{background:var(--ski-accent);color:white;box-shadow:0 2px 5px #0665ef1a}
+#ski-first-look .ski-period-note{display:flex;align-items:center;gap:8px;color:var(--ski-muted);font-size:14px;margin-top:11px}
+#ski-first-look .ski-period-note svg{width:16px;height:16px}
+#ski-first-look .ski-products{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+#ski-first-look .ski-product{background:var(--ski-white);border:1px solid var(--ski-line);border-radius:var(--ski-radius);padding:16px;min-width:0}
+#ski-first-look .ski-product.is-picked{border-color:#a8caff;box-shadow:inset 0 0 0 1px #d6e6ff}
+#ski-first-look .ski-product-title{display:flex;gap:9px;align-items:center;margin-bottom:3px;font-size:19px;font-weight:700;letter-spacing:-.5px}
+#ski-first-look .ski-product-title svg{width:23px;height:23px;color:#708195}
+#ski-first-look .ski-product-price{font-size:15px;color:var(--ski-muted);margin-bottom:13px;font-variant-numeric:tabular-nums}
+#ski-first-look .ski-stepper{display:flex;align-items:center;justify-content:space-between;gap:8px}
+#ski-first-look .ski-stepper button{width:52px;height:52px;border-radius:12px;border:1px solid var(--ski-line);background:#f7f9fc;color:var(--ski-ink);display:grid;place-items:center;flex-shrink:0}
+#ski-first-look .ski-stepper button:last-child{background:var(--ski-blue-soft);color:var(--ski-accent);border-color:#dce9ff}
+#ski-first-look .ski-stepper output{font-size:24px;font-weight:700;min-width:29px;text-align:center;font-variant-numeric:tabular-nums}
+#ski-first-look .ski-summary{background:white;border:1px solid var(--ski-line);border-radius:var(--ski-radius);overflow:clip}
+#ski-first-look .ski-summary-section{padding:20px;border-bottom:1px solid var(--ski-line)}
+#ski-first-look .ski-summary-section:last-child{border:0}
+#ski-first-look .ski-fields{display:grid;grid-template-columns:1fr;gap:12px;margin-top:16px}
+#ski-first-look .ski-field{display:block;font-size:15px;color:var(--ski-muted)}
+#ski-first-look .ski-field input,#ski-first-look .ski-field select{display:block;width:100%;min-width:0;border:1px solid var(--ski-line);border-radius:11px;background:white;color:var(--ski-ink);padding:12px;margin-top:6px;font-size:18px;min-height:50px}
+#ski-first-look .ski-field-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.3fr);gap:10px}
+#ski-first-look .ski-receipt{display:grid;gap:13px;margin-top:18px}
+#ski-first-look .ski-receipt-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px 12px;align-items:center;font-size:17px}
+#ski-first-look .ski-receipt-row small{grid-column:1/-1;color:var(--ski-muted);font-size:14px}
+#ski-first-look .ski-receipt-row strong{font-size:18px;font-weight:650;font-variant-numeric:tabular-nums}
+#ski-first-look .ski-actual{display:flex;gap:8px;align-items:start;padding:12px;background:#f2f7ff;color:#285793;border-radius:10px;font-size:14px;margin-top:16px}
+#ski-first-look .ski-actual svg{width:17px;height:17px;margin-top:1px}
+#ski-first-look .ski-discount{display:flex;justify-content:space-between;gap:16px;align-items:center;font-size:16px;margin-bottom:16px}
+#ski-first-look .ski-discount label{display:flex;align-items:center;gap:7px;min-width:0;color:var(--ski-muted)}
+#ski-first-look .ski-discount input{width:110px;min-width:60px;text-align:right;font-size:18px;border:1px solid var(--ski-line);border-radius:9px;padding:9px;color:var(--ski-ink);min-height:46px}
+#ski-first-look .ski-total{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:19px}
+#ski-first-look .ski-total strong{font-size:31px;color:var(--ski-accent);letter-spacing:-.7px;font-variant-numeric:tabular-nums}
+#ski-first-look .ski-primary,#ski-first-look .ski-secondary-button{display:flex;justify-content:center;align-items:center;gap:9px;min-height:60px;padding:13px 18px;border-radius:12px;font-size:19px;font-weight:650;border:1px solid var(--ski-accent);background:var(--ski-accent);color:white;width:100%}
+#ski-first-look .ski-secondary-button{background:white;color:var(--ski-ink);border-color:var(--ski-line)}
+#ski-first-look .ski-button-stack{display:grid;gap:10px}
+#ski-first-look .ski-done-strip{padding:14px;background:var(--ski-green-soft);color:var(--ski-green);border:1px solid #c5e6d4;border-radius:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:18px;font-size:16px}
+#ski-first-look .ski-done-strip button{margin-left:auto;border:0;background:transparent;color:var(--ski-green);font-size:16px;font-weight:650;min-height:44px}
+#ski-first-look .ski-vehicle-head .ski-segment{min-width:238px}
+#ski-first-look .ski-vehicle-tools{display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap;margin-bottom:20px}
+#ski-first-look .ski-filter{display:flex;gap:7px;flex-wrap:wrap}
+#ski-first-look .ski-filter button{background:white;color:var(--ski-muted);border:1px solid var(--ski-line);border-radius:11px;padding:11px 15px;font-size:16px;min-height:46px;font-weight:600}
+#ski-first-look .ski-filter button[aria-pressed=true]{background:#1e2c42;border-color:#1e2c42;color:white}
+#ski-first-look .ski-sort{border:1px solid var(--ski-line);border-radius:10px;min-height:46px;padding:9px 12px;background:white;color:var(--ski-ink);font-size:16px;max-width:100%}
+#ski-first-look .ski-vehicle-grid{display:grid;grid-template-columns:280px minmax(0,1fr);gap:20px;align-items:start}
+#ski-first-look .ski-vehicle-grid.is-simple{grid-template-columns:minmax(0,1fr)}
+#ski-first-look .ski-job-list{display:grid;gap:11px}
+#ski-first-look .ski-job-item{width:100%;text-align:left;border:1px solid var(--ski-line);background:white;border-radius:15px;padding:16px;color:var(--ski-ink);min-height:128px}
+#ski-first-look .ski-job-item.is-selected{border-color:var(--ski-accent);box-shadow:inset 0 0 0 1px var(--ski-accent);background:#f6f9ff}
+#ski-first-look .ski-job-item.is-urgent{border-color:#edb06e;background:#fff9f1}
+#ski-first-look .ski-job-meta{display:flex;align-items:center;gap:8px;justify-content:space-between;margin-bottom:8px}
+#ski-first-look .ski-job-item strong{display:block;font-size:21px;letter-spacing:-.5px;margin-bottom:4px}
+#ski-first-look .ski-job-item p{font-size:15px;color:var(--ski-muted)}
+#ski-first-look .ski-badge{display:inline-flex;align-items:center;gap:6px;min-height:29px;border-radius:7px;padding:4px 9px;font-size:14px;font-weight:650;white-space:nowrap;background:var(--ski-blue-soft);color:#155fba}
+#ski-first-look .ski-badge.return{background:var(--ski-orange-soft);color:var(--ski-orange)}
+#ski-first-look .ski-badge.done{background:var(--ski-green-soft);color:var(--ski-green)}
+#ski-first-look .ski-badge.neutral{background:#eef1f5;color:var(--ski-muted)}
+#ski-first-look .ski-job-time{font-size:19px;font-weight:700;font-variant-numeric:tabular-nums}
+#ski-first-look .ski-visit{background:white;border:1px solid var(--ski-line);border-radius:20px;overflow:clip}
+#ski-first-look .ski-priority{padding:13px 22px;background:var(--ski-orange-soft);border-bottom:1px solid #f3d9bd;color:var(--ski-orange);display:flex;align-items:center;justify-content:space-between;gap:12px;font-size:16px;font-weight:600}
+#ski-first-look .ski-priority span{display:flex;align-items:center;gap:9px}
+#ski-first-look .ski-priority button{padding:9px 15px;min-height:44px;background:white;border:1px solid #e7c49d;border-radius:10px;color:var(--ski-orange);font-size:16px;font-weight:650;white-space:nowrap}
+#ski-first-look .ski-visit-inner{padding:28px}
+#ski-first-look .ski-visit-top{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:22px}
+#ski-first-look .ski-arrival{font-size:20px;color:var(--ski-muted)}
+#ski-first-look .ski-arrival strong{font-size:30px;color:var(--ski-ink);font-weight:750;letter-spacing:-.8px;margin-left:8px;font-variant-numeric:tabular-nums}
+#ski-first-look .ski-place{font-size:40px;font-weight:750;letter-spacing:-1.6px;line-height:1.2;margin-bottom:12px;overflow-wrap:anywhere}
+#ski-first-look .ski-location-detail{display:flex;gap:7px;align-items:center;font-size:17px;color:var(--ski-muted)}
+#ski-first-look .ski-customer{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:22px 0;margin-top:12px;border-bottom:1px solid var(--ski-line)}
+#ski-first-look .ski-customer strong{font-size:24px}
+#ski-first-look .ski-customer span{font-size:17px;color:var(--ski-muted)}
+#ski-first-look .ski-equipment{display:flex;gap:10px;flex-wrap:wrap;margin:22px 0}
+#ski-first-look .ski-equipment span{padding:13px 16px;display:flex;align-items:center;gap:14px;background:#f2f5f9;border:1px solid #e8ecf2;border-radius:12px;font-size:20px}
+#ski-first-look .ski-equipment strong{font-size:25px;font-variant-numeric:tabular-nums}
+#ski-first-look .ski-actions{display:grid;grid-template-columns:1fr 1.35fr;gap:12px;margin-top:24px}
+#ski-first-look .ski-actions .ski-primary,#ski-first-look .ski-actions .ski-secondary-button{min-height:68px;font-size:21px}
+#ski-first-look .ski-complete{grid-column:1/-1;background:#15334a;border-color:#15334a;min-height:72px!important}
+#ski-first-look .ski-status-message{padding:16px;border-radius:12px;background:var(--ski-green-soft);color:var(--ski-green);display:flex;gap:10px;align-items:start;margin-top:20px;font-size:18px}
+#ski-first-look .ski-next{margin-top:18px;display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;border:1px solid var(--ski-line);border-radius:15px;background:white;padding:16px 22px;font-size:17px}
+#ski-first-look .ski-next small{color:var(--ski-muted);font-size:14px;display:block;margin-bottom:4px}
+#ski-first-look .ski-next button{border:1px solid var(--ski-line);border-radius:10px;background:#f7f9fc;color:var(--ski-ink);padding:12px 16px;min-height:48px;font-size:17px;display:flex;align-items:center;gap:8px}
+#ski-first-look .ski-notice{background:#182b41;color:white;border-radius:12px;padding:15px 18px;margin:0 24px 24px;font-size:17px;display:flex;gap:10px;align-items:center}
+#ski-first-look .ski-overlay{position:absolute;inset:0;z-index:5;background:#18223066;display:flex;align-items:flex-start;justify-content:center;padding:90px 22px 22px;backdrop-filter:blur(3px)}
+#ski-first-look .ski-dialog{width:100%;max-width:610px;background:white;border:1px solid var(--ski-line);border-radius:22px;box-shadow:0 20px 60px #15213233;padding:24px;align-self:flex-start;min-width:0}
+#ski-first-look .ski-dialog-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:24px}
+#ski-first-look .ski-icon-button{width:44px;height:44px;flex-shrink:0;border:1px solid var(--ski-line);background:white;border-radius:10px;display:grid;place-items:center;color:var(--ski-muted)}
+#ski-first-look .ski-message-preview{background:#f0f4fa;border-radius:16px;padding:20px;font-size:20px;line-height:1.65;margin:20px 0}
+#ski-first-look .ski-dialog .ski-primary{margin-top:20px}
+#ski-first-look .ski-dialog-note{font-size:14px;color:var(--ski-muted);margin-top:12px}
+#ski-first-look .ski-phone-number{font-size:30px;font-weight:700;letter-spacing:-.6px;margin:16px 0;overflow-wrap:anywhere}
+#ski-first-look .ski-board-list{display:grid;gap:12px}
+#ski-first-look .ski-board-row{padding:15px;border:1px solid var(--ski-line);border-radius:12px}
+#ski-first-look .ski-board-row-head{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:8px}
+#ski-first-look .ski-board-row p{font-size:16px;color:var(--ski-muted);margin:7px 0 12px}
+#ski-first-look .ski-board-row button{min-height:44px;padding:10px 15px;font-size:16px;background:#f2f6fc;border:1px solid var(--ski-line);border-radius:9px;color:var(--ski-ink)}
+#ski-first-look .ski-board-row button+button{margin-left:7px}
+#ski-first-look .ski-empty{padding:36px 20px;text-align:center;color:var(--ski-muted);font-size:18px;background:white;border:1px solid var(--ski-line);border-radius:15px}
+#ski-first-look .ski-datesort{display:flex;gap:8px;flex-wrap:wrap}
+@media(min-width:850px){#ski-first-look .ski-vehicle-head{margin-bottom:16px}#ski-first-look .ski-vehicle-tools{margin-bottom:16px}#ski-first-look .ski-visit-inner{padding:22px}#ski-first-look .ski-actions{grid-template-columns:1fr 1.2fr 1.3fr;margin-top:16px}#ski-first-look .ski-actions .ski-complete{grid-column:auto;min-height:68px!important}#ski-first-look .is-simple .ski-visit-inner{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);column-gap:24px;grid-template-areas:"meta meta" "place customer" "detail customer" "equipment equipment" "sms sms" "actions actions"}#ski-first-look .is-simple .ski-visit-top{grid-area:meta;margin-bottom:18px}#ski-first-look .is-simple .ski-place{grid-area:place;font-size:44px;margin:0 0 9px}#ski-first-look .is-simple .ski-location-detail{grid-area:detail;align-self:start}#ski-first-look .is-simple .ski-customer{grid-area:customer;display:flex;flex-direction:column;align-items:flex-start;justify-content:center;padding:8px 0 8px 24px;margin:0;border:0;border-left:1px solid var(--ski-line);gap:6px}#ski-first-look .is-simple .ski-equipment{grid-area:equipment;margin:22px 0 0}#ski-first-look .is-simple .ski-actions{grid-area:actions;margin-top:22px}#ski-first-look .is-simple .ski-status-message{grid-area:actions}#ski-first-look .is-simple .ski-visit-inner>p{grid-area:sms;margin-top:12px}#ski-first-look .is-simple .ski-priority{padding:10px 22px}#ski-first-look .is-simple .ski-next{margin-top:14px;padding:13px 20px}}
+@media(min-width:1200px){#ski-first-look .ski-products{grid-template-columns:repeat(3,minmax(0,1fr))}#ski-first-look .ski-grid-shop{grid-template-columns:minmax(0,1.65fr) minmax(350px,1fr)}}
+@media(max-width:800px){#ski-first-look .ski-header{gap:14px;padding:17px 18px}#ski-first-look .ski-demo{display:none}#ski-first-look .ski-content{padding:18px}#ski-first-look .ski-grid-shop{grid-template-columns:minmax(0,1fr)}#ski-first-look .ski-products{grid-template-columns:repeat(3,minmax(0,1fr))}#ski-first-look .ski-vehicle-grid{grid-template-columns:230px minmax(0,1fr);gap:14px}#ski-first-look .ski-visit-inner{padding:20px}#ski-first-look .ski-place{font-size:34px}#ski-first-look .ski-arrival strong{font-size:26px}#ski-first-look .ski-actions{grid-template-columns:1fr}#ski-first-look .ski-priority{padding:12px 16px;flex-wrap:wrap}#ski-first-look .ski-overlay{padding:80px 16px 16px}}
+@media(max-width:600px){#ski-first-look .ski-header{padding:16px;gap:16px}#ski-first-look .ski-view-switch{width:100%}#ski-first-look .ski-view-switch button{flex:1;padding:11px 10px}#ski-first-look .ski-content{padding:16px}#ski-first-look .ski-pagehead{margin-bottom:18px}#ski-first-look .ski-products{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}#ski-first-look .ski-product{padding:12px}#ski-first-look .ski-product-title{font-size:18px;gap:6px}#ski-first-look .ski-product-title svg{width:19px;height:19px}#ski-first-look .ski-stepper button{width:44px;height:48px}#ski-first-look .ski-product-price{font-size:13px}#ski-first-look .ski-stepper output{font-size:22px}#ski-first-look .ski-vehicle-grid{grid-template-columns:minmax(0,1fr)}#ski-first-look .ski-job-list{grid-template-columns:1fr 1fr}#ski-first-look .ski-job-item{padding:12px;min-height:120px}#ski-first-look .ski-job-item strong{font-size:18px}#ski-first-look .ski-job-item p{font-size:14px}#ski-first-look .ski-job-meta{flex-wrap:wrap}#ski-first-look .ski-vehicle-head .ski-segment{width:100%}#ski-first-look .ski-visit-inner{padding:20px}#ski-first-look .ski-place{font-size:34px}#ski-first-look .ski-arrival{font-size:17px}#ski-first-look .ski-arrival strong{font-size:27px}#ski-first-look .ski-equipment{gap:8px}#ski-first-look .ski-equipment span{font-size:18px;padding:11px 12px}#ski-first-look .ski-customer{padding:18px 0}#ski-first-look .ski-field-row{grid-template-columns:minmax(0,1fr)}#ski-first-look .ski-overlay{padding:100px 10px 10px}#ski-first-look .ski-dialog{padding:18px}#ski-first-look .ski-days{padding:14px}#ski-first-look .ski-segment button{padding:9px 12px}#ski-first-look .ski-total strong{font-size:29px}#ski-first-look .ski-notice{margin:0 16px 16px}#ski-first-look h1{font-size:25px}}
+@media(min-width:850px){#ski-first-look .ski-vehicle-grid:not(.is-simple) .ski-customer{padding:14px 0;margin-top:8px}#ski-first-look .ski-vehicle-grid:not(.is-simple) .ski-equipment{margin:16px 0}#ski-first-look .ski-vehicle-grid:not(.is-simple) .ski-visit-top{margin-bottom:14px}}
+@media(max-width:420px){#ski-first-look .ski-products{grid-template-columns:minmax(0,1fr)}#ski-first-look .ski-days-top{flex-wrap:wrap}#ski-first-look .ski-job-list{grid-template-columns:minmax(0,1fr)}#ski-first-look .ski-summary-section{padding:16px}}
+@media(prefers-reduced-motion:reduce){#ski-first-look button{transition:none}}
+#ski-first-look[data-screen=shop]{--ski-accent:var(--ski-shop-accent,#c54b15);--ski-bg:#f5f5f4;--ski-blue-soft:#fff0e7;--ski-radius:var(--ski-shop-radius,12px);border-radius:14px}
+#ski-first-look[data-screen=shop] .ski-header{padding:14px 22px}
+#ski-first-look[data-screen=shop] .ski-content{padding:20px}
+#ski-first-look[data-screen=shop] .ski-pagehead{margin-bottom:18px}
+#ski-first-look[data-screen=shop] .ski-product.is-picked{border-color:#eaa580;box-shadow:none;background:#fffaf7}
+#ski-first-look[data-screen=shop] .ski-product-title{flex-wrap:wrap;font-size:18px}
+#ski-first-look[data-screen=shop] .ski-product-price{font-size:14px}
+#ski-first-look[data-screen=shop] .ski-stepper button:last-child{border-color:#f4d6c4}
+#ski-first-look[data-screen=shop] .ski-actual{background:#f7f5f2;color:#615340}
+#ski-first-look[data-screen=shop] .ski-badge:not(.return):not(.done):not(.neutral){background:#edf4ff;color:#155fba}
+#ski-first-look .ski-pos-layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:18px;align-items:start}
+#ski-first-look .ski-pos-catalog{min-width:0}
+#ski-first-look .ski-pos-customer{min-width:0;background:white;border:1px solid var(--ski-line);border-radius:var(--ski-radius);padding:20px}
+#ski-first-look .ski-pos-customer h2{font-size:21px}
+#ski-first-look .ski-pos-checkout{grid-column:2;grid-row:1/span 2;min-width:0}
+#ski-first-look .ski-pos-catalog .ski-days{padding:15px}
+#ski-first-look .ski-pos-catalog .ski-products{grid-template-columns:repeat(2,minmax(0,1fr))}
+#ski-first-look .ski-pos-catalog .ski-product{padding:13px}
+#ski-first-look .ski-pos-catalog .ski-stepper button{width:46px;height:46px}
+#ski-first-look .ski-pos-catalog .ski-sectionhead{margin-bottom:12px}
+#ski-first-look .ski-pos-customer .ski-field-row{grid-template-columns:minmax(0,1fr)}
+#ski-first-look .ski-return-section{margin-top:18px;padding-top:18px;border-top:1px solid var(--ski-line)}
+#ski-first-look .ski-return-heading{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:10px}
+#ski-first-look .ski-return-heading h3{font-size:19px}
+#ski-first-look .ski-setting-button{border:0;background:transparent;color:var(--ski-muted);font-size:14px;min-height:44px;padding:6px;display:flex;align-items:center;gap:5px}
+#ski-first-look .ski-setting-button svg{width:17px;height:17px}
+#ski-first-look .ski-return-options{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+#ski-first-look .ski-return-options button{min-height:62px;padding:10px 8px;border:1px solid var(--ski-line);border-radius:10px;background:white;color:var(--ski-ink);font-size:17px;font-weight:600}
+#ski-first-look .ski-return-options button[aria-pressed=true]{background:var(--ski-accent);border-color:var(--ski-accent);color:white}
+#ski-first-look .ski-return-result{margin-top:12px;background:#f8f4ef;border-radius:10px;padding:12px;display:grid;gap:4px}
+#ski-first-look .ski-return-result strong{font-size:19px}
+#ski-first-look .ski-return-result span{font-size:14px;color:var(--ski-muted)}
+#ski-first-look .ski-return-error{font-size:15px;color:#a7261e;margin-top:10px}
+#ski-first-look .ski-manual-fields{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:8px;margin-top:12px}
+#ski-first-look .ski-manual-fields input{padding:10px;font-size:16px}
+#ski-first-look .ski-pos-period{font-size:14px;color:var(--ski-muted);margin-top:12px}
+#ski-first-look .ski-quote-schedule{padding:12px 0;border-bottom:1px solid var(--ski-line);font-size:16px;line-height:1.6}
+#ski-first-look .ski-board-schedule{display:block;font-size:16px;color:var(--ski-muted);margin:8px 0}
+#ski-first-look[data-screen=vehicle]{--ski-accent:#6941d9;--ski-ink:#292239;--ski-muted:#6a6179;--ski-line:#e5dff0;--ski-bg:#f5f2fc;--ski-radius:24px;border-radius:28px}
+#ski-first-look[data-screen=vehicle] .ski-header{background:#fff;border-bottom-color:#ede6f7;padding:14px 24px}
+#ski-first-look[data-screen=vehicle] .ski-brandmark{border-radius:50%;background:#efe8ff;color:#6941d9}
+#ski-first-look[data-screen=vehicle] .ski-view-switch{background:#f3effa;border-radius:24px}
+#ski-first-look[data-screen=vehicle] .ski-view-switch button{border-radius:20px}
+#ski-first-look[data-screen=vehicle] .ski-content{padding:20px 24px 24px}
+#ski-first-look[data-screen=vehicle] .ski-vehicle-head{background:#6941d9;color:#fff;border-radius:22px;padding:18px 22px;margin-bottom:16px}
+#ski-first-look[data-screen=vehicle] .ski-vehicle-head .ski-eyebrow{color:#eee6ff;font-size:15px}
+#ski-first-look[data-screen=vehicle] .ski-vehicle-head h1{font-size:30px}
+#ski-first-look[data-screen=vehicle] .ski-vehicle-head .ski-segment{background:#5530ba;border-radius:18px}
+#ski-first-look[data-screen=vehicle] .ski-vehicle-head .ski-segment button{color:#fff;min-height:54px;border-radius:14px;font-size:19px}
+#ski-first-look[data-screen=vehicle] .ski-vehicle-head .ski-segment button[aria-pressed=true]{background:white;color:#5830c2}
+#ski-first-look[data-screen=vehicle] .ski-filter button{border-radius:24px;min-height:50px;font-size:18px;padding:10px 19px}
+#ski-first-look[data-screen=vehicle] .ski-filter button[aria-pressed=true]{background:#302642;border-color:#302642}
+#ski-first-look[data-screen=vehicle] .ski-sort{min-height:50px;border-radius:14px;font-size:17px}
+#ski-first-look[data-screen=vehicle] .ski-job-list{position:relative;gap:10px}
+#ski-first-look[data-screen=vehicle] .ski-job-item{border-radius:18px;border-left:5px solid #dbd0ef;padding:14px 16px;min-height:130px}
+#ski-first-look[data-screen=vehicle] .ski-job-item.is-selected{border-color:#8c6bd4;background:#f0e9ff;box-shadow:none}
+#ski-first-look[data-screen=vehicle] .ski-job-item.is-urgent{border-left-color:#d58a23;background:#fff8ee}
+#ski-first-look[data-screen=vehicle] .ski-job-item.is-selected.is-urgent{box-shadow:inset 0 0 0 1px #8c6bd4}
+#ski-first-look .ski-job-slot{display:block;color:var(--ski-muted);font-size:15px;margin:5px 0}
+#ski-first-look[data-screen=vehicle] .ski-visit{border:0;border-radius:24px;box-shadow:0 4px 18px #43267808}
+#ski-first-look[data-screen=vehicle] .ski-visit-inner{padding:24px}
+#ski-first-look[data-screen=vehicle] .ski-arrival{display:grid;text-align:right;gap:3px;font-size:16px}
+#ski-first-look[data-screen=vehicle] .ski-arrival strong{font-size:27px;margin:0;line-height:1.2;color:#5830c2}
+#ski-first-look[data-screen=vehicle] .ski-arrival small{font-size:15px;color:var(--ski-muted)}
+#ski-first-look[data-screen=vehicle] .ski-equipment span{border:0;background:#f4f0fb;border-radius:16px;padding:13px 18px}
+#ski-first-look[data-screen=vehicle] .ski-actions button{border-radius:18px;min-height:72px;font-size:22px}
+#ski-first-look[data-screen=vehicle] .ski-actions .ski-complete{min-height:72px!important;background:#6941d9;border-color:#6941d9}
+#ski-first-look[data-screen=vehicle] .ski-next{background:transparent;border:1px dashed #cfc2e5;border-radius:18px}
+#ski-first-look[data-screen=vehicle] .ski-next small{color:#6a6179}
+#ski-first-look[data-screen=vehicle] .ski-dialog{border-radius:26px}
+@media(min-width:1100px){#ski-first-look .ski-pos-layout{grid-template-columns:minmax(270px,1.1fr) minmax(290px,1fr) minmax(270px,.95fr)}#ski-first-look .ski-pos-checkout{grid-column:auto;grid-row:auto}#ski-first-look .ski-pos-customer{grid-column:auto;grid-row:auto}#ski-first-look .ski-pos-catalog .ski-products{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:800px){#ski-first-look .ski-pos-layout{grid-template-columns:minmax(0,1fr)}#ski-first-look .ski-pos-checkout{grid-column:auto;grid-row:auto}#ski-first-look .ski-pos-catalog .ski-products{grid-template-columns:repeat(3,minmax(0,1fr))}#ski-first-look .ski-pos-customer .ski-field-row{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}#ski-first-look[data-screen=vehicle] .ski-vehicle-head{padding:18px}#ski-first-look[data-screen=vehicle] .ski-content{padding:18px}#ski-first-look[data-screen=vehicle] .ski-visit-inner{padding:20px}}
+@media(max-width:600px){#ski-first-look .ski-pos-catalog .ski-products{grid-template-columns:repeat(2,minmax(0,1fr))}#ski-first-look .ski-pos-customer .ski-field-row{grid-template-columns:minmax(0,1fr)}#ski-first-look[data-screen=vehicle] .ski-header{padding:16px}#ski-first-look[data-screen=vehicle] .ski-content{padding:14px}#ski-first-look[data-screen=vehicle] .ski-arrival strong{font-size:23px}#ski-first-look[data-screen=vehicle] .ski-vehicle-head .ski-segment{min-width:0}#ski-first-look[data-screen=vehicle] .ski-filter button{font-size:16px;padding:9px 14px}#ski-first-look .ski-manual-fields{grid-template-columns:minmax(0,1fr)}}
+@media(max-width:420px){#ski-first-look .ski-pos-catalog .ski-products{grid-template-columns:minmax(0,1fr)}#ski-first-look .ski-return-options{grid-template-columns:minmax(0,1fr)}#ski-first-look .ski-pos-customer{padding:16px}}
+#ski-first-look .ski-overlay{position:relative;inset:auto;padding:24px;background:#e9e6ee;backdrop-filter:none}
+#ski-first-look .ski-board-row button{margin-top:6px}
+@media(min-width:850px){#ski-first-look[data-screen=vehicle] .ski-header{padding:8px 24px}#ski-first-look[data-screen=vehicle] .ski-vehicle-head{padding:12px 22px}#ski-first-look[data-screen=vehicle] .ski-visit-inner{padding:20px}#ski-first-look[data-screen=vehicle] .ski-priority{padding:6px 20px;font-size:15px}#ski-first-look[data-screen=vehicle] .ski-visit-top{margin-bottom:12px}#ski-first-look[data-screen=vehicle] .is-simple .ski-equipment{margin-top:16px}#ski-first-look[data-screen=vehicle] .is-simple .ski-actions{margin-top:16px}#ski-first-look[data-screen=vehicle] .is-simple .ski-next{padding:9px 18px;margin-top:10px}#ski-first-look[data-screen=shop] .ski-header{padding:10px 22px}#ski-first-look[data-screen=shop] .ski-product{padding:10px}#ski-first-look[data-screen=shop] .ski-product-price{margin-bottom:8px}#ski-first-look[data-screen=shop] .ski-product-title{margin-bottom:0}#ski-first-look[data-screen=shop] .ski-products{gap:10px}}
+@media(min-width:1200px){#ski-first-look .ski-pos-customer .ski-field-row{grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr)}}
+@media(min-width:1300px){#ski-first-look .ski-pos-catalog .ski-products{grid-template-columns:repeat(3,minmax(0,1fr))}#ski-first-look .ski-pos-catalog .ski-product-title{flex-direction:column;align-items:flex-start;justify-content:flex-start;gap:3px;min-height:52px}#ski-first-look .ski-pos-catalog .ski-product-title svg{width:20px;height:20px}#ski-first-look .ski-pos-catalog .ski-stepper{gap:4px}#ski-first-look .ski-pos-catalog .ski-stepper button{width:44px}#ski-first-look .ski-pos-catalog .ski-stepper output{min-width:20px;font-size:22px}}
+@media(min-width:1100px){#ski-first-look[data-screen=shop] .ski-header{padding:6px 22px}#ski-first-look[data-screen=shop] .ski-content{padding:16px 20px}#ski-first-look[data-screen=shop] .ski-pagehead{margin-bottom:14px}}
+@media(max-width:600px){#ski-first-look .ski-overlay{padding:16px}}
+#ski-first-look .ski-period-dates{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
+#ski-first-look .ski-period-dates input{font-size:16px;padding:10px;min-height:48px}
+#ski-first-look .ski-item-discount{border:0;border-radius:6px;background:#fff0e7;color:#9c431b;font-size:14px;min-height:36px;padding:6px 10px;justify-self:start}
+#ski-first-look .ski-discount-heading{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
+#ski-first-look .ski-discount-presets{display:flex;flex-wrap:wrap;gap:7px;margin:12px 0}
+#ski-first-look .ski-discount-presets button{background:white;border:1px solid #e7cbb8;color:#874424;border-radius:9px;padding:9px 11px;min-height:44px;font-size:15px;overflow-wrap:anywhere;max-width:100%}
+#ski-first-look .ski-discount-presets button[aria-pressed=true]{background:#fff0e7;border-color:#c54b15}
+#ski-first-look .ski-discount-note{font-size:13px;color:var(--ski-muted);margin:8px 0}
+#ski-first-look .ski-discount-total{display:flex;justify-content:space-between;gap:12px;font-size:16px;margin:14px 0 18px;color:#a54720}
+#ski-first-look .ski-discount-inputs{margin:18px 0;grid-template-columns:1fr 1fr}
+#ski-first-look .ski-register-discount{margin-top:18px}
+#ski-first-look .ski-dialog-actions{display:grid;grid-template-columns:1fr 1.3fr;gap:10px;margin-top:20px}
+#ski-first-look .ski-dialog-actions .ski-primary{margin:0}
+#ski-first-look .ski-customer-results{display:grid;gap:8px;margin:18px 0}
+#ski-first-look .ski-customer-row{width:100%;text-align:left;display:flex;align-items:center;justify-content:space-between;gap:12px;background:white;border:1px solid var(--ski-line);border-radius:12px;padding:15px;color:var(--ski-ink)}
+#ski-first-look .ski-customer-row strong{font-size:22px;display:block}
+#ski-first-look .ski-customer-row small{font-size:16px;color:var(--ski-muted);display:block;margin-top:3px}
+#ski-first-look .ski-customer-row>span:last-child{display:flex;align-items:center;gap:5px;font-size:16px;white-space:nowrap}
+#ski-first-look .ski-customer-profile{display:grid;gap:8px;margin-bottom:24px}
+#ski-first-look .ski-customer-profile h3{font-size:28px}
+#ski-first-look .ski-customer-history{display:grid;gap:10px;margin-top:12px}
+#ski-first-look .ski-customer-history article{padding:15px;border:1px solid var(--ski-line);border-radius:10px}
+#ski-first-look .ski-customer-history article>div{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;font-size:16px}
+#ski-first-look .ski-customer-history p{font-size:18px;margin-top:10px}
+#ski-first-look .ski-item-discount{min-height:44px;font-size:15px}
+#ski-first-look .ski-customer-row>span:first-child{min-width:0;overflow-wrap:anywhere}
+#ski-first-look .ski-customer-profile{overflow-wrap:anywhere}
+#ski-first-look .ski-total{flex-wrap:wrap}
+#ski-first-look .ski-discount-applied{font-size:16px;line-height:1.6;color:var(--ski-muted);margin:10px 0;overflow-wrap:anywhere}
+#ski-first-look .ski-discount-undo{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 18px}
+#ski-first-look .ski-discount-undo button{min-height:44px;font-size:15px;padding:8px 12px;background:#f5f5f4;border:1px solid var(--ski-line);border-radius:8px;color:var(--ski-muted)}
+#ski-first-look .ski-discount-presets button{font-size:17px;min-height:52px}
+@media(max-width:600px){#ski-first-look .ski-period-dates{grid-template-columns:minmax(0,1fr)}#ski-first-look .ski-dialog-actions{grid-template-columns:minmax(0,1fr)}#ski-first-look .ski-discount-inputs{grid-template-columns:minmax(0,1fr)}}
+/* Trim vertical whitespace in the POS; preserve type sizes and touch targets. */
+#ski-first-look[data-screen=shop] .ski-days{margin-bottom:14px;padding-top:12px;padding-bottom:12px}
+#ski-first-look[data-screen=shop] .ski-days-top{margin-bottom:8px}
+#ski-first-look[data-screen=shop] .ski-period-dates{margin-top:9px}
+#ski-first-look[data-screen=shop] .ski-pos-period{margin-top:9px}
+#ski-first-look[data-screen=shop] .ski-pos-customer{padding-top:16px;padding-bottom:16px}
+#ski-first-look[data-screen=shop] .ski-sectionhead{margin-bottom:10px}
+#ski-first-look[data-screen=shop] .ski-fields{margin-top:12px;gap:10px}
+#ski-first-look[data-screen=shop] .ski-return-section{margin-top:14px;padding-top:14px}
+#ski-first-look[data-screen=shop] .ski-summary-section{padding-top:16px;padding-bottom:16px}
+#ski-first-look[data-screen=shop] .ski-receipt{margin-top:12px;gap:10px}
+#ski-first-look[data-screen=shop] .ski-actual{margin-top:12px;padding-top:10px;padding-bottom:10px}
+#ski-first-look[data-screen=shop] .ski-discount-presets{margin:10px 0}
+#ski-first-look[data-screen=shop] .ski-discount-applied{margin:8px 0}
+#ski-first-look[data-screen=shop] .ski-discount-undo{margin:8px 0 12px}
+#ski-first-look[data-screen=shop] .ski-discount{margin-bottom:12px}
+#ski-first-look[data-screen=shop] .ski-discount-total{margin:10px 0 14px}
+#ski-first-look[data-screen=shop] .ski-total{margin-bottom:14px}
+#ski-first-look .ski-lift-heading{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
+#ski-first-look .ski-lift-heading h2{font-size:21px}
+#ski-first-look .ski-lift-heading .ski-setting-button{color:#98551d}
+#ski-first-look .ski-ticket-receipt{border-top:1px solid var(--ski-line);padding-top:10px;margin-top:12px;display:grid;gap:8px}
+#ski-first-look .ski-ticket-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:3px 8px;width:100%;text-align:left;background:transparent;color:var(--ski-ink);border:0;padding:4px 0;min-height:48px;font-size:16px;align-items:center}
+#ski-first-look .ski-ticket-row strong{font-size:18px;font-variant-numeric:tabular-nums}
+#ski-first-look .ski-ticket-row small{grid-column:1/-1;font-size:14px;color:var(--ski-muted);overflow-wrap:anywhere}
+#ski-first-look .ski-ticket-row span{min-width:0;overflow-wrap:anywhere}
+#ski-first-look .ski-ticket-filters{margin:12px 0;display:flex;gap:7px;flex-wrap:wrap}
+#ski-first-look .ski-ticket-filters button{min-height:44px;border:1px solid var(--ski-line);border-radius:9px;background:white;color:var(--ski-muted);padding:8px 13px;font-size:16px}
+#ski-first-look .ski-ticket-filters button[aria-pressed=true]{color:#874424;border-color:#c54b15;background:#fff0e7}
+#ski-first-look .ski-ticket-count{display:flex;justify-content:space-between;gap:12px;font-size:15px;color:var(--ski-muted);margin:10px 0}
+#ski-first-look .ski-ticket-option{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:12px 0;border-bottom:1px solid var(--ski-line)}
+#ski-first-look .ski-ticket-option>div:first-child{min-width:0}
+#ski-first-look .ski-ticket-option h3{font-size:19px;overflow-wrap:anywhere}
+#ski-first-look .ski-ticket-option p{font-size:16px;color:var(--ski-muted);margin-top:3px}
+#ski-first-look .ski-ticket-option .ski-stepper{flex-shrink:0}
+#ski-first-look .ski-ticket-option .ski-stepper button{width:46px;height:46px}
+#ski-first-look .ski-ticket-pagination{display:flex;align-items:center;justify-content:center;gap:14px;margin:12px 0;font-size:16px}
+#ski-first-look .ski-ticket-pagination button{min-height:44px;padding:8px 14px;border:1px solid var(--ski-line);border-radius:9px;background:white;color:var(--ski-ink);font-size:16px}
+#ski-first-look .ski-ticket-options{display:grid;gap:0 24px}
+@media(max-width:420px){#ski-first-look .ski-lift-launcher{grid-column:auto}#ski-first-look .ski-ticket-controls{grid-template-columns:minmax(0,1fr)}#ski-first-look .ski-ticket-option{flex-wrap:wrap;gap:8px}#ski-first-look .ski-ticket-option .ski-stepper{margin-left:auto}}
+#ski-first-look .ski-product-tabs{display:flex;gap:6px;padding:5px;background:#eae7e2;border-radius:12px;margin-bottom:12px}
+#ski-first-look .ski-product-tabs button{flex:1;min-width:0;min-height:56px;display:flex;align-items:center;justify-content:center;gap:8px;border:0;background:transparent;color:var(--ski-muted);border-radius:9px;padding:10px;font-size:19px;font-weight:650}
+#ski-first-look .ski-product-tabs button[aria-selected=true]{background:var(--ski-accent);color:white}
+#ski-first-look .ski-product-tabs button span{font-size:15px;white-space:nowrap}
+#ski-first-look .ski-day-tabs{display:grid;grid-template-columns:repeat(auto-fit,minmax(115px,1fr));gap:8px;margin:12px 0}
+#ski-first-look .ski-day-tabs button{min-height:64px;padding:9px 7px;background:white;border:1px solid var(--ski-line);color:var(--ski-ink);border-radius:10px;display:grid;gap:3px;text-align:center}
+#ski-first-look .ski-day-tabs button strong{font-size:16px;font-weight:600}
+#ski-first-look .ski-day-tabs button span{font-size:17px;color:var(--ski-muted)}
+#ski-first-look .ski-day-tabs button[aria-pressed=true]{border-color:#c54b15;background:#fff0e7}
+#ski-first-look .ski-day-tabs button[aria-pressed=true] span{color:#9c431b}
+#ski-first-look .ski-day-heading{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin:12px 0}
+#ski-first-look .ski-copy-day{width:100%;min-height:48px;display:flex;align-items:center;justify-content:center;gap:8px;padding:10px 12px;margin-top:12px;border:1px solid var(--ski-line);border-radius:10px;background:white;color:var(--ski-muted);font-size:16px}
+#ski-first-look .ski-lift-inline{background:white;border:1px solid var(--ski-line);border-radius:var(--ski-radius);padding:14px;min-width:0}
+#ski-first-look .ski-lift-inputs{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:10px}
+#ski-first-look .ski-lift-inputs .ski-lift-query{grid-column:1/-1}
+#ski-first-look .ski-lift-inputs input[type=date]{font-size:16px;padding:10px}
+#ski-first-look .ski-lift-inline .ski-ticket-options{grid-template-columns:minmax(0,1fr)}
+#ski-first-look .ski-lift-inline .ski-ticket-option{gap:10px;flex-wrap:wrap}
+#ski-first-look .ski-lift-inline .ski-ticket-option .ski-stepper{margin-left:auto}
+#ski-first-look .ski-lift-inline .ski-ticket-filters{gap:6px}
+#ski-first-look .ski-lift-inline .ski-ticket-filters button{padding:8px 9px;font-size:15px}
+#ski-first-look .ski-day-total{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-top:12px;font-size:17px}
+#ski-first-look .ski-day-total strong{font-size:21px;color:var(--ski-accent)}
+#ski-first-look .ski-physical-summary{background:#f7f5f2;border-radius:10px;padding:12px;margin-top:12px;font-size:14px;display:grid;gap:5px;color:#615340}
+#ski-first-look .ski-physical-summary>strong{font-size:15px}
+#ski-first-look .ski-physical-summary small{font-size:13px;color:#a34d1f}
+#ski-first-look .ski-physical-summary .ski-setting-button{padding:4px 0;color:#9c431b}
+#ski-first-look .ski-physical-summary-head{display:flex;justify-content:space-between;align-items:center;gap:8px}
+#ski-first-look .ski-period-compact{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:12px;padding:8px 12px;border:1px solid var(--ski-line);border-radius:10px;background:white;font-size:16px}
+#ski-first-look .ski-physical-fields{display:grid;gap:18px;margin-top:18px}
+#ski-first-look .ski-physical-fields .ski-field-row{grid-template-columns:repeat(2,minmax(0,1fr));margin-top:8px}
+@media(max-width:420px){#ski-first-look .ski-lift-inputs{grid-template-columns:minmax(0,1fr)}#ski-first-look .ski-physical-fields .ski-field-row{grid-template-columns:minmax(0,1fr)}#ski-first-look .ski-product-tabs button{font-size:18px;gap:5px}}
+</style>
+<script>
+(function(){
+  const root=document.getElementById('ski-first-look');
+  const content=root.querySelector('#ski-content');
+  const notice=root.querySelector('#ski-notice');
+  const overlay=root.querySelector('#ski-overlay');
+  const dialogBody=root.querySelector('#ski-dialog-content');
+  const dialogTitle=root.querySelector('#ski-dialog-title');
+  const products=[{id:'ski',name:'스키',price:20000,icon:'snowflake'},{id:'board',name:'보드',price:20000,icon:'rectangle-horizontal'},{id:'clothes',name:'의류',price:10000,icon:'shirt'},{id:'visor',name:'바이저 헬멧',price:10000,icon:'shield-check'},{id:'helmet',name:'헬멧',price:5000,icon:'shield'},{id:'goggles',name:'고글',price:5000,icon:'glasses'},{id:'pads',name:'보호대',price:5000,icon:'shield-plus'}];
+  // Sample catalog only. Live availability and date-dependent prices are shop settings.
+  const liftCatalog=[['morning','오전권','time',40000,30000],['afternoon','오후권','time',45000,35000],['night','야간권','time',40000,30000],['after-night','후야권','time',65000,50000],['day','종일권','time',70000,55000],['3hour','3시간권','hours',35000,25000],['4hour','4시간권','hours',45000,35000],['6hour','6시간권','hours',55000,45000]].flatMap(([code,name,group,adult,child])=>[{id:code+'-adult',name,group,audience:'성인',price:adult},{id:code+'-child',name,group,audience:'소인',price:child}]);
+  const liftFavorites=['afternoon-adult','night-adult','after-night-adult'];
+  const jobs=[
+    {id:'R-021',type:'return',name:'김영희',phone:'010-0000-0000',time:'16:30',returnPreset:'afternoon',returnLabel:'오후타임 후',place:'만선 티롤 앞',detail:'티롤 호텔 정문 · 버스 정차 구역',items:[['스키',2],['의류',2],['헬멧',1]],status:'waiting',urgent:true,ack:false,sms:false},
+    {id:'R-022',type:'delivery',name:'박준호',phone:'010-0000-0000',time:'16:40',place:'설천 주차장',detail:'주차장 입구 · 고객과 통화 후 만남',items:[['보드',2],['의류',2],['헬멧',2]],status:'waiting',urgent:false,ack:false,sms:false},
+    {id:'R-023',type:'return',name:'이수진',phone:'010-0000-0000',time:'17:00',place:'만선 광장',detail:'곤돌라 매표소 앞',items:[['스키',1],['보드',1],['의류',2]],status:'waiting',urgent:false,ack:false,sms:false},
+    {id:'R-020',type:'direct',name:'정우진',phone:'010-0000-0000',time:'16:50',place:'스키샵 직접 반납',detail:'매장 방문 예정',items:[['스키',1],['고글',1]],status:'waiting',urgent:false,ack:false,sms:false}
+  ];
+  const rentalStart=new Intl.DateTimeFormat('sv-SE',{timeZone:'Asia/Seoul',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
+  const returnPresets=[{id:'afternoon',label:'오후타임 후',time:'16:30',dayOffset:0},{id:'night',label:'야간타임 후',time:'22:00',dayOffset:0},{id:'next-morning',label:'익일 오전',time:'09:00',dayOffset:1}];
+  const state={view:'shop',days:1,startDate:rentalStart,endDate:rentalStart,equipmentDays:[{ski:1,clothes:1}],activeDay:0,productTab:'equipment',qty:{ski:1,clothes:1},returnQty:{ski:1,clothes:1},physicalConfirmed:false,tickets:[],liftDate:rentalStart,liftQuery:'',liftAudience:'성인',liftGroup:'favorites',liftPage:0,discountSteps:[],itemDiscounts:{},customerId:'C-001',name:'김민수',phone:'010-0000-0000',returnMethod:'collect',returnPreset:'afternoon',manualReturnDate:rentalStart,manualReturnTime:'16:30',place:'만선 티롤 앞',mode:'simple',filter:'all',sort:'time',dateOffset:0,selected:'R-021',saved:false};
+  const discountPresets=[{id:'D-01',name:'단골',value:5000},{id:'D-02',name:'단골',value:10000}];
+  const customers=[{id:'C-001',name:'김민수',phone:'010-0000-0000',note:'단골 · 가족 방문',history:[{id:'H-001',date:'2026-01-15',days:2,items:[['스키',1],['의류',1]],total:54000}]},{id:'C-002',name:'김영희',phone:'010-0000-1021',note:'장비는 매장 수령',history:[{id:'H-002',date:'2026-02-08',days:1,items:[['스키',2],['의류',2],['헬멧',1]],total:65000}]},{id:'C-003',name:'박준호',phone:'010-0000-1022',note:'샘플 제휴업체 방문',history:[{id:'H-003',date:'2026-02-10',days:1,items:[['보드',2],['헬멧',2]],total:45000}]},{id:'C-004',name:'김민수',phone:'010-0000-1024',note:'동명이인 예시',history:[]}];
+  const design={radius:12,accent:'오렌지',large:true};
+  let modalJob=null;let previousFocus=null;let discountDraft=null;let customerDetailId=null;let customerEditingId=null;let physicalNextAction='';
+  const money=n=>Math.round(n).toLocaleString('ko-KR')+'원';
+  const escape=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const icon=n=>'<i data-lucide="'+n+'" aria-hidden="true"></i>';
+  const dayQty=(id,index=state.activeDay)=>state.equipmentDays[index]?.[id]||0;
+  const billedQuantity=id=>state.equipmentDays.reduce((sum,day)=>sum+(day[id]||0),0);
+  const peakQuantity=id=>state.equipmentDays.reduce((peak,day)=>Math.max(peak,day[id]||0),0);
+  const picked=()=>products.filter(p=>billedQuantity(p.id)>0);
+  const differentDailyQuantities=()=>picked().some(p=>state.equipmentDays.some(day=>(day[p.id]||0)!==dayQty(p.id,0)));
+  const needsPhysicalCheck=()=>differentDailyQuantities()&&!state.physicalConfirmed;
+  const hasItems=()=>picked().length>0||state.tickets.length>0;
+  const ticketTotal=(lines=state.tickets)=>lines.reduce((sum,line)=>sum+line.price*line.qty,0);
+  const ticketCount=(lines=state.tickets)=>lines.reduce((sum,line)=>sum+line.qty,0);
+  const lineTotal=p=>p.price*billedQuantity(p.id);
+  const discountAmount=(base,value)=>Math.min(base,Math.max(0,Math.floor(Number(value)||0)));
+  const itemDiscount=p=>discountAmount(lineTotal(p),(state.itemDiscounts[p.id]||0)*(state.qty[p.id]||0));
+  const subtotal=()=>discountBase()+ticketTotal();
+  const discountBase=()=>picked().reduce((a,p)=>a+lineTotal(p)-itemDiscount(p),0);
+  const requestedDiscount=()=>state.discountSteps.reduce((sum,step)=>sum+step.value,0);
+  const discount=()=>discountAmount(discountBase(),requestedDiscount());
+  const totalDiscount=()=>picked().reduce((a,p)=>a+itemDiscount(p),0)+discount();
+  const typeLabel=j=>j.type==='return'?'수거':j.type==='delivery'?'배달':'매장 직접';
+  const statusLabel=j=>j.status==='collected'?'매장 확인 대기':j.status==='returned'?'반납 완료':j.status==='delivered'?'배달 완료':j.status==='moving'?'이동 중':'대기';
+  const done=j=>['collected','returned','delivered'].includes(j.status);
+  const addDays=(date,days)=>new Date(Date.parse(date+'T00:00:00Z')+days*86400000).toISOString().slice(0,10);
+  const dateOffset=date=>Math.round((Date.parse(date+'T00:00:00Z')-Date.parse(rentalStart+'T00:00:00Z'))/86400000);
+  const dateLabel=date=>date?(date.slice(0,4)!==rentalStart.slice(0,4)?date.slice(0,4)+'/':'')+Number(date.slice(5,7))+'/'+Number(date.slice(8,10)):'';
+  const validDate=date=>/^\d{4}-\d{2}-\d{2}$/.test(date)&&Number.isFinite(Date.parse(date+'T00:00:00Z'))&&addDays(date,0)===date;
+  const validTime=time=>/^([01]\d|2[0-3]):[0-5]\d$/.test(time);
+  const lastUseDate=()=>state.endDate;
+  const equipmentDateAt=index=>validDate(state.startDate)?addDays(state.startDate,index):'';
+  const useDates=()=>validDate(state.startDate)?Array.from({length:state.days},(_,i)=>addDays(state.startDate,i)):[];
+  function suggestPhysicalQuantities(){state.qty=Object.fromEntries(picked().map(p=>[p.id,peakQuantity(p.id)]));state.returnQty={...state.qty};state.physicalConfirmed=false;}
+  function resizeEquipmentDays(){
+    const countChanged=state.equipmentDays.length!==state.days;
+    state.equipmentDays=Array.from({length:state.days},(_,i)=>({...state.equipmentDays[Math.min(i,state.equipmentDays.length-1)]}));
+    state.activeDay=Math.min(state.activeDay,state.days-1);if(countChanged)suggestPhysicalQuantities();
+    if(!useDates().includes(state.liftDate)&&!state.tickets.some(t=>t.date===state.liftDate))state.liftDate=state.startDate;
+  }
+  function dailyEquipmentRows(){return useDates().map((date,i)=>({date,items:products.filter(p=>dayQty(p.id,i)>0).map(p=>[p.name,dayQty(p.id,i)]),amount:products.reduce((sum,p)=>sum+p.price*dayQty(p.id,i),0)}));}
+  function periodError(){if(!validDate(state.startDate)||!validDate(state.endDate))return '이용 시작일과 종료일을 입력해 주세요.';if(state.endDate<state.startDate)return '종료일은 시작일과 같거나 늦어야 합니다.';return '';}
+  function returnPlan(){
+    const preset=returnPresets.find(p=>p.id===state.returnPreset);
+    return preset?{preset:preset.id,label:preset.label,date:validDate(lastUseDate())?addDays(lastUseDate(),preset.dayOffset):'',time:preset.time}:{preset:'manual',label:'직접 시간 선택',date:state.manualReturnDate,time:state.manualReturnTime};
+  }
+  function returnError(plan){
+    if(periodError())return periodError();
+    if(!validDate(plan.date)||!validTime(plan.time))return '반납 날짜와 시간을 입력해 주세요.';
+    if(plan.date<lastUseDate())return '반납일이 마지막 이용일보다 빠릅니다. 이용 기간이나 반납일을 확인해 주세요.';
+    return '';
+  }
+  const scheduleText=plan=>dateLabel(plan.date)+' · '+(plan.preset==='manual'?plan.time:plan.label+' · 기준 '+plan.time);
+  const jobDate=j=>j.returnDate||addDays(rentalStart,j.dateOffset||0);
+  const hasPreset=j=>j.returnPreset&&j.returnPreset!=='manual';
+  const jobSchedule=j=>dateLabel(jobDate(j))+' · '+(hasPreset(j)?j.returnLabel+' · 기준 ':'')+j.time;
+  const jobOffsets=()=>Array.from(new Set([0,1,2,3,Number(state.dateOffset),...jobs.map(j=>j.dateOffset||0)])).sort((a,b)=>a-b);
+  function icons(){if(globalThis.lucide)globalThis.lucide.createIcons({attrs:{width:22,height:22}});}
+  function tell(text){notice.textContent=text;notice.hidden=false;}
+  function clearNotice(){notice.hidden=true;}
+  function physicalItems(){return picked().map(p=>p.name+' '+state.qty[p.id]+'개').join(' · ');}
+  function equipmentQuantityText(p){const counts=state.equipmentDays.map(day=>day[p.id]||0);return counts.every(q=>q===counts[0])?counts[0]+'개 × '+state.days+'일':counts.map((q,i)=>dateLabel(equipmentDateAt(i))+' '+q+'개').join(' · ');}
+  function receipt(editable=true){return picked().map(p=>{const same=state.equipmentDays.every(day=>(day[p.id]||0)===dayQty(p.id,0));return '<div class="ski-receipt-row"><span>'+p.name+(same?' <b>'+dayQty(p.id,0)+'개</b>':'')+'</span><strong>'+money(lineTotal(p)-itemDiscount(p))+'</strong><small>'+(same?money(p.price)+' × '+equipmentQuantityText(p):equipmentQuantityText(p)+'<br>'+money(p.price)+' / 1일 · 날짜별 요금 합산')+(itemDiscount(p)>0?' · 장비당 할인 −'+money(itemDiscount(p)):'')+'</small>'+(editable&&state.view==='shop'?'<button type="button" class="ski-item-discount" data-discount-item="'+p.id+'">'+(p.name+(itemDiscount(p)>0?' 장비당 할인 변경':' 장비당 할인'))+'</button>':'')+'</div>';}).join('')||(!state.tickets.length?'<p class="ski-secondary">장비 또는 리프트권을 선택해 주세요.</p>':'');}
+  function ticketReceipt(editable){return state.tickets.length?'<section class="ski-ticket-receipt" aria-label="선택한 리프트권"><div class="ski-lift-heading"><h3>리프트권</h3><span class="ski-secondary">'+ticketCount()+'매</span></div>'+state.tickets.map((t,index)=>'<'+(editable?'button type="button" data-ticket-edit="'+index+'"':'div')+' class="ski-ticket-row"><span>'+escape(t.name)+' · '+escape(t.audience)+' <b>'+t.qty+'매</b></span><strong>'+money(t.price*t.qty)+'</strong><small>'+dateLabel(t.date)+' 사용 · '+money(t.price)+'/매'+(editable?' · 수량 변경 ›':'')+'</small></'+(editable?'button':'div')+'>').join('')+'</section>':'';}
+  function plannedReturnItems(){return picked().filter(p=>state.returnQty[p.id]>0).map(p=>[p.name,state.returnQty[p.id]]);}
+  function physicalSummary(editable){const same=picked().every(p=>state.qty[p.id]===state.returnQty[p.id]);return !picked().length?'':'<div class="ski-physical-summary"><div class="ski-physical-summary-head"><strong>'+(needsPhysicalCheck()?'실제 수량 확인 필요':'실제 장비')+'</strong>'+(editable?'<button type="button" class="ski-setting-button" data-action="physical">수량 확인 '+icon('chevron-right')+'</button>':'')+'</div><p>'+(same?'지급·수거':'지급')+' · '+physicalItems()+'</p>'+(!same?'<p>마지막 수거 · '+(plannedReturnItems().map(i=>i[0]+' '+i[1]+'개').join(' · ')||'없음')+'</p>':'')+(needsPhysicalCheck()?'<small>일별 최대 수량을 제안했습니다. 실제 수량을 확인해 주세요.</small>':'')+'</div>';}
+  function quoteSummary(editable=true){return '<div class="ski-receipt">'+receipt(editable)+'</div>'+physicalSummary(editable)+ticketReceipt(editable);}
+  function changeTickets(lines,id,date,delta){
+    const ticket=liftCatalog.find(t=>t.id===id);if(!ticket||!validDate(date))return;
+    const index=lines.findIndex(t=>t.id===id&&t.date===date);const current=index>=0?lines[index]:{...ticket,date,qty:0};const qty=Math.max(0,Math.min(99,current.qty+delta));
+    if(!qty){if(index>=0)lines.splice(index,1);}else if(index>=0)current.qty=qty;else lines.push({...current,qty});
+  }
+  function daySelector(kind){
+    const dates=kind==='equipment'?useDates():Array.from(new Set([...useDates(),...state.tickets.map(t=>t.date),...(validDate(state.liftDate)?[state.liftDate]:[])])).sort();
+    const active=kind==='equipment'?equipmentDateAt(state.activeDay):state.liftDate;
+    const label=date=>{const index=useDates().indexOf(date);const count=kind==='equipment'?products.reduce((sum,p)=>sum+dayQty(p.id,index),0):ticketCount(state.tickets.filter(t=>t.date===date));return {title:index>=0?(index+1)+'일차':'별도 날짜',date:dateLabel(date),count:count+(kind==='equipment'?'개':'매')};};
+    if(periodError())return '<p class="ski-return-error">이용 기간을 먼저 확인해 주세요.</p>';
+    if(dates.length===1)return '';
+    if(dates.length>5)return '<label class="ski-field">입력할 날짜<select data-use-date="'+kind+'">'+dates.map(date=>{const l=label(date);return '<option value="'+date+'" '+(date===active?'selected':'')+'>'+l.title+' · '+l.date+' · '+l.count+'</option>';}).join('')+'</select></label>';
+    return '<div class="ski-day-tabs" aria-label="'+(kind==='equipment'?'장비':'리프트권')+' 날짜별 선택">'+dates.map(date=>{const l=label(date);return '<button type="button" data-use-day="'+date+'" data-kind="'+kind+'" aria-pressed="'+(date===active)+'"><strong>'+l.title+' · '+l.date+'</strong><span>'+l.count+'</span></button>';}).join('')+'</div>';
+  }
+  function equipmentPane(){
+    return daySelector('equipment')+'<div class="ski-day-heading"><h3>'+dateLabel(equipmentDateAt(state.activeDay))+' 장비 선택</h3><span class="ski-secondary">이날 사용할 수량</span></div><div class="ski-products">'+products.map(p=>'<article class="ski-product '+(dayQty(p.id)>0?'is-picked':'')+'"><div class="ski-product-title">'+icon(p.icon)+p.name+'</div><div class="ski-product-price">'+money(p.price)+' / 1일</div><div class="ski-stepper"><button type="button" data-product="'+p.id+'" data-delta="-1" aria-label="'+p.name+' 수량 줄이기" '+(dayQty(p.id)<=0||periodError()?'disabled':'')+'>'+icon('minus')+'</button><output aria-label="'+p.name+' 수량">'+dayQty(p.id)+'</output><button type="button" data-product="'+p.id+'" data-delta="1" aria-label="'+p.name+' 수량 늘리기" '+(dayQty(p.id)>=99||periodError()?'disabled':'')+'>'+icon('plus')+'</button></div></article>').join('')+'</div>'+copyDayButton('equipment');
+  }
+  function copyDayButton(kind){return state.days>1?'<button type="button" class="ski-copy-day" data-copy-days="'+kind+'" '+(periodError()||kind==='lift'&&!validDate(state.liftDate)?'disabled':'')+'>'+icon('copy')+'이 수량을 모든 이용일에 적용</button>':'';}
+  function favoriteTicket(t){return liftFavorites.includes(t.id)||liftFavorites.some(id=>id.replace(/adult$/,'child')===t.id);}
+  function liftResults(){
+    const words=state.liftQuery.toLowerCase().trim().split(/\s+/).filter(Boolean);
+    const matches=liftCatalog.filter(t=>(state.liftAudience==='all'||state.liftAudience===t.audience)&&(state.liftGroup==='all'||(state.liftGroup==='favorites'?favoriteTicket(t):state.liftGroup===t.group))&&words.every(word=>(t.name+' '+t.audience).toLowerCase().includes(word))).sort((a,b)=>Number(favoriteTicket(b))-Number(favoriteTicket(a)));
+    const pages=Math.max(1,Math.ceil(matches.length/6));state.liftPage=Math.max(0,Math.min(pages-1,state.liftPage));const dateValid=validDate(state.liftDate);
+    return '<div class="ski-ticket-count" role="status"><span>권종 '+matches.length+'종</span><span>'+(dateValid?dateLabel(state.liftDate)+' 사용':'사용 날짜 미입력')+'</span></div>'+(!dateValid?'<p class="ski-return-error" role="alert">사용 날짜를 입력해 주세요.</p>':'')+'<div class="ski-ticket-options">'+(matches.length?matches.slice(state.liftPage*6,state.liftPage*6+6).map(t=>{const line=state.tickets.find(line=>line.id===t.id&&line.date===state.liftDate);const qty=line?line.qty:0;return '<article class="ski-ticket-option"><div><h3>'+t.name+' · '+t.audience+'</h3><p>'+money(line?line.price:t.price)+' / 1매</p></div><div class="ski-stepper"><button type="button" data-lift-ticket="'+t.id+'" data-delta="-1" aria-label="'+t.name+' '+t.audience+' 매수 줄이기" '+(!dateValid||!qty?'disabled':'')+'>'+icon('minus')+'</button><output aria-label="'+t.name+' '+t.audience+' 선택 매수">'+qty+'</output><button type="button" data-lift-ticket="'+t.id+'" data-delta="1" aria-label="'+t.name+' '+t.audience+' 매수 늘리기" '+(!dateValid||qty>=99?'disabled':'')+'>'+icon('plus')+'</button></div></article>';}).join(''):'<p class="ski-empty">일치하는 권종이 없습니다.</p>')+'</div>'+(pages>1?'<div class="ski-ticket-pagination"><button type="button" data-lift-page="-1" '+(state.liftPage===0?'disabled':'')+'>이전</button><span>'+(state.liftPage+1)+' / '+pages+'</span><button type="button" data-lift-page="1" '+(state.liftPage===pages-1?'disabled':'')+'>다음</button></div>':'');
+  }
+  function liftPane(){return daySelector('lift')+'<div class="ski-lift-inline"><div class="ski-lift-inputs"><label class="ski-field">사용 날짜<input type="date" data-lift-date value="'+escape(state.liftDate)+'"></label><label class="ski-field">대상<select data-lift-audience>'+['성인','소인','all'].map(a=>'<option value="'+a+'" '+(state.liftAudience===a?'selected':'')+'>'+(a==='all'?'성인 · 소인':a)+'</option>').join('')+'</select></label><label class="ski-field ski-lift-query">권종 찾기<input type="search" data-lift-search value="'+escape(state.liftQuery)+'" placeholder="오후, 후야, 4시간 등" autocomplete="off"></label></div><div class="ski-ticket-filters" aria-label="리프트권 분류">'+[['favorites','자주 사용'],['all','전체 권종'],['time','타임권'],['hours','시간권']].map(([id,label])=>'<button type="button" data-lift-group="'+id+'" aria-pressed="'+(state.liftGroup===id)+'">'+label+'</button>').join('')+'</div><div id="ski-ticket-results">'+liftResults()+'</div><div class="ski-day-total" aria-live="polite"><span>이 날짜 '+ticketCount(state.tickets.filter(t=>t.date===state.liftDate))+'매</span><strong>'+money(ticketTotal(state.tickets.filter(t=>t.date===state.liftDate)))+'</strong></div><p class="ski-dialog-note">권종·가격은 샘플입니다.</p></div>'+copyDayButton('lift');}
+  function productTabs(){return '<div class="ski-product-tabs" role="tablist" aria-label="상품 종류"><button type="button" id="ski-equipment-tab" role="tab" data-product-tab="equipment" aria-controls="ski-product-panel" aria-selected="'+(state.productTab==='equipment')+'">'+icon('snowflake')+'장비</button><button type="button" id="ski-lift-tab" role="tab" data-product-tab="lift" aria-controls="ski-product-panel" aria-selected="'+(state.productTab==='lift')+'">'+icon('ticket')+'리프트권'+(ticketCount()?' <span>'+ticketCount()+'매</span>':'')+'</button></div>';}
+  function productSelector(){return '<section id="ski-product-panel" role="tabpanel" aria-labelledby="ski-'+state.productTab+'-tab">'+(state.productTab==='equipment'?equipmentPane():liftPane())+'</section>';}
+  function periodControls(){if(state.productTab==='lift'&&!state.periodExpanded&&!periodError())return '<div class="ski-period-compact"><span>이용 기간 · '+dateLabel(state.startDate)+' ~ '+dateLabel(state.endDate)+' · '+state.days+'일</span><button type="button" class="ski-setting-button" data-action="toggle-period">변경</button></div>';return '<div class="ski-days"><div class="ski-days-top"><h2>이용 기간</h2>'+(state.productTab==='lift'?'<button type="button" class="ski-setting-button" data-action="toggle-period">접기</button>':'<span class="ski-secondary">날짜별 수량 입력</span>')+'</div><div class="ski-segment" aria-label="대여 일수">'+[1,2,3].map(d=>'<button type="button" data-days="'+d+'" aria-pressed="'+(state.days===d)+'">'+d+'일</button>').join('')+'</div>'+periodFields()+'</div>';}
+  function refreshLiftSearch(){const results=root.querySelector('#ski-ticket-results');if(results){results.innerHTML=liftResults();root.querySelectorAll('[data-lift-group]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.liftGroup===state.liftGroup)));icons();}}
+  function selectUseDate(kind,date){if(kind==='equipment'){const index=useDates().indexOf(date);if(index>=0)state.activeDay=index;}else{state.liftDate=date;state.liftPage=0;}clearNotice();render();}
+  function openPhysical(next=''){
+    physicalNextAction=next;
+    openDialog('실제 지급 · 마지막 수거 수량','<p class="ski-secondary">날짜별 이용 수량은 요금 계산에 사용합니다. 실제 지급한 장비와 마지막에 받을 장비를 따로 확인해 주세요.</p><div class="ski-physical-fields">'+picked().map(p=>'<section><h3>'+p.name+'</h3><p class="ski-secondary">'+equipmentQuantityText(p)+'</p><div class="ski-field-row"><label class="ski-field">실제 지급<input type="number" data-issued="'+p.id+'" min="'+peakQuantity(p.id)+'" max="'+billedQuantity(p.id)+'" step="1" value="'+state.qty[p.id]+'"></label><label class="ski-field">마지막 수거<input type="number" data-return-count="'+p.id+'" min="0" max="'+state.qty[p.id]+'" step="1" value="'+state.returnQty[p.id]+'"></label></div></section>').join('')+'</div><p class="ski-dialog-note">이미 받았거나 다른 날 받을 장비는 마지막 수거 수량에서 제외합니다. 날짜별 수량을 바꾸면 다시 확인합니다.</p><p class="ski-return-error" id="ski-physical-error" role="alert" hidden></p><button type="button" class="ski-primary" data-action="physical-apply">'+(next==='save'?'수량 확인 · 접수 저장':'수량 확인')+'</button>');
+  }
+  function periodFields(){return '<div class="ski-period-dates"><label class="ski-field">이용 시작일<input type="date" data-period="startDate" value="'+escape(state.startDate)+'"></label><label class="ski-field">이용 종료일<input type="date" data-period="endDate" min="'+escape(state.startDate)+'" value="'+escape(state.endDate)+'"></label></div><div class="ski-pos-period" id="ski-period-feedback" aria-live="polite">'+(periodError()?'<span class="ski-return-error" role="alert">'+periodError()+'</span>':'이용일 '+dateLabel(state.startDate)+' ~ '+dateLabel(lastUseDate())+' · '+state.days+'일 요금')+'</div>';}
+  function discountSummary(){const counts=discountPresets.map(p=>({value:p.value,count:state.discountSteps.filter(s=>s.id===p.id).length})).filter(p=>p.count);return '<div class="ski-discount-heading"><h3>총 금액 할인</h3><span class="ski-secondary">누를 때마다 추가</span></div><div class="ski-discount-presets">'+discountPresets.map(p=>'<button type="button" data-order-discount="'+p.id+'" '+(discountBase()<=discount()?'disabled':'')+'>'+escape(p.name)+' '+money(p.value)+'</button>').join('')+'</div><div class="ski-discount-applied" aria-live="polite">'+(counts.length?counts.map(p=>money(p.value)+' × '+p.count+'번').join(' + '):'적용한 총 금액 할인이 없습니다.')+'</div><div class="ski-discount-undo"><button type="button" data-action="undo-discount" '+(!state.discountSteps.length?'disabled':'')+'>한 번 취소</button><button type="button" data-action="clear-discount" '+(!state.discountSteps.length?'disabled':'')+'>전체 해제</button></div><div class="ski-discount"><span>총 금액 할인 적용</span><strong>−'+money(discount())+'</strong></div><p class="ski-discount-note">장비당 할인 후 적용 · 리프트권 제외'+(requestedDiscount()>discountBase()?'<br>입력 '+money(requestedDiscount())+' 중 남은 장비 금액까지만 적용':'')+'</p><div class="ski-discount-total"><span>할인 합계</span><strong>−'+money(totalDiscount())+'</strong></div>';}
+  function openDiscount(target){
+    const product=products.find(p=>p.id===target);if(!product)return;
+    discountDraft={target,value:state.itemDiscounts[target]||0,base:lineTotal(product),quantity:state.qty[target]};
+    openDialog(product.name+' · 장비당 할인','<p class="ski-secondary">실제 지급 '+state.qty[target]+'개 기준으로 장비 1개당 한 번 할인합니다. 날짜별 이용 수량을 다시 곱하지 않습니다.</p><div class="ski-discount-presets">'+discountPresets.map(p=>'<button type="button" data-pick-discount="'+p.id+'" aria-pressed="'+(discountDraft.value===p.value)+'">'+escape(p.name)+' '+money(p.value)+'</button>').join('')+'</div><div id="ski-discount-preview" class="ski-return-result" aria-live="polite"></div><div class="ski-dialog-actions"><button type="button" class="ski-secondary-button" data-action="discount-clear">장비당 할인 해제</button><button type="button" class="ski-primary" data-action="discount-apply">장비당 할인 적용</button></div>');updateDiscountPreview();
+  }
+  function updateDiscountPreview(){if(!discountDraft)return;const d=discountDraft;const amount=discountAmount(d.base,d.value*d.quantity);root.querySelector('#ski-discount-preview').innerHTML='<span>장비당 −'+money(d.value)+' × 실제 지급 '+d.quantity+'개</span><strong>할인 후 '+money(d.base-amount)+'</strong><span>장비 할인 합계 −'+money(amount)+(d.value*d.quantity>d.base?' · 장비 요금 한도 적용':'')+'</span>';root.querySelectorAll('[data-pick-discount]').forEach(b=>b.setAttribute('aria-pressed',String(discountPresets.find(p=>p.id===b.dataset.pickDiscount).value===d.value)));}
+  function applyDiscount(clear){
+    if(!discountDraft)return;state.itemDiscounts[discountDraft.target]=clear?0:discountDraft.value;
+    state.saved=false;discountDraft=null;closeDialog();render();
+  }
+  function customerMatches(query){const text=query.trim().toLowerCase();const digits=text.replace(/\D/g,'');return customers.filter(c=>!text||c.name.toLowerCase().includes(text)||(digits.length>0&&c.phone.replace(/\D/g,'').includes(digits)));}
+  function customerRows(query){const matches=customerMatches(query);return matches.length?matches.map(c=>'<button type="button" class="ski-customer-row" data-customer-detail="'+c.id+'"><span><strong>'+escape(c.name)+'</strong><small>'+escape(c.phone)+'</small></span><span>'+c.history.length+'건 '+icon('chevron-right')+'</span></button>').join(''):'<p class="ski-empty">검색 결과가 없습니다. 신규 고객을 등록할 수 있습니다.</p>';}
+  function customerSearch(){openDialog('고객 찾기 · 관리','<label class="ski-field">대표자 이름 또는 연락처<input type="search" data-customer-search placeholder="이름 또는 전화번호 일부 입력" autocomplete="off"></label><div class="ski-customer-results" id="ski-customer-results">'+customerRows('')+'</div><button type="button" class="ski-secondary-button" data-action="customer-new">'+icon('user-plus')+'신규 고객 등록</button>');}
+  function historyEquipment(h){if(!h.items.length)return '';const actual='<p>실제 지급 · '+h.items.map(i=>escape(i[0])+' '+i[1]+'개').join(' · ')+'</p>';return actual+(h.equipmentDays||[]).map(day=>'<p class="ski-secondary">'+dateLabel(day.date)+' · '+(day.items.map(i=>escape(i[0])+' '+i[1]+'개').join(' · ')||'장비 없음')+' · 할인 전 '+money(day.amount)+'</p>').join('');}
+  function customerDetail(id){customerDetailId=id;const c=customers.find(c=>c.id===id);openDialog('고객 정보','<div class="ski-customer-profile"><h3>'+escape(c.name)+'</h3><p>'+escape(c.phone)+'</p><p class="ski-secondary">'+escape(c.note||'등록한 메모가 없습니다.')+'</p></div><div class="ski-sectionhead"><h3>대여 장비 · 이용 내역</h3><span class="ski-secondary">'+c.history.length+'건</span></div><div class="ski-customer-history">'+(c.history.length?c.history.map(h=>'<article><div><strong>'+escape(h.date)+' · '+(h.items.length?h.days+'일':'리프트권 구매')+'</strong><span>'+money(h.total)+'</span></div>'+historyEquipment(h)+(h.tickets||[]).map(t=>'<p class="ski-secondary">리프트 · '+dateLabel(t.date)+' '+escape(t.name)+' '+escape(t.audience)+' '+t.qty+'매</p>').join('')+'</article>').join(''):'<p class="ski-secondary">아직 이용 내역이 없습니다.</p>')+'</div><div class="ski-dialog-actions"><button type="button" class="ski-secondary-button" data-action="customer-edit">정보 수정</button><button type="button" class="ski-primary" data-action="customer-use">이 고객으로 접수</button></div><button type="button" class="ski-setting-button" data-action="customers">다른 고객 찾기</button>');}
+  function customerForm(id){customerEditingId=id;const c=customers.find(c=>c.id===id)||{name:'',phone:'',note:''};openDialog(id?'고객 정보 수정':'신규 고객 등록','<div class="ski-fields"><label class="ski-field">대표자 이름<input data-customer-edit="name" value="'+escape(c.name)+'" maxlength="30"></label><label class="ski-field">연락처<input type="tel" data-customer-edit="phone" value="'+escape(c.phone)+'" maxlength="20"></label><label class="ski-field">고객 메모<input data-customer-edit="note" value="'+escape(c.note)+'" maxlength="100" placeholder="예: 제휴업체, 장비 요청"></label></div><p id="ski-customer-error" role="alert" class="ski-return-error" hidden></p><button type="button" class="ski-primary" data-action="customer-save">고객 저장</button><p class="ski-dialog-note">같은 이름·연락처가 있어도 기존 고객과 자동으로 합치지 않습니다.</p>');}
+  function returnFields(){
+    const plan=returnPlan();const error=returnError(plan);
+    return '<section class="ski-return-section" aria-label="반납 예정 선택"><div class="ski-return-heading"><h3>반납 예정</h3><button type="button" class="ski-setting-button" data-action="time-settings">'+icon('settings-2')+'타임 기준</button></div><div class="ski-return-options" aria-label="반납 예정 방식">'+[...returnPresets,{id:'manual',label:'직접 시간 선택'}].map(p=>'<button type="button" data-return-preset="'+p.id+'" aria-pressed="'+(state.returnPreset===p.id)+'">'+p.label+'</button>').join('')+'</div>'+
+      (state.returnPreset==='manual'?'<div class="ski-manual-fields"><label class="ski-field">반납 날짜<input type="date" data-field="manualReturnDate" aria-describedby="ski-return-feedback" min="'+lastUseDate()+'" value="'+escape(state.manualReturnDate)+'"></label><label class="ski-field">반납 시간<input type="time" data-field="manualReturnTime" aria-describedby="ski-return-feedback" value="'+escape(state.manualReturnTime)+'"></label></div>':'')+
+      '<div id="ski-return-feedback" aria-live="polite">'+returnFeedback(plan,error)+'</div></section>';
+  }
+  function returnFeedback(plan,error){
+    if(error)return '<p class="ski-return-error" role="alert">'+error+'</p>';
+    return '<div class="ski-return-result"><strong>'+dateLabel(plan.date)+' · '+(plan.preset==='manual'?plan.time+' 반납':plan.label+' 반납')+'</strong><span>'+(plan.preset==='manual'?'직접 지정한 날짜·시간':plan.preset==='next-morning'?'마지막 이용일 '+dateLabel(lastUseDate())+'의 다음 날 · 기준 '+plan.time:'정렬 기준 '+plan.time+' · 매장 설정 예시')+'</span></div>';
+  }
+  function shop(){
+    const total=subtotal()-discount();const ticketOnly=!picked().length&&state.tickets.length>0;
+    return '<div class="ski-pagehead"><div><span class="ski-eyebrow">'+dateLabel(rentalStart)+' · 카운터 POS</span><h1>새 대여 접수</h1></div><button type="button" class="ski-link-button" data-action="board">'+icon('clipboard-list')+'배달·수거 일정 <b>'+jobs.filter(j=>!done(j)).length+'</b>'+icon('chevron-right')+'</button></div>'+
+      (state.saved?'<div class="ski-done-strip">'+icon('check-circle-2')+'접수가 저장되었습니다.<button type="button" data-action="show-saved">업무 확인 →</button></div>':'')+
+      '<div class="ski-pos-layout"><section class="ski-pos-catalog" aria-label="대여 기간과 상품 선택">'+productTabs()+periodControls()+productSelector()+'</section>'+
+      '<section class="ski-pos-customer" aria-label="고객과 반납 정보"><div class="ski-sectionhead"><h2>'+(ticketOnly?'고객 정보':'고객 · 반납')+'</h2><button type="button" class="ski-setting-button" data-action="customers">'+icon('users')+'고객 찾기</button></div><div class="ski-fields"><div class="ski-field-row"><label class="ski-field">이름<input data-field="name" value="'+escape(state.name)+'" placeholder="고객 이름" autocomplete="off"></label><label class="ski-field">연락처<input data-field="phone" type="tel" value="'+escape(state.phone)+'" autocomplete="off"></label></div>'+(!ticketOnly?'<label class="ski-field">반납 방법<select data-field="returnMethod"><option value="collect" '+(state.returnMethod==='collect'?'selected':'')+'>차량 수거</option><option value="direct" '+(state.returnMethod==='direct'?'selected':'')+'>매장 직접</option></select></label>'+(state.returnMethod==='collect'?'<label class="ski-field">수거 장소<select data-field="place">'+['만선 티롤 앞','설천 주차장','만선 광장'].map(p=>'<option '+(state.place===p?'selected':'')+'>'+p+'</option>').join('')+'</select></label>':''):'')+'</div>'+(ticketOnly?'<p class="ski-pos-period">리프트권 구매 · 수거 대상 없음</p>':returnFields()+'<p class="ski-pos-period">장비 수령 · 매장 방문</p>')+'</section>'+
+      '<aside class="ski-summary ski-pos-checkout" aria-label="대여 내역과 견적"><div class="ski-summary-section"><div class="ski-sectionhead"><h2>대여 내역</h2><span class="ski-badge neutral">'+(picked().length?state.days+'일 대여':'리프트권 판매')+'</span></div><div id="ski-live-receipt">'+quoteSummary()+'</div></div><div class="ski-summary-section">'+discountSummary()+'<div class="ski-total"><span>최종 금액</span><strong id="ski-total-value">'+money(total)+'</strong></div><div class="ski-button-stack"><button type="button" class="ski-primary" data-action="save" '+(!hasItems()||state.saved?'disabled':'')+'>'+icon('check')+(state.saved?'접수 저장됨':jobs.some(j=>j.id==='R-025')?'접수 변경 저장':'접수 저장')+'</button><button type="button" class="ski-secondary-button" data-action="quote" '+(!hasItems()?'disabled':'')+'>'+icon('file-text')+'견적 미리보기</button></div></div></aside></div>';
+  }
+  function vehicleJobs(){return jobs.filter(j=>j.type!=='direct'&&(j.dateOffset||0)===Number(state.dateOffset)&&(state.filter==='all'||j.type===state.filter)).sort((a,b)=>state.sort==='place'?a.place.localeCompare(b.place,'ko')||a.time.localeCompare(b.time):a.time.localeCompare(b.time));}
+  function badge(j){return '<span class="ski-badge '+(done(j)?'done':j.type==='return'?'return':j.type==='direct'?'neutral':'')+'">'+typeLabel(j)+' · '+statusLabel(j)+'</span>';}
+  function jobCard(j){return '<button type="button" class="ski-job-item '+(state.selected===j.id?'is-selected ':'')+(j.urgent&&!j.ack?'is-urgent':'')+'" data-job="'+j.id+'" aria-pressed="'+(state.selected===j.id)+'"><div class="ski-job-meta"><span class="ski-badge '+(j.type==='return'?'return':'')+'">'+typeLabel(j)+'</span><span class="ski-job-time">'+j.time+'</span></div><strong>'+escape(j.place)+'</strong>'+(hasPreset(j)?'<span class="ski-job-slot">'+escape(j.returnLabel)+' · 정렬 기준 시간</span>':'')+'<p>'+escape(j.name)+' · '+(j.urgent&&!j.ack?'우선 확인 요청':statusLabel(j))+'</p></button>';}
+  function visit(j){return '<article class="ski-visit">'+(j.urgent&&!j.ack?'<div class="ski-priority"><span>'+icon('bell-ring')+'매장에서 우선 확인을 요청했어요</span><button type="button" data-action="ack">확인했어요</button></div>':'')+'<div class="ski-visit-inner"><div class="ski-visit-top">'+badge(j)+'<span class="ski-arrival"><strong>'+(hasPreset(j)?escape(j.returnLabel):j.time+' 예정')+'</strong><small>'+dateLabel(jobDate(j))+' · '+(hasPreset(j)?'기준 '+j.time:'직접 지정')+'</small></span></div><div class="ski-place">'+escape(j.place)+'</div><div class="ski-location-detail">'+icon('map-pin')+'<span>'+escape(j.detail)+'</span></div><div class="ski-customer"><strong>'+escape(j.name)+' 고객님</strong><span>'+escape(j.phone)+'</span></div><div class="ski-equipment">'+j.items.map(i=>'<span>'+escape(i[0])+' <strong>'+i[1]+'</strong></span>').join('')+'</div>'+(j.sms?'<p class="ski-secondary">출발 안내 · 5분 내 도착 · 발송 완료 시안</p>':'')+(done(j)?'<div class="ski-status-message">'+icon('check-circle-2')+'<span>'+(j.status==='collected'?'수거 완료 · 매장에서 마지막 확인을 기다리고 있어요.':j.status==='returned'?'매장에서 최종 확인하여 반납이 완료됐어요.':'배달 완료 · 고객에게 장비를 전달했어요.')+'</span></div>':'<div class="ski-actions"><button type="button" class="ski-secondary-button" data-action="phone">'+icon('phone')+'전화</button><button type="button" class="ski-secondary-button" data-action="sms">'+icon('message-square')+(j.sms?'문자 확인':'출발 문자')+'</button><button type="button" class="ski-primary ski-complete" data-action="complete">'+icon('package-check')+(j.type==='return'?'수거 완료':'배달 완료')+'</button></div>')+'</div></article>';}
+  function vehicle(){
+    const list=vehicleJobs();if(!list.some(j=>j.id===state.selected)&&list.length)state.selected=(list.find(j=>!done(j))||list[0]).id;
+    const selected=list.find(j=>j.id===state.selected);const next=list.find(j=>j.id!==state.selected&&!done(j));
+    return '<div class="ski-pagehead ski-vehicle-head"><div><span class="ski-eyebrow">'+dateLabel(addDays(rentalStart,Number(state.dateOffset)))+' · 1호 차량</span><h1>배달 · 수거</h1></div><div class="ski-segment" aria-label="차량 화면 모드"><button type="button" data-mode="simple" aria-pressed="'+(state.mode==='simple')+'">간단 모드</button><button type="button" data-mode="detail" aria-pressed="'+(state.mode==='detail')+'">자세히</button></div></div><div class="ski-vehicle-tools"><div class="ski-filter" aria-label="업무 구분">'+[['all','전체'],['delivery','배달'],['return','수거']].map(f=>'<button type="button" data-filter="'+f[0]+'" aria-pressed="'+(state.filter===f[0])+'">'+f[1]+' '+jobs.filter(j=>j.type!=='direct'&&(j.dateOffset||0)===Number(state.dateOffset)&&(f[0]==='all'||j.type===f[0])&&!done(j)).length+'</button>').join('')+'</div><div class="ski-datesort"><select class="ski-sort" data-field="dateOffset" aria-label="업무 날짜">'+jobOffsets().map(d=>'<option value="'+d+'" '+(Number(state.dateOffset)===d?'selected':'')+'>'+dateLabel(addDays(rentalStart,d))+(d===0?' · 오늘':'')+'</option>').join('')+'</select><select class="ski-sort" data-field="sort" aria-label="업무 정렬"><option value="time" '+(state.sort==='time'?'selected':'')+'>시간순</option><option value="place" '+(state.sort==='place'?'selected':'')+'>장소별 · 시간순</option></select></div></div><div class="ski-vehicle-grid '+(state.mode==='simple'?'is-simple':'')+'">'+(state.mode==='detail'?'<div class="ski-job-list" aria-label="선택한 날짜의 업무 목록">'+list.map(jobCard).join('')+'</div>':'')+'<section aria-label="선택한 방문 업무">'+(selected?visit(selected):'<div class="ski-empty">표시할 업무가 없습니다.</div>')+(next&&state.mode==='simple'?'<div class="ski-next"><div><small>다음 확인할 업무 · '+(hasPreset(next)?escape(next.returnLabel)+' · 기준 ':'')+next.time+'</small><strong>'+escape(next.place)+'</strong><span class="ski-secondary"> · '+typeLabel(next)+'</span></div><button type="button" data-job="'+next.id+'">보기 '+icon('arrow-right')+'</button></div>':'')+'</section></div>';
+  }
+  function render(){root.dataset.screen=state.view;content.innerHTML=state.view==='shop'?shop():vehicle();root.querySelector('.ski-brand strong').textContent=state.view==='shop'?'우리 스키샵':'1호 차량';root.querySelector('.ski-brand div>span').textContent=state.view==='shop'?'대여 접수 · 카운터':'배달 · 수거 전용';root.querySelectorAll('[data-view]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.view===state.view)));icons();}
+  function openDialog(title,html){if(overlay.hidden)previousFocus=document.activeElement;dialogTitle.textContent=title;dialogBody.innerHTML=html;clearNotice();content.hidden=true;root.querySelector('.ski-header').inert=true;overlay.hidden=false;icons();overlay.querySelector('[data-action="close-dialog"]').focus();}
+  function closeDialog(){overlay.hidden=true;content.hidden=false;root.querySelector('.ski-header').inert=false;modalJob=null;if(previousFocus&&previousFocus.isConnected)previousFocus.focus();}
+  function selectedJob(){return jobs.find(j=>j.id===state.selected);}
+  function board(){openDialog('배달 · 수거 일정','<div class="ski-board-list">'+jobs.slice().sort((a,b)=>jobDate(a).localeCompare(jobDate(b))||a.time.localeCompare(b.time)).map(j=>'<article class="ski-board-row"><div class="ski-board-row-head"><strong>'+escape(j.name)+'</strong>'+badge(j)+'</div><h3>'+escape(j.place)+'</h3><span class="ski-board-schedule">'+escape(jobSchedule(j))+'</span><p>'+j.items.map(i=>escape(i[0])+' '+i[1]).join(' · ')+'</p>'+(j.type!=='direct'&&!done(j)?'<button type="button" data-alert="'+j.id+'">'+(j.urgent?(j.ack?'기사님 확인함':'확인 요청됨'):'기사님께 확인 요청')+'</button><button type="button" data-vehicle-job="'+j.id+'">차량 화면 보기</button>':j.status==='collected'?'<button type="button" data-final="'+j.id+'">매장 최종 확인</button>':j.type==='direct'?'<span class="ski-secondary">고객이 매장으로 직접 반납하는 건입니다.</span>':'')+'</article>').join('')+'</div>');}
+  function save(){
+    if(state.saved||!hasItems())return;const plan=returnPlan();const error=picked().length?returnError(plan):'';if(!state.name.trim()||!state.phone.trim()){tell('이름과 연락처를 입력해 주세요.');return;}if(error){tell(error);return;}
+    if(needsPhysicalCheck()){openPhysical('save');return;}
+    const equipment=picked().map(p=>[p.name,state.qty[p.id]]);const returns=plannedReturnItems();
+    const existing=jobs.findIndex(j=>j.id==='R-025');
+    if(returns.length){const savedJob={id:'R-025',type:state.returnMethod==='collect'?'return':'direct',name:state.name,phone:state.phone,time:plan.time,returnDate:plan.date,returnPreset:plan.preset,returnLabel:plan.label,place:state.returnMethod==='collect'?state.place:'스키샵 직접 반납',detail:state.returnMethod==='collect'?'고객과 약속한 장소에서 수거':'매장 방문 예정',items:returns,status:'waiting',urgent:false,ack:false,sms:false,dateOffset:dateOffset(plan.date)};if(existing<0)jobs.push(savedJob);else jobs[existing]=savedJob;}else if(existing>=0){jobs.splice(existing,1);}
+    customers.forEach(c=>c.history=c.history.filter(h=>h.id!=='R-025'));
+    const customer=customers.find(c=>c.id===state.customerId);if(customer)customer.history.unshift({id:'R-025',date:equipment.length?state.startDate:state.tickets[0].date,days:equipment.length?state.days:0,items:equipment.map(i=>[...i]),equipmentDays:dailyEquipmentRows(),returns:returns.map(i=>[...i]),tickets:state.tickets.map(t=>({...t})),total:subtotal()-discount()});
+    state.saved=true;render();tell(returns.length?'시안에 접수했습니다. 반납 예정 '+scheduleText(plan):equipment.length?'장비 대여를 저장했습니다. 마지막 수거 예정 수량은 없습니다.':'리프트권 구매를 시안에 저장했습니다. 차량 수거 업무는 생성되지 않습니다.');
+  }
+  root.addEventListener('input',e=>{
+    if(e.target.hasAttribute('data-customer-search')){root.querySelector('#ski-customer-results').innerHTML=customerRows(e.target.value);icons();}
+    if(e.target.hasAttribute('data-lift-search')){state.liftQuery=e.target.value;if(state.liftQuery.trim())state.liftGroup='all';state.liftPage=0;refreshLiftSearch();}
+    if(e.target.hasAttribute('data-issued')){const count=root.querySelector('[data-return-count="'+e.target.dataset.issued+'"]');if(count)count.max=e.target.value;}
+    if(['name','phone'].includes(e.target.dataset.field))state.customerId=null;
+  });
+  root.addEventListener('change',e=>{
+    const field=e.target.dataset.period;if(!field)return;
+    state[field]=e.target.value;
+    if(field==='startDate'&&validDate(state.startDate))state.endDate=addDays(state.startDate,state.days-1);
+    if(validDate(state.startDate)&&validDate(state.endDate)&&state.endDate>=state.startDate)state.days=Math.round((Date.parse(state.endDate+'T00:00:00Z')-Date.parse(state.startDate+'T00:00:00Z'))/86400000)+1;
+    if(!periodError())resizeEquipmentDays();state.saved=false;render();tell('장비 수량은 일차별로 유지하며 늘어난 날은 마지막 날 수량을 복사합니다. 리프트권 날짜는 유지됩니다.');
+  });
+  root.addEventListener('change',e=>{if(e.target.hasAttribute('data-lift-date')){state.liftDate=e.target.value;state.liftPage=0;render();}if(e.target.hasAttribute('data-lift-audience')){state.liftAudience=e.target.value;state.liftPage=0;refreshLiftSearch();}if(e.target.hasAttribute('data-use-date'))selectUseDate(e.target.dataset.useDate,e.target.value);});
+  root.addEventListener('input',e=>{const f=e.target.dataset.field;if(!f)return;if(!['sort','dateOffset'].includes(f)){state.saved=false;const saveButton=root.querySelector('[data-action="save"]');if(saveButton){saveButton.disabled=!hasItems();saveButton.textContent=jobs.some(j=>j.id==='R-025')?'접수 변경 저장':'접수 저장';}const strip=root.querySelector('.ski-done-strip');if(strip)strip.remove();}state[f]=e.target.value;if(['manualReturnDate','manualReturnTime'].includes(f)){const plan=returnPlan();root.querySelector('#ski-return-feedback').innerHTML=returnFeedback(plan,returnError(plan));}});
+  root.addEventListener('change',e=>{const f=e.target.dataset.field;if(!f)return;state[f]=e.target.value;if(['returnMethod','sort','dateOffset'].includes(f))render();});
+  root.addEventListener('click',e=>{
+    const b=e.target.closest('button');if(!b||!root.contains(b)||b.disabled)return;
+    if(b.dataset.view){state.view=b.dataset.view;clearNotice();render();return;}
+    if(b.dataset.days){if(state.days===Number(b.dataset.days)&&!periodError())return;state.days=Number(b.dataset.days);if(!validDate(state.startDate))state.startDate=rentalStart;state.endDate=addDays(state.startDate,state.days-1);resizeEquipmentDays();state.saved=false;clearNotice();render();return;}
+    if(b.dataset.returnPreset){const plan=returnPlan();if(b.dataset.returnPreset==='manual'&&!state.manualInitialized){state.manualReturnDate=plan.date;state.manualReturnTime=plan.time;state.manualInitialized=true;}state.returnPreset=b.dataset.returnPreset;state.saved=false;clearNotice();render();return;}
+    if(b.dataset.productTab){state.productTab=b.dataset.productTab;clearNotice();render();root.querySelector('[data-product-tab="'+state.productTab+'"]').focus();return;}
+    if(b.dataset.useDay){selectUseDate(b.dataset.kind,b.dataset.useDay);return;}
+    if(b.dataset.product){state.equipmentDays[state.activeDay][b.dataset.product]=Math.max(0,Math.min(99,dayQty(b.dataset.product)+Number(b.dataset.delta)));suggestPhysicalQuantities();state.saved=false;clearNotice();render();return;}
+    if(b.dataset.copyDays){if(b.dataset.copyDays==='equipment'){const day={...state.equipmentDays[state.activeDay]};state.equipmentDays=state.equipmentDays.map(()=>({...day}));suggestPhysicalQuantities();}else{const lines=state.tickets.filter(t=>t.date===state.liftDate).map(t=>({...t}));const dates=useDates();state.tickets=state.tickets.filter(t=>!dates.includes(t.date));dates.forEach(date=>lines.forEach(t=>state.tickets.push({...t,date})));}state.saved=false;render();tell('선택한 날짜의 수량을 '+state.days+'개 이용일에 적용했습니다.');return;}
+    if(b.hasAttribute('data-ticket-edit')){const line=state.tickets[Number(b.dataset.ticketEdit)];state.productTab='lift';state.liftDate=line.date;state.liftQuery=line.name;state.liftAudience=line.audience;state.liftGroup='all';state.liftPage=0;render();root.querySelector('[data-lift-search]').focus();return;}
+    if(b.dataset.liftGroup){state.liftGroup=b.dataset.liftGroup;state.liftPage=0;refreshLiftSearch();return;}
+    if(b.dataset.liftPage){state.liftPage+=Number(b.dataset.liftPage);refreshLiftSearch();return;}
+    if(b.dataset.liftTicket){changeTickets(state.tickets,b.dataset.liftTicket,state.liftDate,Number(b.dataset.delta));state.saved=false;clearNotice();render();const next=root.querySelector('[data-lift-ticket="'+b.dataset.liftTicket+'"][data-delta="'+b.dataset.delta+'"]');if(next&&!next.disabled)next.focus();return;}
+    if(b.dataset.orderDiscount){const preset=discountPresets.find(p=>p.id===b.dataset.orderDiscount);state.discountSteps.push({...preset});state.saved=false;render();return;}
+    if(b.dataset.discountItem){openDiscount(b.dataset.discountItem);return;}
+    if(b.dataset.pickDiscount){discountDraft.value=discountPresets.find(p=>p.id===b.dataset.pickDiscount).value;updateDiscountPreview();return;}
+    if(b.dataset.customerDetail){customerDetail(b.dataset.customerDetail);return;}
+    if(b.dataset.mode){state.mode=b.dataset.mode;render();return;}
+    if(b.dataset.filter){state.filter=b.dataset.filter;render();return;}
+    if(b.dataset.job){state.selected=b.dataset.job;clearNotice();render();return;}
+    if(b.dataset.vehicleJob){state.selected=b.dataset.vehicleJob;state.dateOffset=jobs.find(j=>j.id===b.dataset.vehicleJob).dateOffset||0;state.filter='all';state.view='vehicle';closeDialog();render();return;}
+    if(b.dataset.alert){const j=jobs.find(x=>x.id===b.dataset.alert);j.urgent=true;j.ack=false;board();return;}
+    if(b.dataset.final){const j=jobs.find(x=>x.id===b.dataset.final);modalJob=j;openDialog('매장 최종 확인','<p class="ski-secondary">'+escape(j.name)+' · '+escape(j.place)+'</p><div class="ski-equipment">'+j.items.map(i=>'<span>'+escape(i[0])+' <strong>'+i[1]+'</strong></span>').join('')+'</div><p>수량과 장비 상태를 모두 확인했나요?</p><button type="button" class="ski-primary" data-action="final-confirm">모두 확인 · 반납 완료</button>');return;}
+    const a=b.dataset.action;const j=selectedJob();
+    if(a==='close-dialog'){closeDialog();return;}
+    if(a==='board'||a==='show-saved'){board();return;}
+    if(a==='save'){save();return;}
+    if(a==='physical'){openPhysical();return;}
+    if(a==='toggle-period'){state.periodExpanded=!state.periodExpanded;render();return;}
+    if(a==='physical-apply'){
+      const issued={},returns={};let error='';
+      for(const p of picked()){const issuedInput=root.querySelector('[data-issued="'+p.id+'"]');const returnInput=root.querySelector('[data-return-count="'+p.id+'"]');issued[p.id]=Number(issuedInput.value);returns[p.id]=Number(returnInput.value);if(!issuedInput.value.trim()||!Number.isInteger(issued[p.id])||issued[p.id]<peakQuantity(p.id)||issued[p.id]>billedQuantity(p.id))error=p.name+' 지급 수량은 '+peakQuantity(p.id)+'~'+billedQuantity(p.id)+'개의 정수로 입력해 주세요.';if(!returnInput.value.trim()||!Number.isInteger(returns[p.id])||returns[p.id]<0||returns[p.id]>issued[p.id])error=p.name+' 마지막 수거 수량은 0~'+issued[p.id]+'개의 정수로 입력해 주세요.';}
+      if(error){const message=root.querySelector('#ski-physical-error');message.hidden=false;message.textContent=error;return;}
+      const next=physicalNextAction;state.qty=issued;state.returnQty=returns;state.physicalConfirmed=true;state.saved=false;closeDialog();render();if(next==='save')save();return;
+    }
+    if(a==='undo-discount'||a==='clear-discount'){if(a==='undo-discount')state.discountSteps.pop();else state.discountSteps=[];state.saved=false;render();return;}
+    if(a==='discount-apply'||a==='discount-clear'){applyDiscount(a==='discount-clear');return;}
+    if(a==='customers'){customerSearch();return;}
+    if(a==='customer-new'){customerForm(null);return;}
+    if(a==='customer-edit'){customerForm(customerDetailId);return;}
+    if(a==='customer-use'){const c=customers.find(c=>c.id===customerDetailId);state.customerId=c.id;state.name=c.name;state.phone=c.phone;state.saved=false;closeDialog();render();tell('대표자 '+c.name+' 고객을 선택했습니다. 할인은 간편 할인에서 적용할 수 있습니다.');return;}
+    if(a==='customer-save'){const name=root.querySelector('[data-customer-edit="name"]').value.trim();const phone=root.querySelector('[data-customer-edit="phone"]').value.trim();const note=root.querySelector('[data-customer-edit="note"]').value.trim();if(!name||phone.replace(/\D/g,'').length<8){const error=root.querySelector('#ski-customer-error');error.hidden=false;error.textContent='대표자 이름과 연락 가능한 전화번호를 입력해 주세요.';return;}let c=customers.find(c=>c.id===customerEditingId);if(c){c.name=name;c.phone=phone;c.note=note;}else{c={id:'C-'+(customers.length+1),name,phone,note,history:[]};customers.push(c);}if(state.customerId===c.id){state.name=name;state.phone=phone;state.saved=false;render();}customerDetail(c.id);return;}
+    if(a==='time-settings'){openDialog('매장 반납 타임 기준','<p class="ski-secondary">시안용 예시 시간입니다. 실제 매장 운영에 맞춰 설정합니다.</p><div class="ski-fields">'+returnPresets.map(p=>'<label class="ski-field">'+p.label+'<input type="time" data-setting="'+p.id+'" value="'+p.time+'"></label>').join('')+'</div><p class="ski-dialog-note">익일 오전은 마지막 이용일의 다음 날입니다. 기존 접수 건의 시간은 유지됩니다.</p><p id="ski-settings-error" class="ski-return-error" role="alert" hidden></p><button type="button" class="ski-primary" data-action="save-time-settings">기준 시간 저장</button>');return;}
+    if(a==='save-time-settings'){const values=returnPresets.map(p=>root.querySelector('[data-setting="'+p.id+'"]').value);if(values.some(t=>!validTime(t))){const error=root.querySelector('#ski-settings-error');error.hidden=false;error.textContent='세 타임의 기준 시간을 모두 입력해 주세요.';return;}const activeChanged=returnPresets.some((p,i)=>p.id===state.returnPreset&&p.time!==values[i]);returnPresets.forEach((p,i)=>p.time=values[i]);if(activeChanged)state.saved=false;closeDialog();render();tell('기준 시간을 바꿨습니다. 기존 접수는 유지되며, 작성 중인 건은 접수 저장 시 적용됩니다.');return;}
+    if(a==='quote'){const plan=returnPlan();const equipment=picked().length>0;const error=equipment?returnError(plan):'';if(error){tell(error);return;}openDialog('대여 견적','<p class="ski-secondary">우리 스키샵 · '+escape(state.name)+' · '+(equipment?state.days+'일 대여':'리프트권 구매')+'</p>'+(equipment?'<p class="ski-quote-schedule">이용일 '+dateLabel(state.startDate)+' ~ '+dateLabel(lastUseDate())+'<br>반납 '+scheduleText(plan)+'<br>'+(state.returnMethod==='collect'?'차량 수거 · '+escape(state.place):'매장 직접 반납')+'</p>':'')+quoteSummary(false)+'<div class="ski-discount" style="margin-top:22px"><span>총 금액 할인</span><strong>−'+money(discount())+'</strong></div><div class="ski-total"><span>최종 금액</span><strong>'+money(subtotal()-discount())+'</strong></div><button type="button" class="ski-primary" data-action="close-dialog">확인</button>');return;}
+    if(a==='ack'){j.ack=true;render();tell('기사님의 확인 상태가 매장 화면에도 반영됐습니다.');return;}
+    if(a==='phone'){openDialog('고객 연락처','<p>'+escape(j.name)+' 고객님</p><div class="ski-phone-number">'+escape(j.phone)+'</div><p class="ski-dialog-note">전화 연결 버튼의 시안입니다. 실제 통화는 시작되지 않습니다.</p><button type="button" class="ski-primary" data-action="close-dialog">확인</button>');return;}
+    if(a==='sms'){modalJob=j;openDialog('출발 문자 확인','<p class="ski-secondary">'+escape(j.name)+' · '+escape(j.phone)+'</p><div class="ski-message-preview">[우리 스키샵] 차량이 출발하였습니다. 5분 내로 도착하니 '+(j.type==='return'?'반납':'배달')+' 장소에서 '+(j.type==='return'?'장비와 함께 ':'')+'대기해 주시기 바랍니다.</div><button type="button" class="ski-primary" data-action="send-sms" '+(j.sms?'disabled':'')+'>'+icon('send')+(j.sms?'출발 안내 완료':'출발 안내 보내기')+'</button><p class="ski-dialog-note">샘플 시안이며 실제 문자는 발송되지 않습니다.</p>');return;}
+    if(a==='send-sms'){if(modalJob){modalJob.sms=true;modalJob.status='moving';}closeDialog();render();tell('출발 안내 완료 상태로 변경했습니다. 실제 문자는 발송되지 않았습니다.');return;}
+    if(a==='complete'){modalJob=j;openDialog(j.type==='return'?'수거 수량 확인':'배달 수량 확인','<p>'+escape(j.name)+' · '+escape(j.place)+'</p><div class="ski-equipment">'+j.items.map(i=>'<span>'+escape(i[0])+' <strong>'+i[1]+'</strong></span>').join('')+'</div><p>'+(j.type==='return'?'위 장비를 모두 받으셨나요?':'위 장비를 모두 전달하셨나요?')+'</p><button type="button" class="ski-primary" data-action="complete-confirm">모두 '+(j.type==='return'?'수거':'배달')+' 완료</button><p class="ski-dialog-note">'+(j.type==='return'?'수거 후 매장에서 최종 확인해야 반납 완료로 바뀝니다.':'고객에게 전달한 장비 수량을 확인해 주세요.')+'</p>');return;}
+    if(a==='complete-confirm'){if(modalJob){modalJob.status=modalJob.type==='return'?'collected':'delivered';modalJob.ack=true;}closeDialog();render();tell('처리 상태가 매장 화면에도 반영됐습니다.');return;}
+    if(a==='final-confirm'){if(modalJob)modalJob.status='returned';closeDialog();render();tell('매장 최종 확인이 끝나 반납 완료로 변경됐습니다.');return;}
+  });
+  root.addEventListener('keydown',e=>{if(overlay.hidden){if(e.target.hasAttribute('data-product-tab')&&['ArrowLeft','ArrowRight','Home','End'].includes(e.key)){e.preventDefault();state.productTab=e.key==='Home'?'equipment':e.key==='End'?'lift':state.productTab==='equipment'?'lift':'equipment';render();root.querySelector('[data-product-tab="'+state.productTab+'"]').focus();}return;}if(e.key==='Escape'){e.preventDefault();closeDialog();}if(e.key==='Tab'){const f=Array.from(overlay.querySelectorAll('button:not(:disabled),input,select'));if(!f.length)return;const first=f[0],last=f[f.length-1];if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus();}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus();}}});
+  function applyDesign(){root.style.setProperty('--ski-shop-radius',design.radius+'px');root.style.setProperty('--ski-shop-accent',design.accent==='블루'?'#0665ef':'#c54b15');root.style.setProperty('--ski-base',design.large?'20px':'18px');}
+  render();applyDesign();
+  if(globalThis.Tweak){const tweak=new globalThis.Tweak({container:root,onChange:applyDesign});tweak.addSelect(design,'accent',{label:'매장 버튼 색상',options:['블루','오렌지']});tweak.addSlider(design,'radius',{label:'매장 카드 둥글기',min:8,max:24,step:2,unit:'px'});}
+})();
+</script>
