@@ -1,0 +1,17 @@
+<div id="ski-ops" lang="ko" aria-label="스키샵 운영 화면 체험">
+  <div id="so-workspace" class="so-workspace">
+    <aside class="so-sidebar" aria-label="매장 메뉴">
+      <div class="so-brand"><span class="so-brand-icon"><i data-lucide="mountain-snow" aria-hidden="true"></i></span><div><strong>우리 스키샵</strong><small>RENTAL &amp; OPERATIONS</small></div></div>
+      <nav id="so-navigation" aria-label="주요 업무"></nav>
+      <div class="so-sidebar-foot"><span class="so-dot"></span> 화면 체험 중<small>입력 내용은 저장되지 않습니다.</small></div>
+    </aside>
+    <div class="so-workarea">
+      <header class="so-topbar"><div class="so-topbar-left"><button type="button" id="so-menu-toggle" aria-label="메뉴 열기" aria-expanded="false"><i data-lucide="menu" aria-hidden="true"></i></button><span id="so-breadcrumb">오늘 현황</span></div><div class="so-topbar-right"><span class="so-demo-label">샘플 데이터</span><button type="button" data-go="vehicle"><i data-lucide="tablet" aria-hidden="true"></i>차량 화면</button><button type="button" data-action="logout" aria-label="로그인 화면으로"><i data-lucide="log-out" aria-hidden="true"></i><span>나가기</span></button></div></header>
+      <main id="so-main"><div id="so-page"></div><section id="so-legacy" hidden aria-label="기존 대여 접수와 차량 화면"><!-- LEGACY_FRAGMENT --></section></main>
+    </div>
+  </div>
+  <section id="so-entry" hidden></section>
+  <section id="so-public" hidden></section>
+  <dialog id="so-dialog" aria-labelledby="so-dialog-title"><div class="so-dialog-heading"><h2 id="so-dialog-title"></h2><button type="button" data-action="close" aria-label="창 닫기"><i data-lucide="x" aria-hidden="true"></i></button></div><div id="so-dialog-body"></div></dialog>
+  <div id="so-toast" class="so-toast" role="status" aria-live="polite" hidden></div>
+</div>
