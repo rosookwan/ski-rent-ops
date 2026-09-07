@@ -1,0 +1,56 @@
+const { chromium } = require('playwright');
+const assert = require('node:assert/strict');
+const fs = require('node:fs');
+const path = require('node:path');
+(async () => {
+  const url = process.env.SKI_DEMO_URL || 'http://127.0.0.1:58148/';
+  const browser = await chromium.launch({ headless: true, channel: process.env.SKI_CHROME_CHANNEL || 'chrome' });
+  const page = await browser.newPage();
+  const errors = [], mutations = [];
+  page.on('pageerror', error => errors.push(error.message));
+  page.on('request', request => { if (!['GET', 'HEAD'].includes(request.method())) mutations.push(request.method()); });
+  try {
+    await page.goto(url, { waitUntil: 'networkidle' });
+    const frame = page.frames().find(frame => frame.parentFrame());
+    const result = await frame.evaluate(async () => {
+      const api = window.SkiOps.returns;
+      const get = () => api.store.get(api.sampleOrderIds[0]);
+      const originalScreens = JSON.stringify(window.SkiOpsData.orders);
+      let order = await get();
+      const initialVersion = order.version;
+      const payload = api.prepareVehicleReturn(order, [{ itemId: 'ski', quantity: 2 }, { itemId: 'clothes', quantity: 2 }, { itemId: 'ticket', quantity: 2 }], [{ itemId: 'clothes', quantity: 2 }, { itemId: 'ticket', quantity: 2 }]);
+      const command = api.newCommand('collect', order, payload);
+      const collection = await api.driver.execute(command);
+      const retry = await api.driver.execute(command);
+      order = await get();
+      const partial = order.status;
+      const tomorrow = new Date(Date.parse(window.SkiOpsData.today) + 86400000).toISOString().slice(0, 10);
+      await api.store.execute(api.newCommand('planReturn', order, { items: [{ itemId: 'ticket', returnPlan: { date: tomorrow } }] }));
+      order = await get();
+      await api.store.execute(api.newCommand('receiveDirect', order, { items: [{ itemId: 'clothes', quantity: 2 }] }));
+      order = await get();
+      await api.store.execute(api.newCommand('confirmVehicle', order, { collectionId: collection.requestId, items: [{ itemId: 'ski', quantity: 2 }] }));
+      const nextDay = await api.store.list({ onDate: tomorrow, filter: 'liftUnreturned' });
+      order = await get();
+      const receipt = await api.store.execute(api.newCommand('receiveDirect', order, { items: [{ itemId: 'ticket', quantity: 2 }] }));
+      const completed = receipt.order.status;
+      const report = await api.store.report();
+      const corrected = await api.store.execute(api.newCommand('correctReturn', receipt.order, { movementId: receipt.requestId, items: [{ itemId: 'ticket', quantity: 1 }] }));
+      const ticketOnly = await api.store.get(api.sampleOrderIds[1]);
+      return { mode: api.mode, persistent: api.persistent, multiDevice: api.multiDevice, initialVersion, partial, duplicate: retry.duplicate, nextDay: nextDay[0].dueItems.map(item => item.id), completed, corrected: corrected.order.status, report, ticketOnlyTarget: ticketOnly.totals.customerQuantity, defaults: corrected.order.items.slice(1).map(item => item.returnPlan.method), historyCount: (await api.store.history(order.id)).length, screenDataUntouched: JSON.stringify(window.SkiOpsData.orders) === originalScreens };
+    });
+    assert.equal(result.mode, 'memory'); assert.equal(result.persistent, false); assert.equal(result.multiDevice, false);
+    assert.equal(result.partial, 'partial_return'); assert.equal(result.duplicate, true);
+    assert.deepEqual(result.nextDay, ['ticket']); assert.equal(result.completed, 'returned');
+    assert.equal(result.corrected, 'partial_return'); assert.equal(result.report.recoveredQuantity, 2); assert.equal(result.report.recoveryValueWon, 2000);
+    assert.equal(result.ticketOnlyTarget, 4); assert.deepEqual(result.defaults, ['direct', 'direct']);
+    assert.equal(result.screenDataUntouched, true);
+    await page.reload({ waitUntil: 'networkidle' });
+    const reset = await page.frames().find(frame => frame.parentFrame()).evaluate(async () => (await window.SkiOps.returns.store.get('RETURN-DEMO-1')).version);
+    assert.equal(reset, result.initialVersion);
+    assert.deepEqual(errors, []); assert.deepEqual(mutations, []);
+    const output = path.join(__dirname, '../work'); fs.mkdirSync(output, { recursive: true });
+    fs.writeFileSync(path.join(output, 'smoke-returns.json'), JSON.stringify({ url, result, resetVersion: reset, errors, nonGetRequests: mutations }, null, 2) + '\n');
+    console.log('PASS return module: partial collection, next-day ticket, shop confirmation, correction, report, replay, isolated page memory');
+  } finally { await browser.close(); }
+})().catch(error => { console.error(error); process.exitCode = 1; });

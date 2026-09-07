@@ -17,6 +17,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22.22.2'
+      - name: Validate return rules and durable API
+        run: npm run test:returns
       - name: Check JavaScript and build static demo
         run: python3 scripts/check.py
       - uses: actions/upload-pages-artifact@v4

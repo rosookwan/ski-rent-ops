@@ -2,14 +2,19 @@
   "name": "ski-rent-ops",
   "version": "0.9.0",
   "private": true,
-  "description": "Screen-only demo for a ski rental shop and delivery tablet",
+  "description": "Ski rental screen demo with a separate returns engine and SQLite API",
   "scripts": {
     "dev": "python3 scripts/build.py --serve --port 58148",
     "build": "python3 scripts/build.py",
     "check": "python3 scripts/check.py",
     "test": "node scripts/smoke.cjs all",
-    "test:visual": "node scripts/visual-check.cjs"
+    "test:visual": "node scripts/visual-check.cjs",
+    "test:returns": "node --test tests/returns-*.test.cjs",
+    "test:returns:browser": "node scripts/smoke-returns.cjs",
+    "returns:setup": "node scripts/setup-returns-demo.cjs",
+    "returns:server": "node server/returns-api.cjs"
   },
+  "engines": { "node": ">=22.13.0" },
   "devDependencies": {
     "playwright": "1.62.1"
   }

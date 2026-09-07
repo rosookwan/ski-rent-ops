@@ -6,7 +6,8 @@ from html import escape
 
 ROOT = Path(__file__).resolve().parents[1]
 APP = ROOT / 'design/app'
-MODULES = ['data.js', 'core.js', 'rentals.js', 'settings.js', 'partners.js', 'closing.js', 'preparation.js', 'guide.js', 'login.js']
+MODULES = ['data.js', 'core.js', 'return-runtime.js', 'rentals.js', 'settings.js', 'partners.js', 'closing.js', 'preparation.js', 'guide.js', 'login.js']
+RETURN_MODULES = ['domain.js', 'service.js', 'client.js', 'demo.js']
 
 def build():
     legacy = (ROOT / 'design/prototypes/first-look.fragment.html').read_text()
@@ -14,6 +15,8 @@ def build():
     legacy = legacy.replace('  render();applyDesign();', '  '+bridge+'\n  render();applyDesign();')
     fragment = (APP / 'shell.html').read_text().replace('<!-- LEGACY_FRAGMENT -->', legacy)
     fragment += '\n<style>\n' + (APP / 'styles.css').read_text() + '\n' + (APP / 'polish.css').read_text() + '\n</style>\n'
+    for name in RETURN_MODULES:
+        fragment += '<script>\n' + (ROOT / 'src/returns' / name).read_text() + '\n</script>\n'
     for name in MODULES:
         if (APP / name).exists():
             source=(APP/name).read_text()

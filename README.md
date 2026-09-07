@@ -12,6 +12,10 @@
 
 0.9에서는 오늘 현황, 렌탈현황과 상세, 매장 설정, 재고·정비, 거래처 장부, 하루 마감, 사전 사이즈 입력·준비표, QR 이용 안내, 임시 로그인을 연결했습니다. 매장은 Makaryo의 밝은 바탕과 주황 포인트, 차량은 Task management의 보라색과 둥근 업무 카드를 참고했습니다. Pretendard 한글 폰트와 아이콘을 포함해 다른 컴퓨터에서도 같은 모습으로 열립니다.
 
+**반납 기능 1.0 추가:** 리프트권 단독 접수·회수, 품목별 일부 반납, 일정 분리, 차량 인수와 매장 확인, 수량 정정·이력, 장당 1,000원 기준 집계를 화면과 분리해 구현했습니다. SQLite 저장 API와 변경분 동기화 클라이언트도 포함합니다. 의류·리프트권은 직접반납이 기본이며 사유 종류는 보류했습니다.
+
+현재 버튼은 새 반납 기능에 연결하지 않았습니다. Pages에는 `SkiOps.returns` 메모리 체험 모듈이 포함되며 실제 API 서버·영구 저장·기기 간 공유는 연결하지 않았습니다. [기능·API·실행 설명](docs/10-return-functions.md)과 [후속 UI 프롬프트 3개](docs/11-return-ui-handoff.md)를 참고하세요.
+
 | 매장 POS | 차량 태블릿 |
 |---|---|
 | ![매장 화면](design/previews/store.png) | ![차량 화면](design/previews/vehicle.png) |
@@ -31,11 +35,15 @@ npm ci
 npm run check
 npm test
 npm run test:visual
+npm run test:returns
+npm run test:returns:browser
 ```
 
 브라우저 검사는 위의 로컬 서버가 실행 중이어야 합니다. `npm test`는 클릭 흐름 29개, `npm run test:visual`은 화면 크기·차량 버튼 검사 37개를 수행합니다. 검사 결과와 캡처는 Git에서 제외한 `work/`에 생성됩니다. 배포 주소에서도 `SKI_DEMO_URL=https://rosookwan.github.io/ski-rent-ops/ npm test`로 같은 동작을 확인할 수 있습니다.
 
 `npm run build` 결과는 `dist/index.html`입니다. `main`에 푸시하면 GitHub Actions가 구문 검사와 빌드 후 Pages를 갱신합니다. Pages 설정의 빌드 소스는 **GitHub Actions**입니다. 자세한 구현 범위와 검증은 [화면 체험과 검증 기록](docs/09-clickable-demo-and-validation.md)에 정리했습니다.
+
+`test:returns`는 도메인·SQLite·HTTP·클라이언트를 자동 검증합니다. `test:returns:browser`는 실행 중인 로컬 화면 또는 `SKI_DEMO_URL`의 모듈을 검증합니다. Actions에서도 반납 기능 검사를 수행합니다. SQLite API는 Node 22.13 이상에서 실행하며 [로컬 실행 방법](docs/10-return-functions.md#로컬-저장-api-실행)을 따릅니다.
 
 ## 결정 상태
 
