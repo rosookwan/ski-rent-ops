@@ -1,212 +1,560 @@
-/* Figma references: Makaryo (store), Task management (vehicle), Wanted (Korean type). */
-#ski-ops{--so-accent:#da480b;--so-soft:#fff1e8;--so-ink:#262932;--so-muted:#737782;--so-line:#e9e9ed;--so-bg:#f7f8fa;--so-purple:#6840e4;border-radius:0;min-height:100vh;font-weight:400;-webkit-font-smoothing:antialiased;letter-spacing:-.3px}
-#ski-ops svg{stroke-width:1.7}
+/* September reference: Makaryo store, Wanted type, Task management vehicle. */
+#ski-ops{--so-accent:#fe4e10;--so-soft:#fff4ed;--so-ink:#1a1a1a;--so-muted:#6d6d6d;--so-line:#e7e7e7;--so-bg:#f8f8f8;--so-purple:#5f33e1;font:16px/1.45 Pretendard,"Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;height:100vh;height:100dvh;min-height:0;border-radius:0;overflow:hidden;letter-spacing:-.02em;-webkit-font-smoothing:antialiased}
+#ski-ops svg{stroke-width:1.8}
 #ski-ops h1,#ski-ops h2,#ski-ops h3{word-break:keep-all}
-#ski-ops button{transition:background-color .16s,border-color .16s,box-shadow .16s}
-#ski-ops .so-workspace{min-height:100vh;grid-template-columns:214px minmax(0,1fr)}
-#ski-ops .so-sidebar{position:sticky;top:0;height:100vh;gap:28px;padding:28px 16px 20px;overflow-y:auto}
-#ski-ops .so-brand{gap:11px;padding:0 5px}
-#ski-ops .so-brand-icon{width:42px;height:42px;background:#ff5b17;border-radius:14px}
-#ski-ops .so-brand-icon svg{width:26px;height:26px}
-#ski-ops .so-brand strong{font-size:20px;font-weight:750}
-#ski-ops .so-brand small{font-size:8px;letter-spacing:1px;color:#8e929b}
-#ski-ops .so-nav-group{gap:6px}
-#ski-ops .so-nav-group+.so-nav-group{margin-top:27px}
-#ski-ops .so-nav-caption{font-size:12px;padding-left:15px}
-#ski-ops .so-nav-button{min-height:48px;padding:11px 14px;font-size:16px;font-weight:500;color:#6c707b;border-radius:11px;gap:12px}
-#ski-ops .so-nav-button svg{width:21px;height:21px}
-#ski-ops .so-nav-button[aria-current=page]{background:#fff0e7;color:#c64009;font-weight:700}
-#ski-ops .so-nav-button[aria-current=page] svg{stroke-width:2}
-#ski-ops .so-nav-button:hover:not([aria-current]){background:#f6f7f9;color:#30343c}
-#ski-ops .so-sidebar-foot{background:#fafafa;border:1px solid #eeeef1;border-radius:11px;padding:13px 12px;margin-top:auto;font-size:12px}
-#ski-ops .so-sidebar-foot small{font-size:11px;line-height:1.5}
-#ski-ops .so-topbar{min-height:72px;padding:14px 28px;position:sticky;top:0;z-index:5;background:#ffffffed;backdrop-filter:blur(12px)}
-#ski-ops .so-topbar-left{font-size:17px;font-weight:650}
-#ski-ops .so-topbar-right{gap:16px}
-#ski-ops .so-topbar button{font-size:14px;color:#666c77}
-#ski-ops .so-topbar button:hover{background:#f6f7f9}
-#ski-ops .so-demo-label{border:1px solid #eaeaf0;background:#fafafa;padding:4px 9px;font-size:11px;border-radius:6px;letter-spacing:0}
-#ski-ops #so-main{padding:28px}
-#ski-ops .so-pagehead{margin-bottom:24px;gap:14px}
-#ski-ops .so-pagehead h1{font-size:29px;font-weight:720;line-height:1.4;letter-spacing:-1px}
-#ski-ops .so-pagehead p{font-size:15px;margin-top:7px}
-#ski-ops .so-eyebrow{font-size:13px;color:#8a8c94;font-weight:500;letter-spacing:0;margin-bottom:7px}
-#ski-ops .so-button{min-height:46px;padding:11px 17px;font-weight:600;border-radius:10px;border-color:#e1e3e9}
-#ski-ops .so-button:not(.primary):not(.quiet):hover{background:#f9fafc;border-color:#c8cdd7}
-#ski-ops .so-button.primary{background:#ed5010;border-color:#ed5010;box-shadow:0 2px 2px #9e320807}
-#ski-ops .so-button.primary:hover{background:#d94309;border-color:#d94309}
-#ski-ops .so-button.small{min-height:40px;font-size:14px;padding:8px 13px}
-#ski-ops .so-button.soft{background:#fff3eb;border-color:#ffddc8;color:#c44815}
-#ski-ops .so-button.quiet{color:#767b86}
-#ski-ops .so-button.quiet:hover{background:#f3f4f6}
-#ski-ops .so-panel{border-radius:16px;box-shadow:0 3px 7px #34394b02}
-#ski-ops .so-panel-head{padding:20px 22px}
-#ski-ops .so-panel-head h2{font-size:19px;font-weight:680}
-#ski-ops .so-panel-pad{padding:22px}
-#ski-ops .so-stack{gap:20px}
-#ski-ops .so-tabs{gap:3px;padding:4px;border:1px solid #e8e9ef;border-radius:12px;width:fit-content;background:#eff0f4;margin-bottom:22px}
-#ski-ops .so-tab{padding:10px 18px;min-height:44px;border:0;font-size:15px;border-radius:9px;font-weight:560}
-#ski-ops .so-tab[aria-pressed=true]{background:#fff;color:#d14610;box-shadow:0 1px 5px #3035470e}
-#ski-ops .so-toolbar{gap:14px;margin-bottom:20px}
-#ski-ops .so-field{font-size:14px;font-weight:560;gap:8px;color:#5f6570}
-#ski-ops input,#ski-ops select,#ski-ops textarea{min-height:46px;border-color:#e0e3e9;font-size:16px;font-weight:400;padding:11px 13px;border-radius:9px}
-#ski-ops input::placeholder{color:#a0a5af}
-#ski-ops input[readonly]{color:#6b707b;background:#f8f9fb}
-#ski-ops .so-search{width:min(365px,100%)}
-#ski-ops .so-search input{background:#fff;padding-left:15px}
-#ski-ops .so-form-grid{gap:20px}
-#ski-ops table{font-size:15px}
-#ski-ops th{background:#f8f9fb;color:#8b8f99;font-size:13px;padding:14px 20px;font-weight:500}
-#ski-ops td{padding:18px 20px;border-top-color:#f0f1f4}
-#ski-ops td strong{font-size:16px;font-weight:600}
-#ski-ops td small{font-size:13px;color:#9397a1;margin-top:5px}
-#ski-ops tbody tr:hover{background:#fdfdfd}
-#ski-ops .so-status{font-size:12px;font-weight:550;border-radius:6px;padding:5px 9px;line-height:1.5}
-#ski-ops .so-status.orange{background:#fff0e4;color:#b95e24}
-#ski-ops .so-status.green{background:#eaf7ef;color:#388357}
-#ski-ops .so-status.blue{background:#eaf2fe;color:#527bbb}
-#ski-ops .so-status.purple{background:#f0ebff;color:#7854be}
-#ski-ops .so-row{padding:20px 22px}
-#ski-ops .so-avatar{border-radius:50%;font-size:16px;font-weight:500;width:40px;height:40px;background:#f0f2f7;color:#727e96}
-#ski-ops .so-note{background:#fffaf3;border-color:#f1e6d5;color:#926d3b;font-size:14px;line-height:1.65}
-#ski-ops .so-preview-note{font-size:12px;color:#9499a3;line-height:1.65}
-#ski-ops .so-metric{border-radius:15px;padding:21px 22px;border-color:#e9eaf0}
-#ski-ops .so-metric:hover{border-color:#d5d8e0;box-shadow:0 4px 15px #353a4908}
-#ski-ops .so-metric strong{font-weight:680}
-#ski-ops .so-home-metrics{gap:16px;margin-bottom:24px}
-#ski-ops .so-home-metrics .so-metric{padding:16px 20px}
-#ski-ops .so-metric-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
-#ski-ops .so-metric-top>svg{width:17px;height:17px;color:#b7bbc3}
-#ski-ops .so-metric-glyph{display:grid;place-items:center;width:34px;height:34px;border-radius:10px}
-#ski-ops .orange.so-metric-glyph,#ski-ops .orange.so-login-mini-icon{background:#fff1e5;color:#e48037}
-#ski-ops .blue.so-metric-glyph{background:#eef4ff;color:#7094db}
-#ski-ops .purple.so-metric-glyph,#ski-ops .purple.so-login-mini-icon{background:#f1ebff;color:#9574d5}
-#ski-ops .green.so-metric-glyph,#ski-ops .green.so-login-mini-icon{background:#edf7f0;color:#67a77c}
-#ski-ops .so-home-metrics .so-metric-label{font-size:15px;color:#767c86}
-#ski-ops .so-home-metrics .so-metric strong{font-size:33px;margin:4px 0 7px;color:#292d36;letter-spacing:-1px}
-#ski-ops .so-metric strong em{font-size:16px;margin-left:5px;font-style:normal;font-weight:500;letter-spacing:0;color:#9296a0}
-#ski-ops .so-home-metrics .so-metric small{font-size:12px;color:#969ba5;white-space:normal}
-#ski-ops .so-home-grid{display:grid;grid-template-columns:minmax(0,1.8fr) minmax(280px,1fr);gap:22px;align-items:stretch}
-#ski-ops .so-today-work .so-panel-head p{margin-top:6px;font-size:13px}
-#ski-ops .so-count-bubble{display:inline-block;background:#f1f2f6;border-radius:6px;margin-left:5px;font-size:13px;padding:2px 7px;color:#7b818b;font-weight:600}
-#ski-ops .so-work-list{padding:0 22px}
-#ski-ops .so-work-item{width:100%;display:flex;align-items:center;gap:13px;min-height:78px;padding:12px 0;text-align:left;border:0;border-bottom:1px solid #f1f2f4;border-radius:0;background:#fff;color:var(--so-ink)}
-#ski-ops .so-work-item:last-child{border-bottom:0}
-#ski-ops .so-work-item:hover{background:#fcfcfd}
-#ski-ops .so-work-time{width:64px;flex-shrink:0;font-size:14px;font-weight:500;color:#858b97;font-variant-numeric:tabular-nums}
-#ski-ops .so-work-name{flex:1;min-width:0}
-#ski-ops .so-work-name strong{font-size:16px;font-weight:600;display:block}
-#ski-ops .so-work-name small{display:block;margin-top:6px;font-size:13px;color:#9197a1}
-#ski-ops .so-work-item>svg{color:#b9bec8;width:16px}
-#ski-ops .so-section-footer{background:#fcfcfd;color:#9398a2;min-height:51px;font-size:12px}
-#ski-ops .so-section-footer svg{width:15px;height:15px;margin-right:5px}
-#ski-ops .so-driver-preview{padding:25px;background:#f0ebfc;border:1px solid #e8dff9;border-radius:17px;display:flex;flex-direction:column;color:#48336f}
-#ski-ops .so-driver-label{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:550}
-#ski-ops .so-driver-label .so-status{margin-left:auto;background:#fff9}
-#ski-ops .so-driver-place{margin:35px 0 20px}
-#ski-ops .so-driver-place>span{font-size:14px;font-weight:600;color:#8a71b3}
-#ski-ops .so-driver-place small{display:block;color:#9586ae;font-size:12px;font-weight:400;margin-top:4px}
-#ski-ops .so-driver-place h2{font-size:28px;letter-spacing:-.9px;line-height:1.3;margin:12px 0}
-#ski-ops .so-driver-place p{font-size:14px;color:#8f7fa7}
-#ski-ops .so-driver-gear{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:24px}
-#ski-ops .so-driver-gear span{padding:7px 10px;border-radius:8px;background:#faf7ff;color:#837298;font-size:13px}
-#ski-ops .so-driver-gear b{margin-left:5px;color:#5f437f;font-size:15px;font-weight:600}
-#ski-ops .so-driver-preview .driver-link{margin-top:auto;background:#fff;border:0;color:#7759a5;justify-content:space-between;font-size:14px}
-#ski-ops .so-home-shortcuts{margin-top:24px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
-#ski-ops .so-shortcut{display:flex;align-items:center;gap:14px;padding:20px;background:#fff;border:1px solid var(--so-line);border-radius:13px;text-align:left;color:var(--so-ink)}
-#ski-ops .so-shortcut>span{width:42px;height:42px;background:#f7f8fa;border-radius:11px;display:grid;place-items:center;color:#7f899b;flex-shrink:0}
-#ski-ops .so-shortcut strong{font-size:15px;font-weight:600;display:block}
-#ski-ops .so-shortcut small{font-size:12px;display:block;margin-top:6px;color:#969ba5}
-#ski-ops .so-shortcut>svg{margin-left:auto;width:17px;color:#bbc0ca}
-#ski-ops .so-shortcut:hover{border-color:#d5d8e0}
-#ski-ops dialog{border:0;border-radius:20px;box-shadow:0 20px 90px #23293930}
-#ski-ops dialog::backdrop{background:#292e4257;backdrop-filter:blur(3px)}
-#ski-ops .so-dialog-heading{padding:22px 26px}
-#ski-ops #so-dialog-body{padding:26px;gap:22px}
-#ski-ops .so-login-shell{min-height:100vh;grid-template-columns:1fr 1fr}
-#ski-ops .so-login-story{padding:44px 9%;background:#fcf5ef;gap:42px}
-#ski-ops .so-login-brand{font-size:22px}
-#ski-ops .so-login-brand>span{background:#ff5b17;width:44px;height:44px;border-radius:14px}
-#ski-ops .so-login-brand svg{width:28px;height:28px}
-#ski-ops .so-login-copy .so-eyebrow{font-size:11px;letter-spacing:2px;color:#b2876d;margin-bottom:14px}
-#ski-ops .so-login-copy h1{font-size:42px;color:#413a36;font-weight:700;line-height:1.45;letter-spacing:-1.5px}
-#ski-ops .so-login-copy p{margin:18px 0 26px;font-size:17px;color:#9c8576;line-height:1.8}
-#ski-ops .so-login-mini{max-width:415px;background:#fff;border:1px solid #f0e7e1;border-radius:17px;padding:20px 22px;box-shadow:0 14px 35px #8c61380b}
-#ski-ops .so-login-mini-head{display:flex;align-items:center;justify-content:space-between;padding-bottom:16px;border-bottom:1px solid #f1eeeb}
-#ski-ops .so-login-mini-head strong{font-size:15px;font-weight:600}
-#ski-ops .so-login-mini-head span{font-size:11px;color:#aaa3a0}
-#ski-ops .so-login-mini>div:not(:first-child){display:flex;gap:12px;align-items:center;margin-top:18px}
-#ski-ops .so-login-mini-icon{display:grid;place-items:center;width:37px;height:37px;border-radius:10px;flex-shrink:0}
-#ski-ops .so-login-mini b{font-size:14px;font-weight:550;display:block;color:#57535a}
-#ski-ops .so-login-mini small{font-size:11px;display:block;color:#a09aa0;margin-top:4px}
-#ski-ops .so-login-mini em{font-size:10px;font-style:normal;background:#f6f6f8;padding:4px 7px;border-radius:5px;color:#9e99a2;margin-left:auto;white-space:nowrap}
+#ski-ops small,#ski-ops .so-muted{color:#6d6d6d;font-size:14px}
+#ski-ops button{transition:background-color .15s,border-color .15s}
+#ski-ops button:focus-visible,#ski-ops input:focus-visible,#ski-ops select:focus-visible,#ski-ops textarea:focus-visible{outline:3px solid #5f33e1;outline-offset:2px}
+/* One collapsible rail, reset to icons whenever a route opens. */
+#ski-ops .so-workspace{height:100%;min-height:0;grid-template-columns:72px minmax(0,1fr)}
+#ski-ops .so-sidebar{position:relative;height:100%;min-height:0;padding:14px 12px;gap:22px;overflow-y:auto;overflow-x:hidden;scrollbar-width:thin}
+#ski-ops .so-brand{padding:0;gap:11px;justify-content:center;flex-shrink:0}
+#ski-ops .so-brand-icon{width:40px;height:40px;border-radius:7px;background:#fe4e10;flex-shrink:0}
+#ski-ops .so-brand-icon svg{width:25px;height:25px}
+#ski-ops .so-brand>div,#ski-ops .so-nav-label,#ski-ops .so-nav-caption,#ski-ops .so-sidebar-foot{display:none}
+#ski-ops .so-brand strong{font-size:18px;font-weight:700;letter-spacing:-.03em;white-space:nowrap}
+#ski-ops .so-brand small{font-size:10px;line-height:1.3;letter-spacing:.08em}
+#ski-ops .so-nav-group{gap:4px}
+#ski-ops .so-nav-group+.so-nav-group{margin-top:22px}
+#ski-ops .so-nav-button{width:48px;min-height:48px;height:48px;padding:12px;justify-content:center;gap:12px;border-radius:16px;font-size:16px;font-weight:500;color:#5d5d5d;flex-shrink:0}
+#ski-ops .so-nav-button svg{width:22px;height:22px}
+#ski-ops .so-nav-button[aria-current=page]{background:#fe4e10;color:#fff;font-weight:600}
+#ski-ops .so-nav-button:hover:not([aria-current]){background:#f2f2f2}
+#ski-ops.so-menu-open .so-workspace{grid-template-columns:214px minmax(0,1fr)}
+#ski-ops.so-menu-open .so-sidebar{padding:20px 14px 16px}
+#ski-ops.so-menu-open .so-brand{justify-content:flex-start;padding:0 6px}
+#ski-ops.so-menu-open .so-brand>div,#ski-ops.so-menu-open .so-nav-label{display:block}
+#ski-ops.so-menu-open .so-nav-caption{display:block;font-size:13px;padding:0 12px 8px}
+#ski-ops.so-menu-open .so-nav-button{width:100%;justify-content:flex-start;padding:12px;border-radius:14px;white-space:nowrap}
+#ski-ops.so-menu-open .so-sidebar-foot{display:block;border:1px solid #e7e7e7;border-radius:12px;padding:12px;font-size:13px;background:#fafafa}
+#ski-ops .so-sidebar-foot small{font-size:12px}
+#ski-ops .so-dot{background:#fe4e10}
+#ski-ops .so-workarea{display:flex;flex-direction:column;min-height:0;min-width:0;overflow:hidden}
+#ski-ops .so-topbar{position:relative;flex-shrink:0;height:66px;min-height:66px;padding:9px 18px;gap:14px;background:#fff;border-bottom:1px solid #e7e7e7;z-index:5}
+#ski-ops .so-topbar-left{font-size:17px;font-weight:600;gap:12px;flex-shrink:0}
+#ski-ops .so-topbar-right{gap:12px;margin-left:auto;flex-shrink:0}
+#ski-ops .so-topbar button{font-size:14px;color:#5d5d5d;min-height:44px;white-space:nowrap}
+#ski-ops #so-menu-toggle{display:grid;place-items:center;width:46px;height:46px;border:1px solid #d1d1d1;border-radius:14px;padding:10px;flex-shrink:0}
+#ski-ops .so-demo-label{font-size:12px;color:#6d6d6d;background:#f8f8f8;border:1px solid #e7e7e7;border-radius:6px;padding:4px 8px;white-space:nowrap}
+#ski-ops #so-main{padding:18px;flex:1;min-height:0;overflow:hidden}
+#ski-ops #so-page{height:100%;min-height:0;display:flex;flex-direction:column;gap:14px}
+#ski-ops #so-page>*{flex-shrink:0}
+#ski-ops .so-pagehead{margin:0;gap:14px;min-height:64px}
+#ski-ops .so-pagehead h1{font-size:27px;font-weight:700;line-height:1.3;letter-spacing:-.03em}
+#ski-ops .so-pagehead p{font-size:15px;line-height:1.5;margin-top:7px;color:#6d6d6d}
+#ski-ops .so-eyebrow{font-size:13px;font-weight:500;margin:0 0 5px;color:#6d6d6d}
+#ski-ops .so-button{min-height:48px;padding:11px 16px;border:1px solid #d1d1d1;border-radius:12px;font-size:16px;font-weight:600;line-height:1.4;box-shadow:none}
+#ski-ops .so-button.primary{background:#fe4e10;border-color:#fe4e10;color:#fff}
+#ski-ops .so-button.primary:hover{background:#ef3408;border-color:#ef3408}
+#ski-ops .so-button.soft{background:#fff4ed;border-color:transparent;color:#ef3408}
+#ski-ops .so-button.quiet{background:transparent;border-color:transparent;color:#ef3408}
+#ski-ops .so-button.small{min-height:44px;padding:9px 14px;font-size:14px;border-radius:10px}
+#ski-ops .so-button:not(.primary):hover{background:#f8f8f8}
+#ski-ops .so-actions{gap:8px}
+#ski-ops .so-panel{border:1px solid #e7e7e7;border-radius:16px;box-shadow:none;background:#fff;min-height:0}
+#ski-ops #so-page>.so-panel{flex:1;display:flex;flex-direction:column;min-height:0}
+#ski-ops .so-panel-head{padding:16px 18px;min-height:52px;border-bottom:0;flex-shrink:0;gap:12px}
+#ski-ops h2,#ski-ops .so-panel-head h2{font-size:19px;font-weight:700;letter-spacing:-.03em}
+#ski-ops h3{font-size:17px;font-weight:700}
+#ski-ops .so-panel-pad{padding:18px}
+#ski-ops .so-stack{gap:16px}
+#ski-ops .so-grid2{gap:14px;grid-template-columns:1.55fr 1fr;align-items:stretch}
+#ski-ops #so-page>.so-grid2,#ski-ops #so-page>.so-main-detail{flex:1;min-height:0;overflow:auto}
+#ski-ops .so-grid2>.so-panel{display:flex;flex-direction:column}
+#ski-ops .so-grid2>.so-panel>.so-panel-pad{overflow:auto;min-height:0}
+#ski-ops .so-main-detail{gap:18px;grid-template-columns:minmax(0,1fr) 340px;align-items:stretch}
+#ski-ops .so-main-detail>.so-stack{display:flex;flex-direction:column;min-height:0;overflow:hidden}
+#ski-ops .so-main-detail>.so-stack>.so-panel{flex:1;overflow:auto}
+#ski-ops .so-main-detail>.so-panel{align-self:start}
+#ski-ops .so-main-detail>.so-panel .so-actions{display:grid;grid-template-columns:1fr}
+#ski-ops .so-tabs{display:flex;flex-wrap:wrap;gap:8px;padding:0;margin:0;border:0;border-radius:0;background:none;width:auto}
+#ski-ops .so-tab{border:1px solid #d1d1d1;background:#fff;padding:11px 16px;min-height:48px;border-radius:14px;font-size:16px;font-weight:600;color:#5d5d5d}
+#ski-ops .so-tab[aria-pressed=true]{border-color:#fe4e10;background:#fe4e10;color:#fff;box-shadow:none}
+#ski-ops .so-tab-count{display:inline-block;border-radius:4px;padding:0 6px;margin-left:6px;background:#f0f0f0;color:#5d5d5d;font-size:14px}
+#ski-ops .so-tab[aria-pressed=true] .so-tab-count{background:#ffffff33;color:#fff}
+#ski-ops .so-toolbar{gap:12px;margin:0;align-items:end}
+#ski-ops .so-field{font-size:14px;font-weight:500;gap:7px;color:#5d5d5d}
+#ski-ops input,#ski-ops select,#ski-ops textarea{min-height:48px;border:1px solid #d1d1d1;border-radius:10px;padding:11px 12px;font:500 16px/1.45 Pretendard,sans-serif;color:#1a1a1a;background:#fff}
+#ski-ops input::placeholder{color:#6d6d6d;font-weight:400}
+#ski-ops input[readonly]{background:#f8f8f8;color:#1a1a1a;border-color:#e7e7e7}
+#ski-ops .so-search{flex:1;width:auto;min-width:180px}
+#ski-ops .so-form-grid{gap:16px}
+#ski-ops .so-filter-panel{padding:14px;background:#fff;border:1px solid #e7e7e7;border-radius:16px;display:grid;gap:14px}
+#ski-ops .so-filter-panel .so-toolbar>.so-field:not(.so-search){width:190px}
+#ski-ops .so-table-wrap{overflow:auto;min-height:0;flex:1;scrollbar-width:thin}
+#ski-ops table{font-size:16px;line-height:1.45}
+#ski-ops th{position:sticky;top:0;z-index:1;background:#f8f8f8;color:#6d6d6d;font-size:13px;font-weight:500;padding:11px 16px;height:40px}
+#ski-ops td{padding:15px 16px;border:0;height:74px;color:#5d5d5d}
+#ski-ops td strong{font-size:17px;font-weight:700;color:#1a1a1a}
+#ski-ops td small{font-size:14px;margin-top:4px;line-height:1.4;color:#6d6d6d}
+#ski-ops td:last-child{width:110px;text-align:right}
+#ski-ops td .so-text-button{color:inherit;min-height:44px}
+#ski-ops td .so-text-button strong{font-size:17px}
+#ski-ops tbody tr:hover{background:#fffaf7}
+#ski-ops .so-money{font-variant-numeric:tabular-nums;white-space:nowrap}
+#ski-ops .so-receivable{color:#0074d9!important}
+#ski-ops .so-payable,#ski-ops .so-money.is-due{color:#ef3408!important}
+#ski-ops .so-status{font-size:13px;font-weight:600;border-radius:4px;padding:4px 8px;line-height:1.4;background:#f2f2f2;color:#5d5d5d}
+#ski-ops .so-status.orange{background:#fff0e3;color:#b45309}
+#ski-ops .so-status.blue{background:#e8f3ff;color:#0074d9}
+#ski-ops .so-status.green{background:#e5faed;color:#247a3d}
+#ski-ops .so-status.purple{background:#efe8ff;color:#5f33e1}
+#ski-ops .so-status.grey{background:#f2f2f2;color:#5d5d5d}
+#ski-ops .so-status.red{background:#fff0ef;color:#b42318}
+#ski-ops .so-row-list{overflow:auto;min-height:0;flex:1;align-content:start}
+#ski-ops .so-row{min-height:74px;padding:15px 18px;border:0}
+#ski-ops .so-row-title strong{font-size:17px;font-weight:700}
+#ski-ops .so-avatar{width:40px;height:40px;border-radius:50%;background:#fff0e3;color:#ef3408;font-size:17px;font-weight:600}
+#ski-ops .so-avatar.blue{background:#e8f3ff;color:#0074d9}
+#ski-ops .so-avatar.purple{background:#efe8ff;color:#5f33e1}
+#ski-ops .so-avatar.green{background:#e5faed;color:#247a3d}
+#ski-ops .so-note{background:#fffcee;border:1px solid #f3e8ae;border-radius:12px;color:#775d22;font-size:14px;padding:14px;line-height:1.6}
+#ski-ops .so-preview-note{font-size:13px;color:#6d6d6d;line-height:1.5}
+#ski-ops .so-summary-line{padding:14px 0;border-color:#f1f1f1;font-size:16px}
+#ski-ops .so-summary-line strong{font-size:19px;font-weight:700}
+#ski-ops .so-summary-line.total{padding:15px 14px;border:0;border-radius:12px;background:#fff4ed;color:#1a1a1a}
+#ski-ops .so-summary-line.total strong{color:#ef3408;font-size:22px}
+#ski-ops .so-counts{display:flex;gap:10px;margin:0}
+#ski-ops .so-count{flex:1;padding:14px;border:1px solid #e7e7e7;border-radius:12px;background:#f8f8f8;font-size:14px}
+#ski-ops .so-count strong{display:block;margin:8px 0 0;font-size:26px}
+#ski-ops .so-metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin:0}
+#ski-ops .so-metric{padding:16px;border:1px solid #e7e7e7;border-radius:16px;box-shadow:none;background:#fff}
+#ski-ops .so-metric-label{font-size:14px;font-weight:500;color:#5d5d5d;gap:8px}
+#ski-ops .so-metric strong{font-size:30px;font-weight:700;letter-spacing:-.03em;line-height:1.2;margin:10px 0 0;text-align:right}
+#ski-ops .so-metric strong em{font-style:normal;font-size:15px;font-weight:500;color:#6d6d6d;letter-spacing:0;margin-left:3px}
+#ski-ops .so-metric small{font-size:13px;margin-top:6px}
+#ski-ops .so-metric.accent{background:#fff7f0;border-color:#efcfbb}
+#ski-ops .so-metric.accent strong{color:#ef3408}
+/* Dashboard */
+#ski-ops .so-home-metrics .so-metric{display:grid;grid-template-columns:42px minmax(0,1fr) 16px;column-gap:12px;padding:16px;align-content:center}
+#ski-ops .so-home-metrics .so-metric-glyph{grid-column:1;grid-row:1 / span 3;display:grid;place-items:center;width:42px;height:42px;border-radius:12px}
+#ski-ops .so-home-metrics .so-metric-label,#ski-ops .so-home-metrics .so-metric strong,#ski-ops .so-home-metrics .so-metric small{grid-column:2;min-width:0}
+#ski-ops .so-home-metrics .so-metric strong{text-align:left;margin:4px 0 0}
+#ski-ops .so-home-metrics .so-metric>svg{grid-row:1;grid-column:3;width:16px;height:16px;color:#b0b0b0}
+#ski-ops .orange.so-metric-glyph,#ski-ops .orange.so-login-mini-icon{background:#fff0e3;color:#fe4e10}
+#ski-ops .blue.so-metric-glyph{background:#e8f3ff;color:#0074d9}
+#ski-ops .purple.so-metric-glyph,#ski-ops .purple.so-login-mini-icon{background:#efe8ff;color:#5f33e1}
+#ski-ops .green.so-metric-glyph,#ski-ops .green.so-login-mini-icon{background:#e5faed;color:#247a3d}
+#ski-ops .so-home-grid{display:grid;grid-template-columns:minmax(0,1fr) 400px;gap:18px;flex:1;min-height:0}
+#ski-ops .so-today-work{display:flex;flex-direction:column;min-height:0}
+#ski-ops .so-today-work .so-panel-head p{font-size:14px;margin-top:6px}
+#ski-ops .so-count-bubble{background:#f8f8f8;border-radius:6px;font-size:14px;padding:2px 8px;color:#5d5d5d;margin-left:5px}
+#ski-ops .so-work-list{overflow:auto;flex:1;min-height:0;padding:0}
+#ski-ops .so-work-columns,#ski-ops .so-work-item{display:grid;grid-template-columns:100px minmax(140px,.8fr) minmax(180px,1.2fr) 115px 16px;gap:12px;align-items:center;padding:0 18px}
+#ski-ops .so-work-columns{min-height:40px;position:sticky;top:0;background:#f8f8f8;color:#6d6d6d;font-size:13px;z-index:1}
+#ski-ops .so-work-item{width:100%;min-height:64px;height:64px;border:0;border-radius:0;background:#fff;text-align:left;color:#1a1a1a;font-size:16px}
+#ski-ops .so-work-item:hover{background:#fffaf7}
+#ski-ops .so-work-time{font-size:18px;font-weight:700;font-variant-numeric:tabular-nums}
+#ski-ops .so-work-time.is-label{font-size:14px;font-weight:600}
+#ski-ops .so-work-name{display:flex;gap:10px;align-items:center;min-width:0}
+#ski-ops .so-work-name strong{font-size:16px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#ski-ops .so-work-name .so-avatar{width:34px;height:34px;font-size:15px;flex-shrink:0}
+#ski-ops .so-work-description{font-size:16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#ski-ops .so-work-item>.so-status{justify-self:start}
+#ski-ops .so-work-item>svg{width:16px;color:#b0b0b0}
+#ski-ops .so-section-footer{background:#fafafa;padding:16px 18px;font-size:13px;color:#6d6d6d;flex-shrink:0}
+#ski-ops .so-section-footer svg{width:15px;height:15px;margin-right:6px}
+#ski-ops .so-driver-preview{display:flex;flex-direction:column;gap:14px;padding:18px;background:#f4f0ff;border:0;border-radius:16px;min-height:0}
+#ski-ops .so-driver-label{display:flex;gap:8px;align-items:center;color:#5f33e1;font-size:14px;font-weight:600}
+#ski-ops .so-driver-label .so-status{margin-left:auto}
+#ski-ops .so-driver-slot{padding:14px;background:#fff;border-radius:12px;color:#6d6d6d;font-size:14px}
+#ski-ops .so-driver-slot strong{font-size:21px;font-weight:700;color:#1a1a1a;margin-right:8px}
+#ski-ops .so-driver-slot small{font-size:13px}
+#ski-ops .so-driver-place>span{font-size:14px;color:#5f33e1}
+#ski-ops .so-driver-place h2{font-size:28px;line-height:1.25;letter-spacing:-.04em;margin:6px 0 10px}
+#ski-ops .so-driver-place p{font-size:14px;color:#6d6d6d}
+#ski-ops .so-driver-gear{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+#ski-ops .so-driver-gear span{background:#fff;border-radius:12px;padding:11px 12px;font-size:14px;color:#6d6d6d}
+#ski-ops .so-driver-gear b{display:block;font-size:22px;font-weight:700;color:#1a1a1a}
+#ski-ops .driver-link{margin-top:auto;background:#fff;border:0;color:#5f33e1;justify-content:space-between;font-size:15px}
+#ski-ops .so-home-shortcuts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin:0}
+#ski-ops .so-shortcut{display:flex;align-items:center;gap:12px;border:1px solid #e7e7e7;border-radius:16px;background:#fff;padding:14px;text-align:left;min-width:0}
+#ski-ops .so-shortcut>span{background:#f8f8f8;border-radius:12px;padding:10px;display:grid;place-items:center;color:#6d6d6d}
+#ski-ops .so-shortcut strong{font-size:16px;font-weight:600;display:block}
+#ski-ops .so-shortcut small{font-size:14px;display:block;margin-top:4px}
+#ski-ops .so-shortcut>svg{width:16px;color:#b0b0b0;margin-left:auto;flex-shrink:0}
+#ski-ops .so-dispatch-row{display:grid;grid-template-columns:170px minmax(120px,1fr) minmax(150px,1fr) minmax(160px,1.2fr) 100px auto;gap:12px;align-items:center;border-left:4px solid #fe4e10;border-radius:12px;margin:4px 10px;padding:14px 12px;min-height:84px}
+#ski-ops .so-dispatch-row.delivery{border-left-color:#0074d9}
+#ski-ops .so-dispatch-row strong{font-size:17px;font-weight:700;display:block}
+#ski-ops .so-dispatch-row small{display:block;margin-top:4px}
+#ski-ops .so-dispatch-row .so-actions{flex-wrap:nowrap}
+#ski-ops .so-customer-row{display:grid;grid-template-columns:250px 220px minmax(150px,1fr) 130px auto;gap:16px}
+#ski-ops .so-customer-row .so-phone{font-variant-numeric:tabular-nums;white-space:nowrap}
+#ski-ops .so-customer-row .so-phone b{font-size:18px}
+#ski-ops .so-customer-row .so-button{min-width:132px}
+#ski-ops .so-stock-available{font-size:24px;font-weight:700;border-radius:12px;padding:10px 16px;display:inline-flex;align-items:baseline;gap:4px}
+#ski-ops .so-stock-available small{font-size:14px;color:inherit}
+/* Native dialog keeps focus, Escape and backdrop behavior. */
+#ski-ops dialog{border:0;border-radius:14px;box-shadow:0 16px 60px #0002;max-height:88dvh;width:min(640px,calc(100% - 32px));padding:0}
+#ski-ops dialog::backdrop{background:#0006;backdrop-filter:none}
+#ski-ops .so-dialog-heading{padding:18px 20px;position:sticky;top:0;z-index:2;background:#fff;border-bottom:1px solid #f1f1f1}
+#ski-ops #so-dialog-body{padding:20px;gap:18px}
+#ski-ops .so-dialog-heading h2{font-size:19px}
+#ski-ops .so-dialog-heading button{width:44px;height:44px;border-radius:10px;background:#f8f8f8}
+#ski-ops .so-toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);width:max-content;max-width:calc(100% - 32px);border-radius:12px;background:#1a1a1a;color:#fff;font-size:15px;z-index:50}
+/* Login and guest pages have independent scrolling. */
+#ski-ops #so-entry,#ski-ops #so-public{height:100%;overflow:auto;min-height:0;background:#f8f8f8}
+#ski-ops .so-login-shell{min-height:100%;grid-template-columns:minmax(0,1fr) minmax(0,1.18fr);background:#fff}
+#ski-ops .so-login-story{padding:clamp(28px,4.4vh,48px) clamp(24px,3.6vw,52px);background:#fff4ed;justify-content:center;gap:28px}
+#ski-ops .so-login-brand{font-size:22px;font-weight:700}
+#ski-ops .so-login-brand>span{width:40px;height:40px;background:#fe4e10;border-radius:7px}
+#ski-ops .so-login-brand svg{width:25px;height:25px}
+#ski-ops .so-login-copy .so-eyebrow{font-size:13px;letter-spacing:.08em;color:#a63210;margin-bottom:12px}
+#ski-ops .so-login-copy h1{font-size:clamp(26px,2.4vw,34px);font-weight:700;line-height:1.4;letter-spacing:-.03em;color:#1a1a1a}
+#ski-ops .so-login-copy p{font-size:16px;line-height:1.7;color:#6d6d6d;margin:14px 0 28px;max-width:32ch}
+#ski-ops .so-login-mini{max-width:430px;padding:18px 20px;background:#fff;border:1px solid #e7e7e7;border-radius:16px;box-shadow:none}
+#ski-ops .so-login-mini-head{display:flex;justify-content:space-between;padding-bottom:14px;border-bottom:1px solid #f1f1f1;font-size:14px;color:#6d6d6d}
+#ski-ops .so-login-mini-head strong{font-size:16px;color:#1a1a1a}
+#ski-ops .so-login-mini>div:not(:first-child){display:flex;align-items:center;gap:12px;margin-top:16px}
+#ski-ops .so-login-mini-icon{display:grid;place-items:center;width:40px;height:40px;border-radius:12px;flex-shrink:0}
+#ski-ops .so-login-mini b{font-size:16px;font-weight:600;display:block}
+#ski-ops .so-login-mini small{font-size:14px;display:block;margin-top:3px}
+#ski-ops .so-login-mini em{font-style:normal;font-size:13px;background:#f8f8f8;color:#5d5d5d;border-radius:4px;padding:4px 8px;margin-left:auto;white-space:nowrap}
 #ski-ops .so-login-features{display:none}
-#ski-ops .so-login-form{padding:48px}
-#ski-ops .so-login-form-inner{max-width:390px;gap:18px}
-#ski-ops .so-login-form h2{font-size:32px;font-weight:700;margin-top:3px}
-#ski-ops .so-login-form-inner>.so-muted{font-size:16px}
-#ski-ops .so-login-form-inner>.so-stack{margin:13px 0 9px}
-#ski-ops .so-login-form-inner>.so-button{min-height:56px;font-size:17px}
-#ski-ops .so-login-note{font-size:12px;color:#a2a6af}
-#ski-ops .so-login-guest{margin-top:9px;padding-top:22px}
-#ski-ops #so-public{background:#f6f6f8;min-height:100vh}
-#ski-ops .so-guest-shell{border:1px solid #ecebf0;box-shadow:0 12px 48px #46425208}
-#ski-ops .so-guide-hero{background:#fff3e9;padding:32px 28px}
-#ski-ops .so-guide-hero h1{font-size:29px;font-weight:700;color:#564037}
-#ski-ops .so-guide-hero p{font-size:15px;line-height:1.7}
-#ski-ops .so-guest-body{gap:25px}
-#ski-ops .so-guest-description{font-size:15px}
-#ski-ops .so-qr-sheet{padding:32px 22px}
-#ski-ops .so-qr-sheet h2{font-size:28px;font-weight:700}
-/* Match the existing counter to the same Makaryo controls, without shrinking touch targets. */
-#ski-ops #ski-first-look[data-screen=shop]{--ski-accent:#da480b;--ski-shop-accent:#da480b;--ski-ink:#2c3039;--ski-muted:#7b818d;--ski-line:#e5e7ed;--ski-shop-radius:13px;--ski-bg:#f7f8fa;--ski-base:18px}
-#ski-ops #ski-first-look .ski-content{padding:0}
-#ski-ops #ski-first-look[data-screen=shop] h2{font-size:20px;font-weight:650}
-#ski-ops #ski-first-look[data-screen=shop] .ski-product-tabs{background:#eceef2;padding:5px}
-#ski-ops #ski-first-look[data-screen=shop] .ski-product-tabs button{min-height:49px;font-size:18px}
-#ski-ops #ski-first-look[data-screen=shop] .ski-product-tabs button[aria-selected=true]{background:#fff;color:var(--ski-accent);box-shadow:0 2px 5px #303a4b0a}
-#ski-ops #ski-first-look[data-screen=shop] .ski-product.is-picked{background:#fffaf7;border-color:#f3c5ae}
-#ski-ops #ski-first-look[data-screen=shop] .ski-pos-catalog .ski-products{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
-#ski-ops #ski-first-look[data-screen=shop] .ski-pos-catalog .ski-product-title{display:flex;flex-direction:row;align-items:center;gap:7px;min-height:33px;font-size:17px;font-weight:650}
-#ski-ops #ski-first-look[data-screen=shop] .ski-product-title svg{width:20px;height:20px;color:#b08c75}
-#ski-ops #ski-first-look[data-screen=shop] .ski-stepper button{background:#f5f6f8;border-color:#e9ebf0;min-width:42px;min-height:46px}
-#ski-ops #ski-first-look[data-screen=shop] .ski-stepper button:last-child{background:#fff0e6;border-color:#ffe0cd;color:#d9581f}
-#ski-ops #ski-first-look[data-screen=shop] .ski-pos-customer{padding:18px}
-#ski-ops #ski-first-look[data-screen=shop] .ski-primary{background:#ed5010;border-color:#ed5010;font-size:18px}
-#ski-ops #ski-first-look[data-screen=shop] .ski-field input,#ski-ops #ski-first-look[data-screen=shop] .ski-field select{font-size:17px}
-#ski-ops #ski-first-look[data-screen=shop] .ski-return-options button{font-size:16px;min-height:60px;font-weight:550}
-#ski-ops #ski-first-look[data-screen=shop] .ski-return-options button[aria-pressed=true]{background:#fff1e7;color:#bd4514;border-color:#f4b998}
-/* Task management reference: purple summary, lavender canvas, rounded white task cards. */
-#ski-ops.so-vehicle{--so-accent:#7147dd;--so-soft:#f0ebfb;background:#f6f3fc}
-#ski-ops.so-vehicle .so-workspace{grid-template-columns:1fr}
-#ski-ops.so-vehicle .so-topbar{min-height:58px;padding:8px 24px;border-bottom-color:#ece7f5}
-#ski-ops.so-vehicle #so-main{padding:18px 24px}
-#ski-ops #ski-first-look[data-screen=vehicle]{--ski-accent:#7147dd;--ski-ink:#342b46;--ski-muted:#8c819f;--ski-bg:#f6f3fc}
-#ski-ops #ski-first-look[data-screen=vehicle] .ski-vehicle-head{background:#7447dc;border-radius:20px;padding:14px 22px;box-shadow:0 6px 14px #603caf0a}
-#ski-ops #ski-first-look[data-screen=vehicle] .ski-vehicle-head h1{font-size:29px;font-weight:650}
-#ski-ops #ski-first-look[data-screen=vehicle] .ski-vehicle-head .ski-segment{background:#6739cb;border-radius:13px;padding:4px}
-#ski-ops #ski-first-look[data-screen=vehicle] .ski-vehicle-head .ski-segment button{border-radius:10px;min-height:49px;font-size:18px}
-#ski-ops #ski-first-look[data-screen=vehicle] .ski-filter button{border-radius:11px;min-height:49px;font-size:17px;padding:10px 18px;border-color:#e9e2f4}
-#ski-ops #ski-first-look[data-screen=vehicle] .ski-filter button[aria-pressed=true]{background:#eae1fc;color:#7954b5;border-color:#eae1fc}
-#ski-ops #ski-first-look[data-screen=vehicle] .ski-sort{border-radius:11px;font-size:16px;min-height:49px}
-#ski-ops #ski-first-look[data-screen=vehicle] .ski-datesort{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-#ski-ops #ski-first-look[data-screen=vehicle] .ski-datesort select{width:auto;max-width:100%}
-#ski-ops #ski-first-look[data-screen=vehicle] .ski-job-item{border-left-width:4px;border-radius:15px;background:#fff;min-height:124px}
-#ski-ops #ski-first-look[data-screen=vehicle] .ski-job-item.is-selected{border-color:#b69be3;background:#f6f1ff}
-#ski-ops #ski-first-look[data-screen=vehicle] .ski-job-item strong{font-size:22px;font-weight:650}
-#ski-ops #ski-first-look[data-screen=vehicle] .ski-job-item.is-urgent{background:#fff8f0;border-left-color:#e3b77c}
-#ski-ops #ski-first-look[data-screen=vehicle] .ski-visit{border:1px solid #ebe5f4;border-radius:19px;box-shadow:0 5px 16px #55366f04}
-#ski-ops #ski-first-look[data-screen=vehicle] .ski-priority{background:#fff6e8;color:#aa7846;border-bottom:1px solid #f5e8d3}
-#ski-ops #ski-first-look[data-screen=vehicle] .ski-place{font-weight:650;letter-spacing:-1px}
-#ski-ops #ski-first-look[data-screen=vehicle] .ski-equipment span{background:#f6f2fc;color:#69567f;border-radius:11px;font-size:22px}
-#ski-ops #ski-first-look[data-screen=vehicle] .ski-actions button{border-radius:12px;min-height:72px;font-size:22px;font-weight:600}
-#ski-ops #ski-first-look[data-screen=vehicle] .ski-actions .ski-complete{background:#7447dc;border-color:#7447dc}
-#ski-ops #ski-first-look[data-screen=vehicle] .ski-next{background:#eeE8f8;border:0;border-radius:12px}
-@media(min-width:1500px){#ski-ops .so-workspace{grid-template-columns:226px minmax(0,1fr)}#ski-ops.so-vehicle .so-workspace{grid-template-columns:1fr}#ski-ops #so-main{padding:30px 36px}}
-@media(min-width:1100px) and (max-width:1499px){#ski-ops #ski-first-look .ski-pos-layout{grid-template-columns:minmax(285px,1.12fr) minmax(265px,1fr) minmax(265px,1fr);gap:15px}#ski-ops #ski-first-look .ski-pos-customer .ski-field-row{grid-template-columns:1fr}}
-@media(max-width:1250px){#ski-ops .so-workspace{grid-template-columns:190px minmax(0,1fr)}#ski-ops.so-vehicle .so-workspace{grid-template-columns:1fr}#ski-ops .so-sidebar{padding:24px 12px}#ski-ops .so-brand strong{font-size:18px}#ski-ops .so-brand small{font-size:7px}#ski-ops .so-brand-icon{width:36px;height:38px}#ski-ops .so-nav-button{padding:11px;font-size:15px}#ski-ops #so-main{padding:24px}#ski-ops .so-home-grid{grid-template-columns:minmax(0,1.5fr) minmax(255px,1fr);gap:16px}#ski-ops .so-work-list{padding:0 17px}#ski-ops .so-work-item{gap:10px}#ski-ops .so-work-item>.so-avatar{display:none}#ski-ops .so-home-shortcuts{gap:12px}#ski-ops .so-shortcut{padding:17px;gap:10px}}
-@media(max-width:1150px){#ski-ops .so-home-grid{grid-template-columns:1fr}#ski-ops .so-driver-place{margin-top:24px}#ski-ops .so-home-shortcuts{grid-template-columns:1fr}#ski-ops .so-shortcut{padding:16px}#ski-ops .so-tabs{max-width:100%}#ski-ops .so-tab{padding:10px 13px}#ski-ops .so-responsive-table td{padding:0}#ski-ops .so-login-story{padding:36px 8%}#ski-ops .so-login-copy h1{font-size:34px}#ski-ops .so-login-mini{padding:18px}#ski-ops .so-login-mini em{display:none}#ski-ops .so-login-form{padding:38px}#ski-ops #ski-first-look .ski-pos-layout{grid-template-columns:1fr 1fr}#ski-ops #ski-first-look .ski-pos-checkout{grid-column:2;grid-row:1 / span 2}#ski-ops #ski-first-look .ski-pos-customer{grid-column:1;grid-row:2}}
-@media(max-width:760px){#ski-ops .so-workspace{display:block}#ski-ops .so-sidebar{position:static;height:auto;padding:22px;gap:20px}#ski-ops #so-main{padding:22px 16px}#ski-ops .so-topbar{padding:10px 16px;min-height:61px}#ski-ops .so-topbar-left{font-size:15px}#ski-ops .so-topbar-right{gap:4px}#ski-ops .so-topbar button{font-size:12px}#ski-ops .so-pagehead h1{font-size:26px}#ski-ops .so-pagehead p{font-size:14px;line-height:1.6}#ski-ops .so-pagehead{margin-bottom:20px}#ski-ops .so-home-metrics{gap:12px}#ski-ops .so-home-metrics .so-metric{padding:16px}#ski-ops .so-home-metrics .so-metric strong{font-size:28px}#ski-ops .so-home-metrics .so-metric-label{font-size:14px}#ski-ops .so-metric-top{margin-bottom:11px}#ski-ops .so-work-item{flex-wrap:wrap;position:relative;padding:16px 0;gap:8px}#ski-ops .so-work-time{width:54px}#ski-ops .so-work-name{min-width:160px}#ski-ops .so-work-item>.so-status{margin-left:62px}#ski-ops .so-work-item>svg{margin-left:auto}#ski-ops .so-work-name small{line-height:1.5}#ski-ops .so-panel-head{padding:18px;gap:10px}#ski-ops .so-panel-pad{padding:18px}#ski-ops .so-panel-head h2{font-size:18px}#ski-ops .so-panel{border-radius:13px}#ski-ops .so-tabs{width:100%;gap:2px}#ski-ops .so-tab{padding:9px 10px;flex-grow:1;font-size:14px}#ski-ops .so-toolbar{margin-bottom:16px}#ski-ops .so-row{padding:18px}#ski-ops .so-dialog-heading,#ski-ops #so-dialog-body{padding:20px}#ski-ops #ski-first-look .ski-pos-layout{grid-template-columns:1fr}#ski-ops #ski-first-look .ski-pos-checkout,#ski-ops #ski-first-look .ski-pos-customer{grid-column:auto;grid-row:auto}#ski-ops #ski-first-look .ski-pos-customer .ski-field-row{grid-template-columns:1fr 1fr}#ski-ops.so-vehicle #so-main{padding:16px}#ski-ops #ski-first-look[data-screen=vehicle] .ski-vehicle-head{padding:18px}}
-@media(max-width:700px){#ski-ops .so-login-shell{grid-template-columns:1fr}#ski-ops .so-login-story{padding:26px;gap:26px}#ski-ops .so-login-copy h1{font-size:27px}#ski-ops .so-login-copy h1 br{display:block}#ski-ops .so-login-mini{display:none}#ski-ops .so-login-copy .so-eyebrow{font-size:10px;margin-bottom:9px}#ski-ops .so-login-form{padding:32px 26px}#ski-ops .so-login-form-inner{max-width:420px}#ski-ops .so-login-form-inner>.so-demo-label{display:inline-block}#ski-ops .so-login-form h2{font-size:28px}}
-@media(max-width:450px){#ski-ops .so-metrics{grid-template-columns:1fr}#ski-ops .so-home-metrics{grid-template-columns:1fr 1fr}#ski-ops .so-home-metrics .so-metric:last-child strong{font-size:24px}#ski-ops .so-home-metrics .so-metric small{font-size:11px}#ski-ops .so-home-metrics .so-metric-label{font-size:13px}#ski-ops .so-home-metrics .so-metric:last-child strong em{display:block;font-size:12px;margin:0}#ski-ops .so-guest-body{padding:22px}#ski-ops .so-guest-shell{border:0}#ski-ops #ski-first-look .ski-pos-customer .ski-field-row{grid-template-columns:1fr}#ski-ops #ski-first-look[data-screen=shop] .ski-pos-catalog .ski-products{grid-template-columns:1fr}#ski-ops .so-dialog-heading h2{font-size:18px}}
+#ski-ops .so-login-story>small{font-size:14px;color:#6d6d6d}
+#ski-ops .so-login-form{padding:40px 32px}
+#ski-ops .so-login-form-inner{max-width:400px;gap:16px}
+#ski-ops .so-login-form h2{font-size:32px;font-weight:700;line-height:1.3;margin-top:4px}
+#ski-ops .so-login-form-inner>.so-stack{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:12px 0 6px}
+#ski-ops .so-login-form-inner>.so-button{height:56px;font-size:17px}
+#ski-ops .so-button.vehicle{background:#ede8ff;color:#5f33e1;border:0}
+#ski-ops .so-login-note{font-size:14px;line-height:1.7;color:#6d6d6d;text-align:left;margin:8px 0 0}
+#ski-ops .so-login-guest{padding-top:20px;margin-top:8px;gap:10px;font-size:14px;text-align:left;color:#6d6d6d}
+#ski-ops .so-login-guest .so-actions{justify-content:flex-start}
+#ski-ops .so-login-guest .so-button{border:1px solid #e7e7e7;color:#5d5d5d}
+#ski-ops .so-guest-shell{border-color:#e7e7e7;box-shadow:none}
+#ski-ops .so-guide-hero{background:#fff4ed}
+#ski-ops .so-guest-body{gap:22px}
+/* Responsive store lists keep all columns reachable without page overflow. */
+@media(min-width:901px){
+#ski-ops .so-responsive-table{min-width:900px;display:table}
+#ski-ops .so-responsive-table thead{display:table-header-group}
+#ski-ops .so-responsive-table tbody{display:table-row-group}
+#ski-ops .so-responsive-table tr{display:table-row}
+#ski-ops .so-responsive-table td{display:table-cell;padding:15px 16px;min-width:0}
+#ski-ops .so-responsive-table td[data-label]::before{display:none}
+}
+@media(max-width:1250px){
+#ski-ops .so-home-grid{grid-template-columns:minmax(0,1fr) 330px}
+#ski-ops .so-work-columns,#ski-ops .so-work-item{grid-template-columns:80px minmax(115px,.8fr) minmax(140px,1fr) 92px 12px;gap:8px;padding:0 12px}
+#ski-ops .so-work-name .so-avatar{display:none}
+#ski-ops .so-dispatch-row{grid-template-columns:160px 1fr 1fr;gap:12px}
+#ski-ops .so-customer-row{grid-template-columns:180px 180px 1fr auto}
+#ski-ops .so-customer-row>.so-customer-id{display:none}
+}
+@media(max-width:900px){
+#ski-ops #so-main{padding:14px}
+#ski-ops #so-page{overflow:auto;padding-bottom:4px}
+#ski-ops #so-page>.so-panel,#ski-ops #so-page>.so-grid2,#ski-ops #so-page>.so-main-detail{flex:0 0 auto;overflow:visible}
+#ski-ops .so-table-wrap{overflow-x:auto;flex:none}
+#ski-ops .so-responsive-table thead{display:none}
+#ski-ops .so-responsive-table tbody{display:block}
+#ski-ops .so-responsive-table tr{display:flex;flex-wrap:wrap;gap:12px;padding:16px;border-bottom:1px solid #e7e7e7}
+#ski-ops .so-responsive-table td{display:block;flex:1;min-width:130px;padding:0;height:auto}
+#ski-ops .so-responsive-table td:first-child{flex-basis:100%}
+#ski-ops .so-responsive-table td:last-child{width:auto;flex:0 0 auto;min-width:0}
+#ski-ops .so-responsive-table td[data-label]::before{display:block;font-size:13px;color:#6d6d6d}
+#ski-ops .so-main-detail,#ski-ops .so-grid2{grid-template-columns:1fr}
+#ski-ops .so-home-grid{display:flex;flex-direction:column;flex:none}
+#ski-ops .so-home-shortcuts{grid-template-columns:1fr}
+#ski-ops .so-today-work .so-work-list{min-height:296px;overflow-x:auto}
+#ski-ops .so-work-item,#ski-ops .so-work-columns{min-width:580px}
+#ski-ops .so-driver-preview{min-height:380px}
+#ski-ops .so-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}
+#ski-ops .so-customer-row{grid-template-columns:1fr auto}
+#ski-ops .so-dispatch-row{grid-template-columns:1fr 1fr}
+#ski-ops .so-topbar-right .so-demo-label{display:none}
+}
+@media(max-width:760px){
+#ski-ops .so-workspace{display:grid;grid-template-columns:56px minmax(0,1fr)}
+#ski-ops .so-sidebar{display:flex;padding:12px 6px;gap:18px;height:100%;position:relative}
+#ski-ops .so-nav-button{width:44px;height:44px;min-height:44px;padding:11px;border-radius:13px}
+#ski-ops .so-brand-icon{width:36px;height:36px}
+#ski-ops .so-topbar{padding:8px 10px;gap:8px}
+#ski-ops .so-topbar-left{gap:8px;font-size:15px;flex-shrink:1;min-width:0}
+#ski-ops #so-breadcrumb{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#ski-ops .so-topbar-right{gap:2px}
+#ski-ops .so-topbar-right button{font-size:0;width:40px;padding:9px;gap:0}
+#ski-ops .so-topbar-right button svg{width:20px;height:20px}
+#ski-ops .so-topbar-right button span{display:none}
+#ski-ops #so-menu-toggle{width:40px;height:44px}
+#ski-ops.so-menu-open .so-workspace{grid-template-columns:56px minmax(0,1fr)}
+#ski-ops.so-menu-open .so-sidebar{position:absolute;width:214px;top:66px;bottom:0;left:0;height:calc(100% - 66px);z-index:20;box-shadow:8px 0 24px #0002;border:1px solid #e7e7e7}
+#ski-ops.so-menu-open .so-nav-group{display:flex}
+#ski-ops .so-pagehead h1{font-size:25px}
+#ski-ops .so-pagehead p{font-size:14px}
+#ski-ops .so-tab{font-size:14px;padding:10px 12px}
+#ski-ops .so-search{min-width:0;width:100%}
+#ski-ops .so-toolbar{align-items:stretch}
+#ski-ops .so-toolbar>.so-field{width:100%!important}
+#ski-ops .so-form-grid{grid-template-columns:1fr}
+#ski-ops .so-filter-panel{padding:12px}
+#ski-ops .so-customer-row,#ski-ops .so-dispatch-row{display:flex;flex-wrap:wrap}
+#ski-ops .so-customer-row>.so-row-title{width:100%}
+#ski-ops .so-home-metrics .so-metric{display:flex;flex-direction:column;gap:4px;padding:12px}
+#ski-ops .so-home-metrics .so-metric>svg{display:none}
+#ski-ops .so-home-metrics .so-metric strong{font-size:25px}
+#ski-ops .so-home-metrics .so-metric small{font-size:13px}
+#ski-ops .so-metric{padding:14px}
+#ski-ops .so-metric strong{font-size:25px}
+#ski-ops .so-login-shell{grid-template-columns:1fr;min-height:100%}
+#ski-ops .so-login-story{padding:24px;gap:18px}
+#ski-ops .so-login-copy h1{font-size:27px}
+#ski-ops .so-login-copy p,#ski-ops .so-login-mini,#ski-ops .so-login-story>small{display:none}
+#ski-ops .so-login-form{padding:28px 24px}
+#ski-ops .so-login-form-inner>.so-demo-label{display:block}
+}
 @media(prefers-reduced-motion:reduce){#ski-ops *{transition:none!important;scroll-behavior:auto!important}}
+/* Intake: three independent panels with a fixed quote footer. */
+#ski-ops #so-legacy,#ski-ops #ski-first-look,#ski-ops #ski-content{height:100%;min-height:0}
+#ski-ops #ski-first-look{--ski-accent:#fe4e10;--ski-ink:#1a1a1a;--ski-muted:#6d6d6d;--ski-line:#e7e7e7;--ski-bg:#f8f8f8;--ski-blue-soft:#fff4ed;font:16px/1.45 Pretendard,"Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;border:0;border-radius:0;overflow:visible;background:transparent}
+#ski-ops #ski-first-look .ski-header{display:none}
+#ski-ops #ski-first-look .ski-content{padding:0;display:flex;flex-direction:column;gap:12px}
+#ski-ops #ski-first-look h2{font-size:19px;font-weight:700;letter-spacing:-.03em}
+#ski-ops #ski-first-look h3{font-size:17px;font-weight:700}
+#ski-ops #ski-first-look .ski-secondary{font-size:14px;color:#6d6d6d}
+#ski-ops #ski-first-look .ski-pos-layout{display:grid;grid-template-columns:minmax(0,1fr) clamp(300px,24.5vw,440px) clamp(330px,27vw,460px);gap:18px;align-items:stretch;flex:1;min-height:0}
+#ski-ops #ski-first-look .ski-pos-catalog,#ski-ops #ski-first-look .ski-pos-customer,#ski-ops #ski-first-look .ski-pos-checkout{grid-row:auto;grid-column:auto;min-height:0;min-width:0;border:1px solid #e7e7e7;border-radius:16px;background:#fff;padding:14px;display:flex;flex-direction:column;gap:12px}
+#ski-ops #ski-first-look .ski-pos-customer{overflow:auto}
+#ski-ops #ski-first-look .ski-sectionhead{margin:0;gap:8px;flex-shrink:0}
+#ski-ops #ski-first-look .ski-pos-customer .ski-sectionhead>.ski-secondary{font-size:13px;white-space:nowrap}
+#ski-ops #ski-first-look .ski-product-tabs{flex-shrink:0;margin:0;padding:5px;gap:6px;background:#f8f8f8;border-radius:14px}
+#ski-ops #ski-first-look .ski-product-tabs button{height:48px;min-height:48px;font-size:17px;font-weight:700;border-radius:12px;gap:8px}
+#ski-ops #ski-first-look .ski-product-tabs button[aria-selected=true]{background:#fe4e10;color:#fff;box-shadow:none}
+#ski-ops #ski-first-look .ski-product-tabs button span{font-size:14px;background:#00000008;padding:1px 5px;border-radius:4px}
+#ski-ops #ski-first-look .ski-product-tabs button[aria-selected=true] span{background:#ffffff33}
+#ski-ops #ski-first-look .ski-days{display:grid;grid-template-columns:70px minmax(0,1fr);gap:8px;margin:0;padding:12px;background:#f8f8f8;border:0;border-radius:14px;flex-shrink:0}
+#ski-ops #ski-first-look .ski-days-top{margin:0;grid-column:1;grid-row:1;justify-content:flex-start;align-items:center}
+#ski-ops #ski-first-look .ski-days h2{font-size:16px;white-space:nowrap}
+#ski-ops #ski-first-look .ski-days .ski-segment{grid-column:2;grid-row:1;background:none;padding:0;gap:6px;min-width:0}
+#ski-ops #ski-first-look .ski-days .ski-segment button{min-width:0;min-height:48px;height:48px;padding:8px 5px;font-size:16px;font-weight:600;background:#fff;border:1px solid #d1d1d1;border-radius:12px}
+#ski-ops #ski-first-look .ski-days .ski-segment button[aria-pressed=true]{background:#fe4e10;border-color:#fe4e10;color:#fff}
+#ski-ops #ski-first-look .ski-period-dates{grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:0}
+#ski-ops #ski-first-look .ski-period-dates .ski-field{display:flex;flex-direction:row;align-items:center;font-size:14px;gap:6px;white-space:nowrap}
+#ski-ops #ski-first-look .ski-period-dates input{height:44px;min-height:44px;font-size:15px;padding:8px;margin:0;min-width:0}
+#ski-ops #ski-first-look .ski-pos-period{grid-column:1/-1;font-size:14px;color:#6d6d6d;margin:0;line-height:1.5}
+#ski-ops #ski-first-look #ski-product-panel{display:flex;flex-direction:column;gap:10px;flex:1;min-height:0}
+#ski-ops #ski-first-look .ski-day-tabs{display:flex;gap:8px;margin:0;flex-shrink:0;overflow-x:auto}
+#ski-ops #ski-first-look .ski-day-tabs button{flex:1;min-width:85px;min-height:60px;padding:9px 11px;text-align:left;border:1px solid #d1d1d1;border-radius:12px;gap:1px}
+#ski-ops #ski-first-look .ski-day-tabs button strong,#ski-ops #ski-first-look .ski-day-tabs button span{font-size:14px}
+#ski-ops #ski-first-look .ski-day-tabs button[aria-pressed=true]{background:#fff4ed;border-color:#fe4e10;color:#ef3408}
+#ski-ops #ski-first-look .ski-day-tabs button[aria-pressed=true] span{color:#ef3408}
+#ski-ops #ski-first-look .ski-day-heading{margin:0;flex-shrink:0}
+#ski-ops #ski-first-look .ski-products{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;align-content:start;flex:1;min-height:0;overflow-y:auto;scrollbar-width:thin;padding-right:2px}
+#ski-ops #ski-first-look .ski-product{padding:11px;border:1px solid #e7e7e7;border-radius:14px;background:#f8f8f8;min-width:0}
+#ski-ops #ski-first-look .ski-product.is-picked{border-color:#fe4e10;background:#fff;box-shadow:none}
+#ski-ops #ski-first-look .ski-product-title{font-size:16px;display:flex;flex-direction:row;align-items:center;gap:8px;font-weight:700;min-height:0;margin:0 0 5px}
+#ski-ops #ski-first-look .ski-product-title svg{width:20px;height:20px;color:#6d6d6d}
+#ski-ops #ski-first-look .ski-product.is-picked .ski-product-title svg{color:#fe4e10}
+#ski-ops #ski-first-look .ski-product-price{font-size:14px;margin:0 0 8px;color:#6d6d6d;white-space:nowrap}
+#ski-ops #ski-first-look .ski-stepper{gap:6px}
+#ski-ops #ski-first-look .ski-stepper button{width:44px;height:44px;min-width:44px;min-height:44px;padding:10px;border:1px solid #d1d1d1;border-radius:10px;background:#fff;color:#5d5d5d}
+#ski-ops #ski-first-look .ski-stepper button:last-child{background:#fff4ed;color:#ef3408;border-color:#f2c9ae}
+#ski-ops #ski-first-look .ski-stepper button svg{width:20px;height:20px}
+#ski-ops #ski-first-look .ski-stepper output{font-size:20px;min-width:18px;font-weight:700}
+#ski-ops #ski-first-look .ski-copy-day{flex-shrink:0;min-height:48px;margin:0;padding:10px;background:#fff4ed;border:0;color:#ef3408;font-size:15px;font-weight:600;border-radius:12px}
+#ski-ops #ski-first-look .ski-fields{margin:0;gap:8px}
+#ski-ops #ski-first-look .ski-return-method{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+#ski-ops #ski-first-look .ski-field{font-size:14px;font-weight:500;color:#5d5d5d;line-height:1.4}
+#ski-ops #ski-first-look .ski-field input,#ski-ops #ski-first-look .ski-field select{font:500 16px/1.4 Pretendard,sans-serif;min-height:48px;padding:11px 12px;border:1px solid #d1d1d1;border-radius:10px;margin-top:6px;color:#1a1a1a}
+#ski-ops #ski-first-look .ski-return-section{margin:0;padding:12px;background:#f8f8f8;border:0;border-radius:14px}
+#ski-ops #ski-first-look .ski-return-heading{margin:0 0 10px;gap:6px}
+#ski-ops #ski-first-look .ski-setting-button{font-size:14px;font-weight:500;color:#6d6d6d;min-height:40px;padding:8px;border:1px solid #d1d1d1;border-radius:10px;white-space:nowrap}
+#ski-ops #ski-first-look .ski-return-options{grid-template-columns:1fr 1fr;gap:6px}
+#ski-ops #ski-first-look .ski-return-options button{min-height:48px;padding:9px 6px;border:1px solid #d1d1d1;border-radius:12px;background:#fff;font-size:16px;font-weight:600}
+#ski-ops #ski-first-look .ski-return-options button[aria-pressed=true]{background:#fe4e10;border-color:#fe4e10;color:#fff}
+#ski-ops #ski-first-look .ski-return-result{margin-top:10px;padding:10px 0 0;border:0;border-top:1px solid #e7e7e7;border-radius:0;background:transparent;color:#1a1a1a;font-size:16px}
+#ski-ops #ski-first-look .ski-return-result strong{font-size:17px}
+#ski-ops #ski-first-look .ski-return-result span{font-size:14px;color:#6d6d6d}
+#ski-ops #ski-first-look .ski-manual-fields{grid-template-columns:1fr;gap:8px}
+#ski-ops #ski-first-look .ski-checkout-heading{padding-bottom:2px}
+#ski-ops #ski-first-look .ski-checkout-scroll{flex:1;min-height:0;overflow:auto;scrollbar-width:thin}
+#ski-ops #ski-first-look .ski-receipt{margin:0;gap:8px}
+#ski-ops #ski-first-look .ski-receipt-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:5px 8px;background:#f8f8f8;padding:12px;border-radius:12px;font-size:16px}
+#ski-ops #ski-first-look .ski-receipt-row>span,#ski-ops #ski-first-look .ski-receipt-row>strong{font-size:16px;font-weight:700}
+#ski-ops #ski-first-look .ski-receipt-row small{grid-column:1/-1;font-size:14px;color:#5d5d5d}
+#ski-ops #ski-first-look .ski-item-discount{justify-self:end;grid-column:2;background:#fff;color:#ef3408;border:1px solid #d1d1d1;min-height:44px;border-radius:10px;padding:9px 11px;font-size:14px;margin:0}
+#ski-ops #ski-first-look .ski-physical-summary{padding:12px;background:#f1fcf5;border:1px solid #b4dfc2;border-radius:12px;font-size:14px;color:#1a1a1a;gap:8px;margin-top:10px}
+#ski-ops #ski-first-look .ski-physical-summary .ski-setting-button{border:0;color:#ef3408;font-size:14px;padding:4px;min-height:40px}
+#ski-ops #ski-first-look .ski-discount-card{background:#f4f0ff;border-radius:12px;padding:12px;margin-top:10px}
+#ski-ops #ski-first-look .ski-discount-heading h3{font-size:16px}
+#ski-ops #ski-first-look .ski-discount-heading .ski-secondary{font-size:13px}
+#ski-ops #ski-first-look .ski-discount-presets{display:flex;gap:8px;margin:10px 0}
+#ski-ops #ski-first-look .ski-discount-presets button{flex:1;background:#fff;border:0;border-radius:10px;color:#5f33e1;font-size:15px;font-weight:600;min-height:48px;padding:8px}
+#ski-ops #ski-first-look .ski-discount-applied{font-size:14px;margin:8px 0;line-height:1.5;color:#1a1a1a}
+#ski-ops #ski-first-look .ski-discount-undo{display:flex;margin:8px 0 12px;gap:8px}
+#ski-ops #ski-first-look .ski-discount-undo button{flex:1;font-size:14px;background:transparent;border:1px solid #ddd5f1;border-radius:10px;min-height:44px;padding:8px;color:#5f33e1}
+#ski-ops #ski-first-look .ski-discount{margin:0;padding-top:10px;border-top:1px solid #e3ddf2;font-size:14px}
+#ski-ops #ski-first-look .ski-discount-total{font-size:14px;margin:10px 0 0}
+#ski-ops #ski-first-look .ski-discount-total strong{font-size:16px;color:#5f33e1}
+#ski-ops #ski-first-look .ski-checkout-footer{flex-shrink:0;background:#fff;padding-top:4px}
+#ski-ops #ski-first-look .ski-total{display:flex;flex-wrap:nowrap;justify-content:space-between;align-items:center;margin:0 0 10px;padding:14px 12px;background:#fff4ed;border-radius:12px;font-size:17px;font-weight:700}
+#ski-ops #ski-first-look .ski-total strong{font-size:28px;font-weight:700;color:#ef3408;letter-spacing:-.03em}
+#ski-ops #ski-first-look .ski-button-stack{gap:8px}
+#ski-ops #ski-first-look .ski-primary,#ski-ops #ski-first-look .ski-secondary-button{min-height:48px;padding:12px;border-radius:12px;font-size:17px;font-weight:700}
+#ski-ops #ski-first-look .ski-primary{background:#fe4e10;border-color:#fe4e10;color:#fff}
+#ski-ops #ski-first-look .ski-checkout-footer .ski-primary{min-height:56px}
+#ski-ops #ski-first-look .ski-checkout-footer .ski-secondary-button{font-size:15px;font-weight:600;background:#fff;border-color:#d1d1d1;color:#5d5d5d}
+#ski-ops #ski-first-look .ski-lift-inline{overflow:auto;min-height:0;flex:1;padding:0;border:0}
+#ski-ops #ski-first-look .ski-ticket-options{grid-template-columns:1fr}
+#ski-ops #ski-first-look .ski-ticket-option{gap:8px;flex-wrap:wrap}
+#ski-ops #ski-first-look .ski-ticket-option h3{font-size:16px}
+#ski-ops #ski-first-look .ski-ticket-option .ski-stepper{margin-left:auto}
+#ski-ops #ski-first-look .ski-ticket-option p{font-size:14px}
+#ski-ops #ski-first-look .ski-ticket-filters{gap:6px;margin:10px 0}
+#ski-ops #ski-first-look .ski-ticket-filters button{font-size:14px;min-height:44px;padding:8px 12px}
+#ski-ops #ski-first-look .ski-ticket-filters button[aria-pressed=true]{background:#fe4e10;border-color:#fe4e10;color:#fff}
+#ski-ops #ski-first-look .ski-mobile-representative{display:none}
+#ski-ops #so-intake-tools{display:flex;align-items:center;gap:12px;flex:1;min-width:0}
+#ski-ops #so-intake-tools .so-representative{display:flex;align-items:center;gap:10px;text-align:left;padding:4px 10px;background:#f8f8f8;border:1px solid #e7e7e7;border-radius:14px}
+#ski-ops .so-representative .so-avatar{width:32px;height:32px;min-width:32px;font-size:16px}
+#ski-ops .so-representative strong{display:block;font-size:16px;font-weight:700;color:#1a1a1a}
+#ski-ops .so-representative small{display:block;font-size:14px;color:#6d6d6d}
+#ski-ops #so-intake-tools .so-intake-search,#ski-ops #so-intake-tools .so-intake-board{border:1px solid #d1d1d1;border-radius:12px;padding:10px 12px}
+#ski-ops .so-intake-board{margin-left:auto}
+#ski-ops .so-intake-board b{font-size:17px;color:#ef3408}
+#ski-ops #ski-first-look .ski-overlay{position:fixed;inset:0;z-index:40;display:flex;align-items:center;justify-content:center;padding:24px;background:#0006;backdrop-filter:none}
+#ski-ops #so-legacy:has(.ski-overlay:not([hidden])){position:relative;z-index:40}
+#ski-ops #ski-first-look .ski-dialog{width:100%;max-width:640px;max-height:88dvh;overflow:auto;align-self:auto;border:0;border-radius:14px;padding:20px;box-shadow:0 16px 60px #0002}
+#ski-ops #ski-first-look .ski-dialog-head{margin:0 0 18px;padding-bottom:12px;border-bottom:1px solid #e7e7e7}
+#ski-ops #ski-first-look .ski-dialog-head h2{font-size:19px}
+#ski-ops #ski-first-look .ski-notice{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);max-width:calc(100% - 32px);margin:0;z-index:50;font-size:14px;background:#1a1a1a;color:#fff;border-radius:12px;padding:12px 16px}
+/* Vehicle shares the same events, with its own purple workspace. */
+#ski-ops.so-vehicle .so-workspace{grid-template-columns:1fr}
+#ski-ops.so-vehicle .so-sidebar{display:none}
+#ski-ops.so-vehicle .so-topbar{position:absolute;right:28px;top:22px;height:48px;min-height:48px;padding:0;background:transparent;border:0}
+#ski-ops.so-vehicle .so-topbar-left,#ski-ops.so-vehicle .so-demo-label{display:none}
+#ski-ops.so-vehicle .so-topbar-right{gap:6px}
+#ski-ops.so-vehicle .so-topbar-right button{background:#ffffff14;color:#fff;border-radius:12px;padding:10px}
+#ski-ops.so-vehicle #so-main{padding:14px;background:#f4f0ff}
+#ski-ops #ski-first-look[data-screen=vehicle]{--ski-accent:#5f33e1;--ski-ink:#24252c;--ski-muted:#6e6a7c;--ski-bg:#f4f0ff;--ski-line:#ede8ff;font-size:17px;background:#f4f0ff}
+#ski-ops #ski-first-look .ski-vehicle-head{height:88px;min-height:88px;flex-shrink:0;padding:14px 20px;margin:0;border-radius:24px;background:#5f33e1;color:#fff;gap:12px;flex-wrap:nowrap}
+#ski-ops #ski-first-look .ski-vehicle-head h1{font-size:30px;font-weight:700;line-height:1.3;letter-spacing:-.02em}
+#ski-ops #ski-first-look .ski-vehicle-head .ski-eyebrow{font-size:15px;color:#fff;margin:0 0 4px}
+#ski-ops #ski-first-look .ski-vehicle-head .ski-segment{margin-right:225px;min-width:210px;background:#4a25bc;border-radius:20px;padding:4px}
+#ski-ops #ski-first-look .ski-vehicle-head .ski-segment button{min-height:56px;padding:10px 16px;border-radius:16px;background:transparent;color:#fff;font-size:19px;font-weight:700}
+#ski-ops #ski-first-look .ski-vehicle-head .ski-segment button[aria-pressed=true]{background:#fff;color:#4a25bc;box-shadow:0 3px 8px #0001}
+#ski-ops #ski-first-look .ski-vehicle-tools{flex-shrink:0;margin:0;gap:12px;flex-wrap:nowrap}
+#ski-ops #ski-first-look .ski-filter{gap:8px;flex-wrap:nowrap}
+#ski-ops #ski-first-look .ski-filter button{min-height:52px;font-size:18px;font-weight:700;border-radius:28px;border:0;background:#fff;padding:12px 20px;color:#24252c}
+#ski-ops #ski-first-look .ski-filter button[aria-pressed=true]{background:#302942;color:#fff}
+#ski-ops #ski-first-look .ski-datesort{display:flex;gap:8px}
+#ski-ops #ski-first-look .ski-sort{width:auto;min-height:52px;font-size:17px;border:0;border-radius:14px;background:#fff}
+#ski-ops #ski-first-look .ski-vehicle-grid{display:grid;grid-template-columns:320px minmax(0,1fr);gap:12px;flex:1;min-height:0;align-items:stretch}
+#ski-ops #ski-first-look .ski-vehicle-grid.is-simple{grid-template-columns:1fr}
+#ski-ops #ski-first-look .ski-vehicle-grid>section{display:flex;flex-direction:column;gap:12px;min-height:0;min-width:0}
+#ski-ops #ski-first-look .ski-job-list{display:flex;flex-direction:column;gap:10px;overflow:auto;min-height:0}
+#ski-ops #ski-first-look .ski-job-item{min-height:120px;padding:14px;border:2px solid transparent;border-left:5px solid #e0d8f3;border-radius:20px;flex-shrink:0;background:#fff}
+#ski-ops #ski-first-look .ski-job-item.is-selected{border-color:#5f33e1;background:#fffaf1;box-shadow:none}
+#ski-ops #ski-first-look .ski-job-item strong{font-size:22px;font-weight:700}
+#ski-ops #ski-first-look .ski-job-item p,#ski-ops #ski-first-look .ski-job-slot{font-size:15px;color:#6e6a7c}
+#ski-ops #ski-first-look .ski-visit{display:flex;flex-direction:column;flex:1;min-height:0;border:0;border-radius:24px;background:#fff;box-shadow:0 8px 24px #5f33e108;overflow:hidden}
+#ski-ops #ski-first-look .ski-priority{padding:14px 20px;flex-shrink:0;min-height:76px;background:#fff0e5;color:#a65a18;border-bottom:1px solid #f4d9c3;font-size:19px;font-weight:700}
+#ski-ops #ski-first-look .ski-priority button{background:#fff;border:0;border-radius:16px;min-height:52px;font-size:16px;padding:12px 18px;color:#a65a18}
+#ski-ops #ski-first-look .ski-visit-inner{display:grid;grid-template-columns:1fr 1fr;gap:18px;flex:1;min-height:0;overflow:auto;padding:18px 20px;align-content:start}
+#ski-ops #ski-first-look .ski-vehicle-grid:not(.is-simple) .ski-visit-inner{display:flex;flex-direction:column;gap:14px}
+#ski-ops #ski-first-look .ski-place-line{display:flex;align-items:center;justify-content:space-between;gap:10px}
+#ski-ops #ski-first-look .ski-place{font-size:36px;font-weight:700;letter-spacing:-.035em;line-height:1.2;margin:0;color:#24252c}
+#ski-ops #ski-first-look .ski-location-detail{font-size:16px;color:#6e6a7c;margin-top:8px}
+#ski-ops #ski-first-look .ski-location-detail svg{color:#5f33e1}
+#ski-ops #ski-first-look .ski-arrival{padding:12px 16px;margin-top:14px;border-radius:18px;background:#f4f0ff;display:block}
+#ski-ops #ski-first-look .ski-arrival strong{font-size:30px;font-weight:700;color:#5f33e1;margin:0;display:block}
+#ski-ops #ski-first-look .ski-arrival small{display:block;font-size:16px;color:#6e6a7c;margin-top:4px}
+#ski-ops #ski-first-look .ski-customer{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 0 12px;padding:0 0 12px;border:0;border-bottom:1px solid #ede8ff;background:transparent}
+#ski-ops #ski-first-look .ski-customer strong{font-size:23px;font-weight:700}
+#ski-ops #ski-first-look .ski-customer span{font-size:21px;color:#24252c;font-weight:600;white-space:nowrap}
+#ski-ops #ski-first-look .ski-customer b{font-size:24px;color:#5f33e1}
+#ski-ops #ski-first-look .ski-equipment-label{font-size:15px;color:#6e6a7c}
+#ski-ops #ski-first-look .ski-equipment{display:flex;gap:8px;margin:8px 0 0}
+#ski-ops #ski-first-look .ski-equipment span{display:flex;flex:1;align-items:center;justify-content:space-between;gap:10px;padding:14px;border-radius:18px;background:#ede8ff;color:#4a25bc;font-size:18px}
+#ski-ops #ski-first-look .ski-equipment strong{font-size:28px;font-weight:700;color:#5f33e1}
+#ski-ops #ski-first-look .ski-actions{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;padding:12px 20px 14px;margin:0;flex-shrink:0;background:#fff;box-shadow:0 -6px 18px #5f33e103}
+#ski-ops #ski-first-look .ski-actions button{min-height:72px;font-size:21px;font-weight:700;border-radius:16px;border:0;background:#ede8ff;color:#24252c;grid-column:auto}
+#ski-ops #ski-first-look .ski-actions .ski-complete{background:#5f33e1;color:#fff;box-shadow:0 8px 16px #5f33e12b}
+#ski-ops #ski-first-look .ski-upcoming{display:flex;flex-direction:column;gap:6px;flex-shrink:0;color:#4a25bc;font-size:15px;font-weight:600}
+#ski-ops #ski-first-look .ski-upcoming-list{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+#ski-ops #ski-first-look .ski-next{display:flex;flex-direction:column;gap:6px;align-items:stretch;padding:10px 14px;margin:0;border:0;border-radius:20px;background:#ede8ff;text-align:left;color:#24252c}
+#ski-ops #ski-first-look .ski-next-meta{display:flex;gap:8px;align-items:center;font-size:15px}
+#ski-ops #ski-first-look .ski-next-meta b{margin-left:auto;font-size:19px}
+#ski-ops #ski-first-look .ski-next-place{display:flex;align-items:center;justify-content:space-between;gap:10px}
+#ski-ops #ski-first-look .ski-next-place strong{font-size:21px;font-weight:700}
+#ski-ops #ski-first-look .ski-next-place svg{color:#5f33e1}
+#ski-ops #ski-first-look .ski-badge{font-size:14px;font-weight:600;border-radius:6px;min-height:0;padding:4px 8px}
+#ski-ops #ski-first-look .ski-empty{background:#fff;border-radius:20px;min-height:180px;display:grid;place-items:center}
+@media(max-width:1250px){
+#ski-ops #so-intake-tools .so-intake-board{display:none}
+#ski-ops #ski-first-look .ski-pos-layout{grid-template-columns:minmax(0,1fr) 290px 320px;gap:12px}
+#ski-ops #ski-first-look .ski-products{grid-template-columns:repeat(2,minmax(0,1fr))}
+#ski-ops #ski-first-look .ski-product{padding:10px}
+}
+@media(max-width:1050px){
+#ski-ops #ski-first-look .ski-pos-layout{grid-template-columns:minmax(0,1fr) 330px;overflow:auto;align-content:start}
+#ski-ops #ski-first-look .ski-pos-catalog{grid-column:1;grid-row:1;min-height:600px}
+#ski-ops #ski-first-look .ski-pos-customer{grid-column:1;grid-row:2;min-height:350px}
+#ski-ops #ski-first-look .ski-pos-checkout{grid-column:2;grid-row:1 / span 2;position:sticky;top:0;max-height:100%;min-height:580px;align-self:start}
+#ski-ops #so-intake-tools .so-intake-search{display:none}
+#ski-ops #ski-first-look .ski-customer strong{font-size:21px}
+#ski-ops #ski-first-look .ski-customer span{font-size:19px}
+#ski-ops #ski-first-look .ski-vehicle-head .ski-segment{margin-right:190px}
+#ski-ops.so-vehicle .so-topbar-right button{font-size:13px}
+#ski-ops #ski-first-look .ski-vehicle-grid{grid-template-columns:320px minmax(0,1fr)}
+}
+@media(max-width:760px){
+#ski-ops #so-intake-tools{display:none}
+#ski-ops #ski-first-look .ski-pos-layout{display:flex;flex-direction:column;overflow:auto;gap:14px}
+#ski-ops #ski-first-look .ski-pos-catalog,#ski-ops #ski-first-look .ski-pos-customer,#ski-ops #ski-first-look .ski-pos-checkout{min-height:0;flex-shrink:0;position:static;max-height:none}
+#ski-ops #ski-first-look .ski-products{grid-template-columns:repeat(2,minmax(0,1fr));overflow:visible}
+#ski-ops #ski-first-look .ski-pos-catalog{order:1}
+#ski-ops #ski-first-look .ski-pos-customer{order:2}
+#ski-ops #ski-first-look .ski-pos-checkout{order:3}
+#ski-ops #ski-first-look #ski-product-panel,#ski-ops #ski-first-look .ski-checkout-scroll,#ski-ops #ski-first-look .ski-lift-inline{overflow:visible}
+#ski-ops #ski-first-look .ski-mobile-representative{display:flex;font-size:15px;margin:0}
+#ski-ops #ski-first-look .ski-pos-customer .ski-sectionhead>.ski-secondary{display:none}
+#ski-ops #ski-first-look .ski-days{display:flex;flex-direction:column}
+#ski-ops #ski-first-look .ski-days .ski-segment button{min-height:44px;font-size:14px}
+#ski-ops #ski-first-look .ski-period-dates{grid-template-columns:1fr}
+#ski-ops #ski-first-look .ski-return-method{grid-template-columns:1fr}
+#ski-ops #ski-first-look .ski-dialog{padding:18px}
+#ski-ops #ski-first-look .ski-overlay{padding:16px}
+#ski-ops.so-vehicle #so-main{padding:10px}
+#ski-ops.so-vehicle .so-topbar{top:20px;right:22px}
+#ski-ops #ski-first-look .ski-vehicle-head{height:auto;min-height:120px;flex-wrap:wrap;padding:14px}
+#ski-ops #ski-first-look .ski-vehicle-head h1{font-size:25px}
+#ski-ops #ski-first-look .ski-vehicle-head .ski-segment{width:100%;min-width:0;margin:0}
+#ski-ops #ski-first-look .ski-vehicle-head .ski-segment button{min-height:48px}
+#ski-ops #ski-first-look .ski-vehicle-tools{flex-wrap:wrap}
+#ski-ops #ski-first-look .ski-filter button{font-size:16px;padding:10px 16px}
+#ski-ops #ski-first-look .ski-vehicle-grid{display:flex;flex-direction:column;overflow:auto}
+#ski-ops #ski-first-look .ski-vehicle-grid>section{min-height:600px;flex-shrink:0}
+#ski-ops #ski-first-look .ski-vehicle-grid .ski-visit-inner{display:flex;flex-direction:column}
+#ski-ops #ski-first-look .ski-job-list{min-height:160px;max-height:220px;flex-shrink:0}
+#ski-ops #ski-first-look .ski-place{font-size:30px}
+#ski-ops #ski-first-look .ski-actions{padding:10px;gap:6px}
+#ski-ops #ski-first-look .ski-actions button{font-size:16px;min-height:72px}
+#ski-ops #ski-first-look .ski-upcoming-list{grid-template-columns:1fr}
+}
+@media(max-width:450px){
+#ski-ops #ski-first-look .ski-products{grid-template-columns:1fr}
+#ski-ops #ski-first-look .ski-product-title{font-size:17px}
+#ski-ops #ski-first-look .ski-product{padding:12px}
+#ski-ops #ski-first-look .ski-total{flex-wrap:wrap;gap:8px}
+#ski-ops #ski-first-look .ski-total strong{font-size:26px}
+#ski-ops #ski-first-look .ski-lift-inputs{grid-template-columns:1fr}
+}
+
+/* List accents and compact header controls. */
+#ski-ops .so-stock-available.green{color:#247a3d;background:#e5faed}
+#ski-ops .so-stock-available.orange{color:#b45309;background:#fff0e3}
+#ski-ops .so-metric.receivable strong{color:#0074d9}
+#ski-ops[data-page=closing] .so-pagehead>.so-actions{align-items:center}
+#ski-ops[data-page=closing] .so-pagehead .so-field{display:flex;flex-direction:row;align-items:center;gap:8px}
+#ski-ops[data-page=closing] .so-pagehead input{width:164px}
+#ski-ops .so-button{white-space:nowrap}
+#ski-ops td .so-actions{flex-wrap:nowrap}
+#ski-ops #so-page>.so-panel>.so-panel-pad{overflow:auto;min-height:0}
+
+@media(max-width:760px){
+#ski-ops #ski-first-look .ski-product-tabs button{white-space:nowrap;gap:5px;padding:10px 8px;font-size:14px}
+#ski-ops #ski-first-look .ski-product-tabs button svg{width:17px;height:17px;flex-shrink:0}
+#ski-ops #ski-first-look .ski-product-tabs button span{font-size:12px;padding:2px 4px}
+}
