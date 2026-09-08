@@ -9,8 +9,9 @@
   const defaults = () => ({ sound: false, interval: 30, volume: 60 });
   const id = value => typeof value === 'string' && /^[A-Za-z0-9][A-Za-z0-9_.:-]{0,159}$/.test(value);
   const scope = context => context.actor.role === 'driver' ? 'vehicle:' + context.actor.vehicleId : 'store';
+  const preferenceKey = context => (context.deviceId || context.actor.id) + ':' + scope(context);
   const validContext = context => {
-    if (!id(context?.shopId) || !id(context?.actor?.id) || !['store', 'driver'].includes(context.actor.role) || (context.actor.role === 'driver' && !id(context.actor.vehicleId))) fail('FORBIDDEN', '알림 수신 권한을 확인해 주세요.');
+    if (!id(context?.shopId) || !id(context?.actor?.id) || !['store', 'driver'].includes(context.actor.role) || (context.actor.role === 'driver' && !id(context.actor.vehicleId)) || (context.deviceId != null && !id(context.deviceId))) fail('FORBIDDEN', '알림 수신 권한을 확인해 주세요.');
   };
   function touch(state, record) { record.revision = ++state.revision; }
   function emit(state, event, recipient, type, title, summary, extra = {}) {
@@ -45,6 +46,7 @@
         row.taskId = null; touch(state, row);
       }
       for (const task of state.tasks.filter(task => task.orderId === order.id)) { task.vehicleId = order.vehicleId; task.version++; }
+      if (previous.vehicleId) emit(state, event, oldRecipient, 'cancelled', '담당 업무가 변경됐어요', '매장에서 다른 차량에 배정했습니다. 이 업무를 진행하지 않아도 됩니다.');
       emit(state, event, vehicle, 'assignment', customer + ' · 담당 업무 배정', '새로 배정된 업무의 일정과 장소를 확인해 주세요.');
     }
     if (event.type === 'collect') {
@@ -103,7 +105,7 @@
     const checkKeys = keys => {
       if (!payload || typeof payload !== 'object' || Array.isArray(payload) || Object.keys(payload).some(key => !keys.includes(key))) fail('INVALID_INPUT', '입력 항목을 확인해 주세요.');
     };
-    const fingerprint = R.canonical({ command, actor: context.actor });
+    const fingerprint = R.canonical({ command, actor: context.actor, deviceId: context.deviceId || null });
     const requestKey = context.actor.id + ':' + command.requestId;
     if (state.requests[requestKey]) {
       if (state.requests[requestKey].fingerprint !== fingerprint) fail('IDEMPOTENCY_CONFLICT', '같은 요청으로 다른 내용을 저장할 수 없습니다.');
@@ -126,7 +128,7 @@
     } else if (command.type === 'preferences') {
       checkKeys(['sound', 'interval', 'volume']);
       if (typeof payload.sound !== 'boolean' || ![30, 60].includes(payload.interval) || !Number.isInteger(payload.volume) || payload.volume < 0 || payload.volume > 100) fail('INVALID_INPUT', '소리 설정을 확인해 주세요.');
-      state.preferences[context.actor.id + ':' + recipient] = copy(payload); ++state.revision; result = copy(payload);
+      state.preferences[preferenceKey(context)] = copy(payload); ++state.revision; result = copy(payload);
     } else if (command.type === 'request') {
       checkKeys(['orderId', 'message', 'expectedVersion', 'taskId']);
       const order = getOrder(payload.orderId);
@@ -134,7 +136,7 @@
       if (order.version !== payload.expectedVersion) fail('VERSION_CONFLICT', '업무가 바뀌었습니다. 최신 내용을 확인해 주세요.');
       if (R.summarize(order).complete) fail('INVALID_INPUT', '완료된 업무에는 확인 요청을 보낼 수 없습니다.');
       if (!order.vehicleId) fail('INVALID_INPUT', '담당 차량을 먼저 지정해 주세요.');
-      const message = String(payload.message || '').trim();
+      const message = typeof payload.message === 'string' ? payload.message.trim() : '';
       if (!message || message.length > 240) fail('INVALID_INPUT', '요청 내용을 1~240자로 입력해 주세요.');
       if (payload.taskId && !state.tasks.some(task => task.id === payload.taskId && task.orderId === order.id && task.status === 'waiting')) fail('INVALID_INPUT', '진행 중인 업무를 선택해 주세요.');
       const to = context.actor.role === 'driver' ? 'store' : 'vehicle:' + order.vehicleId;
@@ -168,5 +170,5 @@
     state.requests[requestKey] = { fingerprint, result: copy(result) };
     return result;
   }
-  return { fresh, defaults, scope, validContext, view, execute, project, emit, closeWhere, copy };
+  return { fresh, defaults, scope, preferenceKey, validContext, view, execute, project, emit, closeWhere, copy };
 });

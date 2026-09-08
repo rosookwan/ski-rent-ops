@@ -17,7 +17,8 @@
     "test:intake": "node scripts/smoke-intake.cjs",
     "test:time-picker": "node scripts/smoke-time-picker.cjs",
     "test:operations": "node scripts/smoke-operations.cjs",
-    "test:notifications": "node --test tests/notifications.test.cjs"
+    "test:notifications": "node --test tests/notifications.test.cjs",
+    "test:notifications:ui": "node scripts/smoke-notifications.cjs"
   },
   "engines": {
     "node": ">=22.13.0"

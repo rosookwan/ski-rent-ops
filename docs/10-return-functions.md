@@ -83,6 +83,7 @@
 | `receiveDirect` | `items: [{itemId, quantity}]` | 매장 |
 | `confirmVehicle` | `collectionId`, `items: [{itemId, quantity}]` | 매장 |
 | `planReturn` | `items: [{itemId, returnPlan}]` | 매장 |
+| `assignVehicle` | `vehicleId` | 매장. 차량 인수 후 미인계 수량이 남으면 변경 불가 |
 | `correctReturn` | `movementId`, `items: [{itemId, quantity}]` | 매장 또는 본인 인수 기록의 기사 |
 | `undoReturn` | `movementId` | 매장 또는 본인 인수 기록의 기사 |
 
@@ -91,6 +92,8 @@
 수량은 정수이며 일반 처리는 1 이상입니다. `collect`는 하나도 받지 못한 방문을 기록하기 위해 0을 허용합니다. `correctReturn`의 수량은 증감량이 아닌 **해당 반납 기록에서 실제 받은 새 총수량**입니다. 수정하지 않을 품목은 생략하고 0으로 정정하면 해당 품목 처리량을 취소합니다.
 
 차량 인수 기록의 `requestId`가 매장 확인 시 `collectionId`입니다. 특정 인수 기록에서 아직 확인하지 않은 수량만 매장 확인합니다. 정정으로 원래 기록에 없던 품목을 추가하지 않습니다. 매장 확인보다 적은 수량으로 차량 인수를 줄이려면 매장 확인 기록부터 정정해야 합니다. `undoReturn`은 물품 이동 수량을 0으로 돌리며 별도로 변경한 반납 계획은 취소하지 않습니다.
+
+`assignVehicle`은 접수의 담당 차량을 바꾸고 이전 차량에는 개인정보 없는 변경 안내, 새 차량에는 배정 알림을 생성합니다. 기존 알림과 저장된 업무의 담당 차량도 같은 트랜잭션에서 갱신합니다. 품목 수량·요금은 바꾸지 않습니다. 화면의 기사 연락처·담당 차량 명단을 편집하는 것과는 별도 명령입니다.
 
 수량 초과·음수·소수·중복 품목·알 수 없는 필드는 거절합니다. 여러 품목 중 하나라도 실패하면 전체 명령이 적용되지 않습니다. 원본 이벤트는 유지하고 정정 전후 수량·담당자·시각을 새 이벤트로 남깁니다. 완료 후 정정으로 잔여량이 생기면 완료 상태가 다시 열립니다.
 
@@ -156,6 +159,8 @@ console.log(result.status); // 인증 값은 출력하지 않음
 ```
 
 설정은 `{credentials: [{tokenHash, shopId, actor: {id, role, vehicleId?}}], allowedOrigins: []}`입니다. `tokenHash`는 서버용 SHA-256 해시이며 실제 토큰은 직원별로 별도 관리합니다. 본문의 역할·매장·시각을 믿지 않고 인증 정보로 결정합니다. 현재 Pages의 임시 로그인과는 연결하지 않았습니다.
+
+알림 기능은 같은 서버의 `/api/notifications`에서 제공합니다. 2026-09-08부터 DB 스키마는 2이며, 기존 스키마 1의 접수·이력을 보존하고 알림 저장 테이블을 추가합니다. [알림 API와 마이그레이션 설명](17-notification-release.md#저장-api와-운영-연결)을 참고하세요.
 
 | HTTP | 경로 | 내용 |
 |---|---|---|

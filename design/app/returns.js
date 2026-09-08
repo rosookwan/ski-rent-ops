@@ -4,9 +4,9 @@
   const { head, panel, button, link, status, icon, esc, date, money, field, select } = S;
   const cache = new Map(api.initialOrders.map(order => [order.id, order]));
   const labels = { awaiting_issue: ['지급 전', 'grey'], in_use: ['이용 중', 'blue'], partial_return: ['일부 반납', 'orange'], awaiting_shop: ['매장 확인 대기', 'purple'], returned: ['반납 완료', 'green'], no_return_required: ['회수 대상 없음', 'grey'] };
-  const movementLabels = { create: '접수', issue: '실제 지급', collect: '차량 수거', receiveDirect: '매장 직접반납', confirmVehicle: '차량 인계 확인', planReturn: '반납 일정 변경', correctReturn: '반납 수량 정정', undoReturn: '반납 기록 취소' };
+  const movementLabels = { assignVehicle: '담당 차량 변경', create: '접수', issue: '실제 지급', collect: '차량 수거', receiveDirect: '매장 직접반납', confirmVehicle: '차량 인계 확인', planReturn: '반납 일정 변경', correctReturn: '반납 수량 정정', undoReturn: '반납 기록 취소' };
   const filters = [['all', '전체'], ['direct', '직접반납'], ['liftUnreturned', '리프트권 미반납'], ['overdue', '기한 경과'], ['awaitingShop', '매장 확인 대기']];
-  const listCache = new Map(), vehicleLog = new Map(), vehicleFlags = new Map();
+  const listCache = new Map(), vehicleLog = new Map();
   let listLoading = '', generation = 0, operation = null, busy = false, lastDriver = null, nextOrder = 100;
   const current = id => cache.get(id || S.state.params.id);
   const dayOf = at => new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Seoul', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date(at));
@@ -195,7 +195,6 @@
       if (op.kind === 'collect') {
         lastDriver = { orderId: op.order.id, movementId: result.requestId };
         vehicleLog.set(op.job.id, { ...op.job, movementId: result.requestId, status: 'collected', urgent: false, ack: true, items: result.order.items.filter(item => op.job.targets.some(row => row.itemId === item.id)).map(item => [item.label, op.command.payload.items.find(row => row.itemId === item.id)?.quantity || 0]) });
-        vehicleFlags.set(op.job.id, { ack: true });
       }
       if (op.kind === 'undoReturn') {
         for (const [id, job] of vehicleLog) if (job.orderId === op.order.id) vehicleLog.delete(id);
@@ -230,7 +229,7 @@
       const groups = new Map();
       for (const item of order.items.filter(item => item.customerQuantity > 0 && item.returnPlan.method === 'vehicle')) {
         const plan = item.returnPlan, key = [order.id, plan.date, plan.time || '16:30', plan.place || base.place].join(':');
-        if (!groups.has(key)) groups.set(key, { id: key, orderId: order.id, type: 'return', name: base.name, phone: base.phone, time: plan.time || '16:30', returnDate: plan.date, returnPreset: plan.slot && plan.slot !== '직접 시간' ? 'preset' : 'manual', returnLabel: plan.slot, place: plan.place || base.place, detail: base.note, items: [], targets: [], status: 'waiting', urgent: order.id === 'R-021', ack: false, dateOffset: Math.round((Date.parse(plan.date) - Date.parse(S.data.today)) / 86400000), ...(vehicleFlags.get(key) || {}) });
+        if (!groups.has(key)) groups.set(key, { id: key, orderId: order.id, type: 'return', name: base.name, phone: base.phone, time: plan.time || '16:30', returnDate: plan.date, returnPreset: plan.slot && plan.slot !== '직접 시간' ? 'preset' : 'manual', returnLabel: plan.slot, place: plan.place || base.place, detail: base.note, items: [], targets: [], status: 'waiting', urgent: !!S.notifications?.pendingForOrder(order.id), ack: false, dateOffset: Math.round((Date.parse(plan.date) - Date.parse(S.data.today)) / 86400000) });
         const job = groups.get(key); const label = item.category === 'liftTicket' ? '리프트권' : item.label, displayed = job.items.find(row => row[0] === label); if (displayed) displayed[1] += item.customerQuantity; else job.items.push([label, item.customerQuantity]); job.targets.push({ itemId: item.id, quantity: item.customerQuantity });
       }
       result.push(...groups.values());
@@ -291,7 +290,7 @@
   S.action('rental-schedule', id => S.go('return-detail', { id }));
   S.returnUI = { current, refresh, saveIntake, vehicleJobs, dispatchJobs, closingTickets,
     collect: (job, partial) => openOperation('collect', job.orderId, { job, partial }),
-    ackJob: id => vehicleFlags.set(id, { ...(vehicleFlags.get(id) || {}), ack: true }),
+    ackJob: id => { const job = vehicleJobs().find(row => row.id === id); if (job) S.notifications?.acknowledgeOrder(job.orderId); },
     undoButton: () => lastDriver ? button('최근 수거 취소', 'return-driver-undo', '', 'small') : '',
     balances: id => { const order = current(id); return order ? itemText(order.items, 'customerQuantity') : ''; }
   };

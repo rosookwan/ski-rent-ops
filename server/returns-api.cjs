@@ -14,8 +14,9 @@ function tokenAuthenticator(credentials) {
   const entries = credentials.map(entry => {
     if (!/^[a-f0-9]{64}$/.test(entry.tokenHash ?? '') || hashes.has(entry.tokenHash)) throw new Error('인증 해시는 중복 없이 SHA-256 형식이어야 합니다.');
     hashes.add(entry.tokenHash);
-    const context = { shopId: entry.shopId, actor: entry.actor };
+    const context = { shopId: entry.shopId, actor: entry.actor, ...(entry.deviceId ? { deviceId: entry.deviceId } : {}) };
     createService({}, context); // Validate roles and shop identity before accepting requests.
+    createNotificationService({}, context);
     return { hash: Buffer.from(entry.tokenHash, 'hex'), context };
   });
   return request => {

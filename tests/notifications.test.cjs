@@ -9,7 +9,7 @@ const { DatabaseSync } = require('node:sqlite');
 const { createService, createMemoryRepository } = require('../src/returns/service.js');
 const { createSqliteRepository } = require('../server/returns-repository.cjs');
 const { createService: notifications } = require('../src/notifications/service.js');
-const { createHttpClient } = require('../src/notifications/client.js');
+const { createHttpClient, createLocalClient } = require('../src/notifications/client.js');
 const { createApiServer, tokenAuthenticator } = require('../server/returns-api.cjs');
 const { sample } = require('./returns-fixtures.cjs');
 const clock = () => '2026-09-08T08:00:00.000Z';
@@ -83,7 +83,9 @@ test('new schedules supersede requests and reassignment removes old customer det
   assert.ok(changed.records.some(row => row.type === 'priority' && row.lifecycle === 'superseded'));
   assert.ok(changed.records.some(row => row.type === 'schedule' && row.summary.includes('18:00')));
   f.execute('assignVehicle', { vehicleId: 'van-2' });
-  assert.ok(f.car.list().records.every(row => row.lifecycle === 'cancelled'));
+  assert.ok(f.car.list().records.filter(row => row.type !== 'cancelled').every(row => row.lifecycle === 'cancelled'));
+  assert.equal(f.car.list({ filter: 'unread' }).records.length, 1);
+  assert.equal(f.car.list({ filter: 'unread' }).records[0].type, 'cancelled');
   assert.ok(f.car.list().records.every(row => !row.title.includes(sample().customer.name)));
   assert.equal(notifications(f.repo, driver2, clock).list({ filter: 'unread' }).unreadCount, 1);
   assert.throws(() => f.car.execute(f.command('request', { orderId: 'order-1', expectedVersion: 4, message: '요청' })), { code: 'NOT_FOUND' });
@@ -112,6 +114,18 @@ test('sound preferences are scoped to the authenticated user and reject invalid 
   f.pos.execute(f.command('preferences', { sound: true, interval: 60, volume: 30 }));
   assert.equal(f.pos.preferences().volume, 30); assert.equal(f.car.preferences().sound, false);
   assert.throws(() => f.pos.execute(f.command('preferences', { sound: true, interval: 1, volume: 120 })), { code: 'INVALID_INPUT' });
+  const a = notifications(f.repo, { ...store, deviceId: 'pos-a' }, clock);
+  const b = notifications(f.repo, { ...store, deviceId: 'pos-b' }, clock);
+  a.execute(f.command('preferences', { sound: true, interval: 30, volume: 80 }));
+  assert.equal(a.preferences().volume, 80); assert.equal(b.preferences().sound, false);
+});
+test('stopping a client watcher ignores an already in-flight response', async () => {
+  let resolve, changes = 0, statuses = 0;
+  const client = createLocalClient({ sync: () => new Promise(done => { resolve = done; }) });
+  const stop = client.watch({ onChange: () => changes++, onStatus: () => statuses++ });
+  stop(); resolve({ cursor: 1, records: [], reset: true });
+  await new Promise(done => setImmediate(done));
+  assert.equal(changes, 0); assert.equal(statuses, 0);
 });
 test('SQLite keeps acknowledgements across restart and rolls back the whole collection when notification storage fails', t => {
   const folder = mkdtempSync(join(tmpdir(), 'ski-notices-')), file = join(folder, 'test.sqlite');
