@@ -42,6 +42,25 @@ const root=path.resolve(__dirname,'..');
   }
  }
  for(const w of [736,360])for(const route of ['home','rentals','intake','partners','closing','preparation','settings','guide','guest-guide','guest-form','login'])await inspect(route,w,900,(w===360&&['login','guest-guide','guest-form'].includes(route))?'polish-mobile-'+route:undefined);
+ for(const w of [360,390]){
+  await inspect('guest-form',w,740);
+  for(let step=1;step<=4;step++){
+   const footer=await frame.locator('.so-guest-shell footer').evaluate(el=>({top:el.getBoundingClientRect().top,bottom:el.getBoundingClientRect().bottom}));
+   assert.ok(footer.top>=0&&footer.bottom<=740,`guest form ${w} step ${step} footer: ${JSON.stringify(footer)}`);
+   const shell=await frame.locator('.so-guest-shell').evaluate(el=>el.getBoundingClientRect().width);
+   assert.ok(shell<=390);
+   checks.push({route:'guest-form',width:w,step,footer});
+   if(step<4)await frame.locator('[data-action="guest-next"]').click();
+  }
+  await inspect('guest-guide',w,740);
+  for(const id of ['return','faq','visit']){
+   await frame.locator('[data-action="guide-jump"][data-id="'+id+'"]').click();
+   const bounds=await frame.locator('#so-guide-'+id+' h2').evaluate(el=>el.getBoundingClientRect().top);
+   const navBottom=await frame.locator('.so-guide-shortcuts').evaluate(el=>el.getBoundingClientRect().bottom);
+   assert.ok(bounds>=navBottom,`guide section ${id} hidden by header`);
+   checks.push({route:'guest-guide',width:w,section:id,headingTop:bounds});
+  }
+ }
  assert.deepEqual(errors,[]);
  fs.writeFileSync(path.join(root,'work/visual-check.json'),JSON.stringify({checks,errors},null,2));
  await browser.close();console.log('PASS '+checks.length+' viewport / action checks');
