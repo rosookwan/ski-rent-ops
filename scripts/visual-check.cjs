@@ -52,12 +52,24 @@ const root=path.resolve(__dirname,'..');
   await frame.locator('[data-days="3"]').click();
   assert.equal(await frame.locator('.ski-days').count(),0);
   const products=await frame.locator('.ski-products').evaluate(el=>{
-   const panel=el.closest('#ski-product-panel').getBoundingClientRect();
-   return {panel:{top:panel.top,bottom:panel.bottom},cards:[...el.children].slice(0,2).map(card=>({top:card.getBoundingClientRect().top,bottom:card.getBoundingClientRect().bottom,titleSize:parseFloat(getComputedStyle(card.querySelector('.ski-product-title')).fontSize),buttons:[...card.querySelectorAll('button')].map(b=>({height:b.getBoundingClientRect().height,bottom:b.getBoundingClientRect().bottom}))}))};
+   const panel=el.getBoundingClientRect();
+   return {panel:{top:panel.top,bottom:panel.bottom,left:panel.left,right:panel.right},cards:[...el.children].map(card=>({top:card.getBoundingClientRect().top,bottom:card.getBoundingClientRect().bottom,left:card.getBoundingClientRect().left,right:card.getBoundingClientRect().right,titleSize:parseFloat(getComputedStyle(card.querySelector('.ski-product-title')).fontSize),buttons:[...card.querySelectorAll('button')].map(b=>({height:b.getBoundingClientRect().height,bottom:b.getBoundingClientRect().bottom,right:b.getBoundingClientRect().right}))}))};
   });
-  assert.ok(products.cards.every(card=>card.top>=products.panel.top&&card.bottom<=products.panel.bottom+1&&card.titleSize>=18&&card.buttons.every(b=>b.height>=44&&b.bottom<=products.panel.bottom+1)),`intake ${w}x${h} products not readable: ${JSON.stringify(products)}`);
+  assert.equal(products.cards.length,7);
+  assert.ok(products.cards.every(card=>card.top>=products.panel.top&&card.bottom<=products.panel.bottom+1&&card.titleSize>=18&&card.buttons.every(b=>b.height>=44&&b.bottom<=products.panel.bottom+1&&b.right<=card.right)),`intake ${w}x${h} products not readable: ${JSON.stringify(products)}`);
+  assert.ok(products.cards.every(card=>card.left>=products.panel.left&&card.right<=products.panel.right+1));
   checks.at(-1).products=products;
   await page.screenshot({path:path.join(root,'work/screens',`intake-collapsed-${w}x${h}.png`)});
+  await frame.locator('[data-action="fulfillment"]').click();await frame.locator('[data-return-preset="manual"]').click();await frame.locator('.ski-split-return summary').click();
+  const sheet=await frame.locator('[data-intake-sheet] .ski-dialog').evaluate(el=>{
+   const r=el.getBoundingClientRect(),footer=el.querySelector('.ski-sheet-footer').getBoundingClientRect(),scroll=el.querySelector('.ski-sheet-scroll');
+   return {top:r.top,bottom:r.bottom,left:r.left,right:r.right,footerTop:footer.top,footerBottom:footer.bottom,scrollHeight:scroll.scrollHeight,clientHeight:scroll.clientHeight};
+  });
+  assert.ok(sheet.top>=0&&sheet.bottom<=h&&sheet.left>=0&&sheet.right<=w&&sheet.footerTop>=sheet.top&&sheet.footerBottom<=h,`intake sheet ${w}x${h}: ${JSON.stringify(sheet)}`);
+  checks.at(-1).sheet=sheet;
+  await page.screenshot({path:path.join(root,'work/screens',`intake-return-sheet-${w}x${h}.png`)});
+  await frame.locator('[data-return-preset="afternoon"]').click();
+  await frame.locator('[data-action="intake-sheet-done"]').click();
  }
  for(const [w,h] of [[1024,520],[1024,600],[1024,650],[1280,600],[1024,800]]){
   await inspect('vehicle',w,h);

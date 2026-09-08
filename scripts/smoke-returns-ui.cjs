@@ -71,11 +71,12 @@ const fs = require('node:fs');
     });
     await test('new intake separates physical quantity from two-day pricing and actual issue', async () => {
       await nav('intake'); if (await f.locator('[data-action="representative-done"]').isVisible()) await f.locator('[data-action="representative-done"]').click();
-      await f.locator('[data-days="2"]').click(); assert.equal(await f.locator('#ski-total-value').innerText(), '60,000원');
+      await f.locator('[data-action="toggle-period"]').click();await f.locator('[data-days="2"]').click(); assert.equal(await f.locator('#ski-total-value').innerText(), '60,000원');
       await f.locator('[data-product-tab="lift"]').click(); await f.locator('[data-lift-ticket="afternoon-adult"][data-delta="1"]').click();
-      await f.locator('.ski-split-return summary').click(); await f.locator('[data-field="ticketReturnMethod"]').selectOption('collect');
+      await f.locator('[data-action="fulfillment"]').click();await f.locator('.ski-split-return summary').click(); await f.locator('[data-field="ticketReturnMethod"]').selectOption('collect');
       const afterTomorrow = new Date(Date.parse(today) + 2*86400000).toISOString().slice(0,10);
       await f.locator('[data-field="ticketReturnDate"]').fill(afterTomorrow);
+      await f.locator('[data-action="intake-sheet-done"]').click();
       await f.locator('[data-action="save"]').click(); await f.locator('#so-dialog [data-go="return-detail"]').click();
       let order = await get('R-100'); assert.equal(order.status, 'awaiting_issue'); assert.equal(order.totals.issuedQuantity, 0); assert.equal(order.totals.unissuedQuantity, 3); assert.equal(order.rental.amountWon, 105000);
       await action('return-issue'); await apply(); order = await get('R-100'); assert.equal(order.totals.issuedQuantity, 3); assert.equal(order.totals.customerQuantity, 3);
