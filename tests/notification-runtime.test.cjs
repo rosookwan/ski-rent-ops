@@ -9,7 +9,7 @@ const Notifications = require('../src/notifications/domain.js');
 
 // Exercise the shipped UI controller and real workflow/notification services.
 // Only DOM elements, the clock and the audio output device are test doubles.
-function harness() {
+function harness({ failFirstResume = false } = {}) {
   const f = fixture(), listeners = new Map(), timers = new Map(), voices = [];
   let now = Date.parse(f.clock()), nextTimer = 1;
   const element = () => ({
@@ -31,7 +31,7 @@ function harness() {
   class AudioContext {
     constructor() { this.state = 'suspended'; this.destination = {}; }
     get currentTime() { return now / 1000; }
-    async resume() { this.state = 'running'; }
+    async resume() { if (failFirstResume) { failFirstResume = false; throw new Error('Blocked audio'); } this.state = 'running'; }
     createOscillator() {
       const voice = { frequency: {}, stopped: false, connect() {}, disconnect() {}, start(at) { this.startAt = at; }, stop(at) { if (at === undefined) this.stopped = true; else this.stopAt = at; } };
       voices.push(voice); return voice;
@@ -47,8 +47,8 @@ function harness() {
   });
   const flush = async () => { for (let i = 0; i < 8; i++) await Promise.resolve(); };
   const click = async notice => {
-    const button = { dataset: { notice }, disabled: false }, target = { closest: () => button };
-    for (const listener of listeners.get('click') || []) listener({ target });
+    const button = notice ? { dataset: { notice }, disabled: false } : null, target = { closest: () => button };
+    for (const listener of listeners.get('click') || []) listener({ target, isTrusted: true });
     await flush();
   };
   const advance = async ms => {
@@ -64,25 +64,60 @@ function harness() {
   return { f, S, services, voices, click, advance, ack, pending, activeVoices, flush };
 }
 
-test('vehicle sound shortcut retains the four-second chime and stops it when switched off', async () => {
+test('vehicle sound defaults on and the first ordinary touch arms the four-second request chime', async () => {
   const h = harness();
-  assert.match(h.S.notifications.soundControl(), /알림 소리 켜기/);
+  assert.equal(h.S.notifications.soundInfo().preferences.sound, true);
+  h.f.task('pickup', 'collection', 'customer-1');
+  h.f.call('task.priority', { id: 'pickup', message: '먼저 확인해 주세요.' }); await h.flush();
   assert.equal(h.voices.length, 0, 'opening the screen never starts sound without a click');
-  await h.click('sound-toggle');
+  await h.click();
   assert.equal(h.S.notifications.soundInfo().ready, true);
+  assert.equal(h.S.notifications.soundInfo().playback, 'reminder');
   assert.equal(h.voices.length, 18, 'three pairs with three partials each');
   const first = Math.min(...h.voices.map(v => v.startAt)), last = Math.max(...h.voices.map(v => v.stopAt));
   assert.ok(last - first > 4 && last - first < 4.1);
   assert.ok(h.voices.every(v => v.frequency.value > 0));
-  await h.click('sound-toggle');
-  assert.equal(h.S.notifications.soundInfo().ready, false);
+  await h.click();
+  assert.equal(h.voices.length, 18, 'ordinary navigation never repeats a preview sound');
+  for (const n of h.pending()) await h.ack(n.id);
   assert.equal(h.activeVoices().length, 0);
+});
+
+test('automatic sound preparation stays silent when no attention request remains', async () => {
+  const h = harness();
+  h.f.repository.transactNotifications(ctx.shopId, state => {
+    Notifications.emit(state, { orderId: 'pickup', requestId: 'info', at: h.f.clock() }, 'vehicle:van-1', 'handover', '인계 기록', '확인용 기록', { attentionRequired: false });
+    return {};
+  });
+  await h.flush(); await h.click(); await h.advance(31000);
+  assert.equal(h.S.notifications.soundInfo().ready, true);
+  assert.equal(h.pending().length, 1);
+  assert.equal(h.voices.length, 0);
+});
+
+test('a blocked automatic resume retries on the next touch without changing stored sound settings', async () => {
+  const h = harness({ failFirstResume: true });
+  await h.click();
+  assert.equal(h.S.notifications.soundInfo().ready, false);
+  assert.equal(h.S.notifications.soundInfo().preferences.sound, true);
+  await h.click();
+  assert.equal(h.S.notifications.soundInfo().ready, true);
+  assert.equal(h.voices.length, 0);
+});
+
+test('an explicit sound setting remains scoped and is not overwritten by ordinary touches', async () => {
+  const h = harness();
+  h.services.driver.execute(NotificationClient.command('preferences', { sound: false, interval: 60, volume: 30 }));
+  await h.flush(); await h.click();
+  assert.equal(h.S.notifications.soundInfo().ready, false);
+  assert.equal(h.S.notifications.soundInfo().audioState, 'not-started');
+  assert.deepEqual(h.services.driver.preferences(), { sound: false, interval: 60, volume: 30 });
 });
 
 test('new workflow priority requests ring, repeat and stop immediately after acknowledgement despite informational unread rows', async () => {
   const h = harness(); h.f.task('pickup', 'collection', 'customer-1'); await h.flush();
   for (const n of h.pending()) await h.ack(n.id);
-  await h.click('sound-toggle'); await h.advance(4600);
+  await h.click(); await h.advance(4600);
   const played = h.S.notifications.soundInfo().playedCount;
   h.f.call('task.priority', { id: 'pickup', message: '먼저 확인해 주세요.' }); await h.flush();
   assert.equal(h.S.notifications.soundInfo().playedCount, played + 1);
@@ -103,7 +138,7 @@ test('new workflow priority requests ring, repeat and stop immediately after ack
 test('sequence acknowledgement preserves the priority request and the vehicle sound preference', async () => {
   const h = harness(); h.f.task('first', 'collection', 'a'); h.f.task('second', 'collection', 'b', [], '10:00'); await h.flush();
   for (const n of h.pending()) await h.ack(n.id);
-  await h.click('sound-toggle'); await h.advance(4600);
+  await h.click(); await h.advance(4600);
   h.f.call('task.priority', { id: 'first', message: '먼저 확인' });
   h.f.call('dispatch.reorder', { vehicleId: 'van-1', date: '2026-09-09', taskId: 'second', action: 'top' }); await h.flush();
   await h.ack(h.pending().find(n => n.type === 'sequence').id);

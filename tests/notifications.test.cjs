@@ -111,8 +111,12 @@ test('persistent task IDs, updates and cancellation produce notifications from s
 });
 test('sound preferences are scoped to the authenticated user and reject invalid values', () => {
   const f = fixture();
+  assert.equal(f.pos.preferences().sound, false);
+  assert.equal(f.car.preferences().sound, true, 'vehicle notifications are enabled by default');
   f.pos.execute(f.command('preferences', { sound: true, interval: 60, volume: 30 }));
-  assert.equal(f.pos.preferences().volume, 30); assert.equal(f.car.preferences().sound, false);
+  assert.equal(f.pos.preferences().volume, 30); assert.equal(f.car.preferences().volume, 60);
+  f.car.execute(f.command('preferences', { sound: false, interval: 30, volume: 60 }));
+  assert.equal(f.car.preferences().sound, false, 'saved user preferences still take precedence over defaults');
   assert.throws(() => f.pos.execute(f.command('preferences', { sound: true, interval: 1, volume: 120 })), { code: 'INVALID_INPUT' });
   const a = notifications(f.repo, { ...store, deviceId: 'pos-a' }, clock);
   const b = notifications(f.repo, { ...store, deviceId: 'pos-b' }, clock);

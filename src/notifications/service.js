@@ -30,7 +30,7 @@
         }) };
       },
       tasks() { return state().tasks.filter(row => context.actor.role === 'store' || row.vehicleId === context.actor.vehicleId); },
-      preferences() { return state().preferences[N.preferenceKey(context)] || N.defaults(); },
+      preferences() { return state().preferences[N.preferenceKey(context)] || N.defaults(context); },
       execute(command) {
         return repository.transactNotifications(context.shopId, current => N.execute(current, command, { ...context, at: clock() }, orderId => repository.get(context.shopId, orderId)));
       }

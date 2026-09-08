@@ -25,7 +25,7 @@
   S.root.append(dialog);
   const live = document.createElement('span'); live.className = 'so-notice-sr'; live.setAttribute('role', 'status'); live.setAttribute('aria-live', 'polite'); S.root.append(live);
   let tab = 'unread', screen = 'list', selected = null, returnFocus = null, composingOrder = null, pendingCommand = null, lastRole = '', seenRevision = -1;
-  let audio = null, audioReady = new Set(), audioError = '', lastPlayed = 0, playedCount = 0, timer = null, lastSoundRole = '', playback = null;
+  let audio = null, audioReady = new Set(), audioError = '', lastPlayed = 0, playedCount = 0, timer = null, lastSoundRole = '', playback = null, audioStarting = false;
   const oscillatorNodes = new Set();
   const prefs = () => service().preferences();
   const audioUsable = () => audioReady.has(role()) && audio?.state === 'running' && !audioError;
@@ -64,7 +64,9 @@
       if (Date.now() - lastPlayed >= prefs().interval * 1000) playSound();
     } else stopSound(true);
   }
-  async function enableSound(previewOnly = false) {
+  async function enableSound(previewOnly = false, automatic = false) {
+    if (audioStarting) return;
+    audioStarting = true;
     const requestedRole = role();
     try {
       const Audio = window.AudioContext || window.webkitAudioContext;
@@ -76,22 +78,14 @@
           timeout = setTimeout(() => reject(new Error('소리가 차단됐어요. 브라우저의 사이트 소리 설정을 확인하고 다시 눌러 주세요.')), 3000);
         })]);
       } finally { clearTimeout(timeout); }
-      if (!active() || role() !== requestedRole) return;
+      if (!active() || role() !== requestedRole || (automatic && !prefs().sound)) return;
       if (audio.state !== 'running') throw new Error('브라우저의 소리 재생을 허용해 주세요.');
       audioError = ''; audioReady.add(role());
-      if (!previewOnly) service().execute(C.command('preferences', { ...prefs(), sound: true }));
-      playSound('preview'); updateSettings();
+      if (!previewOnly && !automatic) service().execute(C.command('preferences', { ...prefs(), sound: true }));
+      if (automatic) tick(); else playSound('preview');
+      updateSettings();
     } catch (error) { audioError = error.message; updateSettings(); }
-  }
-  const soundControlLabel = () => icon(soundReady() ? 'volume-2' : 'volume-x') + '<span>알림 소리 ' + (soundReady() ? '켜짐' : '켜기') + '</span>';
-  function soundControl() { return makeButton(soundControlLabel(), 'sound-toggle', 'aria-label="알림 소리 ' + (soundReady() ? '끄기' : '켜기') + '" aria-pressed="' + soundReady() + '"', 'so-button wf-sound-control'); }
-  function refreshSoundControl() {
-    for (const button of S.root.querySelectorAll('.wf-sound-control')) {
-      button.innerHTML = soundControlLabel();
-      button.setAttribute('aria-label', '알림 소리 ' + (soundReady() ? '끄기' : '켜기'));
-      button.setAttribute('aria-pressed', String(soundReady()));
-    }
-    S.icons();
+    finally { audioStarting = false; }
   }
   function preferencesHtml() {
     const p = prefs(), ready = soundReady();
@@ -178,7 +172,6 @@
       lastSoundRole = soundRole;
     }
     if (!data.records.some(row => unread(row) && row.attentionRequired)) stopSound(true);
-    refreshSoundControl();
     if (!timer) timer = setInterval(tick, 1000);
   }
   function acknowledge(id) {
@@ -219,7 +212,13 @@
     else if (action === 'interval') { service().execute(C.command('preferences', { ...prefs(), interval: Number(button.dataset.value) })); updateSettings(); }
   }
   bell.addEventListener('click', () => open());
-  S.root.addEventListener('click', event => { const button = event.target.closest('[data-notice]'); if (button && !button.disabled) handle(button.dataset.notice, button); });
+  S.root.addEventListener('click', event => {
+    const button = event.target.closest('[data-notice]');
+    // Core navigation has already handled this click. Resume in the same user gesture,
+    // including entering the vehicle screen, without playing an unsolicited test chime.
+    if (event.isTrusted && active() && prefs().sound && !audioUsable() && !['sound-toggle', 'sound-test'].includes(button?.dataset.notice)) void enableSound(false, true);
+    if (button && !button.disabled) handle(button.dataset.notice, button);
+  });
   S.root.addEventListener('input', event => {
     if (event.target.matches('[data-notice-message], [data-notice-order]')) pendingCommand = null;
     if (event.target.hasAttribute('data-notice-volume')) {
@@ -250,7 +249,7 @@
   });
   S.action('driver-alert', orderId => open('request', orderId));
   S.notifications = {
-    refresh, open, soundControl,
+    refresh, open,
     settingsView: () => '<section id="so-notice-settings-page">' + preferencesHtml() + '</section>',
     pendingForOrder: orderId => runtime.driver.sync(0).records.some(row => row.orderId === orderId && row.type === 'priority' && unread(row)),
     acknowledgeOrder: orderId => {

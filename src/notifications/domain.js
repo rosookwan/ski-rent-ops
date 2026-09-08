@@ -6,7 +6,7 @@
   const copy = value => JSON.parse(JSON.stringify(value));
   const fail = (code, message) => { throw new R.ReturnError(code, message); };
   const fresh = () => ({ revision: 0, records: [], requests: {}, tasks: [], preferences: {} });
-  const defaults = () => ({ sound: false, interval: 30, volume: 60 });
+  const defaults = context => ({ sound: context?.actor?.role === 'driver', interval: 30, volume: 60 });
   const id = value => typeof value === 'string' && /^[A-Za-z0-9][A-Za-z0-9_.:-]{0,159}$/.test(value);
   const scope = context => context.actor.role === 'driver' ? 'vehicle:' + context.actor.vehicleId : 'store';
   const preferenceKey = context => (context.deviceId || context.actor.id) + ':' + scope(context);
