@@ -12,7 +12,7 @@ const {chooseTime}=require('./time-picker-helper.cjs');
   page.on('request',request=>{if(request.method()!=='GET')writes.push(request.method()+' '+request.url());});
   let raw,today;
   const base=process.env.SKI_DEMO_URL||'http://127.0.0.1:58148/';
-  const nav=route=>f.locator('#so-navigation [data-go="'+route+'"]').click();
+  const nav=require('./navigation-helper.cjs').storeNavigation(f);
   const action=name=>f.locator('[data-action="'+name+'"]').click();
   const total=()=>f.locator('#ski-total-value').innerText();
   const presets=()=>raw.evaluate(()=>window.SkiIntake.getReturnPresets());

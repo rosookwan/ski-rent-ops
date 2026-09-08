@@ -1,4 +1,4 @@
-# 스키 렌탈샵 운영 시스템
+# 스키노트 · 스키 렌탈샵 운영 시스템
 
 작성일: 2026-09-08 · 문서 버전: 1.0 · 프로젝트명: `ski-rent-ops`
 
@@ -6,7 +6,13 @@
 
 카운터와 차량이 같은 배달·수거·반납 정보를 공유하고, 대여 접수부터 견적·결제 기록·하루 마감까지 이어지는 시스템의 기획 프로젝트입니다. 부모님 매장에서 먼저 시험하고, 이후 다른 렌탈샵도 각자의 상품·요금·장소·직원 설정으로 사용할 수 있도록 설계합니다.
 
+**스키노트 PWA:** 선택한 보라색 노트 로고와 “렌탈샵의 하루를 한눈에.” 문구를 적용했습니다. 로그인 화면의 앱 설치 안내와 Chrome·Edge의 설치 메뉴로 홈 화면에 추가할 수 있습니다. 설치한 앱에서는 뒤로가기·앞으로가기가 업무 화면과 연결됩니다. 온라인 화면 체험용이며, 새로고침·완전 재실행 시 입력이 초기화되고 기기 간 공유는 연결하지 않았습니다. [적용 내용과 테스트 방법](docs/23-skinote-pwa.md)
+
 **[운영 화면 체험하기](https://rosookwan.github.io/ski-rent-ops/)** · [GitHub 저장소](https://github.com/rosookwan/ski-rent-ops)
+
+**포스·관리 메뉴 분리:** 왼쪽 아래 `관리화면으로` / `포스화면으로` 버튼으로 전환합니다. 양쪽의 오늘 현황은 같은 대시보드이고, 리프트권 예약도 같은 화면과 데이터를 사용합니다. 관리 메뉴로 옮긴 6개 화면과 복귀 동작은 [메뉴 구성·검증 기록](docs/21-pos-management-navigation.md)에 정리했습니다.
+
+**PWA 기본 설정:** 앱 이름·아이콘과 독립 창 실행 설정을 추가했습니다. 설치한 앱으로 열면 일반 브라우저의 주소창·탭·즐겨찾기 영역 없이 사용할 수 있습니다. [설치 방법과 검증 범위](docs/22-pwa-installation.md)를 참고하세요.
 
 로그인 화면에서 **매장 POS** 또는 **차량 화면**으로 들어가 모든 메뉴를 눌러볼 수 있습니다. 이번 버전은 화면 체험용이며, 실제 로그인·고객 영구 저장·문자 발송·결제·기기 간 동기화는 연결하지 않았습니다. 이름·연락처·가격·재고는 가상 예시입니다.
 
@@ -46,11 +52,11 @@ npm run check
 npm test
 ```
 
-`npm test`는 반납·알림·업무 도메인, SQLite, HTTP API, 새 화면의 데모 연결을 69개 검사로 검증합니다. `npm run check`는 JavaScript 구문 검사와 정적 빌드를 수행합니다. GitHub Actions에서도 세 기능 검사를 수행한 뒤 Pages에 배포합니다.
+`npm test`는 반납·알림·업무 도메인, SQLite, HTTP API, 새 화면의 데모 연결을 72개 검사로 검증합니다. `npm run check`는 JavaScript 구문 검사와 정적 빌드를 수행합니다. GitHub Actions에서도 세 기능 검사를 수행한 뒤 Pages에 배포합니다.
 
 현재 화면의 실제 클릭과 가독성은 Chrome에서 매장 1366×768·1024×768, 차량 1024×600, 고객 360px 폭으로 확인했습니다. A4 21명이 실제 브라우저 인쇄에서 20+1명 두 쪽으로 나뉘는지도 확인했습니다. 상세 시나리오는 [1.0 검증 기록](docs/20-workflow-ui-release.md)에 있습니다. `test:legacy-ui`, `test:visual` 및 기존 개별 `test:*:ui` 스크립트는 이전 0.9 화면의 회귀 자료로 유지하며, 새 화면의 통과 근거로 사용하지 않았습니다. `test:workflows`에는 별도 브라우저 번들 검사도 포함되며 Chrome 설치가 필요합니다.
 
-`npm run build` 결과는 `dist/index.html`, `dist/ski-workflows.js`입니다. `main`에 푸시하면 GitHub Actions가 검증·빌드 후 Pages를 갱신합니다. Pages 설정의 빌드 소스는 **GitHub Actions**입니다. 정적 체험 화면의 메모리 상태는 같은 페이지에서 매장·차량·고객 화면을 전환할 때 공유되며, 새로고침하면 초기화됩니다. 다른 기기의 고객 링크·실시간 공유에는 별도 API 연결이 필요합니다.
+`npm run build` 결과는 `dist/index.html`, `dist/ski-workflows.js`, `dist/manifest.webmanifest`, `dist/assets/`의 앱 아이콘입니다. `main`에 푸시하면 GitHub Actions가 검증·빌드 후 Pages를 갱신합니다. Pages 설정의 빌드 소스는 **GitHub Actions**입니다. 정적 체험 화면의 메모리 상태는 같은 페이지에서 매장·차량·고객 화면을 전환할 때 공유되며, 새로고침하면 초기화됩니다. 다른 기기의 고객 링크·실시간 공유에는 별도 API 연결이 필요합니다.
 
 SQLite API는 Node 22.13 이상에서 `npm run returns:server`로 실행합니다. [실행·인증 설명](docs/10-return-functions.md#로컬-저장-api-실행)과 [업무 API 계약](docs/18-workflow-functions-and-ui-contract.md)을 따르세요. Pages에는 API 서버, 실제 로그인, 고객 영구 저장, 문자, 결제, 라벨 프린터 연결을 배포하지 않습니다.
 

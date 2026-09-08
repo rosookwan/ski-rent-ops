@@ -1,0 +1,9 @@
+#ski-ops .so-brand-icon, #ski-ops .so-login-brand>span { background:transparent; }
+#ski-ops .so-brand-icon img, #ski-ops .so-login-brand img { display:block; width:29px; height:34px; object-fit:contain; }
+#ski-ops .so-login-story { background:#f2eefb; }
+#ski-ops .so-login-copy .so-eyebrow { color:#6550ba; }
+#ski-ops .so-install-row { display:flex; align-items:center; flex-wrap:wrap; gap:10px; }
+#ski-ops .so-install-row .so-button { min-height:44px; padding:9px 13px; background:#f2eefb; color:#57429f; border-color:#e0d8f1; font-size:14px; }
+#ski-ops .so-install-help { display:grid; gap:20px; line-height:1.6; }
+#ski-ops .so-install-help p { margin-top:6px; color:#626068; }
+#ski-ops .so-installed-label { color:#6550ba; font-size:13px; }

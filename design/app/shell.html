@@ -1,9 +1,12 @@
-<div id="ski-ops" lang="ko" aria-label="스키샵 운영 화면 체험">
+<div id="ski-ops" lang="ko" aria-label="스키노트 운영 화면 체험">
   <div id="so-workspace" class="so-workspace">
     <aside class="so-sidebar" aria-label="매장 메뉴">
-      <div class="so-brand"><span class="so-brand-icon"><i data-lucide="mountain-snow" aria-hidden="true"></i></span><div><strong>우리 스키샵</strong><small>RENTAL &amp; OPERATIONS</small></div></div>
+      <div class="so-brand"><span class="so-brand-icon"><img src="__SKINOTE_LOGO__" alt="스키노트"></span><div><strong>우리 스키샵</strong><small>스키노트 · SKINOTE</small></div></div>
       <nav id="so-navigation" aria-label="주요 업무"></nav>
-      <div class="so-sidebar-foot"><span class="so-dot"></span> 화면 체험 중<small>입력 내용은 저장되지 않습니다.</small></div>
+      <div class="so-sidebar-bottom">
+        <div class="so-sidebar-foot"><span class="so-dot"></span> 화면 체험 중<small>입력 내용은 저장되지 않습니다.</small></div>
+        <button type="button" id="so-workspace-switch" data-action="workspace-switch" aria-label="관리화면으로" title="관리화면으로"><i data-lucide="settings-2" aria-hidden="true"></i><span class="so-workspace-short" aria-hidden="true">관리</span><span class="so-workspace-long" aria-hidden="true">관리화면으로</span></button>
+      </div>
     </aside>
     <div class="so-workarea">
       <header class="so-topbar"><div class="so-topbar-left"><button type="button" id="so-menu-toggle" aria-label="메뉴 펼치기" aria-controls="so-navigation" aria-expanded="false"><i data-lucide="menu" aria-hidden="true"></i></button><span id="so-breadcrumb">오늘 현황</span></div><div id="so-page-tools" hidden></div><div id="so-intake-tools" hidden></div><div class="so-topbar-right"><span class="so-demo-label">샘플 데이터</span><button type="button" data-go="vehicle"><i data-lucide="tablet" aria-hidden="true"></i>차량 화면</button><button type="button" data-action="logout" aria-label="로그인 화면으로"><i data-lucide="log-out" aria-hidden="true"></i><span>나가기</span></button></div></header>

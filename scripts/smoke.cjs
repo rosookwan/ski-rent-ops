@@ -15,7 +15,7 @@ for(const module of ['settings','partners','closing','preparation','guide','logi
  const test=async(name,fn)=>{await fn();checks.push(name);console.log('PASS '+name);};
  await page.goto(url,{waitUntil:'networkidle'});
  const f=page.frameLocator('iframe');
- const nav=async(route)=>{await f.locator('#so-navigation [data-go="'+route+'"]').click();};
+ const nav=require('./navigation-helper.cjs').storeNavigation(f);
  const close=async()=>{await f.locator('#so-dialog [data-action="close"]').first().click();};
  if(await f.locator('[data-action="login-shop"]').count())await f.locator('[data-action="login-shop"]').click();
  fs.mkdirSync(path.join(root,'work/screens'),{recursive:true});

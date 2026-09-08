@@ -1,17 +1,33 @@
 (() => {
   const root=document.getElementById('ski-ops');
   const registry=new Map(), actions=new Map(), searches=new Map(), changes=new Map();
-  const state={page:'home',params:{},tabs:{},filters:{},history:[],menuOpen:false,authenticated:true};
+  const state={page:'home',params:{},tabs:{},filters:{},history:[],menuOpen:false,authenticated:true,workspace:'pos',posReturn:null};
   const $=s=>root.querySelector(s), esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const money=n=>Number(n).toLocaleString('ko-KR')+'원';
   const date=s=>s?Number(s.slice(5,7))+'/'+Number(s.slice(8,10)):'';
   const icon=n=>'<i data-lucide="'+n+'" aria-hidden="true"></i>';
   const icons=()=>{if(globalThis.lucide)globalThis.lucide.createIcons({attrs:{width:20,height:20}});};
   const routes=[['home','오늘 현황','layout-dashboard'],['intake','새 대여 접수','circle-plus'],['rentals','렌탈현황','clipboard-list'],['returns','반납 확인','package-check'],['dispatch','배달·수거','truck'],['lift-reservations','리프트권 예약','ticket'],['partners','거래처 장부','handshake'],['closing','하루 마감','calculator'],['preparation','사전 입력·준비','list-checks'],['customers','고객관리','users'],['inventory','재고·정비','package'],['settings','매장 설정','settings-2'],['guide','QR 이용 안내','qr-code']];
-  function nav(){return [routes.slice(0,7),routes.slice(7)].map((group,i)=>'<div class="so-nav-group">'+(i?'<span class="so-nav-caption">관리</span>':'')+group.map(([id,label,glyph])=>'<button type="button" class="so-nav-button" data-go="'+id+'" aria-label="'+label+'" title="'+label+'" '+(registry.has(id)?'':'disabled')+' '+(activePage()===id?'aria-current="page"':'')+'>'+icon(glyph)+'<span class="so-nav-label">'+label+'</span></button>').join('')+'</div>').join('');}
+  const managementRoutes=new Set(['partners','closing','customers','inventory','settings','guide']);
+  const sharedRoutes=new Set(['home','lift-reservations']);
+  function nav(){const management=state.workspace==='management';return '<div class="so-nav-group"><span class="so-nav-caption">'+(management?'관리 업무':'포스 업무')+'</span>'+routes.filter(([id])=>sharedRoutes.has(id)||managementRoutes.has(id)===management).map(([id,label,glyph])=>'<button type="button" class="so-nav-button" data-go="'+id+'" aria-label="'+label+'" title="'+label+'" '+(registry.has(id)?'':'disabled')+' '+(activePage()===id?'aria-current="page"':'')+'>'+icon(glyph)+'<span class="so-nav-label">'+label+'</span></button>').join('')+'</div>';}
   function activePage(){return registry.get(state.page)?.parent||state.page;}
-  function go(page,params={},replace=false){if(!registry.has(page)){toast('이 화면은 다음 단계에 연결됩니다.');return;}if(!registry.get(page).public&&!state.authenticated&&registry.has('login')){state.afterLogin={page,params};page='login';params={};}close();if(!replace)state.history.push({page:state.page,params:state.params});if(page==='guest-form'&&state.page!==page)state.guest=null;state.page=page;state.params=params;root.classList.remove('so-menu-open');state.menuOpen=false;$('#so-menu-toggle').setAttribute('aria-expanded','false');$('#so-menu-toggle').setAttribute('aria-label','메뉴 펼치기');render();}
-  function render(){const config=registry.get(state.page);if(!config)return;root.classList.toggle('so-vehicle',state.page==='vehicle');root.classList.toggle('so-at-entry',!!config.entry);$('#so-navigation').innerHTML=nav();$('#so-breadcrumb').textContent=config.title;$('#so-workspace').hidden=!!config.public;$('#so-public').hidden=!config.public||!!config.entry;$('#so-entry').hidden=!config.entry;
+  function workspaceFor(page,preferred=state.workspace){const config=registry.get(page),parent=config?.parent||page;return config?.public||sharedRoutes.has(parent)?preferred:managementRoutes.has(parent)?'management':'pos';}
+  function go(page,params={},replace=false,workspace=state.workspace){
+    if(!registry.has(page)){toast('이 화면은 다음 단계에 연결됩니다.');return;}
+    if(!registry.get(page).public&&!state.authenticated&&registry.has('login')){state.afterLogin={page,params,workspace};page='login';params={};workspace='pos';}
+    const nextWorkspace=workspaceFor(page,workspace);
+    close();
+    if(nextWorkspace!==state.workspace)$('#so-navigation').scrollTop=0;
+    if(!replace)state.history.push({page:state.page,params:state.params,workspace:state.workspace});
+    if(state.workspace==='pos'&&nextWorkspace==='management'&&!registry.get(state.page)?.public&&state.page!=='vehicle')state.posReturn={page:state.page,params:state.params};
+    if(page==='guest-form'&&state.page!==page)state.guest=null;
+    state.page=page;state.params=params;state.workspace=nextWorkspace;
+    root.classList.remove('so-menu-open');state.menuOpen=false;$('#so-menu-toggle').setAttribute('aria-expanded','false');$('#so-menu-toggle').setAttribute('aria-label','메뉴 펼치기');render();window.SkiOps?.appMode?.navigated(replace);
+  }
+  function render(){const config=registry.get(state.page);if(!config)return;root.classList.toggle('so-vehicle',state.page==='vehicle');root.classList.toggle('so-at-entry',!!config.entry);root.dataset.workspace=state.workspace;$('#so-navigation').innerHTML=nav();$('#so-navigation').setAttribute('aria-label',state.workspace==='management'?'관리 업무':'포스 업무');$('.so-sidebar').setAttribute('aria-label',state.workspace==='management'?'관리 메뉴':'포스 메뉴');$('#so-breadcrumb').textContent=(state.workspace==='management'?'관리 · ':'')+config.title;$('#so-workspace').hidden=!!config.public;$('#so-public').hidden=!config.public||!!config.entry;$('#so-entry').hidden=!config.entry;
+    const management=state.workspace==='management',switchButton=$('#so-workspace-switch'),switchLabel=management?'포스화면으로':'관리화면으로';
+    switchButton.setAttribute('aria-label',switchLabel);switchButton.title=switchLabel;switchButton.innerHTML=icon(management?'arrow-left':'settings-2')+'<span class="so-workspace-short" aria-hidden="true">'+(management?'포스':'관리')+'</span><span class="so-workspace-long" aria-hidden="true">'+switchLabel+'</span>';
     const modeButton=$('.so-topbar-right [data-go]');modeButton.dataset.go=state.page==='vehicle'?'home':'vehicle';modeButton.innerHTML=icon(state.page==='vehicle'?'monitor':'tablet')+(state.page==='vehicle'?'매장 화면':'차량 화면');
     const pageTools=$('#so-page-tools');pageTools.innerHTML=config.headerTools?.()||'';pageTools.hidden=!config.headerTools;
     if(!config.entry)$('#so-entry').replaceChildren();
@@ -40,7 +56,8 @@
   root.addEventListener('change',e=>{const key=e.target.dataset.change;if(key&&changes.has(key))changes.get(key)(e.target.value,e.target);});
   root.addEventListener('submit',e=>e.preventDefault());
   root.addEventListener('click',e=>{const b=e.target.closest('#ski-first-look button');if(!b)return;if(b.dataset.view){e.stopPropagation();go(b.dataset.view==='vehicle'?'vehicle':'intake');return;}if(['board','show-saved'].includes(b.dataset.action)){e.stopPropagation();go('dispatch');return;}if(b.dataset.action==='time-settings'){e.stopPropagation();window.SkiIntake?.closeSheet();state.tabs.settings='operations';go('settings');return;}if(b.dataset.action==='save'){e.stopPropagation();if(window.SkiOps.returnUI)window.SkiOps.returnUI.saveIntake();else root.querySelector('#ski-first-look [data-action="quote"]')?.click();return;}if(['send-sms','complete-confirm','final-confirm','customer-save','save-time-settings'].includes(b.dataset.action)||b.hasAttribute('data-alert')||b.hasAttribute('data-final')){e.stopPropagation();toast('처리 화면 예시입니다. 실제 저장·발송·상태 변경은 하지 않습니다.');}},true);
-  actions.set('close',close);actions.set('back',()=>{const prev=state.history.pop();if(prev)go(prev.page,prev.params,true);else go('home',{},true);});actions.set('logout',()=>{if(registry.has('login'))go('login',{},true);else go('home');});
+  actions.set('workspace-switch',()=>{if(state.workspace==='pos')go('home',{},false,'management');else{const target=state.posReturn||{page:'home',params:{}};go(target.page,target.params,false,'pos');}});
+  actions.set('close',close);actions.set('back',()=>{const prev=state.history.pop();if(prev)go(prev.page,prev.params,true,prev.workspace);else go('home',{},true);});actions.set('logout',()=>{if(registry.has('login'))go('login',{},true);else go('home');});
   window.addEventListener('message',e=>{if(e.source===window.parent&&e.data?.type==='ski-public-route'&&['guest-guide','guest-form'].includes(e.data.view))go(e.data.view,{},true);});
   window.SkiOps={root,$,state,data:window.SkiOpsData,register:(id,config)=>registry.set(id,config),action:(id,fn)=>actions.set(id,fn),search:(id,fn)=>searches.set(id,fn),change:(id,fn)=>changes.set(id,fn),go,render,modal,preview,close,toast,esc,money,date,icon,icons,button,link,status,head,panel,tabs,field,select,previewNote,start:()=>go(registry.has('login')?'login':'home',{},true)};
 })();

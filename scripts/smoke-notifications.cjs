@@ -11,7 +11,7 @@ const fs = require('node:fs');
   const f = page.frameLocator('iframe');
   const action = name => f.locator('[data-action="' + name + '"]:visible').click();
   const notice = name => f.locator('#so-notice-dialog [data-notice="' + name + '"]:visible').first().click();
-  const nav = name => f.locator('#so-navigation [data-go="' + name + '"]').click();
+  const nav = require('./navigation-helper.cjs').storeNavigation(f);
   const bell = () => f.locator('#so-notice-bell').click();
   const raw = () => page.frames().find(frame => frame.parentFrame());
   const test = async (name, run) => { await run(); checks.push(name); console.log('PASS ' + name); };

@@ -1,0 +1,16 @@
+{
+  "name": "스키노트",
+  "short_name": "스키노트",
+  "description": "렌탈샵의 하루를 한눈에. 스키·보드 렌탈샵의 접수부터 대여, 배달·수거, 반납과 하루 마감까지 한곳에서 확인하는 운영 도구.",
+  "lang": "ko",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f7f8f6",
+  "theme_color": "#6550ba",
+  "icons": [
+    { "src": "./assets/app-icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "./assets/app-icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "./assets/app-icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

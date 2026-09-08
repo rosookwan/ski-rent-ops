@@ -10,7 +10,7 @@ const {chooseTime}=require('./time-picker-helper.cjs');
   page.on('pageerror',error=>errors.push(error.message));
   page.on('request',request=>{if(!['GET','HEAD'].includes(request.method()))writes.push(request.url());});
   const action=name=>f.locator('[data-action="'+name+'"]').click();
-  const nav=route=>f.locator('#so-navigation [data-go="'+route+'"]').click();
+  const nav=require('./navigation-helper.cjs').storeNavigation(f);
   const test=async(name,run)=>{await run();checks.push(name);console.log('PASS '+name);};
   const time='[data-return-time="time"]',picker=f.locator('.so-time-picker');
   const trigger=selector=>f.locator(selector).locator('..').locator('[data-time-open]');

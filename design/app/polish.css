@@ -7,7 +7,18 @@
 #ski-ops button:focus-visible,#ski-ops input:focus-visible,#ski-ops select:focus-visible,#ski-ops textarea:focus-visible{outline:3px solid #5f33e1;outline-offset:2px}
 /* One collapsible rail, reset to icons whenever a route opens. */
 #ski-ops .so-workspace{height:100%;min-height:0;grid-template-columns:72px minmax(0,1fr)}
-#ski-ops .so-sidebar{position:relative;height:100%;min-height:0;padding:14px 12px;gap:22px;overflow-y:auto;overflow-x:hidden;scrollbar-width:thin}
+#ski-ops .so-sidebar{position:relative;height:100%;min-height:0;padding:14px 12px;gap:22px;overflow:hidden}
+#ski-ops #so-navigation{flex:1;min-height:0;overflow-y:auto;overflow-x:hidden;scrollbar-width:thin}
+#ski-ops .so-sidebar-bottom{display:flex;flex-direction:column;gap:12px;flex-shrink:0;margin-top:auto}
+#ski-ops .so-sidebar-bottom .so-sidebar-foot{margin:0}
+#ski-ops #so-workspace-switch{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;width:48px;min-height:56px;padding:6px 3px;border:1px solid #d1d1d1;border-radius:14px;background:#f8f8f8;color:#5d5d5d;font-weight:600;flex-shrink:0}
+#ski-ops #so-workspace-switch:hover{background:#fff4ed;color:#ef3408;border-color:#fe4e10}
+#ski-ops #so-workspace-switch svg{width:20px;height:20px;flex-shrink:0}
+#ski-ops .so-workspace-short{font-size:12px;line-height:16px}
+#ski-ops .so-workspace-long{display:none}
+#ski-ops.so-menu-open #so-workspace-switch{width:100%;flex-direction:row;justify-content:flex-start;gap:10px;padding:10px 12px}
+#ski-ops.so-menu-open .so-workspace-short{display:none}
+#ski-ops.so-menu-open .so-workspace-long{display:block;font-size:16px;white-space:nowrap}
 #ski-ops .so-brand{padding:0;gap:11px;justify-content:center;flex-shrink:0}
 #ski-ops .so-brand-icon{width:40px;height:40px;border-radius:7px;background:#fe4e10;flex-shrink:0}
 #ski-ops .so-brand-icon svg{width:25px;height:25px}
@@ -269,6 +280,7 @@
 #ski-ops .so-workspace{display:grid;grid-template-columns:56px minmax(0,1fr)}
 #ski-ops .so-sidebar{display:flex;padding:12px 6px;gap:18px;height:100%;position:relative}
 #ski-ops .so-nav-button{width:44px;height:44px;min-height:44px;padding:11px;border-radius:13px}
+#ski-ops #so-workspace-switch{width:44px}
 #ski-ops .so-brand-icon{width:36px;height:36px}
 #ski-ops .so-topbar{padding:8px 10px;gap:8px}
 #ski-ops .so-topbar-left{gap:8px;font-size:15px;flex-shrink:1;min-width:0}
@@ -279,6 +291,7 @@
 #ski-ops .so-topbar-right button span{display:none}
 #ski-ops #so-menu-toggle{width:40px;height:44px}
 #ski-ops.so-menu-open .so-workspace{grid-template-columns:56px minmax(0,1fr)}
+#ski-ops.so-menu-open:not(.so-vehicle) .so-workarea{grid-column:2}
 #ski-ops.so-menu-open .so-sidebar{position:absolute;width:214px;top:66px;bottom:0;left:0;height:calc(100% - 66px);z-index:20;box-shadow:8px 0 24px #0002;border:1px solid #e7e7e7}
 #ski-ops.so-menu-open .so-nav-group{display:flex}
 #ski-ops .so-pagehead h1{font-size:25px}

@@ -9,7 +9,7 @@ const {chooseTime}=require('./time-picker-helper.cjs');
  const f=page.frameLocator('iframe'),errors=[],writes=[],checks=[],screens=[];
  page.on('pageerror',error=>errors.push(error.message));
  page.on('request',request=>{if(!['GET','HEAD'].includes(request.method()))writes.push(request.url());});
- const nav=route=>f.locator('#so-navigation [data-go="'+route+'"]').click();
+ const nav=require('./navigation-helper.cjs').storeNavigation(f);
  const action=name=>f.locator('[data-action="'+name+'"]:visible').click();
  const operations=async()=>{await nav('settings');await f.locator('[data-subtab="operations"]').click();};
  const input=(kind,key)=>f.locator('[data-'+kind+'-field="'+key+'"]');

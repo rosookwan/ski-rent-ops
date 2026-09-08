@@ -11,7 +11,7 @@ const fs = require('node:fs');
     await page.goto(process.env.SKI_DEMO_URL || 'http://127.0.0.1:58148/', { waitUntil: 'networkidle' });
     const f = page.frameLocator('iframe'), frame = page.frames().find(frame => frame.parentFrame());
     const get = id => frame.evaluate(id => window.SkiOps.returns.store.get(id), id);
-    const nav = id => f.locator('#so-navigation [data-go="' + id + '"]').click();
+    const nav = require('./navigation-helper.cjs').storeNavigation(f);
     const close = () => f.locator('#so-dialog [data-action="close"]').first().click();
     const apply = async () => { await f.locator('[data-action="return-apply"]').click(); await f.locator('#so-dialog').waitFor({ state: 'hidden' }); };
     const detail = async id => { await nav('returns'); await f.locator('#so-page [data-go="return-detail"][data-id="' + id + '"]').click(); };
