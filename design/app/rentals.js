@@ -41,10 +41,13 @@
     S.preview(title,body);
   });
   function dispatch(){
-    const list=orders.filter(o=>o.due===S.data.today&&o.items.length&&(tab()==='all'||tab()==='return'&&o.method==='차량 수거'||tab()==='delivery'&&o.id==='R-022'||tab()==='direct'&&o.method==='매장 직접'));
-    return head('배달·수거','시간과 장소를 확인하고 차량 업무를 살펴보세요.',link(icon('tablet')+'차량 화면','vehicle','','primary'))+S.tabs([['all','전체'],['return','차량 수거'],['delivery','배달'],['direct','매장 직접']],'all')+panel('오늘의 일정','<div class="so-row-list">'+list.map(o=>{
+    const base=orders.filter(o=>o.due===S.data.today&&o.items.length);
+    const accepts=(o,t)=>t==='all'||t==='return'&&o.method==='차량 수거'||t==='delivery'&&o.id==='R-022'||t==='direct'&&o.method==='매장 직접';
+    const list=base.filter(o=>accepts(o,tab()));
+    const filters=[['all','전체'],['return','차량 수거'],['delivery','배달'],['direct','매장 직접']].map(([id,label])=>[id,label+'<span class="so-tab-count">'+base.filter(o=>accepts(o,id)).length+'</span>']);
+    return head('배달·수거','시간과 장소를 확인하고 차량 업무를 살펴보세요.',link(icon('tablet')+'차량 화면','vehicle','','primary'))+'<div class="so-filter-panel">'+S.tabs(filters,'all')+'</div>'+panel('오늘의 일정','<div class="so-row-list so-dispatch-list"><div class="so-dispatch-columns"><span>예정 시간 · 타임</span><span>장소 · 방법</span><span>고객</span><span>실제 물품</span><span>상태</span><span>업무 처리</span></div>'+list.map(o=>{
       const delivery=o.id==='R-022';
-      return '<div class="so-dispatch-row '+(delivery?'delivery':'')+'"><div><strong>'+ (delivery?'16:40':o.time)+'</strong><small>'+(delivery?'배달 예정':o.slot)+'</small></div><div><strong>'+o.name+'</strong><small>'+o.id+'</small></div><div><strong>'+(delivery?'설천 주차장':o.place)+'</strong><small>'+(delivery?'장비 배달':o.method)+'</small></div><div>'+o.gear+'</div>'+status(delivery?'배달':o.status==='매장 확인 대기'?'매장 확인 대기':o.method,delivery?'blue':o.status==='매장 확인 대기'?'purple':'orange')+'<div class="so-actions">'+link('업무 상세','rental',o.id,'small')+button(icon('bell')+'확인 요청','driver-alert',o.id,'small soft')+'</div></div>';
+      return '<div class="so-dispatch-row '+(delivery?'delivery':o.method==='매장 직접'?'direct':'')+'"><div><strong>'+(delivery?'16:40':o.time)+'</strong><small>'+(delivery?'배달 예정':o.slot)+'</small></div><div><strong>'+(delivery?'설천 주차장':o.place)+'</strong><small>'+(delivery?'차량 배달':o.method)+'</small></div><div><strong>'+o.name+'</strong><small>'+o.id+'</small></div><div>'+o.gear+'</div>'+status(delivery?'배달 대기':o.status==='매장 확인 대기'?'매장 확인 대기':o.method,delivery?'blue':o.status==='매장 확인 대기'?'purple':'orange')+'<div class="so-actions">'+link('업무 상세','rental',o.id,'small')+button(icon('bell')+'확인 요청','driver-alert',o.id,'small soft')+'</div></div>';
     }).join('')+'</div>');
   }
   S.action('driver-alert',id=>S.preview('기사님 확인 요청','<p>'+esc(id)+' 업무의 차량 알림 화면입니다.</p><div class="so-note">차량 화면에서 해당 업무 강조와 소리 알림으로 확인을 요청합니다.</div><p>이 시안에서는 실제 차량에 알림을 전송하지 않습니다.</p>'));

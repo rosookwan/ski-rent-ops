@@ -11,10 +11,10 @@ RETURN_MODULES = ['domain.js', 'service.js', 'client.js', 'demo.js']
 
 def build():
     legacy = (ROOT / 'design/prototypes/first-look.fragment.html').read_text()
-    bridge = "root.addEventListener('ski:set-view',e=>{closeDialog();state.view=e.detail;render();});"
+    bridge = "root.addEventListener('ski:set-view',e=>{closeDialog();state.view=e.detail;render();if(e.detail==='shop'&&!state.representativeSeen){state.representativeSeen=true;representative();}});"
     legacy = legacy.replace('  render();applyDesign();', '  '+bridge+'\n  render();applyDesign();')
     fragment = (APP / 'shell.html').read_text().replace('<!-- LEGACY_FRAGMENT -->', legacy)
-    fragment += '\n<style>\n' + (APP / 'styles.css').read_text() + '\n' + (APP / 'polish.css').read_text() + '\n</style>\n'
+    fragment += '\n<style>\n' + (APP / 'styles.css').read_text() + '\n' + (APP / 'polish.css').read_text() + '\n' + (APP / 'responsive.css').read_text() + '\n</style>\n'
     for name in RETURN_MODULES:
         fragment += '<script>\n' + (ROOT / 'src/returns' / name).read_text() + '\n</script>\n'
     for name in MODULES:
