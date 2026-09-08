@@ -19,6 +19,21 @@ const root=path.resolve(__dirname,'..');
   const box=await f.evaluate(()=>({width:innerWidth,document:document.documentElement.scrollWidth,root:document.getElementById('ski-ops').scrollWidth,font:document.fonts.check('16px Pretendard')}));
   assert.ok(box.document<=box.width+1&&box.root<=box.width+1,`${route} ${w}: ${JSON.stringify(box)}`);assert.equal(box.font,true);
   checks.push({route,width:w,height:h,...box});
+  if(route==='home'&&w>=901){
+   const home=await f.evaluate(()=>{
+    const bounds=el=>{const r=el.getBoundingClientRect();return {top:r.top,bottom:r.bottom,left:r.left,right:r.right};};
+    const list=document.querySelector('.so-work-list'),driver=document.querySelector('.so-driver-preview');
+    return {panels:[list,driver].map(el=>({name:el.className,width:el.clientWidth,scrollWidth:el.scrollWidth,height:el.clientHeight,scrollHeight:el.scrollHeight,...bounds(el)})),rows:[...list.querySelectorAll('.so-work-item')].map(el=>({...bounds(el),cells:[...el.children].map(bounds)})),driverChildren:[...driver.children].map(bounds)};
+   });
+   for(const panel of home.panels)assert.ok(panel.scrollWidth<=panel.width+1&&panel.scrollHeight<=panel.height+1&&panel.bottom<=h,`home ${w}x${h} unnecessary scroll: ${JSON.stringify(panel)}`);
+   assert.equal(home.rows.length,4);
+   for(const row of home.rows){
+    assert.ok(row.top>=home.panels[0].top&&row.bottom<=home.panels[0].bottom+1,`home ${w}x${h} task hidden: ${JSON.stringify(row)}`);
+    assert.ok(row.cells.every(cell=>cell.left>=row.left&&cell.right<=row.right+1&&cell.top>=row.top&&cell.bottom<=row.bottom+1),`home ${w}x${h} task cell clipped: ${JSON.stringify(row)}`);
+   }
+   assert.ok(home.driverChildren.every(child=>child.top>=home.panels[1].top&&child.bottom<=home.panels[1].bottom+1),`home ${w}x${h} next job clipped`);
+   checks.at(-1).home=home;
+  }
   if(shot)await page.screenshot({path:path.join(root,'work/screens',shot+'.png'),fullPage:false});
  }
  for(const w of [1024,1366])for(const route of ['home','intake','rentals','returns','return-detail','rental','partner','response','dispatch','partners','closing','preparation','customers','inventory','settings','guide','login']){
@@ -29,6 +44,7 @@ const root=path.resolve(__dirname,'..');
    assert.ok(bottom<=768,`intake footer ${w}: ${bottom}`);
   }
  }
+ for(const [w,h] of [[907,710],[907,648],[1024,648],[1366,648]])await inspect('home',w,h,`home-${w}x${h}`);
  for(const [w,h] of [[1024,520],[1024,600],[1024,650],[1280,600],[1024,800]]){
   await inspect('vehicle',w,h);
   for(const mode of ['detail','simple']){

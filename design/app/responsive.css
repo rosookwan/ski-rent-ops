@@ -4,7 +4,6 @@
 #ski-ops th{font-size:14px}
 #ski-ops .so-metric strong{white-space:nowrap}
 #ski-ops .so-home-grid{flex-shrink:1!important;overflow:hidden}
-#ski-ops .so-work-columns,#ski-ops .so-work-item{min-width:716px}
 #ski-ops .so-driver-preview{overflow:auto}
 #ski-ops .so-driver-preview>*{flex-shrink:0}
 #ski-ops .so-dispatch-columns,#ski-ops .so-dispatch-row{display:grid;grid-template-columns:135px minmax(170px,1fr) 145px minmax(180px,1fr) 140px 232px;gap:12px;min-width:1120px}
@@ -19,6 +18,11 @@
 #ski-ops #ski-first-look .ski-dialog:has([data-action=representative-done]){max-width:520px}
 #ski-ops #ski-first-look .ski-dialog:has([data-action=representative-done]) .ski-fields{margin-top:18px;gap:16px}
 #ski-ops #ski-first-look .ski-dialog:has([data-action=representative-done]) .ski-primary{min-height:56px}
+@media(min-width:901px){
+  #ski-ops .so-work-columns,#ski-ops .so-work-item{min-width:0;grid-template-columns:80px 108px minmax(0,1fr) 92px 16px;gap:10px;padding:0 14px}
+  #ski-ops .so-work-item{height:auto}
+  #ski-ops .so-work-description{white-space:normal;overflow:visible;overflow-wrap:anywhere;line-height:1.3}
+}
 @media(min-width:901px) and (max-height:820px){
   #ski-ops:not(.so-vehicle) #so-main{padding:12px 14px}
   #ski-ops #so-page{gap:10px}
@@ -36,10 +40,15 @@
   #ski-ops .so-home-metrics .so-metric strong{font-size:28px}
   #ski-ops .so-home-metrics .so-metric small{grid-column:1/-1;margin-top:8px;white-space:nowrap;font-size:13px}
   #ski-ops .so-home-grid{gap:12px}
-  #ski-ops .so-driver-preview{padding:14px;gap:10px}
+  #ski-ops .so-today-work .so-panel-head{padding:8px 12px}
+  #ski-ops .so-today-work .so-panel-head p{font-size:13px;margin-top:4px}
+  #ski-ops .so-work-columns{min-height:32px}
+  #ski-ops .so-work-item{min-height:48px;padding-top:4px;padding-bottom:4px}
+  #ski-ops .so-today-work .so-section-footer{padding:8px 12px;font-size:12px}
+  #ski-ops .so-driver-preview{padding:12px;gap:8px}
   #ski-ops .so-driver-slot{padding:10px 12px}
   #ski-ops .so-driver-place h2{font-size:26px;margin:4px 0 6px}
-  #ski-ops .so-driver-gear span{padding:8px 10px}
+  #ski-ops .so-driver-gear span{display:flex;align-items:center;justify-content:space-between;gap:6px;padding:8px 10px}
   #ski-ops .so-section-footer{padding:11px 14px}
   #ski-ops .so-shortcut{padding:10px 12px;min-height:70px}
   #ski-ops .so-shortcut small{font-size:13px;margin-top:2px}
@@ -54,7 +63,9 @@
   #ski-ops #ski-first-look .ski-discount-card{padding:10px}
 }
 @media(min-width:901px) and (max-width:1150px){
-  #ski-ops .so-home-grid{grid-template-columns:minmax(0,1fr) 350px}
+  #ski-ops .so-home-grid{grid-template-columns:minmax(0,1fr) 300px}
+  #ski-ops .so-work-columns,#ski-ops .so-work-item{grid-template-columns:72px 60px minmax(0,1fr) 80px 12px;gap:6px;padding-left:10px;padding-right:10px}
+  #ski-ops .so-work-description{font-size:15px}
   #ski-ops .so-main-detail{grid-template-columns:1fr;overflow:auto}
   #ski-ops .so-main-detail>.so-stack{overflow:visible;min-height:360px}
   #ski-ops .so-main-detail>.so-stack>.so-panel{overflow:visible}
@@ -67,6 +78,23 @@
   #ski-ops #ski-first-look .ski-pos-customer .ski-return-section{padding:10px}
   #ski-ops #ski-first-look .ski-pos-customer .ski-return-options{grid-template-columns:repeat(4,minmax(0,1fr))}
   #ski-ops #ski-first-look .ski-pos-customer .ski-return-options button{font-size:14px;white-space:normal}
+}
+/* Browser chrome can leave less than 700px of a 768px POS display. */
+@media(min-width:901px) and (max-height:700px){
+  #ski-ops[data-page=home] #so-main{padding-top:10px;padding-bottom:10px}
+  #ski-ops[data-page=home] #so-page{gap:8px}
+  #ski-ops[data-page=home] .so-pagehead{min-height:60px}
+  #ski-ops[data-page=home] .so-pagehead>div:first-child{display:grid;grid-template-columns:auto 1fr;column-gap:12px;align-items:center}
+  #ski-ops[data-page=home] .so-pagehead h1{grid-column:1;grid-row:1}
+  #ski-ops[data-page=home] .so-eyebrow{grid-column:2;grid-row:1;margin:0}
+  #ski-ops[data-page=home] .so-pagehead p{grid-column:1/-1;margin-top:3px;font-size:13px}
+  #ski-ops .so-home-metrics .so-metric{padding-top:7px;padding-bottom:7px}
+  #ski-ops .so-home-metrics .so-metric strong{font-size:26px}
+  #ski-ops .so-home-metrics .so-metric small{font-size:12px;margin-top:4px}
+  #ski-ops .so-today-work .so-panel-head{padding-top:6px;padding-bottom:6px}
+  #ski-ops .so-home-shortcuts .so-shortcut{min-height:56px;padding:8px 10px}
+  #ski-ops .so-home-shortcuts .so-shortcut>span{padding:8px}
+  #ski-ops .so-home-shortcuts .so-shortcut small{font-size:12px}
 }
 @media(max-width:900px){
   #ski-ops .so-responsive-table td:last-child{position:static;box-shadow:none}
