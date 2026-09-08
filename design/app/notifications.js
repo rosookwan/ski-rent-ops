@@ -39,15 +39,22 @@
     stopSound();
     playback = kind;
     const start = audio.currentTime;
-    for (const [frequency, offset] of [[880, 0], [660, .19]]) {
-      const oscillator = audio.createOscillator(), gain = audio.createGain();
-      oscillator.type = 'sine'; oscillator.frequency.value = frequency;
-      gain.gain.setValueAtTime(0, start + offset);
-      gain.gain.linearRampToValueAtTime(.16 * prefs().volume / 100, start + offset + .012);
-      gain.gain.exponentialRampToValueAtTime(.001, start + offset + .27);
-      oscillator.connect(gain); gain.connect(audio.destination); oscillator.start(start + offset); oscillator.stop(start + offset + .28);
-      oscillator.onended = () => { oscillator.disconnect(); gain.disconnect(); oscillatorNodes.delete(oscillator); if (!oscillatorNodes.size) playback = null; };
-      oscillatorNodes.add(oscillator);
+    // Three rising chime pairs with a ringing tail, lasting about four seconds.
+    // Schedule every partial in the same context so acknowledgement cancels future notes too.
+    for (const pair of [0, 1.35, 2.7]) {
+      for (const [frequency, offset] of [[784, pair], [1046.5, pair + .32]]) {
+        for (const [ratio, strength, decay] of [[1, .76, 1], [2.01, .19, .65], [3.9, .05, .32]]) {
+          const oscillator = audio.createOscillator(), gain = audio.createGain(), at = start + offset;
+          oscillator.type = 'sine'; oscillator.frequency.value = frequency * ratio;
+          gain.gain.setValueAtTime(0, at);
+          gain.gain.linearRampToValueAtTime(.26 * strength * prefs().volume / 100, at + .008);
+          gain.gain.exponentialRampToValueAtTime(.0001, at + decay);
+          gain.gain.linearRampToValueAtTime(0, at + decay + .02);
+          oscillator.connect(gain); gain.connect(audio.destination); oscillator.start(at); oscillator.stop(at + decay + .02);
+          oscillator.onended = () => { oscillator.disconnect(); gain.disconnect(); oscillatorNodes.delete(oscillator); if (!oscillatorNodes.size) playback = null; };
+          oscillatorNodes.add(oscillator);
+        }
+      }
     }
     lastPlayed = Date.now(); playedCount++; return true;
   }
@@ -81,7 +88,7 @@
       makeButton('<span><strong>알림 소리</strong><small>' + (ready ? '켜짐 · 소리를 받을 준비가 됐어요' : p.sound ? '소리 재생을 다시 확인해 주세요' : '꺼짐 · 종과 숫자는 계속 표시돼요') + '</small></span><span class="so-notice-switch ' + (ready ? 'is-on' : '') + '" aria-hidden="true"></span>', 'sound-toggle', 'aria-label="알림 소리 ' + (ready ? '끄기' : '켜기') + '"', 'so-notice-setting-row') +
       '<div class="so-notice-setting"><span>미확인 알림 반복</span><div class="so-notice-segments">' + [30, 60].map(n => makeButton(n + '초', 'interval', 'data-value="' + n + '" aria-pressed="' + (p.interval === n) + '"')).join('') + '</div></div>' +
       '<label class="so-notice-setting"><span>소리 크기 <b id="so-notice-volume-value">' + p.volume + '%</b></span><input type="range" min="0" max="100" step="10" value="' + p.volume + '" data-notice-volume aria-label="알림 소리 크기"></label>' +
-      makeButton(icon('play') + (p.volume ? '소리 들어보기' : '소리 크기를 올려 주세요'), 'sound-test', p.volume ? '' : 'disabled', 'wide') +
+      makeButton(icon('play') + (p.volume ? '소리 들어보기 · 4초' : '소리 크기를 올려 주세요'), 'sound-test', p.volume ? '' : 'disabled', 'wide') +
       '<p class="so-notice-hint">' + esc(audioError || '확인하면 반복 소리가 멈춥니다. 화면을 끄거나 다른 앱을 사용하면 소리가 제한될 수 있어요.') + '</p></div>';
   }
   function listHtml() {
@@ -206,7 +213,7 @@
       const settings = event.target.closest('.so-notice-settings'), volume = Number(event.target.value);
       settings.querySelector('#so-notice-volume-value').textContent = volume + '%';
       const test = settings.querySelector('[data-notice=sound-test]');
-      test.disabled = !volume; test.innerHTML = icon('play') + (volume ? '소리 들어보기' : '소리 크기를 올려 주세요');
+      test.disabled = !volume; test.innerHTML = icon('play') + (volume ? '소리 들어보기 · 4초' : '소리 크기를 올려 주세요');
       if (!volume) stopSound();
       S.icons();
     }

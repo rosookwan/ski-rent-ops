@@ -15,15 +15,20 @@ const fs = require('node:fs');
   const bell = () => f.locator('#so-notice-bell').click();
   const raw = () => page.frames().find(frame => frame.parentFrame());
   const test = async (name, run) => { await run(); checks.push(name); console.log('PASS ' + name); };
-  const measureAudio = () => raw().evaluate(async () => {
-    const samples = new Float32Array(2048); let peak = 0;
-    for (let i = 0; i < 24; i++) {
+  const measureAudio = (durationMs = 600) => raw().evaluate(async durationMs => {
+    const samples = new Float32Array(2048), start = performance.now(); let peak = 0, lastAudibleMs = 0, tailPeak = 0;
+    while (performance.now() - start < durationMs) {
       window.noticeAudioProbe.getFloatTimeDomainData(samples);
-      for (const sample of samples) peak = Math.max(peak, Math.abs(sample));
+      let blockPeak = 0;
+      for (const sample of samples) blockPeak = Math.max(blockPeak, Math.abs(sample));
+      peak = Math.max(peak, blockPeak);
+      const elapsed = performance.now() - start;
+      if (blockPeak > .001) lastAudibleMs = elapsed;
+      if (elapsed > durationMs - 200) tailPeak = Math.max(tailPeak, blockPeak);
       await new Promise(resolve => setTimeout(resolve, 25));
     }
-    return peak;
-  });
+    return { peak, lastAudibleMs, tailPeak };
+  }, durationMs);
   try {
     await page.goto(url, { waitUntil: 'networkidle' });
     await action('login-shop');
@@ -59,14 +64,18 @@ const fs = require('node:fs');
       await bell(); await notice('settings');
       assert.equal((await raw().evaluate(() => SkiOps.notifications.soundInfo())).preferences.sound, false);
       await notice('sound-test');
-      const peak = await measureAudio(); assert.ok(peak > .01, 'PC preview is silent: peak=' + peak);
+      const chime = await measureAudio(4600);
+      assert.ok(chime.peak > .01 && chime.peak < .9, 'Chime must produce a clear signal without clipping: ' + JSON.stringify(chime));
+      assert.ok(chime.lastAudibleMs >= 3000 && chime.lastAudibleMs < 4300, 'Chime should ring for about four seconds: ' + JSON.stringify(chime));
+      assert.ok(chime.tailPeak < .001, 'Chime must finish without an ongoing tone');
+      assert.equal((await raw().evaluate(() => SkiOps.notifications.soundInfo())).playback, null);
       assert.equal((await raw().evaluate(() => SkiOps.notifications.soundInfo())).preferences.sound, false);
       const volume = f.locator('[data-notice-volume]');
       await volume.press('Home'); assert.equal(await f.locator('[data-notice=sound-test]').isDisabled(), true);
       await volume.press('End'); assert.equal(await f.locator('[data-notice=sound-test]').isDisabled(), false);
       for (let i = 0; i < 4; i++) await volume.press('ArrowLeft');
       await notice('sound-toggle');
-      assert.ok(await measureAudio() > .01, 'Enabling sound must play the complete preview without unread alerts');
+      assert.ok((await measureAudio()).peak > .01, 'Enabling sound must play the complete preview without unread alerts');
       await notice('sound-toggle');
       assert.equal((await raw().evaluate(() => SkiOps.notifications.soundInfo())).preferences.sound, false);
       await notice('close');
@@ -87,16 +96,18 @@ const fs = require('node:fs');
       await raw().waitForFunction(() => SkiOps.notifications.soundInfo().ready, null, { timeout: 5000 });
       const count = (await raw().evaluate(() => SkiOps.notifications.soundInfo())).playedCount;
       assert.ok(count >= 1);
-      assert.ok(await measureAudio() > .01, 'Vehicle sound must reach the audio graph');
+      assert.ok((await measureAudio()).peak > .01, 'Vehicle sound must reach the audio graph');
       await page.evaluate(() => { const button = document.createElement('button'); button.id = 'focus-probe'; button.style.cssText = 'position:fixed;width:1px;height:1px;opacity:0'; document.body.append(button); button.focus(); });
       assert.equal(await raw().evaluate(() => document.hasFocus()), false);
       assert.equal(await raw().evaluate(() => document.hidden), false);
       await raw().waitForFunction(count => SkiOps.notifications.soundInfo().playedCount > count, count, { timeout: 36000 });
       assert.ok((await raw().evaluate(() => SkiOps.notifications.soundInfo())).playedCount > count);
-      assert.ok(await measureAudio() > .01, 'Visible PC screen should still sound when focus is outside the iframe');
+      assert.ok((await measureAudio()).peak > .01, 'Visible PC screen should still sound when focus is outside the iframe');
       await page.locator('#focus-probe').evaluate(el => el.remove());
       await notice('close'); await action('ack');
       const stopped = (await raw().evaluate(() => SkiOps.notifications.soundInfo())).playedCount;
+      await page.waitForTimeout(100);
+      assert.ok((await measureAudio(4300)).peak < .001, 'Acknowledgement must also cancel the remaining chime notes');
       await new Promise(resolve => setTimeout(resolve, 31000));
       assert.equal((await raw().evaluate(() => SkiOps.notifications.soundInfo())).playedCount, stopped);
       assert.equal(await f.locator('.ski-priority-button').count(), 0);
