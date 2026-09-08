@@ -15,6 +15,15 @@ const fs = require('node:fs');
   const bell = () => f.locator('#so-notice-bell').click();
   const raw = () => page.frames().find(frame => frame.parentFrame());
   const test = async (name, run) => { await run(); checks.push(name); console.log('PASS ' + name); };
+  const measureAudio = () => raw().evaluate(async () => {
+    const samples = new Float32Array(2048); let peak = 0;
+    for (let i = 0; i < 24; i++) {
+      window.noticeAudioProbe.getFloatTimeDomainData(samples);
+      for (const sample of samples) peak = Math.max(peak, Math.abs(sample));
+      await new Promise(resolve => setTimeout(resolve, 25));
+    }
+    return peak;
+  });
   try {
     await page.goto(url, { waitUntil: 'networkidle' });
     await action('login-shop');
@@ -26,6 +35,41 @@ const fs = require('node:fs');
       assert.match(await f.locator('#so-notice-bell').getAttribute('aria-label'), /모두 확인/);
       assert.deepEqual(await raw().evaluate(() => SkiOps.returns.store.get('R-024')), before);
       await notice('close'); assert.equal(await f.locator('#so-notice-bell').evaluate(el => el === el.ownerDocument.activeElement), true);
+    });
+    await test('PC sound preview produces an audio signal after all alerts are read and keeps the sound preference unchanged', async () => {
+      await raw().evaluate(() => {
+        const Original = window.AudioContext;
+        window.AudioContext = class extends Original {
+          constructor(...args) {
+            super(...args);
+            const analyser = this.createAnalyser(); analyser.fftSize = 2048;
+            window.noticeAudioProbe = analyser;
+            const createGain = this.createGain.bind(this);
+            this.createGain = () => {
+              const gain = createGain(), connect = gain.connect.bind(gain);
+              gain.connect = (target, ...options) => {
+                if (target === this.destination) { connect(analyser); analyser.connect(target); return target; }
+                return connect(target, ...options);
+              };
+              return gain;
+            };
+          }
+        };
+      });
+      await bell(); await notice('settings');
+      assert.equal((await raw().evaluate(() => SkiOps.notifications.soundInfo())).preferences.sound, false);
+      await notice('sound-test');
+      const peak = await measureAudio(); assert.ok(peak > .01, 'PC preview is silent: peak=' + peak);
+      assert.equal((await raw().evaluate(() => SkiOps.notifications.soundInfo())).preferences.sound, false);
+      const volume = f.locator('[data-notice-volume]');
+      await volume.press('Home'); assert.equal(await f.locator('[data-notice=sound-test]').isDisabled(), true);
+      await volume.press('End'); assert.equal(await f.locator('[data-notice=sound-test]').isDisabled(), false);
+      for (let i = 0; i < 4; i++) await volume.press('ArrowLeft');
+      await notice('sound-toggle');
+      assert.ok(await measureAudio() > .01, 'Enabling sound must play the complete preview without unread alerts');
+      await notice('sound-toggle');
+      assert.equal((await raw().evaluate(() => SkiOps.notifications.soundInfo())).preferences.sound, false);
+      await notice('close');
     });
     await test('intake draft and its open period sheet survive notification arrival and nested inbox', async () => {
       await nav('intake'); await action('representative-done'); await action('toggle-period');
@@ -43,8 +87,14 @@ const fs = require('node:fs');
       await raw().waitForFunction(() => SkiOps.notifications.soundInfo().ready, null, { timeout: 5000 });
       const count = (await raw().evaluate(() => SkiOps.notifications.soundInfo())).playedCount;
       assert.ok(count >= 1);
+      assert.ok(await measureAudio() > .01, 'Vehicle sound must reach the audio graph');
+      await page.evaluate(() => { const button = document.createElement('button'); button.id = 'focus-probe'; button.style.cssText = 'position:fixed;width:1px;height:1px;opacity:0'; document.body.append(button); button.focus(); });
+      assert.equal(await raw().evaluate(() => document.hasFocus()), false);
+      assert.equal(await raw().evaluate(() => document.hidden), false);
       await raw().waitForFunction(count => SkiOps.notifications.soundInfo().playedCount > count, count, { timeout: 36000 });
       assert.ok((await raw().evaluate(() => SkiOps.notifications.soundInfo())).playedCount > count);
+      assert.ok(await measureAudio() > .01, 'Visible PC screen should still sound when focus is outside the iframe');
+      await page.locator('#focus-probe').evaluate(el => el.remove());
       await notice('close'); await action('ack');
       const stopped = (await raw().evaluate(() => SkiOps.notifications.soundInfo())).playedCount;
       await new Promise(resolve => setTimeout(resolve, 31000));
@@ -115,6 +165,13 @@ const fs = require('node:fs');
         }
         await notice('close');
         const bellBox = await f.locator('#so-notice-bell').boundingBox(); assert.ok(bellBox.width >= 48 && bellBox.height >= 48);
+        const centered = await f.locator('#so-notice-bell').evaluate(el => {
+          const svg = el.querySelector('svg'), previous = svg.style.animation; svg.style.animation = 'none';
+          const button = el.getBoundingClientRect(), glyph = svg.getBoundingClientRect();
+          const delta = { x: glyph.x + glyph.width / 2 - button.x - button.width / 2, y: glyph.y + glyph.height / 2 - button.y - button.height / 2 };
+          svg.style.animation = previous; return delta;
+        });
+        assert.ok(Math.abs(centered.x) <= .5 && Math.abs(centered.y) <= .5, 'Bell is off-center: ' + JSON.stringify(centered));
         const header = await f.locator('.so-topbar-right').evaluate(el => [...el.querySelectorAll('button:not([hidden])')].map(el => el.getBoundingClientRect().toJSON()));
         for (let i = 1; i < header.length; i++) assert.ok(header[i].left >= header[i-1].right - 1);
         if (vehicle) {

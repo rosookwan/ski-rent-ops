@@ -24,13 +24,20 @@
   S.root.append(dialog);
   const live = document.createElement('span'); live.className = 'so-notice-sr'; live.setAttribute('role', 'status'); live.setAttribute('aria-live', 'polite'); S.root.append(live);
   let tab = 'unread', screen = 'list', selected = null, returnFocus = null, composingOrder = null, pendingCommand = null, lastRole = '', seenRevision = -1;
-  let audio = null, audioReady = new Set(), audioError = '', lastPlayed = 0, playedCount = 0, timer = null, lastSoundRole = '', oscillatorNodes = [];
+  let audio = null, audioReady = new Set(), audioError = '', lastPlayed = 0, playedCount = 0, timer = null, lastSoundRole = '', playback = null;
+  const oscillatorNodes = new Set();
   const prefs = () => service().preferences();
-  const soundReady = () => prefs().sound && audioReady.has(role()) && audio?.state === 'running' && !audioError;
-  const stopSound = () => { for (const node of oscillatorNodes) { try { node.stop(); } catch (_) {} } oscillatorNodes = []; };
-  function playSound() {
-    if (!soundReady() || !active() || document.hidden || !document.hasFocus() || !prefs().volume) return false;
+  const audioUsable = () => audioReady.has(role()) && audio?.state === 'running' && !audioError;
+  const soundReady = () => prefs().sound && audioUsable();
+  const stopSound = (remindersOnly = false) => {
+    if (remindersOnly && playback === 'preview') return;
+    for (const node of oscillatorNodes) { try { node.stop(); } catch (_) {} }
+    oscillatorNodes.clear(); playback = null;
+  };
+  function playSound(kind = 'reminder') {
+    if (!audioUsable() || (kind !== 'preview' && !prefs().sound) || !active() || document.hidden || !prefs().volume) return false;
     stopSound();
+    playback = kind;
     const start = audio.currentTime;
     for (const [frequency, offset] of [[880, 0], [660, .19]]) {
       const oscillator = audio.createOscillator(), gain = audio.createGain();
@@ -39,26 +46,33 @@
       gain.gain.linearRampToValueAtTime(.16 * prefs().volume / 100, start + offset + .012);
       gain.gain.exponentialRampToValueAtTime(.001, start + offset + .27);
       oscillator.connect(gain); gain.connect(audio.destination); oscillator.start(start + offset); oscillator.stop(start + offset + .28);
-      oscillator.onended = () => { oscillator.disconnect(); gain.disconnect(); };
-      oscillatorNodes.push(oscillator);
+      oscillator.onended = () => { oscillator.disconnect(); gain.disconnect(); oscillatorNodes.delete(oscillator); if (!oscillatorNodes.size) playback = null; };
+      oscillatorNodes.add(oscillator);
     }
     lastPlayed = Date.now(); playedCount++; return true;
   }
   function tick() {
     if (active() && !document.hidden && incoming().some(row => unread(row) && row.attentionRequired)) {
       if (Date.now() - lastPlayed >= prefs().interval * 1000) playSound();
-    } else stopSound();
+    } else stopSound(true);
   }
-  async function enableSound() {
+  async function enableSound(previewOnly = false) {
+    const requestedRole = role();
     try {
       const Audio = window.AudioContext || window.webkitAudioContext;
       if (!Audio) throw new Error('이 브라우저에서 소리를 지원하지 않습니다.');
       if (!audio) audio = new Audio();
-      await audio.resume();
+      let timeout;
+      try {
+        await Promise.race([audio.resume(), new Promise((_, reject) => {
+          timeout = setTimeout(() => reject(new Error('소리가 차단됐어요. 브라우저의 사이트 소리 설정을 확인하고 다시 눌러 주세요.')), 3000);
+        })]);
+      } finally { clearTimeout(timeout); }
+      if (!active() || role() !== requestedRole) return;
       if (audio.state !== 'running') throw new Error('브라우저의 소리 재생을 허용해 주세요.');
       audioError = ''; audioReady.add(role());
-      service().execute(C.command('preferences', { ...prefs(), sound: true }));
-      playSound(); updateSettings();
+      if (!previewOnly) service().execute(C.command('preferences', { ...prefs(), sound: true }));
+      playSound('preview'); updateSettings();
     } catch (error) { audioError = error.message; updateSettings(); }
   }
   function preferencesHtml() {
@@ -67,7 +81,7 @@
       makeButton('<span><strong>알림 소리</strong><small>' + (ready ? '켜짐 · 소리를 받을 준비가 됐어요' : p.sound ? '소리 재생을 다시 확인해 주세요' : '꺼짐 · 종과 숫자는 계속 표시돼요') + '</small></span><span class="so-notice-switch ' + (ready ? 'is-on' : '') + '" aria-hidden="true"></span>', 'sound-toggle', 'aria-label="알림 소리 ' + (ready ? '끄기' : '켜기') + '"', 'so-notice-setting-row') +
       '<div class="so-notice-setting"><span>미확인 알림 반복</span><div class="so-notice-segments">' + [30, 60].map(n => makeButton(n + '초', 'interval', 'data-value="' + n + '" aria-pressed="' + (p.interval === n) + '"')).join('') + '</div></div>' +
       '<label class="so-notice-setting"><span>소리 크기 <b id="so-notice-volume-value">' + p.volume + '%</b></span><input type="range" min="0" max="100" step="10" value="' + p.volume + '" data-notice-volume aria-label="알림 소리 크기"></label>' +
-      makeButton(icon('play') + '소리 들어보기', 'sound-test', '', 'wide') +
+      makeButton(icon('play') + (p.volume ? '소리 들어보기' : '소리 크기를 올려 주세요'), 'sound-test', p.volume ? '' : 'disabled', 'wide') +
       '<p class="so-notice-hint">' + esc(audioError || '확인하면 반복 소리가 멈춥니다. 화면을 끄거나 다른 앱을 사용하면 소리가 제한될 수 있어요.') + '</p></div>';
   }
   function listHtml() {
@@ -145,7 +159,7 @@
       if (data.records.some(row => unread(row) && row.attentionRequired) && Date.now() - lastPlayed > 1500) playSound();
       lastSoundRole = soundRole;
     }
-    if (!count) stopSound();
+    if (!count) stopSound(true);
     if (!timer) timer = setInterval(tick, 1000);
   }
   function acknowledge(id) {
@@ -180,7 +194,7 @@
     } else if (action === 'sound-toggle') {
       if (soundReady()) { service().execute(C.command('preferences', { ...prefs(), sound: false })); stopSound(); updateSettings(); }
       else void enableSound();
-    } else if (action === 'sound-test') void enableSound();
+    } else if (action === 'sound-test') void enableSound(true);
     else if (action === 'interval') { service().execute(C.command('preferences', { ...prefs(), interval: Number(button.dataset.value) })); updateSettings(); }
   }
   bell.addEventListener('click', () => open());
@@ -189,7 +203,12 @@
     if (event.target.matches('[data-notice-message], [data-notice-order]')) pendingCommand = null;
     if (event.target.hasAttribute('data-notice-volume')) {
       service().execute(C.command('preferences', { ...prefs(), volume: Number(event.target.value) }));
-      event.target.closest('.so-notice-settings').querySelector('#so-notice-volume-value').textContent = event.target.value + '%';
+      const settings = event.target.closest('.so-notice-settings'), volume = Number(event.target.value);
+      settings.querySelector('#so-notice-volume-value').textContent = volume + '%';
+      const test = settings.querySelector('[data-notice=sound-test]');
+      test.disabled = !volume; test.innerHTML = icon('play') + (volume ? '소리 들어보기' : '소리 크기를 올려 주세요');
+      if (!volume) stopSound();
+      S.icons();
     }
   });
   dialog.addEventListener('click', event => { if (event.target === dialog) { const box = dialog.getBoundingClientRect(); if (event.clientX < box.left || event.clientX > box.right || event.clientY < box.top || event.clientY > box.bottom) close(); } });
@@ -217,6 +236,6 @@
       for (const row of runtime.driver.sync(0).records.filter(row => row.orderId === orderId && row.type === 'priority' && unread(row))) runtime.driver.execute(C.command('ack', {}, row.id));
       refresh();
     },
-    soundInfo: () => ({ ready: soundReady(), playedCount, lastPlayed, preferences: prefs() })
+    soundInfo: () => ({ ready: soundReady(), playedCount, lastPlayed, preferences: prefs(), playback, audioState: audio?.state || 'not-started' })
   };
 })();

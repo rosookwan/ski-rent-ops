@@ -1,9 +1,9 @@
-#ski-ops .so-notice-bell{position:relative;display:grid;place-items:center;width:48px;height:48px;min-height:48px;flex-shrink:0;border:1px solid #e7e7e7;border-radius:14px;background:#fff;color:#606060;padding:0;cursor:pointer}
-#ski-ops .so-notice-bell svg{width:22px;height:22px;transform-origin:50% 12%}
-#ski-ops .so-notice-bell.has-unread{color:#ef4a13;background:#fff7f2;border-color:#ffe2d1}
-#ski-ops .so-notice-bell.has-unread>svg{animation:so-bell-sway 3s ease-in-out infinite}
-#ski-ops .so-notice-count{position:absolute;right:-5px;top:-5px;min-width:21px;height:21px;padding:0 4px;display:grid;place-items:center;border-radius:12px;background:#fe4e10;color:#fff;border:2px solid #fff;font-size:11px;font-weight:750}
-#ski-ops .so-notice-count[hidden],#ski-ops .so-notice-bell[hidden]{display:none}
+#ski-ops #so-notice-bell{position:relative;display:flex;align-items:center;justify-content:center;gap:0;width:48px;height:48px;min-height:48px;flex-shrink:0;border:1px solid #e7e7e7;border-radius:14px;background:#fff;color:#606060;padding:0;cursor:pointer}
+#ski-ops #so-notice-bell>svg{display:block;flex-shrink:0;width:22px;height:22px;margin:0;transform-origin:50% 12%}
+#ski-ops #so-notice-bell.has-unread{color:#ef4a13;background:#fff7f2;border-color:#ffe2d1}
+#ski-ops #so-notice-bell.has-unread>svg{animation:so-bell-sway 3s ease-in-out infinite}
+#ski-ops #so-notice-bell .so-notice-count{position:absolute;right:-5px;top:-5px;min-width:21px;height:21px;padding:0 4px;display:grid;place-items:center;border-radius:12px;background:#fe4e10;color:#fff;border:2px solid #fff;font-size:11px;font-weight:750}
+#ski-ops #so-notice-bell .so-notice-count[hidden],#ski-ops #so-notice-bell[hidden]{display:none}
 @keyframes so-bell-sway{0%,34%,100%{transform:rotate(0)}5%,17%,29%{transform:rotate(11deg)}11%,23%{transform:rotate(-11deg)}}
 #ski-ops #so-notice-dialog{--notice-accent:#f24d13;--notice-soft:#fff5ef;position:fixed;inset:12px 12px 12px auto;width:460px;max-width:calc(100vw - 24px);height:calc(100dvh - 24px);max-height:760px;margin:0;padding:0;border:1px solid #e8e7e5;border-radius:24px;background:#fff;color:#252525;box-shadow:0 16px 65px #24213129;overflow:hidden}
 #ski-ops #so-notice-dialog[open]{display:flex;flex-direction:column}
@@ -82,8 +82,8 @@
 #ski-ops .so-notice-segments button[aria-pressed=true]{color:var(--notice-accent,#fe4e10);background:var(--notice-soft,#fff5ef);border-color:var(--notice-accent,#fe4e10)}
 #ski-ops #so-notice-settings-page{max-width:550px;border:1px solid #e8e8e8;border-radius:20px;background:#fff;overflow:auto;min-height:0}
 #ski-ops .so-notice-sr{position:absolute;width:1px;height:1px;padding:0;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
-#ski-ops.so-vehicle .so-notice-bell{width:56px;height:56px;min-height:56px;border-color:#ffffff22;background:#ffffff14;color:#fff}
-#ski-ops.so-vehicle .so-notice-count{background:#fff;color:#6033e8;border-color:#6033e8}
+#ski-ops.so-vehicle #so-notice-bell{width:56px;height:56px;min-height:56px;border-color:#ffffff22;background:#fff;color:#6033e8}
+#ski-ops.so-vehicle #so-notice-bell .so-notice-count{background:#fff;color:#6033e8;border-color:#6033e8}
 #ski-ops.so-vehicle .so-topbar-right button{background:#744ce9}
 #ski-ops.so-vehicle .so-topbar-right .so-notice-bell{background:#fff;color:#6033e8}
 #ski-ops.so-vehicle #ski-first-look .ski-vehicle-head .ski-segment{margin-right:290px}
@@ -94,4 +94,4 @@
 @media(max-height:680px){#ski-ops .so-notice-header{min-height:68px;padding:10px 18px}#ski-ops .so-notice-settings{gap:16px;padding:18px 22px}#ski-ops .so-notice-setting-intro{padding:0}#ski-ops .so-notice-setting-intro h3{font-size:21px;margin-top:10px}#ski-ops .so-notice-setting-intro br{display:none}#ski-ops .so-notice-setting-intro .so-notice-large-icon{display:none}#ski-ops .so-notice-footer{padding:8px 18px 12px}#ski-ops .so-notice-compose{padding:18px 22px;gap:15px}}
 @media(max-height:560px){#ski-ops .so-notice-settings{gap:10px;padding:14px 20px}#ski-ops .so-notice-setting-intro h3{font-size:18px;line-height:1.4;margin:0}#ski-ops .so-notice-setting-intro p{display:none}#ski-ops .so-notice-setting-row{padding:12px 14px}#ski-ops .so-notice-setting{gap:8px}#ski-ops .so-notice-setting input{min-height:32px}#ski-ops .so-notice-compose{padding:14px 20px;gap:10px}#ski-ops .so-notice-compose>p.so-notice-hint{display:none}#ski-ops .so-notice-compose textarea{padding:10px 13px}#ski-ops .so-notice-detail{padding:18px 22px;gap:14px}#ski-ops .so-notice-detail h3{font-size:23px}#ski-ops .so-notice-detail-message{padding:14px 0;line-height:1.65}}
 @media(max-width:760px){#ski-ops #so-notice-dialog{inset:8px;width:calc(100vw - 16px);max-width:none;height:calc(100dvh - 16px);max-height:none;border-radius:20px}#ski-ops .so-notice-row{gap:10px;padding:14px 10px}#ski-ops .so-notice-row-icon{width:32px;height:32px}#ski-ops .so-notice-row-copy>strong{font-size:16px}#ski-ops .so-notice-row>svg{display:none}#ski-ops .so-notice-tabs{margin-inline:14px}#ski-ops .so-notice-detail,#ski-ops .so-notice-compose{padding:20px}}
-@media(prefers-reduced-motion:reduce){#ski-ops .so-notice-bell.has-unread>svg,#ski-ops #ski-first-look .ski-priority-button svg{animation:none}}
+@media(prefers-reduced-motion:reduce){#ski-ops #so-notice-bell.has-unread>svg,#ski-ops #ski-first-look .ski-priority-button svg{animation:none}}
