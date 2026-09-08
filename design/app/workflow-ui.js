@@ -35,9 +35,9 @@
     const shown = priority && sequence ? [priority, sequence] : records.slice(0, 2);
     return '<div class="wf-alerts" aria-live="polite">' + shown.map(n => {
       const isSequence = n.type === 'sequence', task = F.snap().tasks.find(t => t.id === n.taskId);
-      const customerName = task ? name(task.customerId) : S.data.orders.find(o => o.id === n.orderId)?.name || n.title.split(' · ')[0];
+      const customerName = task ? (task.customerId ? name(task.customerId) : task.title) : S.data.orders.find(o => o.id === n.orderId)?.name || n.title.split(' · ')[0];
       const change = n.changes?.find(c => c.taskId === n.taskId) || n.changes?.[0];
-      const summary = isSequence ? (change ? (task ? name(task.customerId) : change.title.replace(/ 수거$| 전달$/, '')) + ' ' + change.fromRank + ' → ' + change.toRank + '번째' : '시간순으로 복원') : customerName;
+      const summary = isSequence ? (change && !n.summary.startsWith('시간순으로 복원') ? (task ? customerName : change.title.replace(/ 수거$| 전달$/, '')) + ' ' + change.fromRank + ' → ' + change.toRank + '번째' : '시간순으로 복원') : customerName;
       return '<button type="button" class="wf-alert ' + n.type + '" data-action="wf-ack" data-id="' + e(n.id) + '" title="' + e(n.summary) + '"><span class="wf-alert-icon" aria-hidden="true">' + S.icon(isSequence ? 'arrow-up-down' : 'bell-ring') + '</span><span class="wf-alert-copy"><strong>' + (isSequence ? '매장 순서 변경' : '우선 확인 요청') + '</strong><span>' + e(summary) + (isSequence ? ' · ' + stamp(n.createdAt).split(' ').slice(-1)[0] : '') + '</span></span><span class="wf-alert-check">' + (isSequence ? '순서 확인' : '요청 확인') + '</span></button>';
     }).join('') + (records.length > shown.length ? b('다른 요청 ' + (records.length - shown.length) + '건', 'wf-notices', '', 'wf-more-notices') : '') + '</div>';
   }
