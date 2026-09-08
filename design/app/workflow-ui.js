@@ -26,6 +26,7 @@
   function safe(fn) { return async (...args) => { if (actionBusy) return; actionBusy = true; try { await fn(...args); } catch (error) { const el = S.$('#wf-error'); if (el) { el.textContent = error.message; el.hidden = false; } else S.toast(error.message); } finally { actionBusy = false; } }; }
   function modal(title, body, footer) { S.modal(title, '<div class="wf-modal-content">' + body + '<p id="wf-error" class="wf-error" role="alert" hidden></p></div><footer class="wf-modal-footer">' + footer + '</footer>'); }
   const dayPicker = key => '<div class="wf-actions">' + b('오늘', 'wf-date', key + ':today', ui.date === S.data.today ? 'soft' : '') + b('내일', 'wf-date', key + ':tomorrow', ui.date === S.data.day(1) ? 'soft' : '') + '<input type="date" aria-label="조회 날짜" value="' + ui.date + '" data-change="wf-date"></div>';
+  const vehicleDayPicker = () => '<div class="wf-day-picker" role="group" aria-label="방문 날짜">' + b('오늘', 'wf-date', 'vehicle:today', ui.date === S.data.today ? 'soft' : '') + b('내일', 'wf-date', 'vehicle:tomorrow', ui.date === S.data.day(1) ? 'soft' : '') + '<input class="wf-date-control" type="date" aria-label="조회 날짜" value="' + ui.date + '" data-change="wf-date"></div>';
   const stock = () => { const v = F.store.vehicle({ vehicleId: F.vehicleId }); return '<section class="wf-stock" aria-label="현재 차량 보관 수량"><div class="wf-stock-label"><strong>1호 차량</strong><span>현재 보관</span></div>' + v.totals.filter(s => ['ski', 'board', 'clothing', 'helmet', 'ticket-3h', 'ticket-4h', 'ticket-6h'].includes(s.sku) || s.current).map(s => '<div class="wf-stock-item"><span>' + e(s.label) + '</span><strong>' + s.current + '<small>' + s.unit + '</small></strong></div>').join('') + '</section>'; };
   const board = () => F.store.board({ vehicleId: F.vehicleId, date: ui.date, ...(ui.selected ? { selectedTaskId: ui.selected } : {}) });
   function notices() {
@@ -38,8 +39,10 @@
       const customerName = task ? (task.customerId ? name(task.customerId) : task.title) : S.data.orders.find(o => o.id === n.orderId)?.name || n.title.split(' · ')[0];
       const change = n.changes?.find(c => c.taskId === n.taskId) || n.changes?.[0];
       const summary = isSequence ? (change && !n.summary.startsWith('시간순으로 복원') ? (task ? customerName : change.title.replace(/ 수거$| 전달$/, '')) + ' ' + change.fromRank + ' → ' + change.toRank + '번째' : '시간순으로 복원') : customerName;
-      return '<button type="button" class="wf-alert ' + n.type + '" data-action="wf-ack" data-id="' + e(n.id) + '" title="' + e(n.summary) + '"><span class="wf-alert-icon" aria-hidden="true">' + S.icon(isSequence ? 'arrow-up-down' : 'bell-ring') + '</span><span class="wf-alert-copy"><strong>' + (isSequence ? '매장 순서 변경' : '우선 확인 요청') + '</strong><span>' + e(summary) + (isSequence ? ' · ' + stamp(n.createdAt).split(' ').slice(-1)[0] : '') + '</span></span><span class="wf-alert-check">' + (isSequence ? '순서 확인' : '요청 확인') + '</span></button>';
-    }).join('') + (records.length > shown.length ? b('다른 요청 ' + (records.length - shown.length) + '건', 'wf-notices', '', 'wf-more-notices') : '') + '</div>';
+      const sequenceName = task?.kind === 'refund' ? customerName.replace(/^리프트권 /, '') : task ? customerName : change?.title.replace(/ 수거$| 전달$/, '');
+      const detail = isSequence && change && !n.summary.startsWith('시간순으로 복원') ? '<span class="wf-alert-name">' + e(sequenceName) + '</span><span class="wf-alert-rank">' + change.fromRank + '→' + change.toRank + '번째</span>' : '<span class="wf-alert-name">' + e(summary) + '</span>';
+      return '<button type="button" class="wf-alert ' + n.type + '" data-action="wf-ack" data-id="' + e(n.id) + '" aria-label="' + (isSequence ? '순서 확인: ' : '요청 확인: ') + e(summary) + '" title="' + e(n.summary + ' · ' + stamp(n.createdAt)) + '"><span class="wf-alert-icon" aria-hidden="true">' + S.icon(isSequence ? 'arrow-up-down' : 'bell-ring') + '</span><span class="wf-alert-copy"><strong>' + (isSequence ? '매장 순서 변경' : '우선 확인 요청') + '</strong><span class="wf-alert-summary">' + detail + '</span></span><span class="wf-alert-check">확인</span></button>';
+    }).join('') + (records.length > shown.length ? b('외 ' + (records.length - shown.length) + '건', 'wf-notices', '', 'wf-more-notices') : '') + '</div>';
   }
   function taskRow(t, counter = false) {
     const ids = F.remaining(t), customer = S.workflowCustomer(t.customerId);
@@ -55,7 +58,7 @@
   function renderVehicle() {
     const list = board(); ui.selected = list.selectedTaskId;
     const tasks = [...list.inProgress, ...list.pending];
-    return '<div class="wf wf-vehicle">' + stock() + '<div class="wf-vehicle-toolbar"><div class="wf-actions">' + [['jobs', '방문 업무'], ['stock', '적재 내역'], ['history', '처리 내역']].map(([id, text]) => b(text, 'wf-vehicle-tab', id, ui.vehicleTab === id ? 'soft' : '')).join('') + '</div><div class="wf-vehicle-tools">' + S.notifications.soundControl() + dayPicker('vehicle') + '</div></div>' + (ui.vehicleTab === 'jobs' ? '<div class="wf-vehicle-grid"><section class="wf-job-column"><h2>남은 방문 ' + tasks.length + '건 <small>' + (list.manualOrder ? '매장 지정 순서' : '시간순') + '</small></h2><div class="wf-job-scroll">' + (tasks.map(t => taskRow(t)).join('') || empty('오늘 업무를 모두 마쳤습니다.')) + '</div></section>' + '<div class="wf-work-column">' + notices() + taskDetail(tasks.find(t => t.id === ui.selected)) + '</div></div>' : '<div class="wf-secondary-alerts">' + notices() + '</div><div class="wf-scroll">' + (ui.vehicleTab === 'stock' ? inventoryRows(true) : historyRows(true)) + '</div>') + '</div>';
+    return '<div class="wf wf-vehicle">' + stock() + '<div class="wf-vehicle-toolbar"><div class="wf-actions wf-vehicle-tabs">' + [['jobs', '방문 업무'], ['stock', '적재 내역'], ['history', '처리 내역']].map(([id, text]) => b(text, 'wf-vehicle-tab', id, ui.vehicleTab === id ? 'soft' : '')).join('') + '</div><div class="wf-toolbar-notices">' + notices() + '</div>' + S.notifications.soundControl() + '</div>' + (ui.vehicleTab === 'jobs' ? '<div class="wf-vehicle-grid"><section class="wf-job-column"><h2>남은 방문 ' + tasks.length + '건 <small>' + (list.manualOrder ? '매장 지정 순서' : '시간순') + '</small></h2><div class="wf-job-scroll">' + (tasks.map(t => taskRow(t)).join('') || empty('오늘 업무를 모두 마쳤습니다.')) + '</div></section><div class="wf-work-column">' + taskDetail(tasks.find(t => t.id === ui.selected)) + '</div></div>' : '<div class="wf-scroll">' + (ui.vehicleTab === 'stock' ? inventoryRows(true) : historyRows(true)) + '</div>') + '</div>';
   }
   function dispatch() {
     const data = board();
@@ -184,7 +187,7 @@
   S.action('wf-task-edit', safe(id => taskEditor(F.taskPayload(F.snap().tasks.find(t => t.id === id)))));
   S.action('wf-collection-new', safe(id => taskEditor({ id: C.randomId('collection-'), kind: 'collection', customerId: id, vehicleId: F.vehicleId, date: S.data.today, time: '16:30', place: '만선 광장', title: name(id) + ' 수거', assetIds: F.snap().assets.filter(a => a.location.kind === 'customer' && F.customerIds(id).includes(a.location.id)).map(a => a.id) })));
   S.action('wf-task-save', safe(() => { F.saveTask({ ...taskDraft, date: read('wf-task-date'), time: read('wf-task-time'), place: read('wf-task-place') }); changed('수거 일정을 변경했습니다.'); }));
-  S.register('vehicle', { title: '1호 차량', render: renderVehicle });
+  S.register('vehicle', { title: '1호 차량', headerTools: vehicleDayPicker, render: renderVehicle });
   S.register('dispatch', { title: '배달·수거', render: dispatch });
   S.register('vehicle-stock', { title: '차량 적재·인계', parent: 'dispatch', render: vehicleStockPage });
   S.register('lift-reservations', { title: '리프트권 예약', render: reservations });
