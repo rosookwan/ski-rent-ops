@@ -1,7 +1,7 @@
 (function (root, factory) {
-  if (typeof module === 'object' && module.exports) module.exports = factory(require('./domain.js'));
-  else root.SkiReturnService = factory(root.SkiReturns);
-})(globalThis, function (R) {
+  if (typeof module === 'object' && module.exports) module.exports = factory(require('./domain.js'), require('../notifications/domain.js'));
+  else root.SkiReturnService = factory(root.SkiReturns, root.SkiNotifications);
+})(globalThis, function (R, N) {
   'use strict';
   const copy = value => JSON.parse(JSON.stringify(value));
   const fail = (code, message) => { throw new R.ReturnError(code, message); };
@@ -12,17 +12,27 @@
   function createMemoryRepository() {
     const shops = new Map();
     const shop = id => {
-      if (!shops.has(id)) shops.set(id, { revision: 0, orders: new Map() });
+      if (!shops.has(id)) shops.set(id, { revision: 0, orders: new Map(), notifications: N.fresh() });
       return shops.get(id);
     };
     return {
       mode: 'memory',
       get: (shopId, orderId) => copy(shop(shopId).orders.get(orderId)?.order ?? null),
       list: shopId => [...shop(shopId).orders.values()].map(entry => copy(entry.order)),
+      notifications: shopId => copy(shop(shopId).notifications),
+      transactNotifications(shopId, apply) {
+        const state = shop(shopId), next = copy(state.notifications), result = apply(next);
+        state.notifications = next; return copy(result ?? null);
+      },
       transact(shopId, orderId, apply) {
         const state = shop(shopId);
-        const result = apply(copy(state.orders.get(orderId)?.order ?? null));
-        if (!result.duplicate) state.orders.set(orderId, { order: copy(result.order), revision: ++state.revision });
+        const previous = copy(state.orders.get(orderId)?.order ?? null), result = apply(previous);
+        if (!result.duplicate) {
+          const notifications = copy(state.notifications);
+          N.project(notifications, previous, result);
+          state.orders.set(orderId, { order: copy(result.order), revision: ++state.revision });
+          state.notifications = notifications;
+        }
         return result;
       },
       changes(shopId, afterRevision) {

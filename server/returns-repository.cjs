@@ -3,6 +3,7 @@ const { DatabaseSync } = require('node:sqlite');
 const { mkdirSync, chmodSync } = require('node:fs');
 const { dirname } = require('node:path');
 const { ReturnError } = require('../src/returns/domain.js');
+const N = require('../src/notifications/domain.js');
 
 function createSqliteRepository(filename) {
   if (filename !== ':memory:') mkdirSync(dirname(filename), { recursive: true, mode: 0o700 });
@@ -10,7 +11,7 @@ function createSqliteRepository(filename) {
   if (filename !== ':memory:') chmodSync(filename, 0o600);
   db.exec('PRAGMA foreign_keys = ON; PRAGMA busy_timeout = 5000; PRAGMA journal_mode = WAL;');
   const schemaVersion = db.prepare('PRAGMA user_version').get().user_version;
-  if (schemaVersion > 1) { db.close(); throw new Error('지원하지 않는 반납 데이터베이스 버전입니다.'); }
+  if (schemaVersion > 2) { db.close(); throw new Error('지원하지 않는 반납 데이터베이스 버전입니다.'); }
   db.exec(`
     CREATE TABLE IF NOT EXISTS return_shops (shop_id TEXT PRIMARY KEY, revision INTEGER NOT NULL);
     CREATE TABLE IF NOT EXISTS return_orders (
@@ -24,10 +25,16 @@ function createSqliteRepository(filename) {
       PRIMARY KEY (shop_id, order_id, version), UNIQUE (shop_id, order_id, request_id),
       FOREIGN KEY (shop_id, order_id) REFERENCES return_orders (shop_id, order_id)
     );
-    PRAGMA user_version = 1;
+    CREATE TABLE IF NOT EXISTS notification_state (shop_id TEXT PRIMARY KEY, state_json TEXT NOT NULL);
+    PRAGMA user_version = 2;
   `);
   const getOrder = db.prepare('SELECT state_json FROM return_orders WHERE shop_id = ? AND order_id = ?');
   const getRevision = db.prepare('SELECT revision FROM return_shops WHERE shop_id = ?');
+  const notificationState = shopId => {
+    const row = db.prepare('SELECT state_json FROM notification_state WHERE shop_id = ?').get(shopId);
+    return row ? JSON.parse(row.state_json) : N.fresh();
+  };
+  const saveNotifications = (shopId, state) => db.prepare('INSERT INTO notification_state VALUES (?, ?) ON CONFLICT(shop_id) DO UPDATE SET state_json = excluded.state_json').run(shopId, JSON.stringify(state));
   const decode = row => {
     if (!row) return null;
     const order = JSON.parse(row.state_json);
@@ -38,17 +45,28 @@ function createSqliteRepository(filename) {
     mode: 'sqlite',
     get: (shopId, orderId) => decode(getOrder.get(shopId, orderId)),
     list: shopId => db.prepare('SELECT state_json FROM return_orders WHERE shop_id = ? ORDER BY order_id').all(shopId).map(decode),
+    notifications: notificationState,
+    transactNotifications(shopId, apply) {
+      db.exec('BEGIN IMMEDIATE');
+      try {
+        const state = notificationState(shopId), result = apply(state);
+        saveNotifications(shopId, state); db.exec('COMMIT'); return result;
+      } catch (error) { db.exec('ROLLBACK'); throw error; }
+    },
     transact(shopId, orderId, apply) {
       if (typeof orderId !== 'string') throw new ReturnError('INVALID_INPUT', 'orderId가 필요합니다.');
       db.exec('BEGIN IMMEDIATE');
       try {
-        const result = apply(decode(getOrder.get(shopId, orderId)));
+        const previous = decode(getOrder.get(shopId, orderId)), result = apply(previous);
         if (!result.duplicate) {
+          const notifications = notificationState(shopId);
+          N.project(notifications, previous, result);
           db.prepare('INSERT INTO return_shops VALUES (?, 1) ON CONFLICT(shop_id) DO UPDATE SET revision = revision + 1').run(shopId);
           const revision = getRevision.get(shopId).revision;
           db.prepare(`INSERT INTO return_orders VALUES (?, ?, ?, ?, ?)
             ON CONFLICT(shop_id, order_id) DO UPDATE SET version = excluded.version, revision = excluded.revision, state_json = excluded.state_json`).run(shopId, orderId, result.order.version, revision, JSON.stringify(result.order));
           db.prepare('INSERT INTO return_events VALUES (?, ?, ?, ?, ?)').run(shopId, orderId, result.event.version, result.event.requestId, JSON.stringify(result.event));
+          saveNotifications(shopId, notifications);
         }
         db.exec('COMMIT');
         return result;

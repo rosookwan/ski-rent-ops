@@ -287,7 +287,11 @@
     } else {
       if (!current) fail('NOT_FOUND', '접수를 찾을 수 없습니다.');
       order = copy(current);
-      if (command.type === 'issue') {
+      if (command.type === 'assignVehicle') {
+        keys(command.payload, ['vehicleId'], 'assignVehicle');
+        if (order.items.some(item => item.vehicleQuantity > 0)) fail('DEPENDENT_RETURN', '차량 보관 물품을 매장에 인계한 후 담당 차량을 바꿔 주세요.');
+        order.vehicleId = id(command.payload.vehicleId, 'vehicleId');
+      } else if (command.type === 'issue') {
         keys(command.payload, ['items'], 'issue');
         for (const row of itemRows(order, command.payload.items, ['itemId', 'quantity', 'returnQuantity'])) {
           const item = line(order, row.itemId);

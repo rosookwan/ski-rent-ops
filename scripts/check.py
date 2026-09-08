@@ -1,7 +1,7 @@
 from pathlib import Path
 import re, subprocess, json
 ROOT=Path(__file__).resolve().parents[1]
-js=list((ROOT/'design/app').glob('*.js'))+list((ROOT/'src/returns').glob('*.js'))+list((ROOT/'server').glob('*.cjs'))
+js=list((ROOT/'design/app').glob('*.js'))+list((ROOT/'src/returns').glob('*.js'))+list((ROOT/'src/notifications').glob('*.js'))+list((ROOT/'server').glob('*.cjs'))
 for p in js:
     subprocess.run(['node','--check',str(p)],check=True)
     body=p.read_text()

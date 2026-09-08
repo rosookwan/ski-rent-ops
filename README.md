@@ -95,6 +95,7 @@ npm run test:operations
 | [디자인 참고 자료와 첫 시안](docs/07-design-reference-and-preview.md) | Figma 자료별 활용, 시안 범위, 검증 및 다음 작업 |
 | [전체 화면 구성과 확장 계획](docs/08-screen-map-and-expansion-plan.md) | 공식 렌탈 서비스 비교, 거래처 장부·렌탈현황·설정·사전 입력·QR, 구현 순서 |
 | [화면 체험과 검증 기록](docs/09-clickable-demo-and-validation.md) | 구현된 메뉴, 커밋 단위, 테스트, 배포·확장 시 주의점 |
+| [매장·차량 알림 개발계획서](docs/15-notification-development-plan.md) | 상단 종·알림함·확인 상태, 매장·차량 동기화, 반복 소리, 단계별 커밋·검증 기준 |
 | [첫 시안 소스](design/prototypes/first-look.fragment.html) | 대화 안에서 확인하는 매장·차량 인터랙티브 시안 |
 | [계산 예시 데이터](examples/calculation-cases.json) | 가상 금액을 사용한 다일 요금·할인·마감 검산 자료 |
 

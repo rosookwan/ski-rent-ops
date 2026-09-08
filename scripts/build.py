@@ -6,7 +6,7 @@ from html import escape
 
 ROOT = Path(__file__).resolve().parents[1]
 APP = ROOT / 'design/app'
-MODULES = ['data.js', 'core.js', 'operations.js', 'return-runtime.js', 'rentals.js', 'settings.js', 'partners.js', 'closing.js', 'preparation.js', 'guide.js', 'returns.js', 'login.js']
+MODULES = ['data.js', 'core.js', 'operations.js', 'return-runtime.js', 'rentals.js', 'settings.js', 'partners.js', 'closing.js', 'preparation.js', 'guide.js', 'returns.js', 'login.js', 'notifications.js']
 RETURN_MODULES = ['domain.js', 'service.js', 'client.js', 'demo.js']
 
 def build():
@@ -18,6 +18,12 @@ def build():
     fragment += '\n<style>\n' + (APP / 'styles.css').read_text() + '\n' + (APP / 'polish.css').read_text() + '\n' + (APP / 'responsive.css').read_text() + '\n' + (APP / 'time-picker.css').read_text() + '\n' + (APP / 'operations.css').read_text() + '\n</style>\n'
     for name in RETURN_MODULES:
         fragment += '<script>\n' + (ROOT / 'src/returns' / name).read_text() + '\n</script>\n'
+        if name == 'domain.js':
+            fragment += '<script>\n' + (ROOT / 'src/notifications/domain.js').read_text() + '\n</script>\n'
+    for name in ['service.js', 'client.js']:
+        fragment += '<script>\n' + (ROOT / 'src/notifications' / name).read_text() + '\n</script>\n'
+    if (APP / 'notifications.css').exists():
+        fragment += '<style>\n' + (APP / 'notifications.css').read_text() + '\n</style>\n'
     for name in MODULES:
         if (APP / name).exists():
             source=(APP/name).read_text()

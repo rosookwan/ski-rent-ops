@@ -6,6 +6,7 @@ const path = require('node:path');
 const { ReturnError } = require('../src/returns/domain.js');
 const { createService } = require('../src/returns/service.js');
 const { createSqliteRepository } = require('./returns-repository.cjs');
+const { createService: createNotificationService } = require('../src/notifications/service.js');
 
 function tokenAuthenticator(credentials) {
   if (!Array.isArray(credentials) || !credentials.length) throw new Error('직원 API 인증 설정이 필요합니다.');
@@ -59,9 +60,23 @@ function createApiServer({ repository, authenticate, clock, allowedOrigins = [] 
         response.setHeader('Access-Control-Allow-Headers', 'Authorization, Content-Type');
         send(200, {}); return;
       }
-      const service = createService(repository, await authenticate(request), clock);
+      const context = await authenticate(request);
+      const service = createService(repository, context, clock);
       const query = Object.fromEntries(url.searchParams);
-      if (url.pathname === '/api/returns/commands' && request.method === 'POST') send(200, service.execute(await readBody(request)));
+      if (url.pathname.startsWith('/api/notifications')) {
+        const notifications = createNotificationService(repository, context, clock);
+        const route = url.pathname.slice('/api/notifications'.length);
+        if (route === '/commands' && request.method === 'POST') send(200, notifications.execute(await readBody(request)));
+        else if (!route && request.method === 'GET') send(200, notifications.list(query));
+        else if (route === '/sync' && request.method === 'GET') {
+          if (Object.keys(query).some(key => key !== 'cursor')) throw new ReturnError('INVALID_INPUT', '알림 조회 조건을 확인해 주세요.');
+          send(200, notifications.sync(query.cursor || 0));
+        } else if (route === '/sent' && request.method === 'GET') send(200, notifications.sent());
+        else if (route === '/tasks' && request.method === 'GET') send(200, { tasks: notifications.tasks() });
+        else if (route === '/preferences' && request.method === 'GET') send(200, notifications.preferences());
+        else throw new ReturnError('NOT_FOUND', '알림 API 경로를 찾을 수 없습니다.');
+      }
+      else if (url.pathname === '/api/returns/commands' && request.method === 'POST') send(200, service.execute(await readBody(request)));
       else if (url.pathname === '/api/returns' && request.method === 'GET') send(200, { orders: service.list(query) });
       else if (url.pathname === '/api/returns/report' && request.method === 'GET') send(200, service.report(query));
       else if (url.pathname === '/api/returns/sync' && request.method === 'GET') {
