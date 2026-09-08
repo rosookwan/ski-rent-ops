@@ -2,6 +2,7 @@ const {chromium}=require('playwright');
 const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const path=require('node:path');
+const {chooseTime}=require('./time-picker-helper.cjs');
 
 (async()=>{
   const browser=await chromium.launch({headless:true,channel:process.env.SKI_CHROME_CHANNEL||'chrome'});
@@ -40,7 +41,7 @@ const path=require('node:path');
   async function editTime(id,label,time,offset){
     await f.locator('[data-action="return-time-edit"][data-id="'+id+'"]').click();
     await f.locator('[data-return-time="label"]').fill(label);
-    await f.locator('[data-return-time="time"]').fill(time);
+    await chooseTime(f,'[data-return-time="time"]',time);
     await f.locator('[data-return-time="dayOffset"]').selectOption(String(offset));
     await action('return-time-save');
   }
@@ -69,7 +70,7 @@ const path=require('node:path');
       await action('intake-sheet-done');
       assert.match(await f.locator('#ski-sheet-error').innerText(),/마지막 이용일/);
       await f.locator('[data-field="manualReturnDate"]').fill(dateAfter(2));
-      await f.locator('[data-field="manualReturnTime"]').fill('18:10');
+      await chooseTime(f,'[data-field="manualReturnTime"]','18:10');
       await f.locator('.ski-split-return summary').click();
       await f.locator('[data-field="clothesReturnMethod"]').selectOption('collect');
       await f.locator('[data-field="clothesReturnDate"]').fill(dateAfter(-1));
@@ -177,9 +178,9 @@ const path=require('node:path');
       assert.match(await f.locator('#so-return-time-error').innerText(),/이름/);
       await f.locator('[data-return-time="label"]').fill('오후타임 후');await action('return-time-save');
       assert.match(await f.locator('#so-return-time-error').innerText(),/구분/);
-      await f.locator('[data-return-time="label"]').fill('오전 반납');await f.locator('[data-return-time="time"]').fill('');
+      await f.locator('[data-return-time="label"]').fill('오전 반납');await chooseTime(f,'[data-return-time="time"]','');
       await action('return-time-save');assert.match(await f.locator('#so-return-time-error').innerText(),/시간/);
-      await f.locator('[data-return-time="time"]').fill('10:30');
+      await chooseTime(f,'[data-return-time="time"]','10:30');
       await f.locator('[data-return-time="dayOffset"]').selectOption('1');await action('return-time-save');
       assert.equal((await presets()).length,4);
       await f.locator('#so-page [data-go="intake"]').click();await openReturn();await f.getByRole('button',{name:'오전 반납',exact:true}).click();

@@ -21,7 +21,7 @@
     if(legacy){const l=$('#ski-first-look');l.dispatchEvent(new CustomEvent('ski:set-view',{detail:state.page==='vehicle'?'vehicle':'shop'}));}
     else {const target=config.entry?$('#so-entry'):config.public?$('#so-public'):$('#so-page');target.innerHTML=config.render();config.mount?.();}
     root.dataset.page=state.page;icons();}
-  function close(){if($('#so-dialog').open)$('#so-dialog').close();$('#so-dialog-body').innerHTML='';}
+  function close(){window.SkiTimePicker.close();if($('#so-dialog').open)$('#so-dialog').close();$('#so-dialog-body').innerHTML='';}
   function modal(title,body){$('#so-dialog-title').textContent=title;$('#so-dialog-body').innerHTML=body;$('#so-dialog').showModal();icons();}
   let toastTimer;function toast(message){clearTimeout(toastTimer);$('#so-toast').textContent=message;$('#so-toast').hidden=false;toastTimer=setTimeout(()=>{$('#so-toast').hidden=true;},4500);}
   const button=(label,action,id='',kind='')=>'<button type="button" class="so-button '+kind+'" data-action="'+action+'" data-id="'+esc(id)+'">'+label+'</button>';
@@ -30,7 +30,7 @@
   const head=(title,description='',action='',eyebrow='')=>'<div class="so-pagehead"><div>'+(eyebrow?'<span class="so-eyebrow">'+eyebrow+'</span>':'')+'<h1>'+title+'</h1>'+(description?'<p>'+description+'</p>':'')+'</div><div class="so-actions">'+action+'</div></div>';
   const panel=(title,body,action='')=>'<section class="so-panel"><div class="so-panel-head"><h2>'+title+'</h2>'+action+'</div>'+body+'</section>';
   const tabs=(options,fallback)=>{const selected=state.tabs[state.page]||fallback;return '<div class="so-tabs" aria-label="'+esc(registry.get(state.page)?.title)+' 보기">'+options.map(([id,label])=>'<button type="button" class="so-tab" data-subtab="'+id+'" aria-pressed="'+(selected===id)+'">'+label+'</button>').join('')+'</div>';};
-  const field=(label,value='',type='text',attr='')=>'<label class="so-field">'+label+'<input type="'+type+'" value="'+esc(value)+'" '+attr+'></label>';
+  const field=(label,value='',type='text',attr='')=>'<label class="so-field">'+label+(type==='time'?window.SkiTimePicker.control(value,attr,label):'<input type="'+type+'" value="'+esc(value)+'" '+attr+'>')+'</label>';
   const select=(label,options,value='',attr='')=>'<label class="so-field">'+label+'<select '+attr+'>'+options.map(o=>{const a=Array.isArray(o)?o:[o,o];return '<option value="'+esc(a[0])+'" '+(value===a[0]?'selected':'')+'>'+esc(a[1])+'</option>';}).join('')+'</select></label>';
   const previewNote='<p class="so-preview-note">화면 체험용 예시입니다. 저장·정산·문자 발송은 실행되지 않습니다.</p>';
   function preview(title,body){modal(title,body+previewNote+'<div class="so-dialog-actions">'+button('닫기','close','','primary')+'</div>');}
