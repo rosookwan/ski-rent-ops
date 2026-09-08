@@ -23,6 +23,8 @@ jobs:
       - name: Validate return rules and durable API
         run: npm run test:returns
       - run: npm run test:notifications
+      - name: Validate connected workflow rules and migrations
+        run: npm run test:workflows:unit
       - name: Check JavaScript and build static demo
         run: python3 scripts/check.py
       - uses: actions/upload-pages-artifact@v4

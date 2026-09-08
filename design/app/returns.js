@@ -267,7 +267,7 @@
     try {
       busy = true;
       const result = await api.store.execute(api.newCommand('create', { id: orderId, version: 0 }, draft.payload));
-      S.data.orders.unshift({ ...draft.base, id: orderId }); remember(result.order);
+      S.data.orders.unshift({ ...draft.base, id: orderId }); remember(result.order); window.SkiOps.workflow?.importOrder(result.order);
       generation++; listCache.clear(); window.SkiIntake.saved(orderId);
       S.modal('접수 내용을 저장했어요', '<p>' + esc(draft.base.name) + ' · ' + orderId + '</p><p class="so-note">실제 물품을 전달할 때 지급 수량을 확인해 주세요. 지급 전 물품은 미반납으로 계산하지 않습니다.</p>' + (draft.earlyReturn ? '<p>마지막 수거 예정과 다른 수량이 있습니다. 지급한 수량 전체를 반납 대상으로 기록했으며, 먼저 돌려받는 물품은 반납 확인에서 따로 처리해 주세요.</p>' : '') + '<div class="so-dialog-actions">' + button('계속 보기', 'close') + link('지급·반납 확인', 'return-detail', orderId, 'primary') + '</div><p class="so-preview-note">이 브라우저의 체험 데이터입니다. 실제 저장·결제·발권을 실행하지 않습니다.</p>');
     } catch (error) { S.toast(error.message); } finally { busy = false; }

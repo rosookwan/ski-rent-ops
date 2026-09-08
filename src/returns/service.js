@@ -12,7 +12,7 @@
   function createMemoryRepository() {
     const shops = new Map();
     const listeners = new Set();
-    const changed = () => { for (const listener of listeners) listener(); };
+    const changed = () => { for (const listener of listeners) { try { listener(); } catch { /* A view listener cannot undo a committed transaction. */ } } };
     const shop = id => {
       if (!shops.has(id)) shops.set(id, { revision: 0, orders: new Map(), notifications: N.fresh() });
       return shops.get(id);
@@ -23,6 +23,15 @@
       get: (shopId, orderId) => copy(shop(shopId).orders.get(orderId)?.order ?? null),
       list: shopId => [...shop(shopId).orders.values()].map(entry => copy(entry.order)),
       notifications: shopId => copy(shop(shopId).notifications),
+      workflows: shopId => copy(shop(shopId).workflows || null),
+      transactWorkflows(shopId, apply) {
+        const state = shop(shopId), notifications = copy(state.notifications);
+        const result = apply(copy(state.workflows || null), notifications);
+        if (!result.duplicate) {
+          state.workflows = copy(result.state); state.notifications = notifications; changed();
+        }
+        return copy(result);
+      },
       transactNotifications(shopId, apply) {
         const state = shop(shopId), next = copy(state.notifications), result = apply(next);
         state.notifications = next; changed(); return copy(result ?? null);

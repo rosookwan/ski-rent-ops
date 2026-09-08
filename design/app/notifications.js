@@ -7,6 +7,7 @@
   const unread = row => row.lifecycle === 'active' && !row.acknowledgedAt;
   const incoming = () => service().sync(0).records;
   const metadata = {
+    sequence: ['arrow-up-down', '순서 변경'], 'workflow-task': ['truck', '새 업무'], load: ['package-plus', '차량 적재'], 'workflow-collection': ['package-check', '수거 내역'], 'vendor-refund': ['ticket', '발권처 환불'], 'intake-submitted': ['list-checks', '고객 입력'], 'workflow-correction': ['rotate-ccw', '이동 정정'],
     collection: ['package-check', '수거 내역'], priority: ['bell-ring', '확인 요청'],
     help: ['message-circle', '기사님 요청'], schedule: ['calendar-clock', '일정 변경'],
     assignment: ['truck', '새 일정'], cancelled: ['calendar-x', '일정 취소'],
@@ -109,7 +110,7 @@
       (row.type === 'collection' ? '<p class="so-notice-hint">' + icon('info') + '알림 확인 후에도 매장에서 실제 인계 수량을 확인해 주세요.</p>' : '') +
       (row.acknowledgedAt ? '<p class="so-notice-receipt">' + icon('check-check') + '확인함 · ' + stamp(row.acknowledgedAt) + '</p>' : '') +
       '<div id="so-notice-error" role="alert"></div>' +
-      (S.returnUI.current(row.orderId) ? makeButton((role() === 'driver' ? '차량 업무 보기' : row.type === 'priority' ? '배달·수거 보기' : '반납 내역 보기') + icon('arrow-right'), 'job', 'data-id="' + esc(row.orderId) + '"', 'primary wide') : '') + '</div>';
+      ((row.taskId || row.formId || row.refundId || row.movementId || row.type === 'sequence') ? makeButton('해당 업무 보기', 'workflow-job', 'data-id="' + esc(row.id) + '"', 'primary wide') : S.returnUI.current(row.orderId) ? makeButton((role() === 'driver' ? '차량 업무 보기' : row.type === 'priority' ? '배달·수거 보기' : '반납 내역 보기') + icon('arrow-right'), 'job', 'data-id="' + esc(row.orderId) + '"', 'primary wide') : '') + '</div>';
   }
   function requestHtml() {
     const allowed = new Set(runtime.orders(role()).map(order => order.id));
@@ -185,11 +186,13 @@
         try { acknowledge(selected); draw(); }
         catch (error) { dialog.querySelector('#so-notice-error').textContent = '확인 저장 실패 · ' + error.message; }
       }
+    } else if (action === 'workflow-job') {
+      const notice = incoming().concat(service().sent().records).find(n => n.id === button.dataset.id); close(); if (notice) S.workflowUI.openNotice(notice);
     } else if (action === 'job') {
       const orderId = button.dataset.id; close();
       if (role() === 'driver') {
         S.go('vehicle');
-        S.$('#ski-first-look').dispatchEvent(new CustomEvent('ski:open-order', { detail: orderId }));
+        const task = S.workflow?.snap().tasks.find(t => t.orderId === orderId && t.status === 'waiting'); if (task) S.workflowUI.openNotice({ taskId: task.id });
       } else S.go('return-detail', { id: orderId });
     } else if (action === 'quick') { dialog.querySelector('[data-notice-message]').value = button.dataset.value; pendingCommand = null; }
     else if (action === 'send') {

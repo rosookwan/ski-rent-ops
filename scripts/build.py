@@ -6,8 +6,9 @@ from html import escape
 
 ROOT = Path(__file__).resolve().parents[1]
 APP = ROOT / 'design/app'
-MODULES = ['data.js', 'core.js', 'operations.js', 'return-runtime.js', 'rentals.js', 'settings.js', 'partners.js', 'closing.js', 'preparation.js', 'guide.js', 'returns.js', 'login.js', 'notifications.js']
+MODULES = ['data.js', 'core.js', 'operations.js', 'return-runtime.js', 'rentals.js', 'settings.js', 'partners.js', 'closing.js', 'preparation.js', 'guide.js', 'returns.js', 'login.js', 'notifications.js', 'workflow-runtime.js', 'workflow-ui.js', 'workflow-preparation.js']
 RETURN_MODULES = ['domain.js', 'service.js', 'client.js', 'demo.js']
+WORKFLOW_MODULES = ['common.js', 'reservations.js', 'inventory.js', 'dispatch.js', 'intake.js', 'documents.js', 'domain.js', 'service.js', 'client.js', 'demo.js']
 
 def build():
     legacy = (ROOT / 'design/prototypes/first-look.fragment.html').read_text()
@@ -24,6 +25,9 @@ def build():
         fragment += '<script>\n' + (ROOT / 'src/notifications' / name).read_text() + '\n</script>\n'
     if (APP / 'notifications.css').exists():
         fragment += '<style>\n' + (APP / 'notifications.css').read_text() + '\n</style>\n'
+    for name in WORKFLOW_MODULES:
+        fragment += '<script>\n' + (ROOT / 'src/workflows' / name).read_text() + '\n</script>\n'
+    fragment += '<style>\n' + (APP / 'workflows.css').read_text() + '\n</style>\n'
     for name in MODULES:
         if (APP / name).exists():
             source=(APP/name).read_text()
@@ -31,19 +35,24 @@ def build():
                 encoded=base64.b64encode((APP/'assets/guide-qr.png').read_bytes()).decode()
                 source=source.replace('__GUIDE_QR_DATA_URI__','data:image/png;base64,'+encoded)
             fragment += '<script>\n' + source + '\n</script>\n'
-    fragment += '<script>window.SkiOps.start();</script>\n'
+    fragment += '<script>window.SkiOps.workflowsReady.then(()=>window.SkiOps.start()).catch(e=>{document.body.innerHTML=\"<p>화면을 열지 못했습니다. 새로고침해 주세요.</p>\";console.error(e);});</script>\n'
     assert len(fragment.encode()) < 1_000_000
     out = ROOT / 'dist'
     out.mkdir(exist_ok=True)
     (out / 'ops-preview.fragment.html').write_text(fragment)
     font = base64.b64encode((ROOT/'design/vendor/PretendardVariable.woff2').read_bytes()).decode()
     icons = (ROOT/'design/vendor/lucide.js').read_text()
-    policy = "default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; font-src data:; connect-src 'none'; object-src 'none'; form-action 'none'; base-uri 'none'"
+    policy = "default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; font-src data:; connect-src 'none'; frame-src 'self' about:; object-src 'none'; form-action 'none'; base-uri 'none'"
     frame = '<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta http-equiv="Content-Security-Policy" content="'+policy+'"><style>@font-face{font-family:Pretendard;src:url(data:font/woff2;base64,'+font+') format("woff2");font-weight:100 900;font-display:swap}html,body{margin:0;padding:0;background:#f7f8fa}body{font-family:Pretendard,sans-serif}button,input,select,textarea{font:inherit}button{margin:0}a{color:inherit}svg{vertical-align:middle}</style><script>'+icons+'</script></head><body>'+fragment+'</body></html>'
     public_router = "const f=document.querySelector('iframe');f.addEventListener('load',()=>{const view=new URLSearchParams(location.search).get('view');if(['guest-guide','guest-form'].includes(view))f.contentWindow.postMessage({type:'ski-public-route',view},'*');});"
+    public_router += "window.addEventListener('message',e=>{if(e.source!==f.contentWindow||e.data?.type!=='ski-print'||typeof e.data.html!=='string'||e.data.html.length>1000000)return;let p=document.getElementById('ski-print-frame');if(p)p.remove();p=document.createElement('iframe');p.id='ski-print-frame';p.title='인쇄용 문서';p.setAttribute('sandbox','allow-same-origin allow-modals');p.style.cssText='position:fixed;left:-10000px;top:0;width:794px;height:1123px';p.onload=()=>{p.contentWindow.addEventListener('afterprint',()=>p.remove(),{once:true});p.contentWindow.focus();p.contentWindow.print();};p.srcdoc=e.data.html;document.body.append(p);});"
     document = '<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="description" content="스키 렌탈샵의 매장 POS와 차량 태블릿 운영 화면을 둘러보는 데모입니다."><meta name="referrer" content="no-referrer"><title>우리 스키샵 · 운영 화면 체험</title><style>html,body{margin:0;background:#f7f8fa}iframe{display:block;width:100%;height:100vh;height:100dvh;border:0}</style></head><body><iframe title="우리 스키샵 운영 화면" sandbox="allow-scripts" allow="autoplay" srcdoc="'+escape(frame)+'"></iframe><script>'+public_router+'</script></body></html>'
     (out / 'index.html').write_text(document)
     (out / '.nojekyll').write_text('')
+    # Also expose the same workflow library for the operating API client.
+    libraries = ['src/returns/domain.js', 'src/notifications/domain.js', 'src/returns/service.js', 'src/returns/client.js', 'src/notifications/service.js', 'src/notifications/client.js']
+    libraries += ['src/workflows/' + name for name in WORKFLOW_MODULES]
+    (out / 'ski-workflows.js').write_text('\n'.join((ROOT / name).read_text() for name in libraries))
     return document
 
 if __name__ == '__main__':

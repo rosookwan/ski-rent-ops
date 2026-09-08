@@ -16,7 +16,7 @@
   S.search('rentals',q=>{S.state.filters.rentalQuery=q;S.$('#so-rental-rows').innerHTML=rows(filtered());S.icons();});
   S.change('rental-date',v=>{S.state.filters.rentalDate=v;S.render();});
   function driverPreview(){
-    const j=S.returnUI?.vehicleJobs().filter(j=>j.dateOffset===0&&!['collected','returned'].includes(j.status)).sort((a,b)=>a.time.localeCompare(b.time))[0];
+    const j=S.returnUI?.vehicleJobs().filter(j=>j.dateOffset===0&&!['collected','returned'].includes(j.status))[0];
     return '<section class="so-driver-preview"><div class="so-driver-label">'+icon('truck')+'1호 차량 · 다음 일정'+(j?status(j.type==='return'?'수거':'배달','purple'):'')+'</div>'+(j?'<div class="so-driver-slot"><strong>'+esc(j.returnLabel||j.time)+'</strong><small>기준 '+esc(j.time)+'</small></div><div class="so-driver-place"><span>'+(j.type==='return'?'수거':'배달')+' 장소</span><h2>'+esc(j.place)+'</h2><p>'+esc(j.name)+' 고객님 · 물품 '+j.items.reduce((n,i)=>n+i[1],0)+'개</p></div><div class="so-driver-gear">'+j.items.map(([label,q])=>'<span>'+esc(label)+' <b>'+q+'</b></span>').join('')+'</div>':'<div class="so-driver-place"><h2>오늘 남은 일정이 없어요</h2><p>배달·수거 보드에서 다른 일정을 확인하세요.</p></div>')+link('배달·수거 보드 열기 '+icon('arrow-right'),'dispatch','','driver-link')+'</section>';
   }
   function home(){

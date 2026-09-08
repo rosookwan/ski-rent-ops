@@ -7,6 +7,7 @@ const { ReturnError } = require('../src/returns/domain.js');
 const { createService } = require('../src/returns/service.js');
 const { createSqliteRepository } = require('./returns-repository.cjs');
 const { createService: createNotificationService } = require('../src/notifications/service.js');
+const { createService: createWorkflowService, publicRequest } = require('../src/workflows/service.js');
 
 function tokenAuthenticator(credentials) {
   if (!Array.isArray(credentials) || !credentials.length) throw new Error('직원 API 인증 설정이 필요합니다.');
@@ -39,10 +40,10 @@ async function readBody(request) {
   try { return JSON.parse(Buffer.concat(chunks).toString('utf8')); }
   catch { throw new ReturnError('INVALID_INPUT', 'JSON 내용을 확인해 주세요.'); }
 }
-function createApiServer({ repository, authenticate, clock, allowedOrigins = [] }) {
+function createApiServer({ repository, authenticate, clock, allowedOrigins = [], workflowAdapters = {} }) {
   if (typeof authenticate !== 'function') throw new Error('인증 함수를 지정해 주세요.');
   if (!Array.isArray(allowedOrigins) || allowedOrigins.some(origin => typeof origin !== 'string' || !/^https?:\/\//.test(origin) || new URL(origin).origin !== origin)) throw new Error('허용할 화면 출처를 정확한 origin 목록으로 지정해 주세요.');
-  const statuses = { UNAUTHORIZED: 401, FORBIDDEN: 403, NOT_FOUND: 404, ITEM_NOT_FOUND: 404, VERSION_CONFLICT: 409, IDEMPOTENCY_CONFLICT: 409, ALREADY_EXISTS: 409, DEPENDENT_RETURN: 409, QUANTITY_EXCEEDED: 409, NO_CHANGE: 409, NO_OUTSTANDING: 409, PAYLOAD_TOO_LARGE: 413 };
+  const statuses = { UNAUTHORIZED: 401, FORBIDDEN: 403, NOT_FOUND: 404, ITEM_NOT_FOUND: 404, VERSION_CONFLICT: 409, IDEMPOTENCY_CONFLICT: 409, ALREADY_EXISTS: 409, DEPENDENT_RETURN: 409, DEPENDENT_MOVEMENT: 409, TICKET_UNAVAILABLE: 409, FORM_CLOSED: 410, QUANTITY_EXCEEDED: 409, NO_CHANGE: 409, NO_OUTSTANDING: 409, PAYLOAD_TOO_LARGE: 413 };
   const server = http.createServer(async (request, response) => {
     const send = (status, data) => {
       response.writeHead(status, { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-store', 'X-Content-Type-Options': 'nosniff' });
@@ -61,10 +62,41 @@ function createApiServer({ repository, authenticate, clock, allowedOrigins = [] 
         response.setHeader('Access-Control-Allow-Headers', 'Authorization, Content-Type');
         send(200, {}); return;
       }
+      const publicForm = url.pathname.match(/^\/api\/intake\/([A-Za-z0-9][A-Za-z0-9_.:-]{0,159})\/([A-Za-z0-9][A-Za-z0-9_.:-]{0,159})$/);
+      if (publicForm) {
+        if (url.search || !['GET', 'POST'].includes(request.method)) throw new ReturnError('INVALID_INPUT', '입력폼 요청을 확인해 주세요.');
+        const authorization = request.headers.authorization || '';
+        if (!/^Form [A-Za-z0-9_-]{43,128}$/.test(authorization)) throw new ReturnError('UNAUTHORIZED', '입력 링크를 확인해 주세요.');
+        const command = request.method === 'POST' ? await readBody(request) : null;
+        if (request.method === 'POST' && !command) throw new ReturnError('INVALID_INPUT', '제출 내용을 확인해 주세요.');
+        send(200, await publicRequest(repository, { shopId: publicForm[1], formId: publicForm[2], accessToken: authorization.slice(5) }, command, clock));
+        return;
+      }
       const context = await authenticate(request);
       const service = createService(repository, context, clock);
       const query = Object.fromEntries(url.searchParams);
-      if (url.pathname.startsWith('/api/notifications')) {
+      if (url.pathname === '/api/workflows' || url.pathname.startsWith('/api/workflows/')) {
+        const workflows = createWorkflowService(repository, context, clock, workflowAdapters);
+        const route = url.pathname.slice('/api/workflows'.length);
+        if (route === '/commands' && request.method === 'POST') send(200, workflows.execute(await readBody(request)));
+        else if (route === '/forms/send' && request.method === 'POST') send(200, await workflows.sendFormLink(await readBody(request)));
+        else if (route === '/moves/preview' && request.method === 'POST') send(200, workflows.prepareMove(await readBody(request)));
+        else if (route === '/prints/dispatch' && request.method === 'POST') {
+          const payload = await readBody(request);
+          if (!payload || Object.keys(payload).length !== 1 || !payload.id) throw new ReturnError('INVALID_INPUT', '출력 요청을 확인해 주세요.');
+          send(200, await workflows.dispatchPrint(payload.id));
+        }
+        else if (!route && request.method === 'GET') {
+          if (Object.keys(query).length) throw new ReturnError('INVALID_INPUT', '조회 조건을 확인해 주세요.');
+          send(200, workflows.snapshot());
+        } else if (['/sync', '/reservations', '/vehicle', '/board', '/history', '/report'].includes(route) && request.method === 'GET') send(200, workflows[route.slice(1)](query));
+        else {
+          const entity = route.match(/^\/(forms|prints)\/([A-Za-z0-9][A-Za-z0-9_.:-]{0,159})$/);
+          if (!entity || request.method !== 'GET' || Object.keys(query).length) throw new ReturnError('NOT_FOUND', '업무 API 경로를 찾을 수 없습니다.');
+          send(200, workflows[entity[1] === 'forms' ? 'intake' : 'print'](entity[2]));
+        }
+      }
+      else if (url.pathname.startsWith('/api/notifications')) {
         const notifications = createNotificationService(repository, context, clock);
         const route = url.pathname.slice('/api/notifications'.length);
         if (route === '/commands' && request.method === 'POST') send(200, notifications.execute(await readBody(request)));

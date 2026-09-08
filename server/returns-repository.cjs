@@ -11,7 +11,7 @@ function createSqliteRepository(filename) {
   if (filename !== ':memory:') chmodSync(filename, 0o600);
   db.exec('PRAGMA foreign_keys = ON; PRAGMA busy_timeout = 5000; PRAGMA journal_mode = WAL;');
   const schemaVersion = db.prepare('PRAGMA user_version').get().user_version;
-  if (schemaVersion > 2) { db.close(); throw new Error('지원하지 않는 반납 데이터베이스 버전입니다.'); }
+  if (schemaVersion > 3) { db.close(); throw new Error('지원하지 않는 업무 데이터베이스 버전입니다.'); }
   db.exec(`
     CREATE TABLE IF NOT EXISTS return_shops (shop_id TEXT PRIMARY KEY, revision INTEGER NOT NULL);
     CREATE TABLE IF NOT EXISTS return_orders (
@@ -26,7 +26,12 @@ function createSqliteRepository(filename) {
       FOREIGN KEY (shop_id, order_id) REFERENCES return_orders (shop_id, order_id)
     );
     CREATE TABLE IF NOT EXISTS notification_state (shop_id TEXT PRIMARY KEY, state_json TEXT NOT NULL);
-    PRAGMA user_version = 2;
+    CREATE TABLE IF NOT EXISTS workflow_state (shop_id TEXT PRIMARY KEY, revision INTEGER NOT NULL, state_json TEXT NOT NULL);
+    CREATE TABLE IF NOT EXISTS workflow_events (
+      shop_id TEXT NOT NULL, version INTEGER NOT NULL, actor_key TEXT NOT NULL, request_id TEXT NOT NULL, event_json TEXT NOT NULL,
+      PRIMARY KEY (shop_id, version), UNIQUE (shop_id, actor_key, request_id)
+    );
+    PRAGMA user_version = 3;
   `);
   const getOrder = db.prepare('SELECT state_json FROM return_orders WHERE shop_id = ? AND order_id = ?');
   const getRevision = db.prepare('SELECT revision FROM return_shops WHERE shop_id = ?');
@@ -35,6 +40,13 @@ function createSqliteRepository(filename) {
     return row ? JSON.parse(row.state_json) : N.fresh();
   };
   const saveNotifications = (shopId, state) => db.prepare('INSERT INTO notification_state VALUES (?, ?) ON CONFLICT(shop_id) DO UPDATE SET state_json = excluded.state_json').run(shopId, JSON.stringify(state));
+  const workflowState = shopId => {
+    const row = db.prepare('SELECT state_json FROM workflow_state WHERE shop_id = ?').get(shopId);
+    if (!row) return null;
+    const state = JSON.parse(row.state_json);
+    if (state.schemaVersion !== 1) throw new Error('지원하지 않는 업무 데이터 버전입니다.');
+    return state;
+  };
   const decode = row => {
     if (!row) return null;
     const order = JSON.parse(row.state_json);
@@ -46,6 +58,20 @@ function createSqliteRepository(filename) {
     get: (shopId, orderId) => decode(getOrder.get(shopId, orderId)),
     list: shopId => db.prepare('SELECT state_json FROM return_orders WHERE shop_id = ? ORDER BY order_id').all(shopId).map(decode),
     notifications: notificationState,
+    workflows: workflowState,
+    transactWorkflows(shopId, apply) {
+      db.exec('BEGIN IMMEDIATE');
+      try {
+        const notifications = notificationState(shopId), result = apply(workflowState(shopId), notifications);
+        if (!result.duplicate) {
+          db.prepare('INSERT INTO workflow_state VALUES (?, ?, ?) ON CONFLICT(shop_id) DO UPDATE SET revision = excluded.revision, state_json = excluded.state_json').run(shopId, result.state.revision, JSON.stringify(result.state));
+          const event = result.event;
+          db.prepare('INSERT INTO workflow_events VALUES (?, ?, ?, ?, ?)').run(shopId, event.version, event.actor.role + ':' + event.actor.id, event.requestId, JSON.stringify(event));
+          saveNotifications(shopId, notifications);
+        }
+        db.exec('COMMIT'); return result;
+      } catch (error) { db.exec('ROLLBACK'); throw error; }
+    },
     transactNotifications(shopId, apply) {
       db.exec('BEGIN IMMEDIATE');
       try {

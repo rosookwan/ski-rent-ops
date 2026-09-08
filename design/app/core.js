@@ -7,7 +7,7 @@
   const date=s=>s?Number(s.slice(5,7))+'/'+Number(s.slice(8,10)):'';
   const icon=n=>'<i data-lucide="'+n+'" aria-hidden="true"></i>';
   const icons=()=>{if(globalThis.lucide)globalThis.lucide.createIcons({attrs:{width:20,height:20}});};
-  const routes=[['home','오늘 현황','layout-dashboard'],['intake','새 대여 접수','circle-plus'],['rentals','렌탈현황','clipboard-list'],['returns','반납 확인','package-check'],['dispatch','배달·수거','truck'],['partners','거래처 장부','handshake'],['closing','하루 마감','calculator'],['preparation','사전 입력·준비','list-checks'],['customers','고객관리','users'],['inventory','재고·정비','package'],['settings','매장 설정','settings-2'],['guide','QR 이용 안내','qr-code']];
+  const routes=[['home','오늘 현황','layout-dashboard'],['intake','새 대여 접수','circle-plus'],['rentals','렌탈현황','clipboard-list'],['returns','반납 확인','package-check'],['dispatch','배달·수거','truck'],['lift-reservations','리프트권 예약','ticket'],['partners','거래처 장부','handshake'],['closing','하루 마감','calculator'],['preparation','사전 입력·준비','list-checks'],['customers','고객관리','users'],['inventory','재고·정비','package'],['settings','매장 설정','settings-2'],['guide','QR 이용 안내','qr-code']];
   function nav(){return [routes.slice(0,7),routes.slice(7)].map((group,i)=>'<div class="so-nav-group">'+(i?'<span class="so-nav-caption">관리</span>':'')+group.map(([id,label,glyph])=>'<button type="button" class="so-nav-button" data-go="'+id+'" aria-label="'+label+'" title="'+label+'" '+(registry.has(id)?'':'disabled')+' '+(activePage()===id?'aria-current="page"':'')+'>'+icon(glyph)+'<span class="so-nav-label">'+label+'</span></button>').join('')+'</div>').join('');}
   function activePage(){return registry.get(state.page)?.parent||state.page;}
   function go(page,params={},replace=false){if(!registry.has(page)){toast('이 화면은 다음 단계에 연결됩니다.');return;}if(!registry.get(page).public&&!state.authenticated&&registry.has('login')){state.afterLogin={page,params};page='login';params={};}close();if(!replace)state.history.push({page:state.page,params:state.params});if(page==='guest-form'&&state.page!==page)state.guest=null;state.page=page;state.params=params;root.classList.remove('so-menu-open');state.menuOpen=false;$('#so-menu-toggle').setAttribute('aria-expanded','false');$('#so-menu-toggle').setAttribute('aria-label','메뉴 펼치기');render();}
@@ -17,7 +17,7 @@
     if(!config.public||config.entry)$('#so-public').replaceChildren();
     if(config.public)$('#so-page').replaceChildren();
     $('#so-intake-tools').hidden=state.page!=='intake';if(state.page!=='intake')$('#so-intake-tools').replaceChildren();
-    const legacy=state.page==='intake'||state.page==='vehicle';$('#so-page').hidden=legacy;$('#so-legacy').hidden=!legacy;
+    const legacy=state.page==='intake';$('#so-page').hidden=legacy;$('#so-legacy').hidden=!legacy;
     if(legacy){const l=$('#ski-first-look');l.dispatchEvent(new CustomEvent('ski:set-view',{detail:state.page==='vehicle'?'vehicle':'shop'}));}
     else {const target=config.entry?$('#so-entry'):config.public?$('#so-public'):$('#so-page');target.innerHTML=config.render();config.mount?.();}
     root.dataset.page=state.page;if(window.SkiOps?.operations)$('.so-brand strong').textContent=window.SkiOps.operations.store().name;icons();window.SkiOps?.notifications?.refresh();}
