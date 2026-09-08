@@ -295,6 +295,4 @@
     balances: id => { const order = current(id); return order ? itemText(order.items, 'customerQuantity') : ''; }
   };
   for (const order of cache.values()) syncBase(order);
-  S.register('returns', { title: '반납 확인', render: renderList, mount: loadLists });
-  S.register('return-detail', { title: '반납 상세', parent: 'returns', render: renderDetail, mount: mountDetail });
 })();

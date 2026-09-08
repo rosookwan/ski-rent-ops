@@ -7,7 +7,7 @@
   const date=s=>s?Number(s.slice(5,7))+'/'+Number(s.slice(8,10)):'';
   const icon=n=>'<i data-lucide="'+n+'" aria-hidden="true"></i>';
   const icons=()=>{if(globalThis.lucide)globalThis.lucide.createIcons({attrs:{width:20,height:20}});};
-  const routes=[['home','오늘 현황','layout-dashboard'],['intake','새 대여 접수','circle-plus'],['rentals','렌탈현황','clipboard-list'],['returns','반납 확인','package-check'],['dispatch','배달·수거','truck'],['lift-reservations','리프트권 예약','ticket'],['partners','거래처 장부','handshake'],['closing','하루 마감','calculator'],['preparation','사전 입력·준비','list-checks'],['customers','고객관리','users'],['inventory','재고·정비','package'],['settings','매장 설정','settings-2'],['guide','QR 이용 안내','qr-code']];
+  const routes=[['home','오늘 현황','layout-dashboard'],['intake','새 대여 접수','circle-plus'],['rentals','렌탈·반납 현황','clipboard-list'],['dispatch','배달·수거','truck'],['lift-reservations','리프트권 예약','ticket'],['partners','거래처 장부','handshake'],['closing','하루 마감','calculator'],['preparation','사전 입력·준비','list-checks'],['customers','고객관리','users'],['inventory','재고·정비','package'],['settings','매장 설정','settings-2'],['guide','QR 이용 안내','qr-code']];
   const managementRoutes=new Set(['partners','closing','customers','inventory','settings','guide']);
   const sharedRoutes=new Set(['home','lift-reservations']);
   function nav(){const management=state.workspace==='management';return '<div class="so-nav-group"><span class="so-nav-caption">'+(management?'관리 업무':'포스 업무')+'</span>'+routes.filter(([id])=>sharedRoutes.has(id)||managementRoutes.has(id)===management).map(([id,label,glyph])=>'<button type="button" class="so-nav-button" data-go="'+id+'" aria-label="'+label+'" title="'+label+'" '+(registry.has(id)?'':'disabled')+' '+(activePage()===id?'aria-current="page"':'')+'>'+icon(glyph)+'<span class="so-nav-label">'+label+'</span></button>').join('')+'</div>';}
@@ -38,7 +38,7 @@
     if(legacy){const l=$('#ski-first-look');l.dispatchEvent(new CustomEvent('ski:set-view',{detail:state.page==='vehicle'?'vehicle':'shop'}));}
     else {const target=config.entry?$('#so-entry'):config.public?$('#so-public'):$('#so-page');target.innerHTML=config.render();config.mount?.();}
     root.dataset.page=state.page;if(window.SkiOps?.operations)$('.so-brand strong').textContent=window.SkiOps.operations.store().name;icons();window.SkiOps?.notifications?.refresh();}
-  function close(){window.SkiTimePicker.close();if($('#so-dialog').open)$('#so-dialog').close();$('#so-dialog-body').innerHTML='';}
+  function close(){window.SkiTimePicker.close();root.dispatchEvent(new Event('ski:close-dialogs'));if($('#so-dialog').open)$('#so-dialog').close();$('#so-dialog-body').innerHTML='';}
   function modal(title,body){$('#so-dialog-title').textContent=title;$('#so-dialog-body').innerHTML=body;$('#so-dialog').showModal();icons();}
   let toastTimer;function toast(message){clearTimeout(toastTimer);$('#so-toast').textContent=message;$('#so-toast').hidden=false;toastTimer=setTimeout(()=>{$('#so-toast').hidden=true;},4500);}
   const button=(label,action,id='',kind='')=>'<button type="button" class="so-button '+kind+'" data-action="'+action+'" data-id="'+esc(id)+'">'+label+'</button>';

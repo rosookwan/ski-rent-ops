@@ -206,8 +206,6 @@
   S.register('vehicle-stock', { title: '차량 적재·인계', parent: 'dispatch', render: vehicleStockPage });
   S.register('lift-reservations', { title: '리프트권 예약', render: reservations });
   S.register('lift-stock', { title: '리프트권 보관·환불', parent: 'lift-reservations', render: liftStock });
-  S.register('returns', { title: '반납 확인', render: returnsPage });
-  S.register('return-detail', { title: '반납 상세', parent: 'returns', render: returnDetail });
   S.returnUI.closingTickets = () => { const report = F.store.report({ date: S.data.today }); return panel('리프트권 이동 집계', report.totals.filter(x => x.newlyIssued || x.recovered || x.refunded || x.redelivered).map(x => row(e(F.snap().catalog.find(s => s.id === x.sku)?.label || x.sku), '신규 발권 ' + x.newlyIssued + ' · 회수 ' + x.recovered + ' · 재전달 ' + x.redelivered + ' · 발권처 환불 ' + x.refunded)).join('') + row('실제 발권처 환불액', S.money(report.refundAmountWon)) + '<p class="wf-hint">고객 결제 환불 및 장당 회수 기준 금액과 별도 집계입니다.</p>'); };
   S.workflowUI = { openNotice: notice => { if (notice.formId) S.go('response', { id: notice.formId }); else if (notice.taskId) { ui.selected = notice.taskId; S.go(S.state.page === 'vehicle' ? 'vehicle' : 'dispatch'); } else if (notice.refundId) S.go('lift-stock'); else if (notice.movementId) S.go(S.state.page === 'vehicle' ? 'vehicle' : 'vehicle-stock'); else S.go('dispatch'); }, safe, modal, head, panel, row, countInput, read, number, changed, textItems, empty, openPicker, stock, stamp, syncBase };
 })();

@@ -3,10 +3,11 @@ from pathlib import Path
 import argparse
 import base64
 from html import escape
+from rental_template import compile_rental_template
 
 ROOT = Path(__file__).resolve().parents[1]
 APP = ROOT / 'design/app'
-MODULES = ['data.js', 'core.js', 'operations.js', 'return-runtime.js', 'rentals.js', 'settings.js', 'partners.js', 'closing.js', 'preparation.js', 'guide.js', 'returns.js', 'login.js', 'notifications.js', 'workflow-runtime.js', 'workflow-ui.js', 'workflow-preparation.js', 'app-mode.js']
+MODULES = ['data.js', 'core.js', 'operations.js', 'return-runtime.js', 'rentals.js', 'settings.js', 'partners.js', 'closing.js', 'preparation.js', 'guide.js', 'returns.js', 'login.js', 'notifications.js', 'workflow-runtime.js', 'workflow-ui.js', 'workflow-preparation.js', 'rental-board.js', 'app-mode.js']
 RETURN_MODULES = ['domain.js', 'service.js', 'client.js', 'demo.js']
 WORKFLOW_MODULES = ['common.js', 'reservations.js', 'inventory.js', 'dispatch.js', 'intake.js', 'documents.js', 'domain.js', 'service.js', 'client.js', 'demo.js']
 PWA_FILES = {
@@ -22,6 +23,7 @@ PWA_FILES = {
 }
 
 def build():
+    rental_view, rental_hover = compile_rental_template(APP / 'rental-board.html')
     legacy = (ROOT / 'design/prototypes/first-look.fragment.html').read_text()
     bridge = "root.addEventListener('ski:set-view',e=>{closeDialog();state.view=e.detail;render();if(e.detail==='shop'&&!state.representativeSeen){state.representativeSeen=true;representative();}});"
     legacy = legacy.replace('  render();applyDesign();', '  '+bridge+'\n  render();applyDesign();')
@@ -39,6 +41,8 @@ def build():
     for name in WORKFLOW_MODULES:
         fragment += '<script>\n' + (ROOT / 'src/workflows' / name).read_text() + '\n</script>\n'
     fragment += '<style>\n' + (APP / 'workflows.css').read_text() + '\n' + (APP / 'app-mode.css').read_text() + '\n</style>\n'
+    fragment += '<style>\n' + (APP / 'rental-board.css').read_text() + '\n' + rental_hover + '\n</style>\n'
+    fragment += '<script>\n' + rental_view + '\n</script>\n'
     for name in MODULES:
         if (APP / name).exists():
             source=(APP/name).read_text()

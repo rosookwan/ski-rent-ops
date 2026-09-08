@@ -170,7 +170,7 @@
       // Seed assignments are not unread messages; the original priority remains.
       repository.transactNotifications(shopId, notices => { notices.records = notices.records.filter(n => !['workflow-task', 'load', 'intake-submitted'].includes(n.type)); });
     }
-    return { shopId, vehicleId, shop, van, store, driver, snap, run, assets, ticket, remaining, saveTask, taskPayload, importOrder, projectOrder, issueOrder, issueLegacyTicket, dispatchOrder, customerIds, returnCustomer, orders, tokens, createForm, guest, seed };
+    return { shopId, vehicleId, shop, van, store, driver, snap, run, atomic, assets, ticket, remaining, saveTask, taskPayload, importOrder, projectOrder, issueOrder, issueLegacyTicket, dispatchOrder, customerIds, returnCustomer, orders, tokens, createForm, guest, seed };
   }
   return { create };
 });

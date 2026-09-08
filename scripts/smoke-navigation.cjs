@@ -25,7 +25,7 @@ const { storeNavigation } = require('./navigation-helper.cjs');
   fs.mkdirSync('work/menu-split', { recursive: true });
   try {
     await test('management and POS share the unchanged dashboard and have separate menus', async () => {
-      assert.deepEqual(await routes(), ['home', 'intake', 'rentals', 'returns', 'dispatch', 'lift-reservations', 'preparation']);
+      assert.deepEqual(await routes(), ['home', 'intake', 'rentals', 'dispatch', 'lift-reservations', 'preparation']);
       const dashboard = await frame.locator('#so-page').innerHTML();
       await page.screenshot({ path: 'work/menu-split/pos.png' });
       await toggle(); assert.equal(await mode(), 'management'); assert.equal(await current(), 'home');
@@ -34,7 +34,7 @@ const { storeNavigation } = require('./navigation-helper.cjs');
       assert.equal(await frame.locator('#so-workspace-switch').getAttribute('aria-label'), '포스화면으로');
       await page.screenshot({ path: 'work/menu-split/management.png' });
       await toggle(); assert.equal(await mode(), 'pos'); assert.equal(await frame.locator('#so-page').innerHTML(), dashboard);
-      for (const route of ['partners', 'closing', 'customers', 'inventory', 'settings', 'guide', 'preparation', 'returns', 'dispatch']) {
+      for (const route of ['partners', 'closing', 'customers', 'inventory', 'settings', 'guide', 'preparation', 'rentals', 'dispatch']) {
         await nav(route); assert.equal(await current(), route);
         assert.equal(await frame.locator('#so-navigation [aria-current="page"]').getAttribute('data-go'), route);
       }
@@ -54,13 +54,13 @@ const { storeNavigation } = require('./navigation-helper.cjs');
       assert.equal(await frame.locator('#ski-overlay').isVisible(), false);
     });
     await test('rental detail, customer filter and selected tab survive a management visit', async () => {
-      await nav('rentals'); await frame.locator('[data-search="rentals"]').fill('김민수');
-      await frame.locator('#so-rental-rows .so-button[data-id="R-025"]').click();
-      await frame.locator('[data-subtab="payment"]').click();
+      await nav('rentals'); await frame.getByRole('searchbox', { name: '고객 찾기' }).fill('김민수');
+      await frame.locator('#so-rental-rows [data-order-id="R-025"]').click();
+      await frame.getByRole('tab', { name: '결제·환불', exact: true }).click();
       const detail = await frame.locator('#so-page').innerHTML();
       await toggle(); await nav('closing'); await toggle();
       assert.equal(await current(), 'rental'); assert.equal(await frame.locator('#so-page').innerHTML(), detail);
-      await nav('rentals'); assert.equal(await frame.locator('[data-search="rentals"]').inputValue(), '김민수');
+      await nav('rentals'); assert.equal(await frame.getByRole('searchbox', { name: '고객 찾기' }).inputValue(), '김민수');
     });
     await test('lift reservations share saved data, filters and child pages in both workspaces', async () => {
       await nav('lift-reservations'); await action('wf-book-new');

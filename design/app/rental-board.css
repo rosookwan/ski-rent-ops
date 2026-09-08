@@ -1,0 +1,65 @@
+/* Exact tokens from UI 개선 6; scoped to the combined rental screen. */
+#ski-ops .so-rental-board,#ski-ops .so-rental-overlay {
+  --mk-gray-100:rgb(242, 244, 247);
+  --mk-green-100:rgb(220, 252, 231);
+  --mk-green-200:rgb(134, 239, 172);
+  --mk-green-50:rgb(240, 253, 244);
+  --mk-green-700:rgb(21, 128, 61);
+  --mk-label-beverages-bg:rgb(233, 244, 255);
+  --mk-label-beverages-fg:rgb(0, 116, 217);
+  --mk-label-spaghetti-bg:rgb(241, 233, 255);
+  --mk-label-spaghetti-fg:rgb(80, 0, 217);
+  --mk-neutral-100:rgb(231, 231, 231);
+  --mk-neutral-200:rgb(209, 209, 209);
+  --mk-neutral-400:rgb(136, 136, 136);
+  --mk-neutral-50:rgb(248, 248, 248);
+  --mk-neutral-50-alt:rgb(250, 250, 250);
+  --mk-neutral-500:rgb(109, 109, 109);
+  --mk-neutral-600:rgb(93, 93, 93);
+  --mk-orange-100:rgb(255, 230, 212);
+  --mk-orange-200:rgb(255, 202, 168);
+  --mk-orange-50:rgb(255, 244, 237);
+  --mk-orange-500:rgb(254, 78, 16);
+  --mk-orange-600:rgb(239, 52, 8);
+  --mk-orange-700:rgb(198, 34, 8);
+  --mk-radius-2xl:16px;
+  --mk-radius-lg:12px;
+  --mk-radius-md:8px;
+  --mk-radius-sm:6px;
+  --mk-radius-xl:14px;
+  --mk-radius-xs:4px;
+  --mk-red-50:rgb(254, 242, 242);
+  --mk-red-600:rgb(220, 38, 38);
+  --mk-yellow-200:rgb(254, 240, 138);
+  --mk-yellow-50:rgb(254, 252, 232);
+  --radius-modal:14px;
+}
+/* The source uses normal line height and content-box, while legacy screens use
+   1.45 line height and border-box. Reset only this screen, then its inline source
+   declarations supply every colour, size, spacing and position. */
+#ski-ops[data-page="rentals"] #so-main,#ski-ops[data-page="returns"] #so-main,
+#ski-ops[data-page="rental"] #so-main,#ski-ops[data-page="return-detail"] #so-main{padding:0;overflow:hidden}
+#ski-ops[data-page="rentals"] #so-page,#ski-ops[data-page="returns"] #so-page,
+#ski-ops[data-page="rental"] #so-page,#ski-ops[data-page="return-detail"] #so-page{height:100%;min-height:0;display:flex;flex-direction:column;gap:0;overflow:hidden}
+#ski-ops .so-rental-board,#ski-ops .so-rental-overlay{font:16px/normal Pretendard,"Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;letter-spacing:normal;color:#1A1A1A;-webkit-font-smoothing:antialiased}
+#ski-ops .so-rental-board *,#ski-ops .so-rental-overlay *{box-sizing:content-box}
+#ski-ops :is(.so-rental-board,.so-rental-overlay) :is(button,input,select){font:inherit;line-height:normal;letter-spacing:normal}
+#ski-ops :is(.so-rental-board,.so-rental-overlay) button{box-sizing:border-box;margin:0;cursor:pointer;text-align:left}
+#ski-ops :is(.so-rental-board,.so-rental-overlay) button:disabled{cursor:default;opacity:.4}
+#ski-ops :is(.so-rental-board,.so-rental-overlay) input::placeholder{color:revert;font-weight:inherit;opacity:1}
+#ski-ops :is(.so-rental-board,.so-rental-overlay) small{font-size:smaller;color:inherit}
+#ski-ops :is(.so-rental-board,.so-rental-overlay) svg{vertical-align:baseline;flex-shrink:initial}
+#ski-ops :is(.so-rental-board,.so-rental-overlay) :is(h1,h2,h3){word-break:normal}
+#ski-ops .so-rental-board .rental-issue-actions button{box-sizing:border-box;min-height:48px;padding:12px 18px;font-size:16px;font-weight:600;color:#5D5D5D;background:#fff;border:0;border-radius:12px;box-shadow:inset 0 0 0 1px #D1D1D1}
+#ski-ops .so-rental-board .rental-issue-actions button:first-child{color:#fff;background:#FE4E10;box-shadow:none}
+@media(max-height:820px){#ski-ops .so-rental-board[data-main]{padding:12px 14px!important;gap:12px!important}}
+/* Below the supplied POS widths, retain readable type and expose one vertical
+   content scroll. The original 860px item table keeps its horizontal scroller. */
+@media(max-width:900px){
+  #ski-ops .so-rental-board .rental-detail-grid{display:flex!important;flex-direction:column;overflow-y:auto}
+  #ski-ops .so-rental-board .rental-detail-grid>div,#ski-ops .so-rental-board .rental-detail-grid>aside{overflow-y:visible!important;flex-shrink:0}
+  #ski-ops .so-rental-board .rental-card-grid{grid-template-columns:repeat(auto-fill,minmax(min(292px,100%),1fr))!important}
+  #ski-ops .so-rental-board{overflow-y:auto!important}
+  #ski-ops .so-rental-board>div{min-height:min-content!important}
+  #ski-ops .so-rental-board #so-rental-rows{overflow-y:visible!important;flex-shrink:0}
+}
