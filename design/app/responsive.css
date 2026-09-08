@@ -163,3 +163,34 @@
   #ski-ops #ski-first-look .ski-visit-inner,#ski-ops #ski-first-look .ski-vehicle-grid:not(.is-simple) .ski-visit-inner{padding-top:4px;padding-bottom:4px}
   #ski-ops #ski-first-look .is-simple .ski-equipment:has(>span:nth-child(4)){grid-template-columns:repeat(4,minmax(0,1fr))}
 }
+
+/* Ledger, customers, inventory and settings retain their own table scroll areas. */
+#ski-ops .so-zero{color:#959595!important}
+#ski-ops .so-search-hint{align-self:center;color:#6d6d6d;font-size:14px}
+#ski-ops .so-search-hint:before{content:'ⓘ';margin-right:6px}
+#ski-ops[data-page=partners] .so-metric-label,#ski-ops[data-page=partner] .so-metric-label{display:inline-flex;width:fit-content;padding:4px 8px;border-radius:6px;background:#f4f0ff;color:#5f33e1}
+#ski-ops[data-page=partners] .so-metric.receivable .so-metric-label{background:#e8f3ff;color:#0074d9}
+#ski-ops[data-page=partners] .so-metric.accent .so-metric-label{background:#fff0e3;color:#b45309}
+#ski-ops .so-customer-scroll{overflow:auto;min-height:0;flex:1}
+#ski-ops .so-customer-columns,#ski-ops .so-customer-row{display:grid;grid-template-columns:180px 200px minmax(220px,1fr) 105px 148px;gap:14px;min-width:960px;padding-left:18px;padding-right:18px}
+#ski-ops .so-customer-columns{position:sticky;top:0;z-index:1;background:#f8f8f8;color:#6d6d6d;padding-top:10px;padding-bottom:10px;font-size:14px}
+#ski-ops .so-customer-row>.so-customer-id{display:block}
+#ski-ops .so-customer-row{border-top:1px solid #f5f5f5}
+#ski-ops .so-customer-row .so-phone b{font-size:20px;color:#1a1a1a}
+#ski-ops .so-inventory-summary{padding:12px 16px;border:1px solid #e7e7e7;border-radius:12px;background:white;display:flex;gap:24px;align-items:center;font-size:14px;color:#6d6d6d}
+#ski-ops .so-inventory-summary>span:last-child{margin-left:auto}
+#ski-ops .so-stock-low{color:#b45309;font-size:14px;white-space:nowrap}
+#ski-ops td .so-stock-low{display:block;margin-top:4px}
+#ski-ops .so-stock-available{padding:6px 12px;font-size:22px}
+#ski-ops .so-ledger-label{font-size:14px;color:#6d6d6d;margin-top:14px;padding:8px 10px;border-radius:8px;background:#f8f8f8}
+#ski-ops .so-ledger-label:first-child{margin-top:0}
+@media(min-width:901px) and (max-height:820px){
+  #ski-ops[data-page=closing] .so-summary-line{padding:9px 0}
+  #ski-ops[data-page=closing] .so-summary-line.total{padding:12px}
+  #ski-ops[data-page=settings] td,#ski-ops[data-page=inventory] td{padding-top:10px;padding-bottom:10px;height:66px}
+  #ski-ops[data-page=customers] .so-row{min-height:72px}
+}
+@media(max-width:900px){
+  #ski-ops .so-inventory-summary{flex-wrap:wrap;gap:8px 16px}
+  #ski-ops .so-inventory-summary>span:last-child{margin-left:0;width:100%}
+}
