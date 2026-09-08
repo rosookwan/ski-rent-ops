@@ -83,6 +83,16 @@
       playSound('preview'); updateSettings();
     } catch (error) { audioError = error.message; updateSettings(); }
   }
+  const soundControlLabel = () => icon(soundReady() ? 'volume-2' : 'volume-x') + '<span>알림 소리 ' + (soundReady() ? '켜짐' : '켜기') + '</span>';
+  function soundControl() { return makeButton(soundControlLabel(), 'sound-toggle', 'aria-label="알림 소리 ' + (soundReady() ? '끄기' : '켜기') + '" aria-pressed="' + soundReady() + '"', 'so-button wf-sound-control'); }
+  function refreshSoundControl() {
+    for (const button of S.root.querySelectorAll('.wf-sound-control')) {
+      button.innerHTML = soundControlLabel();
+      button.setAttribute('aria-label', '알림 소리 ' + (soundReady() ? '끄기' : '켜기'));
+      button.setAttribute('aria-pressed', String(soundReady()));
+    }
+    S.icons();
+  }
   function preferencesHtml() {
     const p = prefs(), ready = soundReady();
     return '<div class="so-notice-settings"><div class="so-notice-setting-intro"><span class="so-notice-large-icon">' + icon('volume-2') + '</span><h3>확인이 필요할 때, <br>소리로 알려드릴게요.</h3><p>이 화면에서 사용할 소리를 설정하세요.</p></div>' +
@@ -167,7 +177,8 @@
       if (data.records.some(row => unread(row) && row.attentionRequired) && Date.now() - lastPlayed > 1500) playSound();
       lastSoundRole = soundRole;
     }
-    if (!count) stopSound(true);
+    if (!data.records.some(row => unread(row) && row.attentionRequired)) stopSound(true);
+    refreshSoundControl();
     if (!timer) timer = setInterval(tick, 1000);
   }
   function acknowledge(id) {
@@ -239,7 +250,7 @@
   });
   S.action('driver-alert', orderId => open('request', orderId));
   S.notifications = {
-    refresh, open,
+    refresh, open, soundControl,
     settingsView: () => '<section id="so-notice-settings-page">' + preferencesHtml() + '</section>',
     pendingForOrder: orderId => runtime.driver.sync(0).records.some(row => row.orderId === orderId && row.type === 'priority' && unread(row)),
     acknowledgeOrder: orderId => {

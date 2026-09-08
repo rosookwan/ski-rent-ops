@@ -29,7 +29,7 @@ npm run test:returns
 npm run test:notifications
 ```
 
-`npm run build`는 기존 체험 화면과 별도로 `dist/ski-workflows.js`를 생성한다. 이 파일에는 업무·반납·알림의 공통 라이브러리가 들어 있다. 체험 화면에도 같은 모듈을 삽입한다. 기본 `npm test`는 UI 구동 없는 66개 검사이며, `test:workflows`의 추가 브라우저 번들 검사는 Chrome이 필요하다.
+`npm run build`는 기존 체험 화면과 별도로 `dist/ski-workflows.js`를 생성한다. 이 파일에는 업무·반납·알림의 공통 라이브러리가 들어 있다. 체험 화면에도 같은 모듈을 삽입한다. 기본 `npm test`는 UI 구동 없는 69개 검사이며, `test:workflows`의 추가 브라우저 번들 검사는 Chrome이 필요하다.
 
 SQLite HTTP 서버는 기존 `npm run returns:server`를 그대로 사용한다. 직원 인증 해시·DB 경로·허용 origin 설정은 [반납 기능 실행 설명](10-return-functions.md)을 따른다. 공개 Pages에는 연결된 메모리 체험 UI를 배포한다. 운영 API 서버는 별도 실행이 필요하며 Pages 메모리 상태와 API의 SQLite 상태를 구분한다.
 

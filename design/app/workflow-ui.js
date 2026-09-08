@@ -30,7 +30,16 @@
   const board = () => F.store.board({ vehicleId: F.vehicleId, date: ui.date, ...(ui.selected ? { selectedTaskId: ui.selected } : {}) });
   function notices() {
     const records = S.notificationRuntime.driver.sync(0).records.filter(n => n.lifecycle === 'active' && !n.acknowledgedAt && ['sequence', 'priority'].includes(n.type));
-    return '<div class="wf-alerts" aria-live="polite">' + records.slice(0, 2).map(n => '<div class="wf-alert ' + n.type + '"><div><strong>' + (n.type === 'sequence' ? '매장 순서 변경 · ' + stamp(n.createdAt).split(' ').slice(-1)[0] : '우선 확인 요청') + '</strong><p>' + e(n.type === 'sequence' ? n.summary.split('\n')[0] : n.title) + '</p><small>' + (n.type === 'sequence' ? '매장 · ' + stamp(n.createdAt) : e(n.summary)) + '</small></div>' + b(n.type === 'sequence' ? '순서 확인' : '요청 확인', 'wf-ack', n.id) + '</div>').join('') + (records.length > 2 ? b('미확인 ' + (records.length - 2) + '건 더 보기', 'wf-notices') : '') + '</div>';
+    if (!records.length) return '';
+    const sequence = records.find(n => n.type === 'sequence'), priority = records.find(n => n.type === 'priority');
+    const shown = priority && sequence ? [priority, sequence] : records.slice(0, 2);
+    return '<div class="wf-alerts" aria-live="polite">' + shown.map(n => {
+      const isSequence = n.type === 'sequence', task = F.snap().tasks.find(t => t.id === n.taskId);
+      const customerName = task ? name(task.customerId) : S.data.orders.find(o => o.id === n.orderId)?.name || n.title.split(' · ')[0];
+      const change = n.changes?.find(c => c.taskId === n.taskId) || n.changes?.[0];
+      const summary = isSequence ? (change ? (task ? name(task.customerId) : change.title.replace(/ 수거$| 전달$/, '')) + ' ' + change.fromRank + ' → ' + change.toRank + '번째' : '시간순으로 복원') : customerName;
+      return '<button type="button" class="wf-alert ' + n.type + '" data-action="wf-ack" data-id="' + e(n.id) + '" title="' + e(n.summary) + '"><span class="wf-alert-icon" aria-hidden="true">' + S.icon(isSequence ? 'arrow-up-down' : 'bell-ring') + '</span><span class="wf-alert-copy"><strong>' + (isSequence ? '매장 순서 변경' : '우선 확인 요청') + '</strong><span>' + e(summary) + (isSequence ? ' · ' + stamp(n.createdAt).split(' ').slice(-1)[0] : '') + '</span></span><span class="wf-alert-check">' + (isSequence ? '순서 확인' : '요청 확인') + '</span></button>';
+    }).join('') + (records.length > shown.length ? b('다른 요청 ' + (records.length - shown.length) + '건', 'wf-notices', '', 'wf-more-notices') : '') + '</div>';
   }
   function taskRow(t, counter = false) {
     const ids = F.remaining(t), customer = S.workflowCustomer(t.customerId);
@@ -46,7 +55,7 @@
   function renderVehicle() {
     const list = board(); ui.selected = list.selectedTaskId;
     const tasks = [...list.inProgress, ...list.pending];
-    return '<div class="wf wf-vehicle">' + stock() + '<div class="wf-vehicle-toolbar"><div class="wf-actions">' + [['jobs', '방문 업무'], ['stock', '적재 내역'], ['history', '처리 내역']].map(([id, text]) => b(text, 'wf-vehicle-tab', id, ui.vehicleTab === id ? 'soft' : '')).join('') + '</div>' + dayPicker('vehicle') + '</div>' + notices() + (ui.vehicleTab === 'jobs' ? '<div class="wf-vehicle-grid"><section class="wf-job-column"><h2>남은 방문 ' + tasks.length + '건 <small>' + (list.manualOrder ? '매장 지정 순서' : '시간순') + '</small></h2><div class="wf-job-scroll">' + (tasks.map(t => taskRow(t)).join('') || empty('오늘 업무를 모두 마쳤습니다.')) + '</div></section>' + taskDetail(tasks.find(t => t.id === ui.selected)) + '</div>' : '<div class="wf-scroll">' + (ui.vehicleTab === 'stock' ? inventoryRows(true) : historyRows(true)) + '</div>') + '</div>';
+    return '<div class="wf wf-vehicle">' + stock() + '<div class="wf-vehicle-toolbar"><div class="wf-actions">' + [['jobs', '방문 업무'], ['stock', '적재 내역'], ['history', '처리 내역']].map(([id, text]) => b(text, 'wf-vehicle-tab', id, ui.vehicleTab === id ? 'soft' : '')).join('') + '</div><div class="wf-vehicle-tools">' + S.notifications.soundControl() + dayPicker('vehicle') + '</div></div>' + (ui.vehicleTab === 'jobs' ? '<div class="wf-vehicle-grid"><section class="wf-job-column"><h2>남은 방문 ' + tasks.length + '건 <small>' + (list.manualOrder ? '매장 지정 순서' : '시간순') + '</small></h2><div class="wf-job-scroll">' + (tasks.map(t => taskRow(t)).join('') || empty('오늘 업무를 모두 마쳤습니다.')) + '</div></section>' + '<div class="wf-work-column">' + notices() + taskDetail(tasks.find(t => t.id === ui.selected)) + '</div></div>' : '<div class="wf-secondary-alerts">' + notices() + '</div><div class="wf-scroll">' + (ui.vehicleTab === 'stock' ? inventoryRows(true) : historyRows(true)) + '</div>') + '</div>';
   }
   function dispatch() {
     const data = board();
