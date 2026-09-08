@@ -42,13 +42,16 @@ npm run test:visual
 npm run test:returns
 npm run test:returns:browser
 npm run test:returns:ui
+npm run test:intake
 ```
 
-브라우저 검사는 위의 로컬 서버가 실행 중이어야 합니다. `npm test`는 클릭 흐름 30개, `npm run test:visual`은 화면·버튼·모바일 단계·차량 업무 검사 100개를 수행합니다. 오늘 현황은 907×710과 높이 648px의 좁은 창에서도 업무 4건과 차량 다음 일정에 불필요한 스크롤이 없는지 검사합니다. 검사 결과와 캡처는 Git에서 제외한 `work/`에 생성됩니다. 배포 주소에서도 `SKI_DEMO_URL=https://rosookwan.github.io/ski-rent-ops/ npm test`로 같은 동작을 확인할 수 있습니다.
+브라우저 검사는 위의 로컬 서버가 실행 중이어야 합니다. `npm test`는 클릭 흐름 30개, `npm run test:visual`은 화면·버튼·모바일 단계·차량 업무 검사 104개를 수행합니다. 오늘 현황은 907×710과 높이 648px의 좁은 창에서도 업무 4건과 차량 다음 일정에 불필요한 스크롤이 없는지 검사합니다. 접수는 날짜를 접은 뒤 상품 이름·가격·수량 버튼이 온전히 보이는지도 확인합니다. 검사 결과와 캡처는 Git에서 제외한 `work/`에 생성됩니다. 배포 주소에서도 `SKI_DEMO_URL=https://rosookwan.github.io/ski-rent-ops/ npm test`로 같은 동작을 확인할 수 있습니다.
 
 `npm run build` 결과는 `dist/index.html`입니다. `main`에 푸시하면 GitHub Actions가 구문 검사와 빌드 후 Pages를 갱신합니다. Pages 설정의 빌드 소스는 **GitHub Actions**입니다. 자세한 구현 범위와 검증은 [화면 체험과 검증 기록](docs/09-clickable-demo-and-validation.md)에 정리했습니다.
 
 `test:returns`는 도메인·SQLite·HTTP·클라이언트를 자동 검증합니다. `test:returns:browser`는 실행 중인 로컬 화면 또는 `SKI_DEMO_URL`의 모듈을 검증합니다. `test:returns:ui`는 반납 화면의 실제 버튼 흐름 10개를 검증합니다. Actions에서도 반납 기능 검사를 수행합니다. SQLite API는 Node 22.13 이상에서 실행하며 [로컬 실행 방법](docs/10-return-functions.md#로컬-저장-api-실행)을 따릅니다.
+
+`test:intake`는 기간·날짜 접기, 일별 실제 수량, 할인, 타임 추가·수정·삭제, 기존 접수 보존과 저장 흐름 10개를 확인합니다. 매장 설정의 반납 타임은 접수와 같은 메모리 목록을 사용하며 새로고침하면 기본값으로 돌아갑니다.
 
 ## 결정 상태
 

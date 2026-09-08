@@ -45,6 +45,20 @@ const root=path.resolve(__dirname,'..');
   }
  }
  for(const [w,h] of [[907,710],[907,648],[1024,648],[1366,648]])await inspect('home',w,h,`home-${w}x${h}`);
+ for(const [w,h] of [[907,710],[907,648],[1024,768],[1366,768]]){
+  await inspect('intake',w,h);
+  if(await frame.locator('[data-action="representative-done"]').isVisible())await frame.locator('[data-action="representative-done"]').click();
+  if(!await frame.locator('[data-days="3"]').isVisible())await frame.locator('[data-action="toggle-period"]').click();
+  await frame.locator('[data-days="3"]').click();
+  assert.equal(await frame.locator('.ski-days').count(),0);
+  const products=await frame.locator('.ski-products').evaluate(el=>{
+   const panel=el.closest('#ski-product-panel').getBoundingClientRect();
+   return {panel:{top:panel.top,bottom:panel.bottom},cards:[...el.children].slice(0,2).map(card=>({top:card.getBoundingClientRect().top,bottom:card.getBoundingClientRect().bottom,titleSize:parseFloat(getComputedStyle(card.querySelector('.ski-product-title')).fontSize),buttons:[...card.querySelectorAll('button')].map(b=>({height:b.getBoundingClientRect().height,bottom:b.getBoundingClientRect().bottom}))}))};
+  });
+  assert.ok(products.cards.every(card=>card.top>=products.panel.top&&card.bottom<=products.panel.bottom+1&&card.titleSize>=18&&card.buttons.every(b=>b.height>=44&&b.bottom<=products.panel.bottom+1)),`intake ${w}x${h} products not readable: ${JSON.stringify(products)}`);
+  checks.at(-1).products=products;
+  await page.screenshot({path:path.join(root,'work/screens',`intake-collapsed-${w}x${h}.png`)});
+ }
  for(const [w,h] of [[1024,520],[1024,600],[1024,650],[1280,600],[1024,800]]){
   await inspect('vehicle',w,h);
   for(const mode of ['detail','simple']){
