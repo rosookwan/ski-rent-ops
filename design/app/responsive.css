@@ -277,3 +277,59 @@
   #ski-ops[data-page=response] .so-main-detail>.so-panel{min-height:0}
 }
 @media(max-width:900px){#ski-ops .so-qr-layout{grid-template-columns:1fr}}
+
+/* Per-item returns share the POS rail and keep receipts separate from vehicle custody. */
+#ski-ops .so-return-table{min-width:1090px}
+#ski-ops .so-return-items{min-width:860px}
+#ski-ops .so-return-detail{grid-template-columns:minmax(0,1fr) 330px}
+#ski-ops .so-return-detail>.so-stack{overflow:auto;gap:12px}
+#ski-ops .so-return-detail>.so-stack>.so-panel{flex:none;overflow:visible}
+#ski-ops .so-return-detail>.so-stack>.so-panel:first-child{min-height:230px}
+#ski-ops .so-return-detail>.so-stack>.so-panel .so-table-wrap{max-height:400px}
+#ski-ops .so-return-summary{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+#ski-ops .so-return-summary>div{padding:10px 8px;background:#f8f8f8;border-radius:12px;font-size:13px;white-space:nowrap}
+#ski-ops .so-return-summary strong{font-size:28px;display:block;margin-top:4px}
+#ski-ops .so-return-summary>div:first-child{background:#fff4ed;color:#b45309}
+#ski-ops .so-return-summary>div:nth-child(2){background:#f4f0ff;color:#5f33e1}
+#ski-ops .so-return-buttons{display:grid;gap:8px}
+#ski-ops #so-return-history .so-timeline li>div{flex:1;min-width:0}
+#ski-ops #so-return-history .so-timeline li{align-items:flex-start}
+#ski-ops .so-return-stepper input{width:76px;min-height:48px;text-align:center;font-size:22px;font-weight:700;padding:6px}
+#ski-ops .so-return-pick>strong{font-size:18px}
+#ski-ops #so-dialog:has(#so-return-error)[open]{display:flex;flex-direction:column;max-height:calc(100dvh - 24px)}
+#ski-ops #so-dialog:has(#so-return-error) .so-dialog-heading{flex-shrink:0}
+#ski-ops #so-dialog-body:has(#so-return-error){display:flex;flex-direction:column;min-height:0;overflow:auto;gap:12px;padding:16px 20px}
+#ski-ops #so-dialog-body:has(#so-return-error)>*{flex-shrink:0}
+#ski-ops #so-dialog-body:has(#so-return-error) .so-dialog-actions{position:sticky;bottom:-16px;background:#fff;padding:12px 0;z-index:2;margin:0}
+#ski-ops .so-lift-summary{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;padding:0 16px 12px}
+#ski-ops .so-lift-summary>div{display:grid;gap:6px;background:#f8f8f8;border-radius:12px;padding:12px;font-size:14px}
+#ski-ops .so-lift-summary>div:last-child{background:#fff4ed;color:#ef3408}
+#ski-ops .so-lift-summary strong{font-size:26px}
+#ski-ops .so-lift-note{padding:0 16px 12px;font-size:14px;color:#6d6d6d}
+#ski-ops #ski-first-look .ski-split-return{border-top:1px solid #e7e7e7;padding-top:10px;font-size:14px}
+#ski-ops #ski-first-look .ski-split-return summary{min-height:44px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;list-style:none;color:#5d5d5d;font-weight:600}
+#ski-ops #ski-first-look .ski-split-return summary:after{content:'+';font-size:20px}
+#ski-ops #ski-first-look .ski-split-return[open] summary:after{content:'−'}
+#ski-ops #ski-first-look .ski-split-return summary::-webkit-details-marker{display:none}
+#ski-ops #ski-first-look .ski-split-group{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:10px;background:#f8f8f8;border-radius:12px}
+#ski-ops.so-vehicle .so-dialog-actions .so-button.primary{background:#5f33e1;border-color:#5f33e1}
+#ski-ops #ski-first-look .ski-datesort>.so-button{color:#5f33e1;border-color:#ddd5ef;background:#fff}
+@media(min-width:901px) and (max-width:1150px){
+  #ski-ops .so-return-detail{grid-template-columns:1fr;align-content:start;overflow:auto}
+  #ski-ops .so-return-detail>.so-stack{overflow:visible}
+  #ski-ops .so-return-detail .so-return-buttons{grid-template-columns:repeat(3,1fr)}
+}
+@media(max-width:900px){
+  #ski-ops .so-return-detail{grid-template-columns:1fr}
+  #ski-ops .so-lift-summary{grid-template-columns:1fr}
+  #ski-ops .so-return-stepper{gap:6px}
+  #ski-ops .so-return-stepper input{width:60px}
+}
+#ski-ops .so-return-detail .so-panel-pad>.so-status{align-self:flex-start;width:fit-content}
+#ski-ops #ski-first-look .ski-remaining-note{font-size:14px;color:#a65a18;margin-top:6px}
+#ski-ops #ski-first-look .ski-status-message{margin:0;border-radius:0;padding:16px 20px;flex-shrink:0;font-size:17px}
+@media(min-width:761px) and (max-height:680px){
+  #ski-ops #ski-first-look .ski-equipment span{white-space:normal}
+  #ski-ops #ski-first-look .is-simple .ski-customer{flex-direction:row;align-items:center;justify-content:space-between;gap:8px}
+  #ski-ops #ski-first-look .is-simple .ski-equipment:has(>span:nth-child(4)){grid-template-columns:repeat(4,minmax(0,1fr))}
+}

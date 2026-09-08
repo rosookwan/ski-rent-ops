@@ -6,7 +6,7 @@ from html import escape
 
 ROOT = Path(__file__).resolve().parents[1]
 APP = ROOT / 'design/app'
-MODULES = ['data.js', 'core.js', 'return-runtime.js', 'rentals.js', 'settings.js', 'partners.js', 'closing.js', 'preparation.js', 'guide.js', 'login.js']
+MODULES = ['data.js', 'core.js', 'return-runtime.js', 'rentals.js', 'settings.js', 'partners.js', 'closing.js', 'preparation.js', 'guide.js', 'returns.js', 'login.js']
 RETURN_MODULES = ['domain.js', 'service.js', 'client.js', 'demo.js']
 
 def build():

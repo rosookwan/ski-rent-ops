@@ -14,14 +14,14 @@ const root=path.resolve(__dirname,'..');
  fs.mkdirSync(path.join(root,'work/screens'),{recursive:true});
  async function inspect(route,w,h,shot){
   await page.setViewportSize({width:w,height:h});
-  await f.evaluate(route=>{window.SkiOps.state.authenticated=true;window.SkiOps.go(route);},route);
+  await f.evaluate(route=>{window.SkiOps.state.authenticated=true;window.SkiOps.go(route,route==='return-detail'?{id:'R-021'}:{});},route);
   await f.evaluate(()=>new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r))));
   const box=await f.evaluate(()=>({width:innerWidth,document:document.documentElement.scrollWidth,root:document.getElementById('ski-ops').scrollWidth,font:document.fonts.check('16px Pretendard')}));
   assert.ok(box.document<=box.width+1&&box.root<=box.width+1,`${route} ${w}: ${JSON.stringify(box)}`);assert.equal(box.font,true);
   checks.push({route,width:w,height:h,...box});
   if(shot)await page.screenshot({path:path.join(root,'work/screens',shot+'.png'),fullPage:false});
  }
- for(const w of [1024,1366])for(const route of ['home','intake','rentals','dispatch','partners','closing','preparation','customers','inventory','settings','guide','login']){
+ for(const w of [1024,1366])for(const route of ['home','intake','rentals','returns','return-detail','rental','partner','response','dispatch','partners','closing','preparation','customers','inventory','settings','guide','login']){
   await inspect(route,w,768,`${route}-${w}x768`);
   if(route==='intake'){
    if(await frame.locator('[data-action="representative-done"]').isVisible())await frame.locator('[data-action="representative-done"]').click();
@@ -39,6 +39,18 @@ const root=path.resolve(__dirname,'..');
    assert.ok(content.scroll<=content.height+1&&content.scrollWidth<=content.width+1,`${mode} ${w}x${h} core info clips: ${JSON.stringify(content)}`);
    await page.screenshot({path:path.join(root,'work/screens',`vehicle-${mode}-${w}x${h}.png`)});
    checks.push({route:'vehicle',width:w,height:h,mode,actions:sizes,content});
+  }
+ }
+ await inspect('vehicle',1024,520);
+ await frame.locator('[data-mode="detail"]').click();
+ const jobIds=await frame.locator('.ski-job-item').evaluateAll(bs=>bs.map(b=>b.dataset.job));
+ for(const id of jobIds){
+  await frame.locator('.ski-job-item[data-job="'+id+'"]').click();
+  for(const mode of ['simple','detail']){
+   await frame.locator('[data-mode="'+mode+'"]').click();
+   const content=await frame.locator('.ski-visit-inner').evaluate(el=>({height:el.clientHeight,scroll:el.scrollHeight,width:el.clientWidth,scrollWidth:el.scrollWidth}));
+   assert.ok(content.scroll<=content.height+1&&content.scrollWidth<=content.width+1,`${id} ${mode} clips: ${JSON.stringify(content)}`);
+   checks.push({route:'vehicle',job:id,mode,width:1024,height:520,content});
   }
  }
  for(const w of [736,360])for(const route of ['home','rentals','intake','partners','closing','preparation','settings','guide','guest-guide','guest-form','login'])await inspect(route,w,900,(w===360&&['login','guest-guide','guest-form'].includes(route))?'polish-mobile-'+route:undefined);

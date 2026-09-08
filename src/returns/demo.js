@@ -24,5 +24,23 @@
     }
     return drafts.map(draft => draft.id);
   }
-  return { seed };
+  function seedOperations(store, driver, orders) {
+    const itemIds = { '스키': 'ski', '보드': 'board', '의류': 'clothes', '헬멧': 'helmet', '고글': 'goggles', '보호대': 'pads', '바이저 헬멧': 'visor' };
+    for (const order of orders) {
+      const returnPlan = { method: order.method === '차량 수거' ? 'vehicle' : 'direct', date: order.due, time: order.time || null, slot: order.slot, place: order.place };
+      const equipment = order.items.map(([label, quantity], index) => ({ id: itemIds[label] || 'gear-' + index, label, category: label === '의류' ? 'clothing' : 'equipment', plannedQuantity: quantity, returnPlan }));
+      const tickets = (order.ticketItems || []).map(ticket => ({ id: ticket.id, label: ticket.label, category: 'liftTicket', unit: '매', plannedQuantity: ticket.quantity, returnPlan: { method: 'direct', date: ticket.date, place: '매장' }, usage: [{ date: ticket.date, quantity: ticket.quantity }] }));
+      const items = [...equipment, ...tickets];
+      if (!items.length) continue;
+      let current = store.execute({ type: 'create', orderId: order.id, requestId: order.id + '-create', expectedVersion: 0, payload: { customer: { id: order.customer, name: order.name, phone: order.phone }, rental: { startDate: order.start, endDate: order.end, amountWon: order.amount }, vehicleId: 'demo-van-1', returnPlan, items } }).order;
+      const issue = [...equipment.filter(() => order.issued > 0).map(item => ({ itemId: item.id, quantity: item.plannedQuantity })), ...(order.ticketItems || []).filter(ticket => ticket.issued > 0).map(ticket => ({ itemId: ticket.id, quantity: ticket.issued }))];
+      const command = (type, payload, client = store) => { current = client.execute({ type, orderId: order.id, requestId: order.id + '-' + type, expectedVersion: current.version, payload }).order; };
+      if (issue.length) command('issue', { items: issue });
+      const received = order.items.flatMap(([label,,returned], index) => returned ? [{ itemId: equipment[index].id, quantity: returned }] : []);
+      if (received.length) command('receiveDirect', { items: received });
+      if (order.collected) command('collect', { items: equipment.map(item => ({ itemId: item.id, quantity: item.plannedQuantity })) }, driver);
+    }
+    return orders.map(order => order.id);
+  }
+  return { seed, seedOperations };
 });

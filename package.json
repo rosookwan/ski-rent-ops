@@ -12,9 +12,12 @@
     "test:returns": "node --test tests/returns-*.test.cjs",
     "test:returns:browser": "node scripts/smoke-returns.cjs",
     "returns:setup": "node scripts/setup-returns-demo.cjs",
-    "returns:server": "node server/returns-api.cjs"
+    "returns:server": "node server/returns-api.cjs",
+    "test:returns:ui": "node scripts/smoke-returns-ui.cjs"
   },
-  "engines": { "node": ">=22.13.0" },
+  "engines": {
+    "node": ">=22.13.0"
+  },
   "devDependencies": {
     "playwright": "1.62.1"
   }

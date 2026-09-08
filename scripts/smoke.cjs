@@ -32,11 +32,11 @@ for(const module of ['settings','partners','closing','preparation','guide','logi
    });
    await test('extension exchange return and contact previews do not alter sample order',async()=>{
     for(const a of ['rental-extend','rental-exchange','rental-contact']){await f.locator('[data-action="'+a+'"]').click();assert.equal(await f.locator('#so-dialog').isVisible(),true);await close();}
-    await f.locator('[data-subtab="return"]').click();await f.locator('[data-action="rental-return"]').click();await f.locator('#so-dialog input[type="number"]').fill('2');await close();
-    assert.match(await f.locator('#so-page').innerText(),/고객에게 남음\s*3/);
+    await f.locator('[data-subtab="return"]').click();await f.locator('[data-action="rental-return"]').click();await f.locator('#so-dialog input[type="number"]').first().fill('2');await close();
+    assert.match(await f.locator('#so-page').innerText(),/고객에게 남음\s*7/);
    });
    await test('legacy intake tabs and draft calculation still available',async()=>{
-    await nav('intake');if(await f.locator('#ski-overlay [data-action=representative-done]').isVisible())await f.locator('[data-action=representative-done]').click();await f.locator('[data-days="2"]').click();assert.equal(await f.locator('#ski-total-value').innerText(),'60,000원');await f.locator('[data-product-tab="lift"]').click();assert.equal(await f.locator('[data-lift-date]').isVisible(),true);await f.locator('[data-product-tab="equipment"]').click();await f.locator('[data-action="save"]').click();assert.match(await f.locator('#ski-dialog-title').innerText(),/견적/);await f.locator('#ski-overlay [data-action="close-dialog"]').first().click();
+    await nav('intake');if(await f.locator('#ski-overlay [data-action=representative-done]').isVisible())await f.locator('[data-action=representative-done]').click();await f.locator('[data-days="2"]').click();assert.equal(await f.locator('#ski-total-value').innerText(),'60,000원');await f.locator('[data-product-tab="lift"]').click();assert.equal(await f.locator('[data-lift-date]').isVisible(),true);await f.locator('[data-product-tab="equipment"]').click();await f.locator('[data-action="quote"]').click();assert.match(await f.locator('#ski-dialog-title').innerText(),/견적/);await f.locator('#ski-overlay [data-action="close-dialog"]').first().click();
    });
    await test('intake header keeps the vehicle and store return controls distinct',async()=>{
     await nav('intake');
