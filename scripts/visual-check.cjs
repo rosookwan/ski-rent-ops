@@ -21,15 +21,25 @@ const root=path.resolve(__dirname,'..');
   checks.push({route,width:w,height:h,...box});
   if(shot)await page.screenshot({path:path.join(root,'work/screens',shot+'.png'),fullPage:false});
  }
- for(const route of ['home','intake','rentals','dispatch','partners','closing','preparation','customers','inventory','settings','guide','login'])await inspect(route,1366,1024,route==='home'||route==='intake'||route==='login'?'polish-'+route:undefined);
- await inspect('vehicle',1024,800,'polish-vehicle-simple');
- for(const mode of ['detail','simple']){
-  await frame.locator('[data-mode="'+mode+'"]').click();
-  await frame.locator('.ski-actions button').first().waitFor();
-  const sizes=await frame.locator('.ski-actions button').evaluateAll(bs=>bs.map(b=>({height:b.getBoundingClientRect().height,bottom:b.getBoundingClientRect().bottom})));
-  assert.ok(sizes.every(s=>s.height>=72),`${mode} action targets: ${JSON.stringify(sizes)}`);
-  await page.screenshot({path:path.join(root,'work/screens','polish-vehicle-'+mode+'.png')});
-  checks.push({route:'vehicle',width:1024,mode,actions:sizes});
+ for(const w of [1024,1366])for(const route of ['home','intake','rentals','dispatch','partners','closing','preparation','customers','inventory','settings','guide','login']){
+  await inspect(route,w,768,`${route}-${w}x768`);
+  if(route==='intake'){
+   if(await frame.locator('[data-action="representative-done"]').isVisible())await frame.locator('[data-action="representative-done"]').click();
+   const bottom=await frame.locator('.ski-checkout-footer').evaluate(el=>el.getBoundingClientRect().bottom);
+   assert.ok(bottom<=768,`intake footer ${w}: ${bottom}`);
+  }
+ }
+ for(const [w,h] of [[1024,520],[1024,600],[1024,650],[1280,600],[1024,800]]){
+  await inspect('vehicle',w,h);
+  for(const mode of ['detail','simple']){
+   await frame.locator('[data-mode="'+mode+'"]').click();
+   const sizes=await frame.locator('.ski-actions button').evaluateAll(bs=>bs.map(b=>({height:b.getBoundingClientRect().height,bottom:b.getBoundingClientRect().bottom})));
+   assert.ok(sizes.every(s=>s.height>=72&&s.bottom<=h),`${mode} ${w}x${h} actions: ${JSON.stringify(sizes)}`);
+   const content=await frame.locator('.ski-visit-inner').evaluate(el=>({height:el.clientHeight,scroll:el.scrollHeight,width:el.clientWidth,scrollWidth:el.scrollWidth}));
+   assert.ok(content.scroll<=content.height+1&&content.scrollWidth<=content.width+1,`${mode} ${w}x${h} core info clips: ${JSON.stringify(content)}`);
+   await page.screenshot({path:path.join(root,'work/screens',`vehicle-${mode}-${w}x${h}.png`)});
+   checks.push({route:'vehicle',width:w,height:h,mode,actions:sizes,content});
+  }
  }
  for(const w of [736,360])for(const route of ['home','rentals','intake','partners','closing','preparation','settings','guide','guest-guide','guest-form','login'])await inspect(route,w,900,(w===360&&['login','guest-guide','guest-form'].includes(route))?'polish-mobile-'+route:undefined);
  assert.deepEqual(errors,[]);
