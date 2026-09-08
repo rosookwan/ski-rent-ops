@@ -6,12 +6,27 @@
   const stock=[['스키 · 일반','150~160cm',24,7,2,3],['스키 · 고급','160~170cm',12,5,1,1],['보드 · 일반','145~155cm',18,8,2,2],['부츠 · 스키','260mm',12,6,2,2],['부츠 · 보드','240mm',8,3,1,1],['의류','L',20,7,3,4],['헬멧','M',15,4,2,1]];
   S.data.products=products;S.data.tickets=tickets;S.data.stock=stock;
   const current=()=>S.state.tabs.settings||'equipment';
-  let returnTimeDraft=null,returnTimeSequence=0;
+  let returnTimeDraft=null,returnTimeSequence=0,returnTimeOrdering=false;
   const returnTimes=()=>window.SkiIntake.getReturnPresets();
   function returnTimePanel(){
     const rows=returnTimes();
-    return panel('반납 타임 기준','<div class="so-panel-pad so-stack"><p class="so-muted">접수 화면에 표시할 이름과 반납 기준을 관리하세요.</p><div class="so-return-time-list">'+(rows.map(p=>'<div class="so-return-time-row"><div><strong>'+esc(p.label)+'</strong><p><b>'+esc(p.time)+'</b> · '+(p.dayOffset?'마지막 이용일 다음 날':'마지막 이용일')+'</p></div><div class="so-actions">'+button('수정','return-time-edit',p.id,'small')+button('삭제','return-time-delete',p.id,'quiet small')+'</div></div>').join('')||'<p class="so-empty">등록된 타임이 없습니다. 접수에서는 직접 시간을 선택할 수 있습니다.</p>')+'</div><p class="so-note">변경한 타임은 작성 중인 접수에 적용됩니다. 이미 저장한 접수의 이름·날짜·시간은 유지합니다.</p></div>',button(S.icon('plus')+'타임 추가','return-time-edit','new','soft small'));
+    const move=(p,index,delta)=>'<button type="button" class="so-time-move" data-action="return-time-move" data-id="'+esc(p.id)+'" data-delta="'+delta+'" aria-label="'+esc(p.label)+(delta<0?' 위로':' 아래로')+'" '+(index+delta<0||index+delta>=rows.length?'disabled':'')+'>'+S.icon(delta<0?'arrow-up':'arrow-down')+(delta<0?'위로':'아래로')+'</button>';
+    return panel('반납 타임 기준','<div class="so-panel-pad so-stack"><p class="so-muted">'+(returnTimeOrdering?'위로·아래로 눌러 접수 표시 순서를 바꾸세요.':'타임 줄을 눌러 이름과 시간을 수정하세요.')+'</p><div class="so-return-time-list">'+(rows.map((p,index)=>'<div class="so-return-time-row" data-preset-row="'+esc(p.id)+'"><button type="button" class="so-time-row-edit" data-action="return-time-edit" data-id="'+esc(p.id)+'" aria-label="'+esc(p.label)+' 수정"><span class="so-time-rank">'+(index+1)+'</span><span><strong>'+esc(p.label)+'</strong><span class="so-time-row-meta"><b>'+esc(p.time)+'</b> · '+(p.dayOffset?'마지막 이용일 다음 날':'마지막 이용일')+'</span></span>'+S.icon('chevron-right')+'</button><div class="so-actions">'+(returnTimeOrdering?move(p,index,-1)+move(p,index,1):button('삭제','return-time-delete',p.id,'quiet small'))+'</div></div>').join('')||'<p class="so-empty">등록된 타임이 없습니다. 접수에서는 직접 시간을 선택할 수 있습니다.</p>')+'</div><p class="so-note">저장된 접수의 이름·날짜·시간은 유지합니다.</p></div>','<div class="so-actions"><button type="button" class="so-button small" data-action="return-time-order" aria-pressed="'+returnTimeOrdering+'">'+(returnTimeOrdering?'순서 변경 완료':'순서 변경')+'</button>'+button(S.icon('plus')+'타임 추가','return-time-edit','new','soft small')+'</div>');
   }
+  S.action('return-time-order',()=>{returnTimeOrdering=!returnTimeOrdering;S.render();S.$('[data-action="return-time-order"]').focus({preventScroll:true});});
+  S.action('return-time-move',(id,button)=>{
+    const rows=returnTimes(),index=rows.findIndex(row=>row.id===id),delta=Number(button.dataset.delta),next=index+delta;
+    if(index<0||![-1,1].includes(delta)||next<0||next>=rows.length)return;
+    const scroll=S.$('.so-return-time-list').closest('.so-panel-pad').scrollTop;
+    [rows[index],rows[next]]=[rows[next],rows[index]];
+    window.SkiIntake.setReturnPresets(rows);S.render();
+    const row=S.$('[data-preset-row="'+id+'"]');
+    const focus=row.querySelector('[data-delta="'+delta+'"]');
+    (focus.disabled?row.querySelector('.so-time-row-edit'):focus).focus({preventScroll:true});
+    row.closest('.so-panel-pad').scrollTop=scroll;
+    row.scrollIntoView({block:'nearest'});
+    S.toast(rows[next].label+'을 '+(next+1)+'번째로 옮겼습니다.');
+  });
   function returnTimeError(error){const el=S.$('#so-return-time-error');if(el){el.hidden=false;el.textContent=error.message;}else S.toast(error.message);}
   S.action('return-time-edit',id=>{
     const existing=returnTimes().find(p=>p.id===id);
@@ -39,8 +54,8 @@
     if(current()==='equipment')content=panel('장비 종류 · 요금',productTable(),button('장비 추가','product-edit','new','soft small'));
     if(current()==='tickets')content='<div class="so-filter-panel"><div class="so-toolbar"><label class="so-field so-search">권종 찾기<input type="search" data-search="setting-tickets" placeholder="오후, 후야, 4시간 등" value="'+esc(S.state.filters.settingQuery||'')+'"></label>'+select('대상',[['all','전체'],['성인','성인'],['소인','소인']],S.state.filters.settingAudience||'all','data-change="setting-audience"')+'</div></div>'+panel('리프트권 '+tickets.length+'종','<div class="so-table-wrap"><table class="so-responsive-table"><thead><tr><th>권종·대상</th><th>이용시간</th><th>판매가</th><th>기준 매입가</th><th>상태</th><th></th></tr></thead><tbody id="so-setting-tickets">'+ticketRows(S.state.filters.settingQuery||'')+'</tbody></table></div>',button('권종 추가','ticket-edit','new','soft small'));
     if(current()==='discounts')content='<div class="so-grid2">'+[5000,10000].map((v,i)=>panel('간편 할인 '+(i+1),'<div class="so-panel-pad so-stack"><div class="so-form-grid">'+field('버튼 이름','할인 '+v.toLocaleString()+'원')+field('할인 금액',v,'number','min="0" step="1000"')+'</div><label class="so-check"><input type="checkbox" checked>장비당 할인에 표시</label><label class="so-check"><input type="checkbox" checked>총 금액 할인에 표시</label><div class="so-note">장비당은 실제 지급 수량 기준<br>총 할인은 누를 때마다 누적 · 리프트권 제외</div>'+button('버튼 모양 보기','discount-preview',String(v),'soft')+'</div>')).join('')+'</div>';
-    if(current()==='operations')content='<div class="so-grid2">'+returnTimePanel()+panel('매장·직원·차량','<div class="so-panel-pad so-stack">'+field('상호','우리 스키샵')+field('매장 연락처','010-0000-0000')+select('기본 수거 장소',['만선 티롤 앞','설천 주차장','만선 광장'])+select('차량',['1호 차량','2호 차량'])+button('직원 권한 보기','staff-preview','','soft')+'</div>')+'</div>';
-    return head('매장 설정','대여 접수에서 사용할 장비·가격·권종을 관리합니다.',link('접수 화면 보기','intake','','primary'))+S.tabs([['equipment','장비·요금'],['tickets','리프트권'],['discounts','간편 할인'],['operations','운영·직원']],'equipment')+content+'<p class="so-preview-note">'+(current()==='operations'?'반납 타임은 이 브라우저의 접수 화면에 반영되며 새로고침하면 초기화됩니다. 매장·직원·차량 설정은 미리보기입니다.':'설정 화면 시안입니다. 입력값은 저장하거나 실제 가격표에 반영하지 않습니다.')+'</p>';
+    if(current()==='operations')content='<div class="so-grid2 so-operations-grid">'+returnTimePanel()+S.operations.panels()+'</div>';
+    return head('매장 설정','대여 접수에서 사용할 장비·가격·권종을 관리합니다.',link('접수 화면 보기','intake','','primary'))+S.tabs([['equipment','장비·요금'],['tickets','리프트권'],['discounts','간편 할인'],['operations','운영·직원']],'equipment')+content+'<p class="so-preview-note">'+(current()==='operations'?'설정·직원·연락처는 현재 체험 화면에서만 유지되며 새로고침하면 초기화됩니다. 직원 등록은 실제 로그인 계정 발급과 별개입니다.':'설정 화면 시안입니다. 입력값은 저장하거나 실제 가격표에 반영하지 않습니다.')+'</p>';
   }
   S.search('setting-tickets',q=>{S.state.filters.settingQuery=q;S.$('#so-setting-tickets').innerHTML=ticketRows(q);});
   S.change('setting-audience',v=>{S.state.filters.settingAudience=v;S.render();});

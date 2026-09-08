@@ -20,7 +20,7 @@
     const legacy=state.page==='intake'||state.page==='vehicle';$('#so-page').hidden=legacy;$('#so-legacy').hidden=!legacy;
     if(legacy){const l=$('#ski-first-look');l.dispatchEvent(new CustomEvent('ski:set-view',{detail:state.page==='vehicle'?'vehicle':'shop'}));}
     else {const target=config.entry?$('#so-entry'):config.public?$('#so-public'):$('#so-page');target.innerHTML=config.render();config.mount?.();}
-    root.dataset.page=state.page;icons();}
+    root.dataset.page=state.page;if(window.SkiOps?.operations)$('.so-brand strong').textContent=window.SkiOps.operations.store().name;icons();}
   function close(){window.SkiTimePicker.close();if($('#so-dialog').open)$('#so-dialog').close();$('#so-dialog-body').innerHTML='';}
   function modal(title,body){$('#so-dialog-title').textContent=title;$('#so-dialog-body').innerHTML=body;$('#so-dialog').showModal();icons();}
   let toastTimer;function toast(message){clearTimeout(toastTimer);$('#so-toast').textContent=message;$('#so-toast').hidden=false;toastTimer=setTimeout(()=>{$('#so-toast').hidden=true;},4500);}

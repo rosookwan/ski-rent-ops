@@ -1,0 +1,59 @@
+/* Settings use full-row edit targets; ordering controls remain large enough for POS. */
+#ski-ops #so-page>.so-operations-grid{grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);align-items:stretch;overflow:hidden}
+#ski-ops .so-operations-grid>.so-panel>.so-panel-pad{padding:12px 14px;gap:12px}
+#ski-ops .so-operations-grid .so-panel-head{flex-shrink:0}
+#ski-ops .so-operations-grid .so-button{min-height:44px}
+#ski-ops .so-return-time-row{gap:6px;padding:3px 0}
+#ski-ops .so-time-row-edit{display:flex;align-items:center;gap:10px;flex:1;min-width:0;min-height:76px;padding:10px 4px;border:0;background:#fff;text-align:left;color:#222}
+#ski-ops .so-time-row-edit>span:nth-child(2){flex:1;min-width:0;overflow-wrap:anywhere}
+#ski-ops .so-time-row-edit>svg{width:16px;color:#999}
+#ski-ops .so-time-rank{display:grid;place-items:center;flex-shrink:0;width:28px;height:28px;border-radius:8px;background:#f6f6f6;color:#777;font-size:14px}
+#ski-ops .so-time-row-meta{display:block;font-size:13px;line-height:1.45;color:#707070;margin-top:4px}
+#ski-ops .so-time-row-meta b{font-variant-numeric:tabular-nums}
+#ski-ops .so-return-time-row .so-actions{gap:4px}
+#ski-ops .so-time-move{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;min-width:48px;min-height:52px;padding:5px;border:1px solid #e6e6e6;background:#fff;color:#555;font-size:13px}
+#ski-ops .so-time-move svg{width:18px;height:18px}
+#ski-ops .so-operations-directory{display:flex;flex-direction:column;min-height:0;gap:12px;overflow:auto;padding-right:3px}
+#ski-ops .so-operations-directory>.so-panel{flex-shrink:0}
+#ski-ops .so-shop-summary{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;padding:14px;border:0;background:#fff;text-align:left;color:#242424}
+#ski-ops .so-shop-summary>span{display:grid;gap:8px;min-width:0;overflow-wrap:anywhere}
+#ski-ops .so-shop-summary strong{font-size:18px}
+#ski-ops .so-shop-summary>span>span{font-size:13px;color:#757575;display:flex;gap:8px;flex-wrap:wrap}
+#ski-ops .so-shop-summary b{font-size:15px;color:#303030;font-weight:550}
+#ski-ops .so-shop-summary>svg,#ski-ops .so-person-row>svg{width:18px;color:#999}
+#ski-ops .so-person-row{display:flex;align-items:center;gap:12px;width:100%;min-height:80px;padding:12px 14px;border:0;border-radius:0;border-top:1px solid #f0f0f0;background:#fff;color:#222;text-align:left}
+#ski-ops .so-person-row>span:nth-child(2){display:grid;gap:3px;flex:1;min-width:0;overflow-wrap:anywhere}
+#ski-ops .so-person-row strong{font-size:17px}
+#ski-ops .so-person-icon{display:grid;place-items:center;flex-shrink:0;width:36px;height:36px;border-radius:10px;background:#f8f8f8;color:#777}
+#ski-ops .so-person-meta{font-size:13px;color:#777}
+#ski-ops .so-person-phone{font-size:15px;color:#444;font-variant-numeric:tabular-nums}
+#ski-ops .so-people-empty{padding:14px;font-size:14px;color:#777}
+#ski-ops .so-people-foot{padding:0 12px 8px}
+#ski-ops .so-shop-summary:hover,#ski-ops .so-person-row:hover,#ski-ops .so-time-row-edit:hover{background:#fff8f3}
+#ski-ops .so-contact-directory{display:grid;gap:12px}
+#ski-ops .so-contact-card{display:grid;gap:6px;padding:16px;border-radius:12px;background:#f8f8f8;overflow-wrap:anywhere}
+#ski-ops .so-contact-card>span{font-size:14px;color:#777}
+#ski-ops .so-contact-card strong{font-size:18px}
+#ski-ops .so-contact-card>b{font-size:25px;font-variant-numeric:tabular-nums}
+#ski-ops #so-dialog:has(.so-operation-form,.so-contact-directory)[open]{display:flex;flex-direction:column;max-height:calc(100dvh - 24px)}
+#ski-ops #so-dialog:has(.so-operation-form,.so-contact-directory) .so-dialog-heading{flex-shrink:0}
+#ski-ops #so-dialog-body:has(.so-operation-form,.so-contact-directory){overflow:auto;min-height:0}
+#ski-ops #so-dialog-body:has(.so-operation-form,.so-contact-directory)>.so-dialog-actions{position:sticky;bottom:-20px;background:#fff;padding:12px 0;margin:0;z-index:1}
+#ski-ops #ski-first-look .ski-contact-button{display:flex;align-items:center;justify-content:center;gap:6px;min-height:44px;padding:8px 12px;border:0;border-radius:12px;background:#fff;color:#5f33e1;font-size:14px;font-weight:650;white-space:nowrap}
+@media(max-width:900px){
+ #ski-ops #so-page>.so-operations-grid{grid-template-columns:1fr;overflow:visible}
+ #ski-ops .so-operations-directory{overflow:visible;padding:0}
+}
+@media(min-width:901px) and (max-height:700px){
+ #ski-ops .so-operations-grid>.so-panel>.so-panel-pad{padding:8px 14px;gap:6px}
+ #ski-ops .so-time-row-edit{min-height:64px;padding-top:6px;padding-bottom:6px}
+ #ski-ops .so-operations-directory{gap:8px}
+ #ski-ops .so-operations-directory .so-panel-head{padding:8px 12px}
+ #ski-ops .so-operations-directory>.so-panel:first-child .so-panel-head{min-height:44px}
+ #ski-ops .so-shop-summary{padding:12px}
+ #ski-ops .so-shop-summary>span{gap:4px}
+ #ski-ops .so-people-empty{padding:10px 12px}
+ #ski-ops .so-operations-directory .so-panel:has(>.so-people-empty):has(>.so-people-foot){display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center}
+ #ski-ops .so-operations-directory .so-panel:has(>.so-people-empty):has(>.so-people-foot)>.so-panel-head{grid-column:1/-1}
+ #ski-ops .so-operations-directory .so-panel:has(>.so-people-empty)>.so-people-foot{padding:4px}
+}
