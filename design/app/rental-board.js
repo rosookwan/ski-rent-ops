@@ -496,8 +496,8 @@ function render() {
     const tasks = F.snap().tasks.filter(t => t.orderId === order.id && t.kind === 'delivery' && t.plannedItems && t.plannedItems.every(i => (F.snap().catalog.find(s => s.id === i.sku)?.kind === 'liftTicket') === (category === 'liftTicket')));
     const pending = tasks.filter(t => ['waiting', 'in_progress'].includes(t.status)).reduce((n, t) => n + F.remainingQuantity(t), 0);
     const unprepared = tasks.filter(t => ['waiting', 'in_progress'].includes(t.status)).reduce((n, t) => n + t.plannedItems.reduce((sum, i) => sum + i.quantity - i.assetIds.length, 0), 0);
-    const label = category === 'equipment' ? '장비' : '리프트권', plan = plans[category];
-    return { category, title: label + (pending ? ' 배달 대기 ' + pending + (category === 'equipment' ? '개' : '매') : ' 배달완료'), pending: pending > 0, canIssue: category === 'liftTicket' && unprepared > 0, summary: pending ? plan.date + ' ' + plan.time + ' · ' + plan.place + (category === 'liftTicket' && unprepared ? ' · 발권 전 ' + unprepared + '매' : '') : '고객 전달 완료', completeLabel: label + ' 배달완료', actionId: order.id + '|' + category };
+    const label = category === 'equipment' ? '장비' : '리프트권', plan = plans[category], cancelled = tasks.some(t => t.status === 'cancelled');
+    return { category, title: label + (pending ? ' 배달 대기 ' + pending + (category === 'equipment' ? '개' : '매') : cancelled ? ' 배달 취소' : ' 배달완료'), pending: pending > 0, canIssue: category === 'liftTicket' && unprepared > 0, summary: pending ? plan.date + ' ' + plan.time + ' · ' + plan.place + (category === 'liftTicket' && unprepared ? ' · 발권 전 ' + unprepared + '매' : '') : cancelled ? '업무 관리에서 취소한 배달입니다.' : '고객 전달 완료', completeLabel: label + ' 배달완료', actionId: order.id + '|' + category };
   });
   values.hasDeliveryPlan = values.deliveryRows.length > 0;
   values.needsGear = values.needsGear && plans.equipment?.method !== 'delivery';

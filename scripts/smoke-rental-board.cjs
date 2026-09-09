@@ -113,6 +113,14 @@ const fs = require('node:fs');
       await frame.getByRole('tab', { name: '반납 확인', exact: true }).click();
       assert.equal(await frame.getByRole('button', { name: '고객 직접반납 받음', exact: true }).isDisabled(), false);
     });
+    await test('cancelled equipment delivery is distinct from completion and leaves ticket delivery pending', async () => {
+      await frame.evaluate(() => SkiOps.workflow.run('task.status', { id: 'R-022-delivery-equipment', status: 'cancelled' }));
+      await frame.locator('[data-order-id="R-022"]').click();
+      assert.match(await frame.locator('[data-delivery-category="equipment"]').innerText(), /장비 배달 취소/);
+      assert.doesNotMatch(await frame.locator('[data-delivery-category="equipment"]').innerText(), /배달완료|고객 전달 완료/);
+      assert.match(await frame.locator('[data-delivery-category="liftTicket"]').innerText(), /배달 대기 1매/);
+      assert.equal((await current('R-022')).totals.customerQuantity, 0);
+    });
     await test('keyboard focus, escape and navigation release modal isolation', async () => {
       await detail('R-021'); await click('고객 직접반납 받음');
       assert.equal(await frame.locator('.so-topbar').evaluate(el => el.inert), true);
