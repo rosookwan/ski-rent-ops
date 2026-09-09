@@ -43,6 +43,11 @@ const assert = require('node:assert/strict'), fs = require('node:fs');
       await click('새 장비 전달'); await frame.getByLabel('스키부츠 받음', { exact: true }).check(); await click('선택 수량 확인');
       await click('기존품 받음'); await frame.getByLabel('스키부츠 받음', { exact: true }).check(); await click('선택 수량 확인');
       const o = await order(); assert.equal(o.items.find(i => i.id === 'ski').customerQuantity, 2); assert.equal(o.items.find(i => i.component).customerQuantity, 1); assert.equal((await latest()).status, 'completed');
+      await click('닫기');
+      await frame.getByRole('tab', { name: '장비·리프트권', exact: true }).click();
+      const component = o.items.find(i => i.component);
+      assert.equal(await frame.locator('[data-product-id="' + component.id + '"] [data-product-issued]').innerText(), '1개');
+      assert.equal(await frame.locator('[data-product-id="ski"] [data-product-issued]').innerText(), '2대');
       await page.screenshot({ path: 'work/exchange-boots-complete.png' });
     });
     await test('request cancellation restores the selected return, and stale input changes nothing', async () => {

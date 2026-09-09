@@ -52,6 +52,46 @@
 #ski-ops :is(.so-rental-board,.so-rental-overlay) :is(h1,h2,h3){word-break:normal}
 #ski-ops .so-rental-board .rental-issue-actions button{box-sizing:border-box;min-height:48px;padding:12px 18px;font-size:16px;font-weight:600;color:#5D5D5D;background:#fff;border:0;border-radius:12px;box-shadow:inset 0 0 0 1px #D1D1D1}
 #ski-ops .so-rental-board .rental-issue-actions button:first-child{color:#fff;background:#FE4E10;box-shadow:none}
+/* Product quantities are presented per physical item and ticket use date. */
+#ski-ops .rental-products,#ski-ops .rental-products *{box-sizing:border-box}
+#ski-ops .rental-products{display:flex;flex-direction:column;gap:20px;line-height:1.4}
+#ski-ops .rental-products h3{margin:0 0 10px;font-size:17px;font-weight:700;color:#333}
+#ski-ops .rental-product-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(280px,100%),1fr));gap:12px}
+#ski-ops .rental-product-card{min-width:0;border:1px solid #e7e7e7;border-radius:16px;background:#fff;overflow:hidden}
+#ski-ops .rental-product-card>header{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:14px 16px;background:#FFF4ED}
+#ski-ops .rental-product-card[data-product-theme=tickets]>header{background:#E9F4FF}
+#ski-ops .rental-product-card>header>div{min-width:0}
+#ski-ops .rental-product-category{font-size:12px;font-weight:700;color:#C62208}
+#ski-ops .rental-product-card[data-product-theme=tickets] .rental-product-category{color:#0074D9}
+#ski-ops .rental-product-card h4{margin:3px 0 4px;font-size:21px;line-height:1.25;font-weight:750;overflow-wrap:anywhere}
+#ski-ops .rental-product-period{font-size:14px;color:#6D6D6D}
+#ski-ops .rental-product-state{flex-shrink:0;max-width:46%;font-size:12px;font-weight:700;line-height:1.4;padding:6px 9px;border-radius:8px;word-break:keep-all}
+#ski-ops .rental-product-issued{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:14px 16px}
+#ski-ops .rental-product-issued>div{display:flex;flex-direction:column;gap:4px;min-width:0}
+#ski-ops .rental-product-issued>div:last-child{text-align:right}
+#ski-ops .rental-product-issued>div>span{font-size:13px;color:#666}
+#ski-ops .rental-product-issued strong{font-size:29px;line-height:1.15;font-weight:750;color:#1A1A1A;font-variant-numeric:tabular-nums}
+#ski-ops .rental-product-issued b{color:#333;font-weight:700}
+#ski-ops .rental-product-issued small{font-size:12px;color:#777}
+#ski-ops .rental-product-counts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;padding:0 12px 12px}
+#ski-ops .rental-product-counts>div{display:flex;flex-direction:column;gap:5px;border-radius:9px;padding:10px;background:#FFF4ED;color:#C62208}
+#ski-ops .rental-product-counts>[data-product-count=vehicle]{background:#F1E9FF;color:#5000D9}
+#ski-ops .rental-product-counts>[data-product-count=confirmed]{background:#F0FDF4;color:#15803D}
+#ski-ops .rental-product-counts>div>span{font-size:12px;font-weight:600;white-space:nowrap}
+#ski-ops .rental-product-counts strong{font-size:21px;line-height:1.2;font-weight:750;font-variant-numeric:tabular-nums}
+#ski-ops .rental-product-component{margin:0;padding:0 16px 12px;font-size:13px;color:#666}
+#ski-ops .rental-daily-section h3{display:flex;align-items:center;gap:8px}
+#ski-ops .rental-daily-section h3 small{font-size:13px;font-weight:500;color:#777}
+#ski-ops .rental-daily-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(180px,100%),1fr));gap:10px}
+#ski-ops .rental-daily-card{display:grid;grid-template-columns:1fr auto;gap:7px;padding:14px 16px;background:#F8F8F8;border-radius:12px}
+#ski-ops .rental-daily-card>span{grid-column:1/-1;font-size:13px;color:#777}
+#ski-ops .rental-daily-card strong{font-size:16px}
+#ski-ops .rental-daily-card b{font-size:16px;text-align:right;font-variant-numeric:tabular-nums}
+#ski-ops .rental-product-note{border:1px solid #E7E7E7;border-radius:12px;padding:12px 16px;background:#F8F8F8}
+#ski-ops .rental-product-note>strong{font-size:13px;color:#666}
+#ski-ops .rental-product-note>p{margin:5px 0 0;font-size:15px;overflow-wrap:anywhere}
+#ski-ops .rental-summary-breakdown{display:block;margin-top:6px;font-size:12px;font-weight:600;line-height:1.5;overflow-wrap:anywhere;max-width:185px}
+#ski-ops .rental-product-empty{margin:0;padding:20px;color:#777;text-align:center}
 @media(max-height:820px){#ski-ops .so-rental-board[data-main]{padding:12px 14px!important;gap:12px!important}}
 /* Below the supplied POS widths, retain readable type and expose one vertical
    content scroll. The original 860px item table keeps its horizontal scroller. */

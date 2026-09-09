@@ -10,6 +10,21 @@ const rel = s => ({ '-1': '어제', 0: '오늘', 1: '내일', 2: '모레' })[dif
 const money = n => Number(n).toLocaleString('ko-KR') + '원';
 const UNIT = { '스키': '세트', '보드': '세트', '의류': '벌', '리프트권': '매', '헬멧': '개' };
 const unit = name => UNIT[name] || '개';
+const cardUnit = item => item.ticket ? '매' : ['스키', '보드'].includes(item.name) ? '대' : item.name === '의류' ? '벌' : '개';
+function productCards(o) {
+  return [['gear', '장비·의류', false], ['tickets', '리프트권', true]].map(([id, title, ticket]) => ({ id, title,
+    cards: o.items.filter(i => i.ticket === ticket).map(i => {
+      const u = cardUnit(i), issued = i.issued ?? i.total - i.unissued;
+      const state = i.exchange ? '교환품 전달 대기' : i.unissued === i.total ? '지급 전' : i.vehicle ? '매장 확인 대기' : i.confirmed && i.customer ? '일부 반납' : !i.customer && i.confirmed && !i.unissued ? '반납 완료' : i.unissued ? '일부 지급' : i.ticket ? '고객 보유' : '대여 중';
+      const color = state === '반납 완료' ? 'green' : i.exchange || i.vehicle ? 'purple' : i.unissued ? 'blue' : 'orange';
+      const useDates = i.usage?.length ? i.usage.map(p => d(p.date)).join(' · ') : d(o.start) + (o.start !== o.end ? ' ~ ' + d(o.end) : '');
+      return { id: i.id, name: i.label || i.name, category: i.ticket ? '리프트권' : i.component ? '교환 구성품' : i.name === '의류' ? '의류' : ['스키','보드'].includes(i.name) ? '장비' : '보호구',
+        theme: i.ticket ? 'tickets' : 'gear', state, stateStyle: BADGE[color], period: useDates + ' 이용', unit: u, plannedLabel: i.ticket ? '예정 수량' : '대여 수량', planned: i.total + u, issued: issued + u,
+        pending: i.unissued ? '지급 전 ' + i.unissued + u : i.exchange ? '교환품 전달 대기 ' + i.exchange + u : '예정 수량 지급 완료',
+        counts: [['customer', '고객 보유', i.customer], ['vehicle', '차량 보관', i.vehicle], ['confirmed', '매장 확인', i.confirmed]].map(([id, label, n]) => ({ id, label, quantity: n + u })),
+        componentNote: i.component ? '본체 수량에 포함하지 않는 교환 구성품' : '' };
+    }) })).filter(group => group.cards.length);
+}
 const it = (name, total, customer, vehicle, confirmed, due, method) => ({ name, total, customer, vehicle, confirmed, due, method });
 
 const SLOT_ORDER = ['오후타임 후', '야간타임 후', '익일 오전', '직접 시간', '수거 없음'];
@@ -261,13 +276,9 @@ class RentalBoard {
       openFix: () => this.setState({ dialog: { kind: 'fix', id: o.id, revision: F.snap().revision, field: 'confirmed', qty: {} } }),
 
       gear: o.gear, gearDetail: o.detail, tickets: o.tickets, note: o.note,
+      productCards: productCards(o).flatMap(group => group.cards), hasProductNotes: !!o.note,
       orderId: o.id, needsIssue: !!o.unissued, needsGear: o.items.some(i => i.unissued && !i.ticket), needsTickets: o.items.some(i => i.unissued && i.ticket), hasDaily: !!o.daily,
       dailyRows: (o.daily || []).map((q, i) => ({ date: d(day(i)), qty: q + '대', amount: money(q * 20000) })),
-      itemCounts: [
-        { label: '실제 지급', value: o.items.reduce((n, i) => n + i.total - i.unissued, 0), note: o.stage === 'pickup' ? '아직 지급 전' : '고객에게 건넨 수량', style: plate + PLATE.neutral },
-        { label: '차량 인수', value: b.vehicle, note: '차량이 수거 · 매장 확인 전', style: plate + PLATE.purple },
-        { label: '매장 확인', value: b.confirmed, note: '매장 최종 확인 (반납 완료)', style: plate + PLATE.green }
-      ],
 
       paymentLines: [{ label: '최종 대여금액', value: money(o.amount) }, { label: '받은 금액', value: money(o.paid) }],
       balance: money(balance),
@@ -280,7 +291,7 @@ class RentalBoard {
         { label: '고객 보유', note: '아직 받지 않은 수량', value: b.customer, style: 'display:flex;align-items:center;justify-content:space-between;gap:10px;' + plate + PLATE.orange },
         { label: '매장 확인 대기', note: '차량 인수 후 확인 전', value: b.vehicle, style: 'display:flex;align-items:center;justify-content:space-between;gap:10px;' + plate + PLATE.purple },
         { label: '매장 확인 완료', note: '반납 처리 완료', value: b.confirmed, style: 'display:flex;align-items:center;justify-content:space-between;gap:10px;' + plate + PLATE.green }
-      ],
+      ].map((row, index) => ({ ...row, breakdown: s.tab === 'items' ? o.items.filter(i => i[['customer', 'vehicle', 'confirmed'][index]] > 0).map(i => (i.label || i.name) + ' ' + i[['customer', 'vehicle', 'confirmed'][index]] + cardUnit(i)).join(' · ') : '' })),
       period: d(o.start) + (o.start !== o.end ? ' ~ ' + d(o.end) : ''),
       due: rem.length ? rel(rem.map(i => i.due).sort()[0]) + ' · ' + o.slot + (o.time ? ' ' + o.time : '') : o.exchangeOpenQuantity ? '장비교환 확인 필요' : '모두 확인 완료',
       dueNote: rem.length ? rem.map(i => i.method).filter((v, k, a) => a.indexOf(v) === k).join(' · ') + ' · ' + o.place : '',
@@ -346,7 +357,7 @@ function projectOrders() {
       const schedules = itemTasks.map(t => ({ date: t.date, time: t.time, place: t.place, quantity: F.remaining(t).filter(a => assetIds.includes(a)).length, early: !!t.earlyReturnId }));
       const plan = i.returnPlan || {};
       const ticket = i.category === 'liftTicket';
-      return { id: i.id, name: ticket ? '리프트권' : i.label, ticket, total: i.plannedQuantity, customer: i.customerQuantity, vehicle: i.vehicleQuantity, confirmed: i.shopQuantity, unissued: i.unissuedQuantity, exchange: i.exchangePendingQuantity || 0,
+      return { id: i.id, name: ticket ? '리프트권' : i.label, label: i.label, ticket, component: !!i.component, usage: i.usage || [], issued: i.issuedQuantity, total: i.plannedQuantity, customer: i.customerQuantity, vehicle: i.vehicleQuantity, confirmed: i.shopQuantity, unissued: i.unissuedQuantity, exchange: i.exchangePendingQuantity || 0,
         schedules, due: task?.date || plan.date || end, method: task || plan.method === 'vehicle' ? '차량 수거' : '직접반납', assetIds,
         time: task?.time || plan.time || base.time || '16:30', place: task?.place || plan.place || base.place || '매장' };
     });

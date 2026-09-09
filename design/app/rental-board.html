@@ -161,45 +161,26 @@
                       </div></sc-for>
                     </div></sc-if>
                     <sc-if value="{{ needsIssue }}"><div class="rental-issue-actions" style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:18px"><sc-if value="{{ needsGear }}"><button type="button" data-action="wf-order-issue" data-id="{{ orderId }}">장비 지급 확인</button></sc-if><sc-if value="{{ needsTickets }}"><button type="button" data-action="wf-legacy-ticket" data-id="{{ orderId }}">리프트권 지급</button></sc-if></div></sc-if>
-                    <div style="display:flex;flex-direction:column;gap:18px">
-                      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px">
-                        <div style="box-sizing:border-box;padding:14px 16px;border-radius:var(--mk-radius-lg,12px);background:var(--mk-neutral-50,#F8F8F8)">
-                          <span style="display:block;font-size:14px;font-weight:600;color:#5D5D5D">장비</span>
-                          <strong style="display:block;margin-top:5px;font-size:20px;font-weight:700;letter-spacing:-0.02em;line-height:1.3">{{ gear }}</strong>
-                          <span style="display:block;margin-top:4px;font-size:15px;color:var(--mk-neutral-500,#6D6D6D)">{{ gearDetail }}</span>
-                        </div>
-                        <div style="box-sizing:border-box;padding:14px 16px;border-radius:var(--mk-radius-lg,12px);background:var(--mk-neutral-50,#F8F8F8)">
-                          <span style="display:block;font-size:14px;font-weight:600;color:#5D5D5D">리프트권</span>
-                          <strong style="display:block;margin-top:5px;font-size:20px;font-weight:700;letter-spacing:-0.02em;line-height:1.3">{{ tickets }}</strong>
-                        </div>
+                    <div class="rental-products">
+                      <div class="rental-product-grid">
+                        <sc-for list="{{ productCards }}" as="card">
+                              <article class="rental-product-card" data-product-id="{{ card.id }}" data-product-theme="{{ card.theme }}">
+                                <header><div><span class="rental-product-category">{{ card.category }}</span><h4>{{ card.name }}</h4><span class="rental-product-period">{{ card.period }}</span></div><span class="rental-product-state" style="{{ card.stateStyle }}">{{ card.state }}</span></header>
+                                <div class="rental-product-issued"><div><span>실제 지급</span><strong data-product-issued>{{ card.issued }}</strong></div><div><span>{{ card.plannedLabel }} <b data-product-planned>{{ card.planned }}</b></span><small>{{ card.pending }}</small></div></div>
+                                <div class="rental-product-counts">
+                                  <sc-for list="{{ card.counts }}" as="count"><div data-product-count="{{ count.id }}"><span>{{ count.label }}</span><strong>{{ count.quantity }}</strong></div></sc-for>
+                                </div>
+                                <sc-if value="{{ card.componentNote }}"><p class="rental-product-component">{{ card.componentNote }}</p></sc-if>
+                              </article>
+                        </sc-for>
                       </div>
+                      <sc-if value="{{ noItems }}"><p class="rental-product-empty">등록된 대여 품목이 없습니다.</p></sc-if>
                       <sc-if value="{{ hasDaily }}" hint-placeholder-val="{{ false }}">
-                        <div style="border-radius:var(--mk-radius-lg,12px);box-shadow:inset 0 0 0 1px var(--mk-neutral-100,#E7E7E7);overflow:hidden">
-                          <div style="display:grid;grid-template-columns:minmax(0,1fr) 120px 140px;gap:12px;padding:0 14px;min-height:38px;align-items:center;background:var(--mk-neutral-50,#F8F8F8);font-size:14px;font-weight:500;color:var(--mk-neutral-500,#6D6D6D)">
-                            <span>이용일</span><span style="text-align:right">스키 수량</span><span style="text-align:right">할인 전</span>
-                          </div>
-                          <sc-for list="{{ dailyRows }}" as="dr" hint-placeholder-count="2">
-                            <div style="display:grid;grid-template-columns:minmax(0,1fr) 120px 140px;gap:12px;padding:12px 14px;min-height:48px;align-items:center;font-size:16px">
-                              <span style="font-weight:600;font-variant-numeric:tabular-nums">{{ dr.date }}</span>
-                              <span style="text-align:right;font-variant-numeric:tabular-nums">{{ dr.qty }}</span>
-                              <strong style="text-align:right;font-weight:700;font-variant-numeric:tabular-nums">{{ dr.amount }}</strong>
-                            </div>
-                          </sc-for>
-                        </div>
+                        <section class="rental-daily-section"><h3>이용일별 장비 요금 <small>할인 전</small></h3><div class="rental-daily-grid">
+                          <sc-for list="{{ dailyRows }}" as="dr"><article class="rental-daily-card"><span>{{ dr.date }} 이용</span><strong>스키 {{ dr.qty }}</strong><b>{{ dr.amount }}</b></article></sc-for>
+                        </div></section>
                       </sc-if>
-                      <div>
-                        <span style="display:block;font-size:14px;font-weight:600;color:#5D5D5D;margin-bottom:8px">실제 장비 수량</span>
-                        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px">
-                          <sc-for list="{{ itemCounts }}" as="ic" hint-placeholder-count="3">
-                            <div style="{{ ic.style }}">
-                              <span style="display:block;font-size:14px;font-weight:600">{{ ic.label }}</span>
-                              <strong style="display:block;margin-top:4px;font-size:26px;font-weight:700;letter-spacing:-0.03em;font-variant-numeric:tabular-nums">{{ ic.value }}</strong>
-                              <small style="display:block;margin-top:3px;font-size:14px;line-height:1.45">{{ ic.note }}</small>
-                            </div>
-                          </sc-for>
-                        </div>
-                      </div>
-                      <p style="margin:0;padding:13px 15px;background:var(--mk-yellow-50,#FEFCE8);border-radius:var(--mk-radius-lg,12px);box-shadow:inset 0 0 0 1px var(--mk-yellow-200,#FEF08A);font-size:15px;line-height:1.6;color:#713F12">{{ note }}</p>
+                      <sc-if value="{{ hasProductNotes }}"><div class="rental-product-note"><strong>접수 메모</strong><p>{{ note }}</p></div></sc-if>
                     </div>
                   </sc-if>
 
@@ -249,7 +230,7 @@
                   <div style="{{ sm.style }}">
                     <span style="min-width:0">
                       <strong style="display:block;font-size:16px;font-weight:700;letter-spacing:-0.02em">{{ sm.label }}</strong>
-                      <small style="display:block;margin-top:3px;font-size:14px;line-height:1.45">{{ sm.note }}</small>
+                      <small style="display:block;margin-top:3px;font-size:14px;line-height:1.45">{{ sm.note }}</small><sc-if value="{{ sm.breakdown }}"><span class="rental-summary-breakdown">{{ sm.breakdown }}</span></sc-if>
                     </span>
                     <strong style="font-size:26px;font-weight:700;letter-spacing:-0.03em;font-variant-numeric:tabular-nums">{{ sm.value }}</strong>
                   </div>

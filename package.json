@@ -33,7 +33,8 @@
     "test:vehicle-board": "node scripts/smoke-vehicle-board.cjs",
     "test:vehicle-parity": "node scripts/compare-vehicle-reference.cjs",
     "test:rental-changes": "node scripts/smoke-rental-changes.cjs",
-    "test:early-return": "node scripts/smoke-early-return.cjs"
+    "test:early-return": "node scripts/smoke-early-return.cjs",
+    "test:rental-items": "node scripts/smoke-rental-items.cjs"
   },
   "engines": {
     "node": ">=22.13.0"

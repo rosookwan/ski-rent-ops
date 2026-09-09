@@ -109,6 +109,9 @@ const measure = root => [...root.querySelectorAll('h1,h2,button,input,select,str
       await Promise.all([frame.locator('[data-order-id="R-025"]').click(), ref.getByRole('button').filter({ hasText: '김민수' }).click()]);
       for (const title of ['반납 확인', '장비·리프트권', '결제·환불', '변경 이력']) {
         await Promise.all([frame.getByRole('tab', { name: title, exact: true }).click(), ref.getByRole('tab', { name: title, exact: true }).click()]);
+        // This tab was explicitly redesigned into per-item cards. Its data and
+        // responsive layout are verified by smoke-rental-items, not old pixels.
+        if (title === '장비·리프트권') continue;
         await capture('detail-' + ({ '반납 확인': 'return', '장비·리프트권': 'items', '결제·환불': 'payment', '변경 이력': 'history' })[title]);
       }
       await Promise.all([frame.getByRole('tab', { name: '반납 확인', exact: true }).click(), ref.getByRole('tab', { name: '반납 확인', exact: true }).click()]);
@@ -122,7 +125,7 @@ const measure = root => [...root.querySelectorAll('h1,h2,button,input,select,str
     }
     assert.deepEqual(errors, []);
   } finally {
-    fs.writeFileSync(path.join(output, 'parity.json'), JSON.stringify({ source: path.join(directory, name), scope: 'Main list, detail, dialogs; matching data in isolated browser contexts. Existing app branding, POS/management menu and notifications remain in the shell.', results, errors }, null, 2));
+    fs.writeFileSync(path.join(output, 'parity.json'), JSON.stringify({ source: path.join(directory, name), scope: 'Main list, return/payment/history detail, dialogs; matching data in isolated browser contexts. Explicitly redesigned item cards are excluded and verified with smoke-rental-items.', results, errors }, null, 2));
     await browser.close();
   }
   // An opaque iframe and the reference's top-level page can rasterize a few
