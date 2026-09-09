@@ -18,6 +18,8 @@
     "test:navigation": "node scripts/smoke-navigation.cjs",
     "test:rental-board": "node scripts/smoke-rental-board.cjs",
     "test:rental-parity": "node scripts/compare-rental-reference.cjs",
+    "test:dispatch-board": "node scripts/smoke-dispatch-board.cjs",
+    "test:dispatch-parity": "node scripts/compare-dispatch-reference.cjs",
     "test:pwa": "npm run build && node scripts/smoke-pwa.cjs",
     "icons:build": "node scripts/build-app-icons.cjs",
     "test:time-picker": "node scripts/smoke-time-picker.cjs",

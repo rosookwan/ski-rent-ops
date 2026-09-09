@@ -37,6 +37,7 @@
       if (m.kind === 'load') N.emit(notifications, source, 'vehicle:' + m.to.id, 'load', '카운터에서 물품을 추가했어요', counts, { senderScope, movementId: m.id });
       if (m.kind === 'collect') N.emit(notifications, source, 'store', 'workflow-collection', '차량 수거 내역', counts, { senderScope, movementId: m.id });
     }
+    if (event.type === 'stock.purpose') N.emit(notifications, source, 'vehicle:' + result.vehicleId, 'load', '리프트권 용도가 변경됐어요', result.assetIds.length + '매 · ' + (result.purpose === 'spare' ? '차량 예비분' : '고객 전달') + ' · 수량은 그대로입니다.', { senderScope });
     if (event.type === 'task.status' && ['completed', 'cancelled'].includes(event.payload.status)) N.closeWhere(notifications, n => n.taskId === result.taskId && ['priority', 'help', 'workflow-task'].includes(n.type), event.payload.status === 'completed' ? 'resolved' : 'cancelled');
     if (['movement.undo', 'movement.correct'].includes(event.type)) {
       const m = C.find(state.movements, result.movementId), vehicleId = m.to?.kind === 'vehicle' ? m.to.id : m.from?.kind === 'vehicle' ? m.from.id : null;

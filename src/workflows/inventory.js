@@ -184,6 +184,17 @@
     return { refundId: r.id, movementId: movement.id, completed: selected.length, remaining: r.assetIds.length - r.completedAssetIds.length - r.cancelledAssetIds.length, amountWon };
   }
   function handle(state, type, p, context) {
+    if (type === 'stock.purpose') {
+      C.store(context); C.keys(p, ['assetIds', 'vehicleId', 'purpose']);
+      const vehicleId = C.id(p.vehicleId), purpose = C.oneOf(p.purpose, ['spare', 'delivery']);
+      const assets = C.ids(p.assetIds).map(id => C.find(state.assets, id, '물품'));
+      if (assets.some(a => !a.ticket || !same(a.location, { kind: 'vehicle', id: vehicleId }))) C.fail('INVALID_INPUT', '이 차량에 있는 리프트권만 용도를 바꿀 수 있습니다.');
+      if (assets.some(a => a.refundId)) C.fail('NO_CHANGE', '환불 예정을 먼저 취소해 주세요.');
+      if (purpose === 'spare' && state.allocations.some(a => assets.some(item => item.id === a.assetId) && a.status === 'active' && !a.fulfilledAt)) C.fail('NO_CHANGE', '전달 예약이 배정된 권은 배정을 해제한 뒤 예비분으로 바꿔 주세요.');
+      if (assets.every(a => a.purpose === purpose)) C.fail('NO_CHANGE', '이미 선택한 용도입니다.');
+      assets.forEach(a => { a.purpose = purpose; a.lastRevision = state.revision + 1; });
+      return { assetIds: assets.map(a => a.id), vehicleId, purpose };
+    }
     if (type === 'stock.move') return move(state, p, context);
     if (['stock.receive', 'stock.opening', 'ticket.issue'].includes(type)) return stock(state, type, p, context);
     if (['movement.undo', 'movement.correct'].includes(type)) return undo(state, type, p, context);

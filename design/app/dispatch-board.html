@@ -1,0 +1,147 @@
+    <div class="so-dispatch-board" data-main style="flex:1;min-width:0;min-height:0;overflow:hidden;box-sizing:border-box;padding:min(16px,2vh) clamp(14px,1.6vw,24px);display:flex;flex-direction:column;gap:min(12px,1.5vh)">
+
+      <div style="flex-shrink:0;display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px">
+        <h1 style="margin:0;font-size:26px;font-weight:700;letter-spacing:-0.03em;white-space:nowrap">배달·수거 <span style="font-weight:500;font-size:20px;color:var(--mk-neutral-500,#6D6D6D)">{{ driverLine }}</span></h1>
+        <div role="group" aria-label="날짜" style="display:flex;gap:4px;padding:4px;background:#fff;border-radius:var(--mk-radius-xl,14px);box-shadow:inset 0 0 0 1px var(--mk-neutral-100,#E7E7E7)">
+          <sc-for list="{{ dateBtns }}" as="d" hint-placeholder-count="2">
+            <button type="button" aria-pressed="{{ d.pressed }}" onClick="{{ d.onClick }}" style="{{ d.style }}">{{ d.label }}</button>
+          </sc-for>
+        </div>
+        <div class="dispatch-vehicles" aria-label="담당 차량" style="margin-left:auto;display:flex;gap:6px">
+          <sc-for list="{{ vehicles }}" as="v" hint-placeholder-count="2">
+            <button type="button" aria-pressed="{{ v.pressed }}" onClick="{{ v.onClick }}" style="{{ v.style }}">{{ v.name }}<span style="{{ v.subStyle }}">{{ v.sub }}</span></button>
+          </sc-for>
+        </div>
+      </div>
+
+      <div style="{{ tabRowStyle }}">
+        <button type="button" aria-pressed="{{ tabLoadOn }}" onClick="{{ showLoad }}" style="{{ tabLoadStyle }}"><span style="font-size:14px;font-weight:700">차에 실을 팀</span><span style="font-size:20px;font-weight:700;font-variant-numeric:tabular-nums">{{ loadCount }}</span></button>
+        <button type="button" aria-pressed="{{ tabReturnOn }}" onClick="{{ showReturn }}" style="{{ tabReturnStyle }}"><span style="font-size:14px;font-weight:700">수거·매장 인계</span><span style="font-size:20px;font-weight:700;font-variant-numeric:tabular-nums">{{ returnCount }}</span></button>
+      </div>
+
+      <div class="dispatch-columns" style="{{ boardStyle }}">
+
+        <section aria-label="매장 → 차량 · 필요한 물품 싣기" style="{{ loadPanelStyle }}">
+          <div style="flex-shrink:0;padding:14px 18px;background:var(--mk-orange-100,#FFE6D4)">
+            <span style="display:block;font-size:15px;font-weight:700;color:var(--mk-orange-600,#EF3408)">매장 → 차량 · 필요한 물품 싣기</span>
+            <strong style="display:block;margin-top:2px;font-size:22px;font-weight:700;letter-spacing:-0.02em">{{ loadCount }}</strong>
+          </div>
+          <div data-dispatch-scroll style="flex:1;min-height:0;overflow-y:auto;padding:12px 14px;display:flex;flex-direction:column;gap:8px">
+            <sc-for list="{{ loadTeams }}" as="t" hint-placeholder-count="3">
+              <div data-load-id="{{ t.id }}" style="{{ t.style }}">
+                <span style="flex:1;min-width:0">
+                  <strong style="display:block;font-size:22px;font-weight:700;letter-spacing:-0.02em">{{ t.name }}</strong>
+                  <span style="display:block;margin-top:2px;font-size:15px;font-weight:500;color:var(--mk-neutral-500,#6D6D6D);font-variant-numeric:tabular-nums">{{ t.line }}</span>
+                </span>
+                <button type="button" onClick="{{ t.onLoad }}" style="{{ t.btnStyle }}" style-hover="background:var(--mk-orange-600,#EF3408)">실었어요</button>
+                <span style="{{ t.doneStyle }}">{{ t.done }}</span>
+              </div>
+            </sc-for>
+            <sc-if value="{{ noLoad }}" hint-placeholder-val="{{ false }}">
+              <p style="margin:0;padding:28px 0;text-align:center;font-size:17px;color:var(--mk-neutral-500,#6D6D6D)">실을 배달 팀이 없습니다.</p>
+            </sc-if>
+            <button type="button" onClick="{{ openPurposeEdit }}" style="margin-top:auto;display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:52px;padding:10px 14px;font-size:15px;font-weight:600;color:#5D5D5D;background:var(--mk-neutral-50,#F8F8F8);border:0;border-radius:var(--mk-radius-lg,12px);text-align:left" style-hover="background:var(--mk-neutral-100,#E7E7E7)"><span>{{ spareLine }}</span><span style="color:#1A1A1A;font-weight:700;white-space:nowrap">용도 바꾸기 ›</span></button>
+          </div>
+          <div style="flex-shrink:0;display:flex;padding:10px 14px 12px;box-shadow:0 -4px 12px rgba(0,0,0,.04)"><button type="button" onClick="{{ loadMore }}" style="flex:1;display:flex;align-items:center;justify-content:center;min-height:56px;padding:10px 16px;font-size:17px;font-weight:700;color:#fff;background:var(--mk-orange-500,#FE4E10);border:0;border-radius:var(--mk-radius-md,8px)" style-hover="background:var(--mk-orange-600,#EF3408)">추가로 싣기</button></div>
+        </section>
+
+        <section aria-label="차량 · 방문 순서" style="min-width:0;min-height:0;display:flex;flex-direction:column;background:#fff;border-radius:var(--mk-radius-2xl,16px);box-shadow:inset 0 0 0 1px var(--mk-neutral-100,#E7E7E7);overflow:hidden">
+          <div style="flex-shrink:0;display:flex;align-items:flex-end;justify-content:space-between;gap:12px;padding:14px 18px;background:var(--mk-label-beverages-bg,#E9F4FF)">
+            <span><span style="display:block;font-size:15px;font-weight:700;color:var(--mk-label-beverages-fg,#0074D9)">차량 · 방문 순서</span><strong style="display:block;margin-top:2px;font-size:22px;font-weight:700;letter-spacing:-0.02em">{{ visitCount }}</strong></span>
+            <span style="font-size:15px;font-weight:600;color:#5D5D5D;white-space:nowrap">▲ ▼ 로 순서만 바꿉니다</span>
+          </div>
+          <div aria-label="방문 순서" style="flex:1;min-height:0;overflow-y:auto;padding:12px 16px;display:flex;flex-direction:column;gap:8px">
+            <sc-for list="{{ visits }}" as="j" hint-placeholder-count="5">
+              <div data-visit-id="{{ j.id }}" role="button" tabindex="0" aria-pressed="{{ j.selected }}" onClick="{{ j.onPick }}" style="{{ j.style }}">
+                <span style="{{ j.numStyle }}">{{ j.num }}</span>
+                <strong style="flex-shrink:0;width:80px;font-size:24px;font-weight:700;letter-spacing:-0.02em;font-variant-numeric:tabular-nums">{{ j.time }}</strong>
+                <span style="flex:1;min-width:0">
+                  <strong style="font-size:22px;font-weight:700;letter-spacing:-0.02em">{{ j.name }}</strong>
+                  <span style="display:block;margin-top:2px;font-size:15px;font-weight:500;color:var(--mk-neutral-500,#6D6D6D)"><span style="{{ j.kindStyle }}">{{ j.kind }}</span>{{ j.line }}</span>
+                </span>
+                <span style="{{ j.stateStyle }}">{{ j.state }}</span>
+                <span style="{{ j.moveWrapStyle }}">
+                  <button type="button" aria-label="위로" disabled="{{ j.upOff }}" onClick="{{ j.onUp }}" style="display:grid;place-items:center;width:48px;height:48px;background:var(--mk-neutral-50,#F8F8F8);border:0;border-radius:var(--mk-radius-md,8px);box-shadow:inset 0 0 0 1px var(--mk-neutral-200,#D1D1D1);font-size:16px;font-weight:700;color:#1A1A1A">▲</button>
+                  <button type="button" aria-label="아래로" disabled="{{ j.downOff }}" onClick="{{ j.onDown }}" style="display:grid;place-items:center;width:48px;height:48px;background:var(--mk-neutral-50,#F8F8F8);border:0;border-radius:var(--mk-radius-md,8px);box-shadow:inset 0 0 0 1px var(--mk-neutral-200,#D1D1D1);font-size:16px;font-weight:700;color:#1A1A1A">▼</button>
+                </span>
+              </div>
+            </sc-for>
+            <sc-if value="{{ noVisits }}" hint-placeholder-val="{{ false }}">
+              <p style="margin:0;padding:36px 0;text-align:center;font-size:17px;color:var(--mk-neutral-500,#6D6D6D)">이 날 방문 업무가 없습니다.</p>
+            </sc-if>
+          </div>
+          <div style="flex-shrink:0;display:flex;gap:8px;padding:10px 16px 12px;box-shadow:0 -4px 12px rgba(0,0,0,.04)">
+            <button type="button" disabled="{{ notifyOff }}" onClick="{{ notifyDriver }}" style="flex:1;display:flex;align-items:center;justify-content:center;min-height:56px;padding:10px 14px;font-size:18px;font-weight:700;color:var(--mk-orange-600,#EF3408);background:var(--mk-orange-100,#FFE6D4);border:0;border-radius:var(--mk-radius-lg,12px)" style-hover="background:var(--mk-orange-200,#FFCAA8)">{{ notifyLabel }}</button>
+            <button type="button" onClick="{{ restoreOrder }}" style="flex:0 0 auto;display:flex;align-items:center;justify-content:center;min-height:56px;padding:10px 18px;font-size:18px;font-weight:700;color:#5D5D5D;background:#fff;border:0;border-radius:var(--mk-radius-lg,12px);box-shadow:inset 0 0 0 1px var(--mk-neutral-200,#D1D1D1)" style-hover="box-shadow:inset 0 0 0 1px var(--mk-orange-500,#FE4E10)">시간순 되돌리기</button>
+          </div>
+        </section>
+
+        <section aria-label="수거 · 매장 인계" style="{{ returnPanelStyle }}">
+          <div style="flex-shrink:0;padding:14px 18px;background:var(--mk-neutral-100,#E7E7E7)">
+            <span style="display:block;font-size:15px;font-weight:700;color:#414141">수거 · 매장 인계</span>
+            <strong style="display:block;margin-top:2px;font-size:22px;font-weight:700;letter-spacing:-0.02em">{{ returnCount }}</strong>
+          </div>
+          <div data-dispatch-scroll style="flex:1;min-height:0;overflow-y:auto;padding:12px 14px;display:flex;flex-direction:column;gap:8px">
+            <sc-for list="{{ returnTeams }}" as="r" hint-placeholder-count="4">
+              <div data-return-id="{{ r.id }}" style="{{ r.style }}">
+                <span style="display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 8px"><strong style="font-size:20px;font-weight:700;letter-spacing:-0.02em">{{ r.name }}</strong><span style="{{ r.stateStyle }}">{{ r.state }}</span></span>
+                <span style="display:block;margin-top:2px;font-size:15px;font-weight:500;color:var(--mk-neutral-500,#6D6D6D);font-variant-numeric:tabular-nums">{{ r.line }}</span>
+                <sc-if value="{{ r.canCollect }}"><button type="button" onClick="{{ r.onCollect }}" style="margin-top:8px;width:100%;display:flex;align-items:center;justify-content:center;min-height:48px;padding:0 11px;font-size:16px;font-weight:700;color:#5D5D5D;background:#fff;border:0;border-radius:var(--mk-radius-md,8px);box-shadow:inset 0 0 0 1px var(--mk-neutral-200,#D1D1D1)">수거 수량 입력</button></sc-if>
+              </div>
+            </sc-for>
+            <sc-if value="{{ noReturn }}" hint-placeholder-val="{{ false }}">
+              <p style="margin:0;padding:28px 0;text-align:center;font-size:17px;color:var(--mk-neutral-500,#6D6D6D)">수거 예정 팀이 없습니다.</p>
+            </sc-if>
+            <p style="margin:auto 0 0;padding:10px 12px;font-size:15px;line-height:1.45;color:var(--mk-neutral-500,#6D6D6D);background:var(--mk-neutral-50,#F8F8F8);border-radius:var(--mk-radius-lg,12px)">차에 실은 수량과 매장에 내린 수량을 나눠 기록합니다. 미수거 물품은 다음 방문에 이어서 받으세요.</p>
+          </div>
+          <div style="flex-shrink:0;display:flex;padding:10px 14px 12px;box-shadow:0 -4px 12px rgba(0,0,0,.04)"><button type="button" onClick="{{ receiveMore }}" style="flex:1;display:flex;align-items:center;justify-content:center;min-height:56px;padding:10px 16px;font-size:17px;font-weight:700;color:#fff;background:var(--mk-orange-500,#FE4E10);border:0;border-radius:var(--mk-radius-md,8px)" style-hover="background:var(--mk-orange-600,#EF3408)">매장에 내리기</button></div>
+        </section>
+      </div>
+    </div>
+  <sc-if value="{{ dialogOpen }}" hint-placeholder-val="{{ false }}">
+    <div class="so-dispatch-overlay" role="dialog" aria-labelledby="dispatch-dialog-title" aria-modal="true" style="position:fixed;inset:0;z-index:30;display:flex;align-items:center;justify-content:center;padding:24px;background:rgba(0,0,0,.4)">
+      <div style="width:100%;max-width:620px;max-height:calc(100vh - 48px);overflow-y:auto;box-sizing:border-box;background:#fff;border-radius:var(--radius-modal,14px);box-shadow:inset 0 0 0 1px var(--mk-neutral-100,#E7E7E7)">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;padding:16px 20px;box-shadow:inset 0 -1px 0 var(--mk-gray-100,#F2F4F7)">
+          <h2 id="dispatch-dialog-title" style="margin:0;font-size:20px;font-weight:700;letter-spacing:-0.03em">{{ dialogTitle }}</h2>
+          <button type="button" aria-label="창 닫기" onClick="{{ closeDialog }}" style="display:grid;place-items:center;width:48px;height:48px;flex-shrink:0;background:var(--mk-neutral-50,#F8F8F8);border:0;border-radius:var(--mk-radius-md,8px);color:#5D5D5D">
+            <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" style="fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg>
+          </button>
+        </div>
+        <div style="padding:18px 20px;display:flex;flex-direction:column;gap:14px">
+          <p style="margin:0;font-size:18px;font-weight:600">{{ dialogLead }}</p>
+<sc-if value="{{ dialogError }}"><p role="alert" style="margin:0;color:#DC2626;font-size:16px">{{ dialogError }}</p></sc-if>
+
+          <sc-if value="{{ dialogOpen }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <sc-for list="{{ liftRows }}" as="l" hint-placeholder-count="3">
+                <div data-lift-id="{{ l.id }}" style="box-sizing:border-box;padding:12px 14px;background:var(--mk-neutral-50,#F8F8F8);border-radius:var(--mk-radius-lg,12px)">
+                  <div style="display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 10px;margin-bottom:7px">
+                    <strong style="font-size:19px;font-weight:700;letter-spacing:-0.02em">{{ l.name }}</strong>
+                    <span style="font-size:17px;font-weight:600;color:#5D5D5D;font-variant-numeric:tabular-nums">{{ l.qty }}</span>
+                    <span style="font-size:16px;color:var(--mk-neutral-500,#6D6D6D)">{{ l.who }}</span>
+                  </div>
+                  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(118px,1fr));gap:6px">
+                    <sc-for list="{{ l.options }}" as="o" hint-placeholder-count="3">
+                      <button type="button" aria-pressed="{{ o.pressed }}" onClick="{{ o.onClick }}" style="{{ o.style }}">{{ o.label }}</button>
+                    </sc-for>
+                  </div>
+                </div>
+              </sc-for>
+              <sc-if value="{{ noLifts }}" hint-placeholder-val="{{ false }}">
+                <p style="margin:0;padding:24px 0;text-align:center;font-size:17px;color:var(--mk-neutral-500,#6D6D6D)">차량에 실린 리프트권이 없습니다.</p>
+              </sc-if>
+            </div>
+          </sc-if>
+
+          <p style="margin:0;font-size:16px;line-height:1.5;color:var(--mk-neutral-500,#6D6D6D)">{{ dialogNote }}</p>
+          <div style="display:flex;justify-content:flex-end">
+            <button type="button" onClick="{{ closeDialog }}" style="display:flex;align-items:center;justify-content:center;min-height:56px;padding:12px 26px;font-size:18px;font-weight:700;color:#fff;background:var(--mk-orange-500,#FE4E10);border:0;border-radius:var(--mk-radius-lg,12px);transition:background 180ms cubic-bezier(.2,0,.2,1)" style-hover="background:var(--mk-orange-600,#EF3408)">닫기</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ notice }}" hint-placeholder-val="{{ false }}">
+    <div role="status" style="position:fixed;left:50%;bottom:24px;transform:translateX(-50%);max-width:calc(100% - 40px);padding:14px 20px;font-size:17px;font-weight:500;color:#fff;background:#1A1A1A;border-radius:var(--mk-radius-lg,12px);box-shadow:0 4px 12px rgba(0,0,0,.16);z-index:40">{{ notice }}</div>
+  </sc-if>

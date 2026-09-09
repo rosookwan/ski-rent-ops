@@ -71,5 +71,5 @@
     S.modal('매장·기사님 연락처','<div class="so-contact-directory">'+card(shop.name,shop.phone,'매장 대표번호')+'<h3>기사님 연락처</h3>'+(drivers.length?drivers.map(person=>card(person.name,person.phone,vehicleName(person.vehicleId))).join(''):'<p class="so-muted">등록된 기사님이 없습니다. 매장 설정에서 기사님 연락처를 추가해 주세요.</p>')+'</div><p class="so-muted">번호 확인 화면입니다. 실제 통화는 시작하지 않습니다.</p><div class="so-dialog-actions">'+button('닫기','close','','primary')+'</div>');
   }
   S.action('operations-contacts',contacts);
-  S.operations={panels,store:()=>({...shop})};
+  S.operations={panels,store:()=>({...shop}),drivers:()=>people.filter(person=>person.role==='driver').map(person=>({...person}))};
 })();

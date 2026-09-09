@@ -67,10 +67,6 @@
     const tasks = [...list.inProgress, ...list.pending];
     return '<div class="wf wf-vehicle"><div class="wf-vehicle-toolbar"><div class="wf-actions wf-vehicle-tabs">' + [['jobs', '방문 업무'], ['stock', '적재 내역'], ['history', '처리 내역']].map(([id, text]) => b(text, 'wf-vehicle-tab', id, ui.vehicleTab === id ? 'soft' : '')).join('') + '</div><div class="wf-toolbar-notices">' + notices() + '</div></div>' + (ui.vehicleTab === 'jobs' ? '<div class="wf-vehicle-grid"><section class="wf-job-column"><h2>남은 방문 ' + tasks.length + '건 <small>' + (list.manualOrder ? '매장 지정 순서' : '시간순') + '</small></h2><div class="wf-job-scroll">' + (tasks.map(t => taskRow(t)).join('') || empty('오늘 업무를 모두 마쳤습니다.')) + '</div></section><div class="wf-work-column">' + taskDetail(tasks.find(t => t.id === ui.selected)) + '</div></div>' : '<div class="wf-scroll">' + (ui.vehicleTab === 'stock' ? inventoryRows(true) : historyRows(true)) + '</div>') + '</div>';
   }
-  function dispatch() {
-    const data = board();
-    return '<div class="wf">' + head('배달·수거 순서', '대기 중인 방문만 순서를 바꿉니다. 확인 요청은 별도로 유지됩니다.', b('시간순 복원', 'wf-restore') + go('차량 화면 보기', 'vehicle', '', 'primary')) + '<div class="wf-toolbar">' + dayPicker('dispatch') + b('차량 적재·인계', 'wf-stock-page') + b(ui.completed ? '남은 업무 보기' : '완료 내역 보기', 'wf-completed') + '</div><div class="wf-scroll">' + (ui.completed ? data.completed.map(t => row(e(t.title), e(t.place) + ' · ' + e(t.time), tag(t.status === 'cancelled' ? '취소' : '완료', 'green'))).join('') : [...data.inProgress, ...data.pending].map(t => taskRow(t, true)).join('')) + '</div></div>';
-  }
   function groups(rows) { const map = new Map(); for (const a of rows) { const k = [a.lotId, a.location.kind, a.location.id, a.purpose, a.refundId || ''].join('|'); if (!map.has(k)) map.set(k, []); map.get(k).push(a); } return [...map.values()]; }
   function inventoryRows(driverOnly = false) {
     const state = F.snap(), records = groups(state.assets.filter(a => driverOnly ? a.location.kind === 'vehicle' && a.location.id === F.vehicleId : a.ticket && a.location.kind !== 'vendor'));
@@ -130,7 +126,8 @@
   S.action('wf-select', id => { ui.selected = id; S.render(); });
   S.action('wf-vehicle-tab', id => { ui.vehicleTab = id; S.render(); });
   S.action('wf-task-move', safe(taskMove));
-  S.action('wf-open-task', id => { ui.selected = id; S.go('vehicle'); });
+  const openTask = id => { const task = F.snap().tasks.find(t => t.id === id); if (task) ui.date = task.date; ui.selected = id; S.go('vehicle'); };
+  S.action('wf-open-task', openTask);
   S.action('wf-stock-page', () => S.go('vehicle-stock'));
   S.action('wf-stock-popup', openVehicleStock);
   S.$('#so-dialog').addEventListener('click', event => {
@@ -202,10 +199,9 @@
   S.action('wf-collection-new', safe(id => taskEditor({ id: C.randomId('collection-'), kind: 'collection', customerId: id, vehicleId: F.vehicleId, date: S.data.today, time: '16:30', place: '만선 광장', title: name(id) + ' 수거', assetIds: F.snap().assets.filter(a => a.location.kind === 'customer' && F.customerIds(id).includes(a.location.id)).map(a => a.id) })));
   S.action('wf-task-save', safe(() => { F.saveTask({ ...taskDraft, date: read('wf-task-date'), time: read('wf-task-time'), place: read('wf-task-place') }); changed('수거 일정을 변경했습니다.'); }));
   S.register('vehicle', { title: '1호 차량', headerTools: vehicleHeaderTools, render: renderVehicle });
-  S.register('dispatch', { title: '배달·수거', render: dispatch });
   S.register('vehicle-stock', { title: '차량 적재·인계', parent: 'dispatch', render: vehicleStockPage });
   S.register('lift-reservations', { title: '리프트권 예약', render: reservations });
   S.register('lift-stock', { title: '리프트권 보관·환불', parent: 'lift-reservations', render: liftStock });
   S.returnUI.closingTickets = () => { const report = F.store.report({ date: S.data.today }); return panel('리프트권 이동 집계', report.totals.filter(x => x.newlyIssued || x.recovered || x.refunded || x.redelivered).map(x => row(e(F.snap().catalog.find(s => s.id === x.sku)?.label || x.sku), '신규 발권 ' + x.newlyIssued + ' · 회수 ' + x.recovered + ' · 재전달 ' + x.redelivered + ' · 발권처 환불 ' + x.refunded)).join('') + row('실제 발권처 환불액', S.money(report.refundAmountWon)) + '<p class="wf-hint">고객 결제 환불 및 장당 회수 기준 금액과 별도 집계입니다.</p>'); };
-  S.workflowUI = { openNotice: notice => { if (notice.formId) S.go('response', { id: notice.formId }); else if (notice.taskId) { ui.selected = notice.taskId; S.go(S.state.page === 'vehicle' ? 'vehicle' : 'dispatch'); } else if (notice.refundId) S.go('lift-stock'); else if (notice.movementId) S.go(S.state.page === 'vehicle' ? 'vehicle' : 'vehicle-stock'); else S.go('dispatch'); }, safe, modal, head, panel, row, countInput, read, number, changed, textItems, empty, openPicker, stock, stamp, syncBase };
+  S.workflowUI = { openNotice: notice => { if (notice.formId) S.go('response', { id: notice.formId }); else if (notice.taskId) { ui.selected = notice.taskId; if (S.state.page === 'vehicle') openTask(notice.taskId); else { S.go('dispatch'); S.dispatchBoard?.selectTask(notice.taskId); } } else if (notice.refundId) S.go('lift-stock'); else if (notice.movementId) S.go(S.state.page === 'vehicle' ? 'vehicle' : 'vehicle-stock'); else S.go('dispatch'); }, openTask, safe, modal, head, panel, row, countInput, read, number, changed, textItems, empty, openPicker, stock, stamp, syncBase };
 })();

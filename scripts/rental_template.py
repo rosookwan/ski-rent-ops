@@ -14,8 +14,9 @@ BINDING = re.compile(r'{{\s*([\w.]+)\s*}}')
 
 
 class Template(HTMLParser):
-    def __init__(self):
+    def __init__(self, namespace='rental'):
         super().__init__(convert_charrefs=True)
+        self.namespace = namespace
         self.tree = []
         self.stack = [self.tree]
         self.hover = {}
@@ -64,7 +65,7 @@ class Template(HTMLParser):
             return '(' + value + '||[]).map(' + name + '=>' + self.children(nodes, names | {name}) + ').join("")'
         if 'style-hover' in attrs:
             css = attrs.pop('style-hover')
-            key = self.hover.setdefault(css, 'rental-hover-' + str(len(self.hover)))
+            key = self.hover.setdefault(css, self.namespace + '-hover-' + str(len(self.hover)))
             attrs['class'] = (attrs.get('class', '') + ' ' + key).strip()
         # The application's global icon sizing must not replace source SVG sizes.
         if tag == 'svg':
@@ -75,7 +76,7 @@ class Template(HTMLParser):
                 continue
             if key.startswith('on'):
                 path = BINDING.fullmatch(value)[1]
-                out += [json.dumps(' data-rental-' + key[2:] + '="'), 'bind(' + self.value(path, names) + ',' + json.dumps(path) + ')', "'\"'"]
+                out += [json.dumps(' data-' + self.namespace + '-' + key[2:] + '="'), 'bind(' + self.value(path, names) + ',' + json.dumps(path) + ')', "'\"'"]
             elif key in ('disabled', 'readonly', 'checked') and BINDING.fullmatch(value or ''):
                 expr = self.value(BINDING.fullmatch(value)[1], names)
                 out.append('(' + expr + '?' + json.dumps(' ' + key) + ':"")')
@@ -88,9 +89,9 @@ class Template(HTMLParser):
         return '(' + '+'.join(out) + ')'
 
 
-def compile_rental_template(path):
-    template = Template()
+def compile_rental_template(path, namespace='rental', view='SkiRentalView'):
+    template = Template(namespace)
     template.feed(path.read_text())
-    source = 'window.SkiRentalView=(v,bind,esc)=>' + template.children(template.tree, set()) + ';'
+    source = 'window.' + view + '=(v,bind,esc)=>' + template.children(template.tree, set()) + ';'
     css = '\n'.join('#ski-ops .' + name + ':hover:not(:disabled){' + rule + ' !important}' for rule, name in template.hover.items())
     return source, css

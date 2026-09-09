@@ -187,3 +187,36 @@ test('partial work cannot be reassigned and correcting a completed movement reop
   assert.equal(f.driver.board().inProgress[0].status, 'in_progress');
   assert.equal(f.driver.vehicle().equipmentCount, 1);
 });
+
+test('vehicle ticket purpose changes preserve physical custody and cannot release active reservations', () => {
+  const f = fixture(), ids = f.issue(2);
+  f.move('load', ids, shop, van);
+  const before = f.store.snapshot(), movementCount = f.store.history().movements.length;
+  f.call('stock.purpose', { assetIds: ids, vehicleId: van.id, purpose: 'delivery' });
+  const after = f.store.snapshot();
+  assert.equal(after.assets.length, before.assets.length);
+  assert.deepEqual(after.assets.map(a => [a.id, a.location, a.vehicleOrigin, a.ticket]), before.assets.map(a => [a.id, a.location, a.vehicleOrigin, a.ticket]));
+  assert.equal(f.store.history().movements.length, movementCount);
+  assert.ok(after.assets.every(a => a.purpose === 'delivery'));
+  assert.throws(() => f.call('stock.purpose', { assetIds: ids, vehicleId: 'van-2', purpose: 'spare' }), errorCode('INVALID_INPUT'));
+  assert.throws(() => f.call('stock.purpose', { assetIds: ids, vehicleId: van.id, purpose: 'spare' }, f.driver), errorCode('FORBIDDEN'));
+  f.book('next'); f.call('ticket.allocate', { reservationId: 'next', lineId: 'line-1', assetIds: [ids[0]] });
+  const revision = f.store.snapshot().revision;
+  assert.throws(() => f.call('stock.purpose', { assetIds: ids, vehicleId: van.id, purpose: 'spare' }), errorCode('NO_CHANGE'));
+  assert.equal(f.store.snapshot().revision, revision);
+  f.call('stock.purpose', { assetIds: [ids[1]], vehicleId: van.id, purpose: 'spare' });
+  assert.equal(f.store.snapshot().assets.find(a => a.id === ids[0]).purpose, 'delivery');
+});
+
+test('purpose change cannot bypass a refund plan or apply to equipment and shop-held tickets', () => {
+  const f = fixture(), ids = f.issue(2), gear = f.call('stock.receive', { sku: 'ski', quantity: 1 }).assetIds;
+  f.move('load', [ids[0], ...gear], shop, van);
+  const payload = { vehicleId: van.id, purpose: 'delivery' };
+  assert.throws(() => f.call('stock.purpose', { ...payload, assetIds: [ids[1]] }), errorCode('INVALID_INPUT'));
+  assert.throws(() => f.call('stock.purpose', { ...payload, assetIds: gear }), errorCode('INVALID_INPUT'));
+  f.call('refund.plan', { id: 'purpose-refund', assetIds: [ids[0]], vehicleId: van.id, vendorId: 'resort-1', date: '2026-09-09', time: '17:00', place: '발권처' });
+  const revision = f.store.snapshot().revision;
+  assert.throws(() => f.call('stock.purpose', { ...payload, assetIds: [ids[0]] }), errorCode('NO_CHANGE'));
+  assert.equal(f.store.snapshot().revision, revision);
+  assert.equal(f.store.snapshot().assets.find(a => a.id === ids[0]).refundId, 'purpose-refund');
+});
