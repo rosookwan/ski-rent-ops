@@ -75,3 +75,5 @@
 #ski-ops #so-dialog:has(.wf-stock-popup) .wf-modal-footer .so-button{min-width:100px}
 @media(max-width:900px){#ski-ops.so-vehicle .so-topbar{height:auto;flex-wrap:wrap}#ski-ops.so-vehicle #so-page-tools{flex-basis:100%}#ski-ops .wf-vehicle-header-tools{justify-content:space-between}}
 @media(max-width:600px){#ski-ops .wf-vehicle-header-tools{flex-wrap:wrap;gap:8px}#ski-ops .wf-vehicle-header-tools>.wf-stock-triggers{width:100%}#ski-ops .wf-vehicle-header-tools .wf-stock-trigger{flex:1}#ski-ops #so-dialog:has(.wf-stock-popup)[open]{margin-top:16px;max-height:calc(100dvh - 32px)}}
+
+#ski-ops .wf-received-label{display:flex;align-items:center;gap:12px;min-height:48px;cursor:pointer}#ski-ops .wf-received-label input{width:28px;height:28px;accent-color:#6550ba}#ski-ops #wf-received-summary p{margin:5px 0 12px}

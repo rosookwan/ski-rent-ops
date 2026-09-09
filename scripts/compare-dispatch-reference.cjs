@@ -23,7 +23,7 @@ function tripReference() {
     const pattern = new RegExp('(<section aria-label="' + panel + '"[\\s\\S]*?)(</section>)');
     assert.match(html, pattern); html = html.replace(pattern, (_, body, close) => body + footer(label) + close);
   }
-  const collect = '<sc-if value="{{ r.canCollect }}"><button type="button" style="margin-top:8px;width:100%;display:flex;align-items:center;justify-content:center;min-height:48px;padding:0 11px;font-size:16px;font-weight:700;color:#5D5D5D;background:#fff;border:0;border-radius:var(--mk-radius-md,8px);box-shadow:inset 0 0 0 1px var(--mk-neutral-200,#D1D1D1)">수거 수량 입력</button></sc-if>';
+  const collect = '<sc-if value="{{ r.canCollect }}"><div style="margin-top:8px;display:flex;gap:8px"><button type="button" style="flex:1;min-width:0;display:flex;align-items:center;justify-content:center;min-height:48px;padding:0 8px;font-size:16px;font-weight:700;color:#5D5D5D;background:#fff;border:0;border-radius:var(--mk-radius-md,8px);box-shadow:inset 0 0 0 1px var(--mk-neutral-200,#D1D1D1)">모두 받음</button><button type="button" style="flex:1;min-width:0;display:flex;align-items:center;justify-content:center;min-height:48px;padding:0 8px;font-size:16px;font-weight:700;color:#5D5D5D;background:#fff;border:0;border-radius:var(--mk-radius-md,8px);box-shadow:inset 0 0 0 1px var(--mk-neutral-200,#D1D1D1)">일부만 받음</button></div></sc-if>';
   html = html.replace('{{ r.line }}</span>', '{{ r.line }}</span>' + collect);
   html = html.replace("state: done ? '✓ 차에 있음'", "canCollect: j.kind === 'collect' && j.remainingCount > 0, state: j.returnState || (done ? '✓ 차에 있음'")
     .replace("'환불 예정' : '수거 예정'),", "'환불 예정' : '수거 예정')),");
@@ -41,7 +41,7 @@ const referenceURL = base + encodeURIComponent(name);
 const appURL = process.env.SKI_DEMO_URL || 'http://127.0.0.1:58148/';
 const output = path.resolve(process.env.SKI_DISPATCH_OUTPUT || 'work/dispatch-ui-parity');
 fs.mkdirSync(output, { recursive: true });
-fs.writeFileSync(path.join(output, 'reference-adjustments.json'), JSON.stringify({ original: path.join(directory, name), copyChanges, controls: ['추가로 싣기: original 56px/17px load button style in fixed footer', '매장에 내리기: same fixed footer', '수거 수량 입력: original 48px/16px neutral button style', 'Unissued tickets: 발권·준비 using the unchanged loading button style'], data: 'Physical remaining, on-vehicle and shop-received counts replace the reference completed=on-vehicle assumption. Equipment and tickets are separate pending tasks; completed deliveries leave the loading panel.' }, null, 2));
+fs.writeFileSync(path.join(output, 'reference-adjustments.json'), JSON.stringify({ original: path.join(directory, name), copyChanges, controls: ['추가로 싣기: original 56px/17px load button style in fixed footer', '매장에 내리기: same fixed footer', '모두 받음 / 일부만 받음: requested 48px/16px neutral shortcuts', 'Unissued tickets: 발권·준비 using the unchanged loading button style'], data: 'Physical remaining, on-vehicle and shop-received counts replace the reference completed=on-vehicle assumption. Equipment and tickets are separate pending tasks; completed deliveries leave the loading panel.' }, null, 2));
 function pixels(a, b, filename, rounded = false) {
   const x = PNG.sync.read(a), y = PNG.sync.read(b);
   assert.equal(x.width, y.width); assert.equal(x.height, y.height);

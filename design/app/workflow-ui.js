@@ -93,11 +93,34 @@
   }
   function liftStock() { const refunds = F.snap().refunds; return '<div class="wf">' + head('리프트권 보관·환불', '현재 위치와 다음 고객, 환불 잔량을 함께 확인합니다.', b('보유권 등록', 'wf-ticket-new') + go('예약·발권', 'lift-reservations')) + '<div class="wf-scroll">' + panel('환불 업무', refunds.map(r => row('환불 ' + r.plannedQuantity + '매 · 완료 ' + r.completedQuantity + ' / 남음 ' + r.remainingQuantity, e(r.status === 'partial' ? '일부 환불 · 남은 수량 재처리 가능' : r.status === 'incomplete' ? '미처리 · 사유 확인 후 재시도' : r.remainingQuantity ? '환불 대기' : '종료') + ' · 차량 보관 ' + r.onboardQuantity + '매 · 실제 환불액 ' + S.money(r.amountWon), r.remainingQuantity ? b('환불 결과 입력', 'wf-refund-result', r.id) + b('남은 환불 취소', 'wf-refund-cancel', r.id) : tag('처리 완료', 'green'))).join('')) + inventoryRows() + '</div></div>'; }
   let picker = null;
-  function openPicker(title, rows, apply, extra = '') {
-    picker = { rows: groups(rows), apply };
-    modal(title, extra + (picker.rows.length ? picker.rows.map((group, i) => { const a = group[0], sku = F.snap().catalog.find(s => s.id === a.sku); return row(e(sku.label) + ' · ' + group.length + sku.unit + ' 가능', a.ticket ? stamp(a.ticket.validTo) + '까지 · ' + (a.refundId ? '환불 예정' : e(locationName(a.location))) : e(locationName(a.location)), countInput(sku.label, 'wf-q-' + i, 0, group.length)); }).join('') : empty('처리할 수 있는 물품이 없습니다.')), b('모두 선택', 'wf-pick-all') + b('취소', 'close') + b('선택 수량 확인', 'wf-pick-apply', '', 'primary'));
+  function openPicker(title, rows, apply, extra = '', options = {}) {
+    picker = { rows: groups(rows), apply, received: !!options.received };
+    modal(title, extra + (picker.rows.length ? picker.rows.map((group, i) => {
+      const a = group[0], sku = F.snap().catalog.find(s => s.id === a.sku);
+      const title = picker.received ? '<label class="wf-received-label"><input type="checkbox" data-received-index="' + i + '" aria-label="' + e(sku.label) + ' 받음" ' + (options.all ? 'checked' : '') + '>' + e(sku.label) + ' · 이번 대상 ' + group.length + e(sku.unit) + '</label>' : e(sku.label) + ' · ' + group.length + sku.unit + ' 가능';
+      return row(title, picker.received ? '실제로 받은 수량' : a.ticket ? stamp(a.ticket.validTo) + '까지 · ' + (a.refundId ? '환불 예정' : e(locationName(a.location))) : e(locationName(a.location)), countInput(sku.label, 'wf-q-' + i, options.all ? group.length : 0, group.length));
+    }).join('') : empty('처리할 수 있는 물품이 없습니다.')) + (picker.received ? '<div id="wf-received-summary" class="wf-hint" aria-live="polite"></div>' : ''), b('모두 선택', 'wf-pick-all') + b('취소', 'close') + b('선택 수량 확인', 'wf-pick-apply', '', 'primary'));
+    updateReceived();
   }
-  S.action('wf-pick-all', () => picker.rows.forEach((group, i) => { S.$('#wf-q-' + i).value = group.length; }));
+  function updateReceived() {
+    if (!picker?.received || !S.$('#wf-received-summary')) return;
+    const received = [], left = [];
+    picker.rows.forEach((group, i) => {
+      const value = Math.max(0, Math.min(group.length, Number(S.$('#wf-q-' + i).value) || 0)), sku = F.snap().catalog.find(s => s.id === group[0].sku);
+      S.$('[data-received-index="' + i + '"]').checked = value > 0;
+      if (value) received.push(sku.label + ' ' + value + sku.unit);
+      if (value < group.length) left.push(sku.label + ' ' + (group.length - value) + sku.unit);
+    });
+    S.$('#wf-received-summary').innerHTML = '<strong>이번에 받은 품목</strong><p>' + e(received.join(' · ') || '선택한 품목 없음') + '</p><strong>고객에게 남은 품목</strong><p>' + e(left.join(' · ') || '없음') + '</p>';
+    S.$('#so-dialog [data-action="wf-pick-apply"]').disabled = !received.length;
+  }
+  S.$('#so-dialog').addEventListener('input', event => { if (event.target.matches('input[type="number"]')) updateReceived(); });
+  S.$('#so-dialog').addEventListener('change', event => {
+    if (!event.target.matches('[data-received-index]')) return;
+    const i = Number(event.target.dataset.receivedIndex);
+    S.$('#wf-q-' + i).value = event.target.checked ? picker.rows[i].length : 0; updateReceived();
+  });
+  S.action('wf-pick-all', () => { picker.rows.forEach((group, i) => { S.$('#wf-q-' + i).value = group.length; }); updateReceived(); });
   function pickRows() { return picker.rows.flatMap((group, i) => group.slice(0, number('wf-q-' + i)).map(a => a.id)); }
   S.action('wf-pick-apply', safe(() => { const ids = pickRows(); if (!ids.length) throw new Error('처리할 수량을 선택해 주세요.'); picker.apply(ids); }));
   function movement(kind, rows, options = {}) {

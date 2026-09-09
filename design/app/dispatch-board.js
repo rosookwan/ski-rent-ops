@@ -123,7 +123,7 @@ function openTransfer(kind) {
   currentRevision();
   const state = F.snap(), revision = state.revision, id = vehicleId(board.state.vehicle), van = { kind: 'vehicle', id };
   const loading = kind === 'load', from = loading ? F.shop : van, to = loading ? van : F.shop;
-  const rows = state.assets.filter(a => a.location.kind === from.kind && a.location.id === from.id && (!loading ||
+  const rows = state.assets.filter(a => a.location.kind === from.kind && a.location.id === from.id && (!loading || a.ticket) && (!loading ||
     (!a.refundId || state.refunds.find(r => r.id === a.refundId)?.vehicleId === id) &&
     !state.tasks.some(t => t.kind === 'delivery' && ['waiting', 'in_progress'].includes(t.status) && t.vehicleId !== id && F.remaining(t).includes(a.id))));
   const vehicle = projection.vehicles.find(v => vehicleId(v.id) === id).name;
@@ -138,9 +138,9 @@ function openTransfer(kind) {
       } });
     } else F.run('stock.move', { kind, from, to, assetIds: ids });
     W.changed(ids.length + '개 ' + (loading ? '적재했습니다. 기존 적재품과 남은 업무는 유지됩니다.' : '매장에 내렸습니다. 미수거 수량은 다음 방문에 이어서 받을 수 있습니다.'));
-  }, '<p class="wf-hint">' + (loading ? '이번에 실은 물품만 선택하세요. 리프트권만 추가로 실어도 됩니다.' : '이번에 매장에 내린 물품만 선택하세요. 차에 남기는 물품은 선택하지 마세요.') + '</p>');
+  }, '<p class="wf-hint">' + (loading ? '이번에 추가로 실은 리프트권만 선택하세요. 배달·교환 장비는 해당 고객의 적재 목록에서 처리하세요.' : '이번에 매장에 내린 물품만 선택하세요. 차에 남기는 물품은 선택하지 마세요.') + '</p>');
 }
-function openCollection(id) {
+function openCollection(id, all = false) {
   currentRevision();
   const task = F.snap().tasks.find(t => t.id === id), revision = F.snap().revision;
   if (!task || task.kind !== 'collection' || task.vehicleId !== vehicleId(board.state.vehicle) || !['waiting', 'in_progress'].includes(task.status)) throw new Error('현재 차량의 남은 수거 업무를 확인해 주세요.');
@@ -148,14 +148,14 @@ function openCollection(id) {
   const rows = F.assets(remaining).filter(a => a.location.kind === 'customer' && a.location.id === task.customerId);
   const name = projection.jobs.find(j => j.id === id).name;
   S.close(); S.render();
-  W.openPicker(name + ' 팀 · 이번에 수거한 수량', rows, ids => {
+  W.openPicker(name + ' 팀 · ' + (all ? '모두 받음 확인' : '일부만 받음'), rows, ids => {
     if (F.snap().revision !== revision) throw new Error('수거 내역이 변경됐습니다. 창을 다시 열어 주세요.');
     F.atomic(commit => {
       commit('stock.move', { kind: 'collect', from, to, taskId: task.id, assetIds: ids });
       if (remaining.every(id => ids.includes(id))) commit('task.status', { id: task.id, status: 'completed' });
     });
     W.changed(ids.length + '개 수거했습니다. ' + (remaining.length > ids.length ? '남은 ' + (remaining.length - ids.length) + '개는 다음 방문에 이어서 받으세요.' : '매장에 내리면 인계 수량에 반영됩니다.'));
-  }, '<p class="wf-hint">이번에 차에 실은 수량만 선택하세요. 차가 꽉 차면 매장에 내린 뒤 나머지를 이어서 받을 수 있습니다.</p>');
+  }, '<p class="wf-hint">받은 품목을 체크하고 실제 받은 수량을 맞추세요. 선택하지 않은 품목과 기존 반납 일정은 그대로 남습니다.</p>', { received: true, all });
 }
 const RETURN_KINDS = ['collect', 'refund'];
 const KIND_COLOR = { collect: '#EF3408', deliver: '#0074D9', refund: '#414141', liftDeliver: '#0074D9', liftRefund: '#414141' };
@@ -380,6 +380,7 @@ function render() {
     if (job.carryOver) row.line = dateAt(job.dateOffset).slice(5).replace('-', '/') + ' 예정 · ' + row.line;
     row.canCollect = job.kind === 'collect' && job.remainingCount > 0;
     row.onCollect = () => openCollection(job.taskId);
+    row.onCollectAll = () => openCollection(job.taskId, true);
   });
   values.visits.forEach((row, i) => {
     const job = visits[i], movable = visits.filter(j => !j.locked), index = movable.indexOf(job);
