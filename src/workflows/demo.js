@@ -13,12 +13,13 @@
     const orders = new Map(), tokens = new Map();
     const snap = () => store.snapshot();
     const run = (type, payload, role = 'store') => (role === 'driver' ? driver : store).execute(Client.newCommand(type, snap(), payload));
-    function atomic(apply) {
+    function atomic(apply, role = 'store') {
+      const actor = role === 'driver' ? { id: 'demo-driver', role, vehicleId } : { id: 'demo-store', role: 'store' };
       let value;
       repository.transactWorkflows(shopId, (previous, notifications) => {
         let state = previous, last;
         value = apply((type, payload) => {
-          last = W.execute(state, Client.newCommand(type, state.revision, payload), { shopId, actor: { id: 'demo-store', role: 'store' }, at: clock() });
+          last = W.execute(state, Client.newCommand(type, state.revision, payload), { shopId, actor, at: clock() });
           Service.project(notifications, last); state = last.state; return last.result;
         });
         return last;

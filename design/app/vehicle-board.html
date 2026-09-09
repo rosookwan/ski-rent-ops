@@ -1,0 +1,345 @@
+<div class="so-vehicle-board" data-screen-label="차량 배달·수거" style="height:max(100vh,600px);min-width:1000px;overflow:hidden;box-sizing:border-box;padding:min(12px,1.6vh) 12px;display:flex;flex-direction:column;gap:min(8px,1.2vh);background:var(--purple-25,#F4F0FF);font-family:Pretendard,'Apple SD Gothic Neo','Malgun Gothic',system-ui,sans-serif;color:var(--ink-900,#24252C)">
+
+  <header style="flex-shrink:0;box-sizing:border-box;display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;padding:min(8px,1.1vh) 16px;background:var(--purple-800,#5F33E1);border-radius:20px;color:#fff">
+    <div style="min-width:0;margin-right:auto;display:flex;align-items:baseline;gap:10px">
+      <h1 style="margin:0;font-size:24px;font-weight:700;letter-spacing:-0.03em;line-height:1.2"><button type="button" aria-label="매장 화면으로" onClick="{{ openStore }}" style="font:inherit;letter-spacing:inherit;line-height:inherit;color:inherit;background:transparent;border:0;padding:0">배달 · 수거</button></h1>
+      <span style="font-size:16px;font-weight:600;color:#EDE8FF">{{ eyebrow }}</span>
+    </div>
+    <div aria-label="업무 구분" style="display:flex;flex-wrap:wrap;gap:6px;min-width:0">
+      <sc-for list="{{ filters }}" as="f" hint-placeholder-count="5">
+        <button type="button" aria-pressed="{{ f.pressed }}" onClick="{{ f.onClick }}" style="{{ f.style }}">{{ f.label }}<span style="{{ f.countStyle }}">{{ f.count }}</span></button>
+      </sc-for>
+    </div>
+    <div data-vehicle-bell style="display:flex;flex-shrink:0;width:56px;height:56px"></div>
+    <div aria-label="업무 날짜" style="display:flex;gap:6px;flex-shrink:0;padding:4px;background:#4A25BC;border-radius:16px">
+      <sc-for list="{{ dateButtons }}" as="d" hint-placeholder-count="3">
+        <button type="button" aria-pressed="{{ d.pressed }}" onClick="{{ d.onClick }}" style="{{ d.style }}">{{ d.label }}</button>
+      </sc-for>
+    </div>
+  </header>
+
+  <section aria-label="현재 차량 보관 수량" style="flex-shrink:0;box-sizing:border-box;padding:min(9px,1.2vh) 16px;background:#fff;border-radius:20px;box-shadow:0 4px 32px rgba(0,0,0,.04)">
+    <div style="display:flex;flex-wrap:wrap;align-items:center;gap:6px 12px;margin-bottom:min(7px,1vh)">
+      <strong style="font-size:19px;font-weight:700;letter-spacing:-0.02em">지금 차에 있는 수량</strong>
+      <span style="flex:1;min-width:220px;font-size:16px;font-weight:600;line-height:1.35;color:var(--ink-500,#6E6A7C);font-variant-numeric:tabular-nums">{{ sourceLine }}</span>
+      <button type="button" onClick="{{ toggleView }}" style="{{ viewBtnStyle }}" style-hover="background:#E3DAFF">{{ viewBtnLabel }}</button>
+    </div>
+    <div style="display:flex;flex-wrap:wrap;align-items:stretch;gap:8px">
+      <sc-for list="{{ stockTiles }}" as="t" hint-placeholder-count="4">
+        <div style="{{ t.style }}">
+          <span style="display:flex;align-items:baseline;gap:6px">
+            <strong style="font-size:clamp(24px,3.6vh,32px);font-weight:700;letter-spacing:-0.03em;line-height:1.15;color:var(--purple-800,#5F33E1);font-variant-numeric:tabular-nums">{{ t.value }}</strong>
+            <span style="font-size:17px;font-weight:600;color:#4A25BC">{{ t.label }}</span>
+          </span>
+          <span style="display:block;font-size:15px;font-weight:600;line-height:1.2;white-space:nowrap;color:var(--ink-500,#6E6A7C);font-variant-numeric:tabular-nums">{{ t.sub }}</span>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+
+  <sc-if value="{{ showRequests }}" hint-placeholder-val="{{ true }}">
+    <section aria-label="매장에서 보낸 변경·확인 요청" style="flex-shrink:0;box-sizing:border-box;padding:min(8px,1.1vh) 12px;background:rgba(255,145,66,.15);border-radius:20px;box-shadow:inset 0 0 0 2px rgba(255,145,66,.45)">
+      <div style="display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;margin-bottom:min(6px,.8vh)">
+        <strong style="font-size:16px;font-weight:700;letter-spacing:-0.02em;color:#B45309">매장에서 보낸 변경 · 확인 요청 {{ requestCount }}</strong>
+        <sc-if value="{{ hasMoreRequests }}" hint-placeholder-val="{{ false }}">
+          <button type="button" onClick="{{ openInbox }}" style="display:flex;align-items:center;justify-content:center;min-height:40px;padding:0 12px;font-size:16px;font-weight:700;color:#B45309;background:#fff;border:0;border-radius:12px">알림함에서 {{ moreRequests }} 더 보기</button>
+        </sc-if>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(360px,1fr));gap:8px">
+        <sc-for list="{{ requests }}" as="r" hint-placeholder-count="2">
+          <div style="display:flex;align-items:center;gap:6px;padding:6px 6px 6px 12px;background:#fff;border-radius:14px">
+            <span style="flex:1;min-width:0;display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 8px">
+              <span style="{{ r.tagStyle }}">{{ r.tag }}</span>
+              <span style="font-size:17px;font-weight:600;line-height:1.35;color:var(--ink-900,#24252C);text-wrap:pretty">{{ r.text }}</span>
+            </span>
+            <button type="button" style="{{ r.openStyle }}" onClick="{{ r.onOpen }}" style-hover="background:var(--purple-75,#EDE8FF)">업무 보기</button>
+            <button type="button" onClick="{{ r.onAck }}" style="display:flex;align-items:center;justify-content:center;flex-shrink:0;box-sizing:border-box;min-height:48px;padding:0 14px;font-size:17px;font-weight:700;color:#fff;background:#B45309;border:0;border-radius:12px" style-hover="background:#92400E">확인했어요</button>
+          </div>
+        </sc-for>
+      </div>
+    </section>
+  </sc-if>
+
+  <sc-if value="{{ isStorageView }}" hint-placeholder-val="{{ false }}">
+    <section aria-label="차량 보관 내역" style="flex:1;min-height:0;box-sizing:border-box;padding:min(12px,1.6vh) 16px;background:#fff;border-radius:20px;box-shadow:0 4px 32px rgba(0,0,0,.04);display:flex;flex-direction:column;gap:min(10px,1.3vh)">
+      <div style="flex-shrink:0;display:flex;flex-wrap:wrap;align-items:baseline;gap:10px">
+        <strong style="font-size:21px;font-weight:700;letter-spacing:-0.02em">차량 보관 내역 · 품목별</strong>
+        <span style="font-size:16px;font-weight:600;color:var(--ink-500,#6E6A7C)">매장 적재분과 고객 수거분을 나눠서 봅니다</span>
+      </div>
+      <div style="flex:1;min-height:0;overflow-y:auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));grid-auto-rows:min-content;gap:8px">
+        <sc-for list="{{ stockRows }}" as="r" hint-placeholder-count="7">
+          <div style="box-sizing:border-box;padding:11px 14px;background:var(--purple-25,#F4F0FF);border-radius:15px">
+            <div style="display:flex;align-items:baseline;justify-content:space-between;gap:10px">
+              <strong style="font-size:20px;font-weight:700;letter-spacing:-0.02em">{{ r.name }}</strong>
+              <span style="display:flex;align-items:baseline;gap:4px;font-variant-numeric:tabular-nums">
+                <strong style="font-size:28px;font-weight:700;letter-spacing:-0.03em;color:var(--purple-800,#5F33E1)">{{ r.total }}</strong>
+                <span style="font-size:17px;font-weight:600;color:#4A25BC">{{ r.unit }}</span>
+              </span>
+            </div>
+            <span style="display:block;margin-top:4px;font-size:16px;font-weight:600;color:var(--ink-500,#6E6A7C);font-variant-numeric:tabular-nums">{{ r.sub }}</span>
+          </div>
+        </sc-for>
+      </div>
+    </section>
+  </sc-if>
+
+  <sc-if value="{{ isJobView }}" hint-placeholder-val="{{ true }}">
+    <div style="flex:1;min-height:0;display:flex;align-items:stretch;gap:10px">
+
+      <div style="flex:0 0 330px;min-width:0;min-height:0;display:flex;flex-direction:column;gap:min(7px,1vh)">
+        <div style="flex-shrink:0;display:flex;align-items:center;gap:6px">
+          <span style="flex:1;min-width:0;font-size:16px;font-weight:700;color:#4A25BC">{{ listCaption }}</span>
+        </div>
+        <div aria-label="업무 목록" style="flex:1;min-height:0;overflow-y:auto;display:flex;flex-direction:column;gap:8px">
+          <sc-for list="{{ jobs }}" as="j" hint-placeholder-count="5">
+            <button type="button" data-vehicle-job="{{ j.id }}" aria-pressed="{{ j.selected }}" onClick="{{ j.onPick }}" style="{{ j.cardStyle }}">
+              <span style="display:flex;align-items:center;gap:8px;margin-bottom:5px">
+                <span style="{{ j.orderStyle }}">{{ j.order }}</span>
+                <span style="{{ j.badgeStyle }}">{{ j.type }}</span>
+                <span style="margin-left:auto;font-size:20px;font-weight:700;font-variant-numeric:tabular-nums">{{ j.time }}</span>
+              </span>
+              <strong style="display:block;font-size:20px;font-weight:700;letter-spacing:-0.03em;line-height:1.25">{{ j.title }}</strong>
+              <span style="display:block;margin-top:3px;font-size:16px;font-weight:600;color:var(--ink-500,#6E6A7C)">{{ j.itemLine }}</span>
+              <span style="display:block;margin-top:2px;font-size:16px;color:var(--ink-500,#6E6A7C)">{{ j.statusLine }}</span>
+            </button>
+          </sc-for>
+        </div>
+      </div>
+
+      <section aria-label="선택한 고객의 이번 업무" style="flex:1;min-width:0;min-height:0;background:#fff;border-radius:20px;box-shadow:0 4px 32px rgba(0,0,0,.04);overflow:hidden;display:flex;flex-direction:column">
+        <div style="flex:1;min-height:0;overflow-y:auto;padding:min(11px,1.4vh) 18px;display:flex;flex-direction:column;gap:min(9px,1.1vh)">
+
+          <div style="display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px">
+            <span style="{{ badgeStyle }}">{{ type }}</span>
+            <strong style="font-size:24px;font-weight:700;letter-spacing:-0.02em;font-variant-numeric:tabular-nums">{{ timeLine }}</strong>
+            <span style="margin-left:auto;display:flex;align-items:baseline;gap:10px;min-width:0">
+              <strong style="font-size:24px;font-weight:700;letter-spacing:-0.03em">{{ customer }}</strong>
+              <span style="display:flex;align-items:baseline;gap:2px;font-variant-numeric:tabular-nums;white-space:nowrap">
+                <span style="font-size:18px;font-weight:600">{{ phoneHead }}</span>
+                <strong style="font-size:22px;font-weight:700;color:var(--purple-800,#5F33E1)">{{ phoneTail }}</strong>
+              </span>
+            </span>
+          </div>
+
+          <div style="display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 12px">
+            <h2 style="margin:0;font-size:24px;font-weight:700;letter-spacing:-0.03em;line-height:1.2;text-wrap:pretty">{{ place }}</h2>
+            <span style="font-size:17px;font-weight:600;color:var(--ink-500,#6E6A7C)">{{ detail }}</span>
+          </div>
+
+          <sc-if value="{{ hasStoreNote }}" hint-placeholder-val="{{ false }}">
+            <p style="margin:0;padding:min(9px,1.2vh) 14px;background:var(--purple-25,#F4F0FF);border-radius:14px;font-size:18px;font-weight:600;line-height:1.45;color:#4A25BC;text-wrap:pretty">{{ storeNote }}</p>
+          </sc-if>
+
+          <div style="display:flex;flex-wrap:wrap;align-items:center;gap:7px 12px">
+            <span style="flex:0 0 auto;font-size:17px;font-weight:700;color:var(--ink-900,#24252C)">{{ itemsLabel }}</span>
+            <div style="flex:1;min-width:220px;display:grid;grid-template-columns:repeat(auto-fit,minmax(104px,1fr));gap:7px">
+              <sc-for list="{{ items }}" as="it" hint-placeholder-count="3">
+                <span style="display:flex;align-items:baseline;justify-content:space-between;gap:8px;padding:min(7px,.9vh) 12px;background:var(--purple-100,#EDE4FF);border-radius:14px">
+                  <span style="font-size:18px;font-weight:600;color:#4A25BC">{{ it.name }}</span>
+                  <strong style="font-size:26px;font-weight:700;letter-spacing:-0.03em;color:var(--purple-800,#5F33E1);font-variant-numeric:tabular-nums">{{ it.qty }}</strong>
+                </span>
+              </sc-for>
+            </div>
+          </div>
+
+          <sc-if value="{{ hasMemo }}" hint-placeholder-val="{{ true }}">
+            <p style="margin:0;display:flex;flex-wrap:wrap;align-items:baseline;gap:8px;padding:min(7px,.9vh) 14px;background:#FFF7ED;border-radius:14px;font-size:18px;font-weight:600;line-height:1.35;color:#8A4A08">
+              <span style="font-size:15px;font-weight:700;color:#B45309">메모</span>{{ memo }}
+            </p>
+          </sc-if>
+
+          <sc-if value="{{ hasLot }}" hint-placeholder-val="{{ false }}">
+            <p style="margin:0;display:flex;flex-wrap:wrap;align-items:baseline;gap:8px;padding:min(7px,.9vh) 14px;background:var(--purple-25,#F4F0FF);border-radius:14px;font-size:17px;font-weight:600;line-height:1.35;color:#4A25BC">
+              <span style="font-size:15px;font-weight:700;color:var(--purple-800,#5F33E1)">리프트권 묶음</span>{{ lotLine }}
+            </p>
+          </sc-if>
+
+          <sc-if value="{{ hasGuard }}" hint-placeholder-val="{{ false }}">
+            <p style="margin:0;padding:min(7px,.9vh) 14px;background:rgba(255,145,66,.18);border-radius:14px;font-size:17px;font-weight:700;line-height:1.35;color:#8A4A08">{{ guardNote }}</p>
+          </sc-if>
+
+          <sc-if value="{{ smsSent }}" hint-placeholder-val="{{ false }}">
+            <p style="margin:0;font-size:16px;font-weight:600;color:var(--ink-500,#6E6A7C)">출발 안내 · 5분 내 도착 · 발송 완료 시안</p>
+          </sc-if>
+
+          <sc-if value="{{ isDone }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px;padding:min(10px,1.4vh) 14px;background:var(--mk-green-50,#F0FDF4);border-radius:14px">
+              <strong style="flex:1 1 240px;min-width:0;font-size:18px;font-weight:700;line-height:1.4;color:var(--mk-green-700,#15803D)">{{ doneMessage }}</strong>
+              <span style="font-size:17px;font-weight:600;color:var(--ink-900,#24252C);font-variant-numeric:tabular-nums">{{ resultSummary }}</span>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ hasLeft }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex;flex-wrap:wrap;align-items:center;gap:7px">
+              <span style="font-size:16px;font-weight:700;color:#B45309">{{ leftLabel }}</span>
+              <sc-for list="{{ resultLeft }}" as="l" hint-placeholder-count="1">
+                <span style="display:flex;align-items:center;gap:8px;padding:7px 12px;background:#FFF7ED;border-radius:12px">
+                  <span style="display:flex;align-items:baseline;gap:6px;font-size:18px;font-weight:600">{{ l.name }}<strong style="font-size:22px;font-weight:700;color:#B45309;font-variant-numeric:tabular-nums">{{ l.qty }}</strong></span>
+                  <span style="{{ l.tagStyle }}">{{ l.tag }}</span>
+                </span>
+              </sc-for>
+            </div>
+          </sc-if>
+        </div>
+
+        <sc-if value="{{ showActions }}" hint-placeholder-val="{{ true }}">
+          <div aria-label="처리 버튼" style="flex-shrink:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(118px,1fr));gap:8px;padding:min(8px,1vh) 18px min(9px,1.2vh);background:#fff;box-shadow:0 -4px 12px rgba(0,0,0,.04)">
+            <button type="button" onClick="{{ openPhone }}" style="display:flex;align-items:center;justify-content:center;gap:8px;min-height:72px;padding:10px;font-size:20px;font-weight:700;letter-spacing:-0.02em;color:var(--ink-900,#24252C);background:var(--purple-50,#EEE9FF);border:0;border-radius:14px;transition:background 180ms cubic-bezier(.2,0,.2,1)" style-hover="background:var(--purple-75,#EDE8FF)">
+              <svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" style="flex-shrink:0;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round"><path d="M13.832 16.568a1 1 0 0 0 1.213-.303l.355-.465A2 2 0 0 1 17 15h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2A18 18 0 0 1 2 4a2 2 0 0 1 2-2h3a2 2 0 0 1 2 2v3a2 2 0 0 1-.8 1.6l-.468.351a1 1 0 0 0-.292 1.233 14 14 0 0 0 6.392 6.384"></path></svg>전화
+            </button>
+            <button type="button" onClick="{{ openSms }}" style="{{ smsBtnStyle }}" style-hover="background:var(--purple-75,#EDE8FF)">
+              <svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" style="flex-shrink:0;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round"><path d="M22 17a2 2 0 0 1-2 2H6.828a2 2 0 0 0-1.414.586l-2.202 2.202A.71.71 0 0 1 2 21.286V5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2z"></path></svg>{{ smsLabel }}
+            </button>
+            <button type="button" onClick="{{ openPartial }}" style="display:flex;align-items:center;justify-content:center;gap:8px;min-height:72px;padding:10px;font-size:20px;font-weight:700;letter-spacing:-0.02em;color:#B45309;background:rgba(255,145,66,.18);border:0;border-radius:14px;transition:background 180ms cubic-bezier(.2,0,.2,1)" style-hover="background:#FFEDD5">{{ partialLabel }}</button>
+            <button type="button" disabled="{{ completeOff }}" onClick="{{ openComplete }}" style="display:flex;align-items:center;justify-content:center;gap:8px;min-height:72px;padding:10px;font-size:20px;font-weight:700;letter-spacing:-0.02em;color:#fff;background:var(--purple-800,#5F33E1);border:0;border-radius:14px;box-shadow:2px 10px 18px rgba(95,51,225,.35);transition:background 180ms cubic-bezier(.2,0,.2,1)" style-hover="background:#4A25BC">{{ completeLabel }}</button>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ isDone }}" hint-placeholder-val="{{ false }}">
+          <div style="flex-shrink:0;display:flex;flex-wrap:wrap;align-items:center;gap:10px;padding:min(8px,1vh) 18px min(9px,1.2vh);background:#fff;box-shadow:0 -4px 12px rgba(0,0,0,.04)">
+            <span style="flex:1 1 220px;min-width:0;font-size:17px;font-weight:600;line-height:1.4;color:var(--ink-500,#6E6A7C)">{{ doneNote }}</span>
+            <button type="button" onClick="{{ openPhone }}" style="display:flex;align-items:center;justify-content:center;gap:8px;flex:0 1 180px;box-sizing:border-box;min-height:72px;padding:10px;font-size:20px;font-weight:700;color:var(--ink-900,#24252C);background:var(--purple-50,#EEE9FF);border:0;border-radius:14px" style-hover="background:var(--purple-75,#EDE8FF)">전화</button>
+            <button type="button" onClick="{{ undoJob }}" style="display:flex;align-items:center;justify-content:center;gap:8px;flex:0 1 200px;box-sizing:border-box;min-height:72px;padding:10px;font-size:20px;font-weight:700;color:#4A25BC;background:var(--purple-50,#EEE9FF);border:0;border-radius:14px" style-hover="background:var(--purple-75,#EDE8FF)">
+              <svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" style="flex-shrink:0;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path></svg>되돌리기
+            </button>
+          </div>
+        </sc-if>
+      </section>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ dialogOpen }}" hint-placeholder-val="{{ false }}">
+    <div class="so-vehicle-overlay" role="dialog" aria-modal="true" aria-labelledby="vehicle-dialog-title" style="position:fixed;inset:0;z-index:30;display:flex;align-items:center;justify-content:center;padding:20px;background:rgba(36,37,44,.4)">
+      <div style="width:100%;max-width:600px;max-height:calc(100vh - 40px);overflow-y:auto;box-sizing:border-box;background:#fff;border-radius:20px;box-shadow:0 4px 32px rgba(0,0,0,.12)">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;padding:16px 20px;box-shadow:inset 0 -1px 0 #EDE8FF">
+          <h2 id="vehicle-dialog-title" style="margin:0;font-size:22px;font-weight:700;letter-spacing:-0.03em">{{ dialogTitle }}</h2>
+          <button type="button" aria-label="창 닫기" onClick="{{ closeDialog }}" style="display:grid;place-items:center;width:52px;height:52px;flex-shrink:0;background:var(--purple-25,#F4F0FF);border:0;border-radius:14px;color:#4A25BC">
+            <svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" style="fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg>
+          </button>
+        </div>
+        <div style="padding:18px 20px;display:flex;flex-direction:column;gap:14px"><sc-if value="{{ dialogError }}"><p role="alert" style="margin:0;color:#B45309;font-size:18px">{{ dialogError }}</p></sc-if>
+          <p style="margin:0;font-size:18px;font-weight:600;color:var(--ink-500,#6E6A7C)">{{ dialogLead }}</p>
+
+          <sc-if value="{{ dialogHasPhone }}" hint-placeholder-val="{{ false }}">
+            <strong style="display:flex;align-items:baseline;gap:3px;font-size:36px;font-weight:700;letter-spacing:-0.03em;font-variant-numeric:tabular-nums">{{ phoneHead }}<span style="color:var(--purple-800,#5F33E1)">{{ phoneTail }}</span></strong>
+          </sc-if>
+
+          <sc-if value="{{ dialogHasMessage }}" hint-placeholder-val="{{ false }}">
+            <p style="margin:0;padding:14px 16px;background:var(--purple-25,#F4F0FF);border-radius:14px;font-size:18px;line-height:1.55;color:var(--ink-900,#24252C)">{{ dialogMessage }}</p>
+          </sc-if>
+
+          <sc-if value="{{ dialogHasDates }}" hint-placeholder-val="{{ false }}"><input type="date" aria-label="조회 날짜" value="{{ selectedDate }}" onChange="{{ chooseDate }}" style="min-height:48px;padding:0 12px;font:inherit;border:1px solid #EDE8FF;border-radius:12px">
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px">
+              <sc-for list="{{ calendarDays }}" as="c" hint-placeholder-count="4">
+                <button type="button" aria-pressed="{{ c.pressed }}" onClick="{{ c.onClick }}" style="{{ c.style }}">{{ c.label }}</button>
+              </sc-for>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ dialogHasInbox }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <sc-for list="{{ inboxRows }}" as="n" hint-placeholder-count="3">
+                <div style="{{ n.wrapStyle }}">
+                  <span style="flex:1;min-width:0;display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 8px">
+                    <span style="{{ n.tagStyle }}">{{ n.tag }}</span>
+                    <span style="font-size:18px;font-weight:600;line-height:1.35">{{ n.text }}</span>
+                    <span style="font-size:15px;font-weight:600;color:var(--ink-500,#6E6A7C);font-variant-numeric:tabular-nums">{{ n.at }}</span>
+                  </span>
+                  <button type="button" style="{{ n.btnStyle }}" disabled="{{ n.ack }}" onClick="{{ n.onAck }}">{{ n.btnLabel }}</button>
+                </div>
+              </sc-for>
+              <sc-if value="{{ inboxEmpty }}" hint-placeholder-val="{{ false }}">
+                <p style="margin:0;padding:24px 0;text-align:center;font-size:17px;color:var(--ink-500,#6E6A7C)">받은 알림이 없습니다.</p>
+              </sc-if>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ dialogHasItems }}" hint-placeholder-val="{{ false }}">
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px">
+              <sc-for list="{{ items }}" as="it" hint-placeholder-count="3">
+                <span style="display:flex;align-items:baseline;justify-content:space-between;gap:8px;padding:12px 14px;background:var(--purple-100,#EDE4FF);border-radius:14px">
+                  <span style="font-size:18px;font-weight:600;color:#4A25BC">{{ it.name }}</span>
+                  <strong style="font-size:26px;font-weight:700;letter-spacing:-0.03em;color:var(--purple-800,#5F33E1);font-variant-numeric:tabular-nums">{{ it.qty }}</strong>
+                </span>
+              </sc-for>
+            </div>
+            <p style="margin:0;font-size:19px;font-weight:700">{{ dialogAsk }}</p>
+          </sc-if>
+
+          <sc-if value="{{ dialogIsPartial }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex;flex-direction:column;gap:12px">
+              <p style="margin:0;font-size:18px;line-height:1.5;color:var(--ink-900,#24252C)">{{ partialGuide }}</p>
+              <div style="display:flex;flex-direction:column;gap:8px">
+                <sc-for list="{{ partialRows }}" as="r" hint-placeholder-count="3">
+                  <div style="{{ r.wrapStyle }}">
+                    <button type="button" aria-pressed="{{ r.on }}" aria-label="{{ r.toggleLabel }}" onClick="{{ r.onToggle }}" style="display:flex;align-items:center;gap:12px;flex:1;min-width:0;padding:12px 14px;background:transparent;border:0;text-align:left">
+                      <span style="{{ r.boxStyle }}">
+                        <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" style="fill:none;stroke:currentColor;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round"><path d="M20 6 9 17l-5-5"></path></svg>
+                      </span>
+                      <span style="min-width:0">
+                        <strong style="display:block;font-size:21px;font-weight:700;letter-spacing:-0.02em">{{ r.name }}</strong>
+                        <span style="{{ r.stateStyle }}">{{ r.stateLabel }}</span>
+                      </span>
+                    </button>
+                    <sc-if value="{{ r.on }}" hint-placeholder-val="{{ false }}">
+                      <span style="display:flex;align-items:center;gap:8px;flex-shrink:0;padding:8px 10px 8px 0">
+                        <button type="button" aria-label="{{ r.decLabel }}" disabled="{{ r.decOff }}" onClick="{{ r.onDec }}" style="display:grid;place-items:center;width:64px;height:64px;flex-shrink:0;background:#fff;border:0;border-radius:14px;color:#B45309">
+                          <svg viewBox="0 0 24 24" width="30" height="30" aria-hidden="true" style="fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round"><path d="M5 12h14"></path></svg>
+                        </button>
+                        <output style="min-width:48px;text-align:center;font-size:32px;font-weight:700;letter-spacing:-0.03em;color:#B45309;font-variant-numeric:tabular-nums">{{ r.received }}</output>
+                        <button type="button" aria-label="{{ r.incLabel }}" disabled="{{ r.incOff }}" onClick="{{ r.onInc }}" style="display:grid;place-items:center;width:64px;height:64px;flex-shrink:0;background:#fff;border:0;border-radius:14px;color:#B45309">
+                          <svg viewBox="0 0 24 24" width="30" height="30" aria-hidden="true" style="fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round"><path d="M5 12h14"></path><path d="M12 5v14"></path></svg>
+                        </button>
+                      </span>
+                    </sc-if>
+                  </div>
+                </sc-for>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:8px;padding:12px 14px;background:var(--purple-25,#F4F0FF);border-radius:14px">
+                <div>
+                  <span style="display:block;margin-bottom:5px;font-size:16px;font-weight:700;color:var(--mk-green-700,#15803D)">{{ takenLabel }}</span>
+                  <div style="display:flex;flex-wrap:wrap;gap:6px">
+                    <sc-for list="{{ draftTaken }}" as="t" hint-placeholder-count="2">
+                      <span style="display:flex;align-items:baseline;gap:6px;padding:8px 12px;background:#fff;border-radius:12px;font-size:18px;font-weight:600">{{ t.name }}<strong style="font-size:22px;font-weight:700;color:var(--mk-green-700,#15803D);font-variant-numeric:tabular-nums">{{ t.qty }}</strong></span>
+                    </sc-for>
+                    <sc-if value="{{ draftNoTaken }}" hint-placeholder-val="{{ false }}">
+                      <span style="font-size:17px;font-weight:600;color:var(--ink-500,#6E6A7C)">처리한 품목이 없습니다</span>
+                    </sc-if>
+                  </div>
+                </div>
+                <div>
+                  <span style="display:block;margin-bottom:5px;font-size:16px;font-weight:700;color:#B45309">{{ leftLabel }}</span>
+                  <div style="display:flex;flex-wrap:wrap;gap:6px">
+                    <sc-for list="{{ draftLeft }}" as="l" hint-placeholder-count="1">
+                      <span style="display:flex;align-items:center;gap:8px;padding:8px 12px;background:#fff;border-radius:12px">
+                        <span style="display:flex;align-items:baseline;gap:6px;font-size:18px;font-weight:600">{{ l.name }}<strong style="font-size:22px;font-weight:700;color:#B45309;font-variant-numeric:tabular-nums">{{ l.qty }}</strong></span>
+                        <span style="{{ l.tagStyle }}">{{ l.tag }}</span>
+                      </span>
+                    </sc-for>
+                    <sc-if value="{{ draftNoLeft }}" hint-placeholder-val="{{ true }}">
+                      <span style="font-size:17px;font-weight:600;color:var(--ink-500,#6E6A7C)">{{ partialEmpty }}</span>
+                    </sc-if>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ dialogHasPrimary }}" hint-placeholder-val="{{ false }}">
+            <button type="button" disabled="{{ dialogPrimaryOff }}" onClick="{{ dialogConfirm }}" style="display:flex;align-items:center;justify-content:center;gap:9px;width:100%;box-sizing:border-box;min-height:76px;padding:14px;font-size:21px;font-weight:700;letter-spacing:-0.02em;color:#fff;background:var(--purple-800,#5F33E1);border:0;border-radius:14px;box-shadow:2px 10px 18px rgba(95,51,225,.35);transition:background 180ms cubic-bezier(.2,0,.2,1)" style-hover="background:#4A25BC">{{ dialogPrimary }}</button>
+          </sc-if>
+
+          <p style="margin:0;font-size:16px;line-height:1.55;color:var(--ink-500,#6E6A7C)">{{ dialogNote }}</p>
+
+          <sc-if value="{{ dialogHasClose }}" hint-placeholder-val="{{ true }}">
+            <button type="button" onClick="{{ closeDialog }}" style="display:flex;align-items:center;justify-content:center;width:100%;box-sizing:border-box;min-height:76px;padding:14px;font-size:21px;font-weight:700;letter-spacing:-0.02em;color:#fff;background:var(--purple-800,#5F33E1);border:0;border-radius:14px;box-shadow:2px 10px 18px rgba(95,51,225,.35);transition:background 180ms cubic-bezier(.2,0,.2,1)" style-hover="background:#4A25BC">확인</button>
+          </sc-if>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ notice }}" hint-placeholder-val="{{ false }}">
+    <div role="status" style="position:fixed;left:50%;bottom:20px;transform:translateX(-50%);max-width:calc(100% - 40px);padding:14px 20px;font-size:18px;font-weight:500;color:#fff;background:#24252C;border-radius:14px;box-shadow:0 4px 32px rgba(0,0,0,.16);z-index:40">{{ notice }}</div>
+  </sc-if>
+</div>

@@ -222,7 +222,7 @@ const path = require('node:path');
       const t = await frame.evaluate(() => { const F = SkiOps.workflow; return F.store.board({ vehicleId: F.vehicleId, date: SkiOps.data.day(1) }).pending[0].id; });
       await frame.locator('#so-dialog [data-action="dispatch-task"][data-id="' + t + '"]').click();
       assert.equal(await frame.locator('#ski-ops').getAttribute('data-page'), 'vehicle');
-      assert.equal(await frame.locator('[data-action="wf-select"][data-id="' + t + '"]').isVisible(), true);
+      assert.equal(await frame.locator('[data-vehicle-job="' + t + '"]').isVisible(), true);
     });
     await test('literal customer text stays escaped and POS layouts contain overflow', async () => {
       await frame.evaluate(() => { const F = SkiOps.workflow; const ids = F.run('stock.receive', { sku: 'ski', quantity: 1 }).assetIds; F.saveTask({ id: 'unsafe-name', kind: 'delivery', customerId: 'escaped', title: '<b>이름</b>', assetIds: ids }); SkiOps.render(); });

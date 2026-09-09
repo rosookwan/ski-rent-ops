@@ -1,0 +1,95 @@
+/* Colors — transcribed verbatim from the .fig. No Figma Variables exist in the
+ * source file, so every value below was read off the fills it is used on. */
+#ski-ops .so-vehicle-board,#ski-ops .so-vehicle-overlay{
+  /* ── Brand purple ──────────────────────────────────────────────── */
+  --purple-900:#5F27FF;   /* Button fill, "Componants" spec page          */
+  --purple-800:#5F33E1;   /* THE brand purple — 46 uses across the file   */
+  --purple-700:#7C46F0;   /* background-blob gradient stop                */
+  --purple-600:#8764FF;   /* progress-ring base under the 85% dial        */
+  --purple-500:#9260F4;   /* user-octagon glyph                           */
+  --purple-400:#AB94FF;   /* time-circle glyph on task cards              */
+  --purple-300:#CAB8FF;
+  --purple-100:#EDE4FF;   /* purple icon tile                             */
+  --purple-75:#EDE8FF;    /* Done pill, Change Logo pill                  */
+  --purple-50:#EEE9FF;    /* bottom-nav bar, View Task button             */
+  --purple-25:#F4F0FF;    /* cover / presentation page canvas             */
+
+  /* ── Ink ───────────────────────────────────────────────────────── */
+  --ink-900:#24252C;      /* body + heading text — 123 uses               */
+  --ink-700:#333333;      /* documentation headings                       */
+  --ink-500:#6E6A7C;      /* secondary / label text                       */
+  --ink-450:#6E7191;      /* documentation body copy                      */
+  --ink-300:#3C3C43;
+  --white:#FFFFFF;
+  --black:#000000;
+
+  /* ── Neutrals / surfaces ───────────────────────────────────────── */
+  --slate-100:#EFF0F7;    /* spec-sheet header pill, device placeholder   */
+  --slate-150:#EFF0F6;    /* 1.619px inset border on doc swatch cards     */
+  --paper:#FAFAFA;        /* Typeface spec-sheet canvas                   */
+
+  /* ── Category accents (task-group colour coding) ───────────────── */
+  --pink-500:#F478B8;     /* briefcase glyph — Office Project             */
+  --pink-100:#FFE4F2;     /* briefcase tile                              */
+  --orange-500:#FF9142;   /* book glyph — Daily Study                    */
+  --orange-100:#FFE6D4;   /* book tile                                   */
+  --amber-500:#FFD12E;    /* book glyph, yellow variant                  */
+  --amber-600:#FDAD00;
+  --amber-700:#FDB300;    /* cover check-decagram                        */
+
+  /* ── Semantic hues + their 15% background tints ────────────────── */
+  --blue-500:#46BDF0;     --blue-tint:rgba(70,179,240,0.15);
+  --green-500:#46F080;    --green-tint:rgba(70,240,138,0.15);
+  --yellow-500:#EDF046;   --yellow-tint:rgba(240,233,70,0.15);
+  --amber-tint:rgba(240,203,70,0.15);
+  --purple-tint:rgba(124,70,240,0.15);
+
+  /* ── Incidental ────────────────────────────────────────────────── */
+  --lime-dot:#EAED2A;     /* confetti dot, onboarding                    */
+  --blue-dot:#2555FF;     /* onboarding blob gradient                    */
+  --doc-yellow:#F6E31A;   /* spec-sheet section badge                    */
+  --battery-green:#34C759;/* iOS status bar                              */
+  --dribbble:#E84C88;
+  --behance:#105DFB;
+  --teal-logo:#047C78;    /* "Grocery shop" project wordmark             */
+  --green-link:#008060;   /* underlined "Groundsup" credit               */
+
+  /* ── Semantic aliases ──────────────────────────────────────────── */
+  --brand:var(--purple-800);
+  --brand-press:var(--purple-900);
+  --text-primary:var(--ink-900);
+  --text-secondary:var(--ink-500);
+  --text-label:var(--ink-500);
+  --text-inverse:var(--white);
+  --text-on-brand:var(--white);
+  --text-link:var(--purple-800);
+  --surface-app:var(--white);
+  --surface-card:var(--white);
+  --surface-card-brand:var(--purple-800);
+  --surface-nav:var(--purple-50);
+  --surface-chip:var(--purple-50);
+  --surface-chip-selected:var(--purple-800);
+  --surface-pill:var(--purple-75);
+  --surface-canvas:var(--purple-25);
+  --surface-spec:var(--slate-100);
+
+  --status-todo-fg:var(--blue-500);        --status-todo-bg:var(--blue-tint);
+  --status-progress-fg:var(--orange-500);  --status-progress-bg:var(--orange-100);
+  --status-done-fg:var(--purple-800);      --status-done-bg:var(--purple-75);
+
+  --track:var(--white);
+}
+
+#ski-ops.so-vehicle .so-topbar{display:none!important}
+#ski-ops.so-vehicle #so-main{padding:0!important;overflow:auto!important}
+#ski-ops.so-vehicle #so-page{height:100%;padding:0!important}
+#ski-ops .so-vehicle-board,#ski-ops .so-vehicle-board *{box-sizing:content-box}
+#ski-ops .so-vehicle-board button,#ski-ops .so-vehicle-board input{box-sizing:border-box}
+#ski-ops .so-vehicle-board{font-family:Pretendard,'Apple SD Gothic Neo','Malgun Gothic',system-ui,sans-serif;-webkit-font-smoothing:antialiased;line-height:normal;letter-spacing:normal}
+#ski-ops .so-vehicle-board button{font:inherit;margin:0;cursor:pointer;text-align:left;border-radius:0;letter-spacing:normal}
+#ski-ops .so-vehicle-board button:disabled{cursor:default;opacity:.4}
+#ski-ops .so-vehicle-board a{color:#5F33E1;text-decoration:none}
+#ski-ops .so-vehicle-board a:hover{color:#4A25BC;text-decoration:underline}
+#ski-ops .so-vehicle-board p,#ski-ops .so-vehicle-board h1,#ski-ops .so-vehicle-board h2{line-height:inherit}
+#ski-ops .so-vehicle-board [data-vehicle-bell] #so-notice-bell{width:56px;height:56px;min-height:56px}
+#ski-ops .so-vehicle-overlay{z-index:30}

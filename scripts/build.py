@@ -7,7 +7,7 @@ from rental_template import compile_rental_template
 
 ROOT = Path(__file__).resolve().parents[1]
 APP = ROOT / 'design/app'
-MODULES = ['data.js', 'core.js', 'operations.js', 'return-runtime.js', 'rentals.js', 'settings.js', 'partners.js', 'closing.js', 'preparation.js', 'guide.js', 'returns.js', 'login.js', 'notifications.js', 'workflow-runtime.js', 'workflow-ui.js', 'workflow-preparation.js', 'rental-board.js', 'dispatch-board.js', 'app-mode.js']
+MODULES = ['data.js', 'core.js', 'operations.js', 'return-runtime.js', 'rentals.js', 'settings.js', 'partners.js', 'closing.js', 'preparation.js', 'guide.js', 'returns.js', 'login.js', 'notifications.js', 'workflow-runtime.js', 'workflow-ui.js', 'workflow-preparation.js', 'rental-board.js', 'dispatch-board.js', 'vehicle-board.js', 'app-mode.js']
 RETURN_MODULES = ['domain.js', 'service.js', 'client.js', 'demo.js']
 WORKFLOW_MODULES = ['common.js', 'reservations.js', 'inventory.js', 'dispatch.js', 'intake.js', 'documents.js', 'domain.js', 'service.js', 'client.js', 'demo.js']
 PWA_FILES = {
@@ -25,6 +25,7 @@ PWA_FILES = {
 def build():
     rental_view, rental_hover = compile_rental_template(APP / 'rental-board.html')
     dispatch_view, dispatch_hover = compile_rental_template(APP / 'dispatch-board.html', 'dispatch', 'SkiDispatchView')
+    vehicle_view, vehicle_hover = compile_rental_template(APP / 'vehicle-board.html', 'vehicle', 'SkiVehicleView')
     legacy = (ROOT / 'design/prototypes/first-look.fragment.html').read_text()
     bridge = "root.addEventListener('ski:set-view',e=>{closeDialog();state.view=e.detail;render();if(e.detail==='shop'&&!state.representativeSeen){state.representativeSeen=true;representative();}});"
     legacy = legacy.replace('  render();applyDesign();', '  '+bridge+'\n  render();applyDesign();')
@@ -46,6 +47,8 @@ def build():
     fragment += '<script>\n' + rental_view + '\n</script>\n'
     fragment += '<style>\n' + (APP / 'dispatch-board.css').read_text() + '\n' + dispatch_hover + '\n</style>\n'
     fragment += '<script>\n' + dispatch_view + '\n</script>\n'
+    fragment += '<style>\n' + (APP / 'vehicle-board.css').read_text() + '\n' + vehicle_hover + '\n</style>\n'
+    fragment += '<script>\n' + vehicle_view + '\n</script>\n'
     for name in MODULES:
         if (APP / name).exists():
             source=(APP/name).read_text()

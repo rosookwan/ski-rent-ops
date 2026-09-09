@@ -152,7 +152,7 @@
   S.action('wf-select', id => { ui.selected = id; S.render(); });
   S.action('wf-vehicle-tab', id => { ui.vehicleTab = id; S.render(); });
   S.action('wf-task-move', safe(taskMove));
-  const openTask = id => { const task = F.snap().tasks.find(t => t.id === id); if (task) ui.date = task.date; ui.selected = id; S.go('vehicle'); };
+  const openTask = id => { const task = F.snap().tasks.find(t => t.id === id); if (task) ui.date = task.date; ui.selected = id; S.go('vehicle'); S.vehicleBoard?.selectTask(id); };
   S.action('wf-open-task', openTask);
   S.action('wf-stock-page', () => S.go('vehicle-stock'));
   S.action('wf-stock-popup', openVehicleStock);
@@ -246,5 +246,5 @@
   S.register('lift-reservations', { title: '리프트권 예약', render: reservations });
   S.register('lift-stock', { title: '리프트권 보관·환불', parent: 'lift-reservations', render: liftStock });
   S.returnUI.closingTickets = () => { const report = F.store.report({ date: S.data.today }); return panel('리프트권 이동 집계', report.totals.filter(x => x.newlyIssued || x.recovered || x.refunded || x.redelivered).map(x => row(e(F.snap().catalog.find(s => s.id === x.sku)?.label || x.sku), '신규 발권 ' + x.newlyIssued + ' · 회수 ' + x.recovered + ' · 재전달 ' + x.redelivered + ' · 발권처 환불 ' + x.refunded)).join('') + row('실제 발권처 환불액', S.money(report.refundAmountWon)) + '<p class="wf-hint">고객 결제 환불 및 장당 회수 기준 금액과 별도 집계입니다.</p>'); };
-  S.workflowUI = { openOrderTickets, openNotice: notice => { if (notice.formId) S.go('response', { id: notice.formId }); else if (notice.taskId) { ui.selected = notice.taskId; if (S.state.page === 'vehicle') openTask(notice.taskId); else { S.go('dispatch'); S.dispatchBoard?.selectTask(notice.taskId); } } else if (notice.refundId) S.go('lift-stock'); else if (notice.movementId) S.go(S.state.page === 'vehicle' ? 'vehicle' : 'vehicle-stock'); else S.go('dispatch'); }, openTask, safe, modal, head, panel, row, countInput, read, number, changed, textItems, empty, openPicker, stock, stamp, syncBase };
+  S.workflowUI = { openOrderTickets, openNotice: notice => { if (notice.formId) S.go('response', { id: notice.formId }); else if (notice.taskId) { ui.selected = notice.taskId; if (S.state.page === 'vehicle') openTask(notice.taskId); else { S.go('dispatch'); S.dispatchBoard?.selectTask(notice.taskId); } } else if (notice.refundId) S.go('lift-stock'); else if (notice.movementId) S.go(S.state.page === 'vehicle' ? 'vehicle' : 'vehicle-stock'); else S.go('dispatch'); }, openTask, openRefund: refundResult, safe, modal, head, panel, row, countInput, read, number, changed, textItems, empty, openPicker, stock, stamp, syncBase };
 })();
