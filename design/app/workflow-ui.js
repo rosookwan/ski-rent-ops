@@ -20,7 +20,7 @@
   const number = id => { const n = Number(read(id)), input = S.$('#' + id); if (!Number.isSafeInteger(n) || n < +(input?.min || 0) || n > +(input?.max || 500)) throw new Error('수량을 확인해 주세요.'); return n; };
   const changed = message => { syncBase(); S.close(); S.render(); S.toast(message || '반영했습니다.'); };
   function syncBase() {
-    for (const base of S.data.orders) { const o = F.projectOrder(base.id); if (!o) continue; const eq = o.items.filter(i => i.category !== 'liftTicket'); base.issued = eq.reduce((n, i) => n + i.issuedQuantity, 0); base.returned = eq.reduce((n, i) => n + i.shopQuantity, 0); base.collected = eq.reduce((n, i) => n + i.vehicleQuantity, 0); base.status = ({ in_use: '대여 중', partial_return: '일부 반납', awaiting_shop: '매장 확인 대기', awaiting_issue: '수령 예정', returned: '반납 완료' })[o.status]; }
+    for (const base of S.data.orders) { const o = F.projectOrder(base.id); if (!o) continue; const eq = o.items.filter(i => i.category !== 'liftTicket' && !i.component); base.issued = eq.reduce((n, i) => n + i.issuedQuantity, 0); base.returned = eq.reduce((n, i) => n + i.shopQuantity, 0); base.collected = eq.reduce((n, i) => n + i.vehicleQuantity, 0); base.status = ({ awaiting_exchange: '장비교환 진행 중', in_use: '대여 중', partial_return: '일부 반납', awaiting_shop: '매장 확인 대기', awaiting_issue: '수령 예정', returned: '반납 완료' })[o.status]; }
   }
   let actionBusy = false;
   function safe(fn) { return async (...args) => { if (actionBusy) return; actionBusy = true; try { await fn(...args); } catch (error) { const el = S.$('#wf-error'); if (el) { el.textContent = error.message; el.hidden = false; } else S.toast(error.message); } finally { actionBusy = false; } }; }

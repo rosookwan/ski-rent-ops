@@ -42,7 +42,7 @@ function snapshot() {
         const quantities = counts(task.status === 'completed' ? task.assetIds : remaining);
         for (const item of task.plannedItems || []) if (item.quantity > item.assetIds.length) quantities[item.sku] = (quantities[item.sku] || 0) + item.quantity - item.assetIds.length;
         const needsIssue = (task.plannedItems || []).some(i => i.quantity > i.assetIds.length && state.catalog.find(s => s.id === i.sku)?.kind === 'liftTicket');
-        jobs.push({ id: task.id, vehicleId: v.id, kind, time: task.time, place: task.place, name, items: quantities, dateOffset: offsetOf(date), orderId: task.orderId, needsIssue, canLoad: waiting.some(a => a.location.kind === 'shop'),
+        jobs.push({ id: task.id, vehicleId: v.id, kind, time: task.time, place: task.place, name, items: quantities, dateOffset: offsetOf(date), orderId: task.orderId, memo: task.memo || '', exchangeId: task.exchangeId, needsIssue, canLoad: waiting.some(a => a.location.kind === 'shop'),
           status: task.status === 'completed' ? 'done' : task.status === 'in_progress' ? 'moving' : remaining.length < task.assetIds.length ? 'partial' : 'waiting',
           loadedAt: loaded ? localTime(loading?.at || task.createdAt) : null, inCar, received, remainingCount: remaining.length + unassigned,
           returnState: task.kind === 'collection' ? '미수거 ' + remaining.length + ' · 차에 ' + inCar + ' · 매장 인계 ' + received : null,
@@ -190,7 +190,7 @@ class DispatchBoard {
 
     const all = F.jobsOf(vid, s.dateOffset);
     const vehicle = F.VEHICLES.filter(v => v.id === vid)[0] || {};
-    const itemsLine = j => F.ITEMS.filter(i => j.items[i.key]).map(i => i.short + ' ' + j.items[i.key]).join(' · ');
+    const itemsLine = j => (j.memo ? j.memo + ' · ' : '') + F.ITEMS.filter(i => j.items[i.key]).map(i => i.short + ' ' + j.items[i.key]).join(' · ');
     const loadJob = all.filter(j => j.kind === 'load')[0];
     const handover = all.filter(j => j.kind === 'handover')[0];
     const visits = all.filter(j => j.kind !== 'load' && j.kind !== 'handover' && !j.loadOnly);
@@ -254,13 +254,13 @@ class DispatchBoard {
         return {
           id: j.id, name: j.name + ' 팀',
           line: j.time + ' ' + j.place + ' · ' + itemsLine(j) + (j.needsIssue ? ' · 발권 전 수량 있음' : '') + (fromCollect ? ' · 수거한 권으로 전달, 실을 것 없음' : ''),
-          loadLabel: j.needsIssue && !j.canLoad ? '발권·준비' : '실었어요',
+          loadLabel: j.exchangeId && !j.canLoad && !j.loadedAt ? '교환품 준비' : j.needsIssue && !j.canLoad ? '발권·준비' : '실었어요',
           style: 'display:flex;align-items:center;gap:12px;box-sizing:border-box;padding:12px 14px;border-radius:var(--mk-radius-lg,12px);'
             + (pending ? 'background:#fff;box-shadow:inset 0 0 0 3px var(--mk-orange-500,#FE4E10);' : at ? 'background:var(--mk-green-50,#F0FDF4);' : 'background:var(--mk-neutral-50,#F8F8F8);'),
           btnStyle: pending ? 'display:flex;align-items:center;justify-content:center;flex-shrink:0;min-height:56px;padding:0 16px;font-size:17px;font-weight:700;color:#fff;background:var(--mk-orange-500,#FE4E10);border:0;border-radius:var(--mk-radius-md,8px);white-space:nowrap;transition:background 180ms cubic-bezier(.2,0,.2,1);' : 'display:none',
           doneStyle: pending ? 'display:none' : 'flex-shrink:0;text-align:right;font-size:15px;font-weight:700;line-height:1.3;white-space:nowrap;color:' + (at ? 'var(--mk-green-700,#15803D)' : '#6D6D6D'),
           done: at ? '✓ 실림 ' + at : '수거 후',
-          onLoad: () => { if (j.needsIssue && !j.canLoad) { W.openOrderTickets(j.orderId); return; } F.loadJob(j.id); this.say(j.name + ' 팀 물품을 차에 실었습니다. 차량 화면에 표시됩니다.'); }
+          onLoad: () => { if (j.exchangeId && !j.canLoad && !j.loadedAt) { S.rentalChanges.openRecord(j.exchangeId); return; } if (j.needsIssue && !j.canLoad) { W.openOrderTickets(j.orderId); return; } F.loadJob(j.id); this.say(j.name + ' 팀 물품을 차에 실었습니다. 차량 화면에 표시됩니다.'); }
         };
       }),
       spareLine: spareText,

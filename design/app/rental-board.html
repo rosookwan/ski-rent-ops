@@ -115,6 +115,7 @@
                   <h2 style="margin:0;font-size:19px;font-weight:700;letter-spacing:-0.03em">{{ paneTitle }}</h2>
                 </div>
 
+                <sc-if value="{{ hasExchanges }}"><section aria-label="장비교환 내역" style="display:flex;flex-direction:column;gap:8px;margin-bottom:12px"><sc-for list="{{ exchangeRows }}" as="x"><button type="button" onClick="{{ x.onOpen }}" style="padding:14px;background:#FFF4ED;border:1px solid #FFCAA8;border-radius:12px;text-align:left"><strong>{{ x.summary }}</strong><span style="display:block;margin-top:6px">{{ x.status }} · 교환 처리 보기</span></button></sc-for></section></sc-if>
                 <sc-if value="{{ isReturnTab }}" hint-placeholder-val="{{ true }}">
                   <div style="overflow-x:auto">
                     <div style="display:grid;grid-template-columns:112px 72px 100px 108px 108px minmax(168px,1fr) 104px;align-items:center;gap:10px;padding:0 18px;min-height:40px;min-width:860px;background:var(--mk-neutral-50,#F8F8F8);font-size:14px;font-weight:500;color:var(--mk-neutral-500,#6D6D6D)">
@@ -151,7 +152,7 @@
 
                 <div style="{{ paneBodyStyle }}">
                   <sc-if value="{{ isItemsTab }}" hint-placeholder-val="{{ false }}">
-                    <sc-if value="{{ hasDeliveryPlan }}"><div class="rental-delivery-status" style="display:flex;flex-direction:column;gap:10px;margin-bottom:18px">
+                  <sc-if value="{{ hasDeliveryPlan }}"><div class="rental-delivery-status" style="display:flex;flex-direction:column;gap:10px;margin-bottom:18px">
                       <sc-for list="{{ deliveryRows }}" as="delivery"><div class="rental-issue-actions" data-delivery-category="{{ delivery.category }}" style="display:flex;align-items:center;flex-wrap:wrap;gap:10px;padding:12px 14px;border-radius:var(--mk-radius-lg,12px);background:var(--mk-neutral-50,#F8F8F8)">
                         <div style="flex:1;min-width:180px"><strong style="font-size:16px;font-weight:700">{{ delivery.title }}</strong><p style="margin:4px 0 0;font-size:14px;color:var(--mk-neutral-600,#5D5D5D)">{{ delivery.summary }}</p></div>
                         <sc-if value="{{ delivery.canIssue }}"><button type="button" data-action="wf-legacy-ticket" data-id="{{ orderId }}">리프트권 발권·준비</button></sc-if>

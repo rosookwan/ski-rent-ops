@@ -1,14 +1,14 @@
 (function (root, factory) {
-  if (typeof module === 'object' && module.exports) module.exports = factory(require('./common.js'), require('./reservations.js'), require('./inventory.js'), require('./dispatch.js'), require('./intake.js'), require('./documents.js'));
-  else root.SkiWorkflows = factory(root.SkiWorkflowCommon, root.SkiWorkflowReservations, root.SkiWorkflowInventory, root.SkiWorkflowDispatch, root.SkiWorkflowIntake, root.SkiWorkflowDocuments);
-})(globalThis, function (C, B, I, D, F, P) {
+  if (typeof module === 'object' && module.exports) module.exports = factory(require('./common.js'), require('./reservations.js'), require('./inventory.js'), require('./dispatch.js'), require('./intake.js'), require('./documents.js'), require('./exchanges.js'));
+  else root.SkiWorkflows = factory(root.SkiWorkflowCommon, root.SkiWorkflowReservations, root.SkiWorkflowInventory, root.SkiWorkflowDispatch, root.SkiWorkflowIntake, root.SkiWorkflowDocuments, root.SkiWorkflowExchanges);
+})(globalThis, function (C, B, I, D, F, P, E) {
   'use strict';
   const catalog = () => [
     { id: 'ski', label: '스키', kind: 'equipment', unit: '대' }, { id: 'board', label: '보드', kind: 'equipment', unit: '대' },
     { id: 'clothing', label: '의류', kind: 'clothing', unit: '벌' }, { id: 'helmet', label: '헬멧', kind: 'helmet', unit: '개' },
     ...[3, 4, 6].map(hours => ({ id: 'ticket-' + hours + 'h', label: hours + '시간권', kind: 'liftTicket', unit: '매', hours }))
   ];
-  const fresh = shopId => ({ schemaVersion: 1, shopId: C.id(shopId), revision: 0, catalog: catalog(), assets: [], reservations: [], allocations: [], movements: [], corrections: [], refunds: [], tasks: [], sequences: [], forms: [], printJobs: [], deliveries: [], stockReferences: [], events: [], requests: {} });
+  const fresh = shopId => ({ schemaVersion: 1, shopId: C.id(shopId), revision: 0, catalog: catalog(), assets: [], reservations: [], allocations: [], movements: [], corrections: [], exchanges: [], refunds: [], tasks: [], sequences: [], forms: [], printJobs: [], deliveries: [], stockReferences: [], events: [], requests: {} });
   function execute(previous, command, trustedContext) {
     C.context(trustedContext, true); const context = { ...C.copy(trustedContext), at: C.instant(trustedContext.at) };
     C.keys(command, ['type', 'requestId', 'expectedVersion', 'payload']); C.id(command.requestId); C.string(command.type, 50); C.integer(command.expectedVersion, 0, Number.MAX_SAFE_INTEGER);
@@ -27,7 +27,9 @@
     if (command.expectedVersion !== version) C.fail('VERSION_CONFLICT', '다른 기기에서 변경했습니다. 최신 내용을 확인해 주세요.');
     const type = command.type, p = command.payload;
     let result;
-    if (type.startsWith('reservation.') || ['ticket.allocate', 'ticket.release'].includes(type)) result = B.handle(state, type, p, context);
+    if (type === 'stock.move') E.beforeMove(state, p);
+    if (type.startsWith('exchange.')) result = E.handle(state, type, p, context);
+    else if (type.startsWith('reservation.') || ['ticket.allocate', 'ticket.release'].includes(type)) result = B.handle(state, type, p, context);
     else if (type.startsWith('stock.') || type.startsWith('refund.') || type.startsWith('movement.') || type === 'ticket.issue') result = I.handle(state, type, p, context);
     else if (type.startsWith('task.') || type.startsWith('dispatch.')) result = D.handle(state, type, p, context);
     else if (type.startsWith('intake.') || type.startsWith('delivery.')) result = F.handle(state, type, p, context);
@@ -39,6 +41,7 @@
       if (sku.kind === 'liftTicket') sku.hours = C.integer(p.hours, 1, 24);
       state.catalog.push(sku); result = { sku: sku.id };
     } else C.fail('INVALID_INPUT', '지원하지 않는 업무입니다.');
+    if (type === 'stock.move') E.afterMove(state, result, context);
     state.revision++;
     const event = { version: state.revision, requestId: command.requestId, type, at: context.at, actor: C.copy(context.actor), payload: C.copy(p), result: C.copy(result) };
     state.events.push(event);
@@ -46,5 +49,5 @@
     state.requests[requestKey] = { fingerprint, result: C.copy(response) };
     return { state, event, duplicate: false, result: response };
   }
-  return { fresh, execute, catalog, reservations: B, inventory: I, dispatch: D, intake: F, documents: P };
+  return { fresh, execute, catalog, reservations: B, inventory: I, dispatch: D, intake: F, documents: P, exchanges: E };
 });

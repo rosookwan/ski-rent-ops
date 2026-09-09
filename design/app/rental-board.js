@@ -37,13 +37,14 @@ class RentalBoard {
   say(t) { clearTimeout(this._t); this.setState({ notice: t }); this._t = setTimeout(() => this.setState({ notice: '' }), 4500); }
   order() { return this.state.data.find(o => o.id === this.state.id) || this.state.data[0]; }
   buckets(o) {
-    const sum = k => o.items.reduce((n, i) => n + i[k], 0);
-    return { total: sum('total'), customer: sum('customer'), vehicle: sum('vehicle'), confirmed: sum('confirmed'), remaining: sum('customer') + sum('vehicle') };
+    const sum = k => o.items.reduce((n, i) => n + (i[k] || 0), 0);
+    return { total: sum('total'), customer: sum('customer'), vehicle: sum('vehicle'), confirmed: sum('confirmed'), remaining: sum('customer') + sum('vehicle') + Math.max(sum('exchange'), o.exchangeOpenQuantity || 0) };
   }
   remainingItems(o) { return o.items.filter(i => i.customer + i.vehicle + i.unissued > 0); }
   isLate(o) { return o.stage === 'out' && o.items.some(i => i.customer + i.vehicle > 0 && diff(i.due) < 0); }
   // 카드·상세에서 같은 상태 이름을 쓴다
   stateOf(o) {
+    if (o.exchangeOpenQuantity || o.items.some(i => i.exchange)) return { label: '장비교환 진행 중', color: 'orange', card: 'background:#fff;box-shadow:inset 0 0 0 1px #E7E7E7;' };
     const b = this.buckets(o);
     if (o.stage === 'pickup') return { label: o.stageLabel || '수령 예정', color: 'blue', card: 'background:#fff;box-shadow:inset 0 0 0 1px var(--mk-neutral-100,#E7E7E7);' };
     if (b.remaining === 0 && !o.unissued) return { label: '반납 완료', color: 'green', card: 'background:var(--mk-green-50,#F0FDF4);box-shadow:inset 0 0 0 1px var(--mk-green-200,#BBF7D0);' };
@@ -54,6 +55,7 @@ class RentalBoard {
     return { label: this.remainingItems(o).every(i => i.method === '직접반납') ? '내려와서 반납' : '대여 중 · 차량 수거', color: 'gray', card: white };
   }
   itemState(o, i) {
+    if (i.exchange) return { text: '교환품 전달 대기 ' + i.exchange + '개', color: 'orange' };
     if (i.unissued > 0 && !i.customer && !i.vehicle && !i.confirmed) return { text: '지급 전', color: 'gray' };
     if (i.vehicle > 0) return { text: '차량 인수 · 매장 확인 대기', color: 'purple' };
     if (i.customer > 0) return { text: (i.name === '리프트권' ? '미회수 · ' : '고객 보유 · ') + i.method + ' 예정', color: diff(i.due) < 0 ? 'red' : 'orange' };
@@ -89,6 +91,7 @@ class RentalBoard {
   qtyText(o, qty) { return o.items.filter(i => (qty[i.id] || 0) > 0).map(i => i.name + ' ' + qty[i.id] + unit(i.name)).join(' · '); }
 
   openForm(kind) {
+    if (kind === 'exchange') return S.rentalChanges.openExchange(this.order());
     const o = this.order();
     const lead = o.name + ' 고객님 · ' + o.id;
     const D = {
@@ -133,6 +136,7 @@ class RentalBoard {
       const note = 'font-size:14px;font-weight:600;white-space:nowrap;text-align:right;';
       const lines = [];
       x.items.forEach(i => {
+        if (i.exchange > 0) lines.push({ text: i.name + ' ' + i.exchange + unit(i.name), style: hold, note: '장비교환 진행 중', noteStyle: note + 'color:#C62208;' });
         if (i.unissued > 0) lines.push({ text: i.name + ' ' + i.unissued + unit(i.name), style: hold, note: '지급 전', noteStyle: note + 'color:var(--mk-neutral-500,#6D6D6D);' });
         if (x.stage === 'pickup') { return; }
         if (i.confirmed > 0) lines.push({ text: i.name + ' ' + i.confirmed + unit(i.name), style: done, note: '받음', noteStyle: note + 'color:var(--mk-green-700,#15803D);' });
@@ -328,7 +332,7 @@ function projectOrders() {
     if (!projected) return [];
     const base = S.data.orders.find(o => o.id === id) || {};
     const reservation = snapshot.reservations.find(r => r.id === id);
-    const tasks = snapshot.tasks.filter(t => t.customerId === id && t.kind === 'collection' && !['cancelled', 'completed'].includes(t.status));
+    const tasks = snapshot.tasks.filter(t => !t.exchangeId && t.customerId === id && t.kind === 'collection' && !['cancelled', 'completed'].includes(t.status));
     const dates = reservation?.lines.map(l => l.useDate).sort() || [];
     const start = base.start || projected.rental?.startDate || dates[0] || today;
     const end = base.end || projected.rental?.endDate || dates.at(-1) || start;
@@ -339,7 +343,7 @@ function projectOrders() {
       const task = tasks.find(t => t.assetIds.some(a => assetIds.includes(a)));
       const plan = i.returnPlan || {};
       const ticket = i.category === 'liftTicket';
-      return { id: i.id, name: ticket ? '리프트권' : i.label, ticket, total: i.plannedQuantity, customer: i.customerQuantity, vehicle: i.vehicleQuantity, confirmed: i.shopQuantity, unissued: i.unissuedQuantity,
+      return { id: i.id, name: ticket ? '리프트권' : i.label, ticket, total: i.plannedQuantity, customer: i.customerQuantity, vehicle: i.vehicleQuantity, confirmed: i.shopQuantity, unissued: i.unissuedQuantity, exchange: i.exchangePendingQuantity || 0,
         due: task?.date || plan.date || end, method: task || plan.method === 'vehicle' ? '차량 수거' : '직접반납', assetIds,
         time: task?.time || plan.time || base.time || '16:30', place: task?.place || plan.place || base.place || '매장' };
     });
@@ -349,6 +353,7 @@ function projectOrders() {
     const history = movements.filter(m => m.kind !== 'stock.opening' && (m.assetIds.some(a => relevantIds.includes(a)) || m.to?.id === id));
     const log = history.slice().reverse().map(m => [new Date(m.at).toLocaleTimeString('ko-KR', { timeZone: 'Asia/Seoul', hour: '2-digit', minute: '2-digit', hour12: false }),
       ({ directReturn: '직접반납 접수', collect: '차량 수거', receive: '차량 인수분 최종 확인', deliver: '장비 지급', correction: '수량 정정' }[m.kind] || m.kind) + ' · ' + m.assetIds.filter(a => relevantIds.includes(a)).length + '개' + (m.reversedAssetIds.length ? ' (정정 ' + m.reversedAssetIds.length + '개)' : ''), m.actor?.role === 'driver' ? '차량' : '카운터']);
+    for (const x of snapshot.exchanges.filter(x => x.orderId === id)) log.unshift([new Date(x.createdAt).toLocaleTimeString('ko-KR', { timeZone: 'Asia/Seoul', hour: '2-digit', minute: '2-digit' }), window.SkiWorkflows.exchanges.summary(x) + ' · ' + (x.status === 'cancelled' ? '취소' : '전달 ' + x.units.filter(u => u.deliveredAt).length + ' · 회수 ' + x.units.filter(u => u.collectedAt || u.receivedAt).length + ' · 매장 확인 ' + x.units.filter(u => u.receivedAt).length), '카운터']);
     const customer = S.workflowCustomer(id);
     return [{ ...base, id, name: base.name || customer.name, phone: base.phone || customer.phone || '', start, end,
       stage, stageLabel: stage === 'pickup' && items.every(i => i.ticket) ? '리프트권 전달 대기' : '',
@@ -357,14 +362,14 @@ function projectOrders() {
       amount: base.amount ?? projected.rental?.amountWon ?? 0, paid: base.paid ?? projected.rental?.paidWon ?? 0,
       gear: base.gear || items.filter(i => !i.ticket).map(i => i.name + ' ' + i.total).join(' · ') || '장비 없음',
       detail: base.detail || '1일 이용', tickets: base.tickets || items.filter(i => i.ticket).map(i => i.total + '매').join(' · ') || '없음',
-      note: base.note || '', items, unissued: total('unissued'), log }];
+      note: base.note || '', items, exchangeOpenQuantity: projected.exchangeOpenQuantity, unissued: total('unissued'), log }];
   });
 }
 
 function assetsFor(item, field, orderId) {
-  return F.assets(item.assetIds).filter(a => field === 'customer' ? a.location.kind === 'customer' && F.customerIds(orderId).includes(a.location.id)
+  return F.assets(item.assetIds).filter(a => !a.exchangeReservationId && (field === 'customer' ? a.location.kind === 'customer' && F.customerIds(orderId).includes(a.location.id)
     : field === 'vehicle' ? a.location.kind === 'vehicle' && a.location.id === F.vehicleId
-      : a.location.kind === 'shop' && a.location.id === F.shopId);
+      : a.location.kind === 'shop' && a.location.id === F.shopId));
 }
 
 function updatePlan(order, selectedItems, plan) {
@@ -493,12 +498,14 @@ function render() {
   const values = board.renderVals();
   const order = F.orders.get(board.state.id), plans = order?.pickupPlan || {};
   values.deliveryRows = ['equipment', 'liftTicket'].filter(category => plans[category]?.method === 'delivery' && order.bindings.some(b => (b.item.category === 'liftTicket') === (category === 'liftTicket'))).map(category => {
-    const tasks = F.snap().tasks.filter(t => t.orderId === order.id && t.kind === 'delivery' && t.plannedItems && t.plannedItems.every(i => (F.snap().catalog.find(s => s.id === i.sku)?.kind === 'liftTicket') === (category === 'liftTicket')));
+    const tasks = F.snap().tasks.filter(t => !t.exchangeId && t.orderId === order.id && t.kind === 'delivery' && t.plannedItems && t.plannedItems.every(i => (F.snap().catalog.find(s => s.id === i.sku)?.kind === 'liftTicket') === (category === 'liftTicket')));
     const pending = tasks.filter(t => ['waiting', 'in_progress'].includes(t.status)).reduce((n, t) => n + F.remainingQuantity(t), 0);
     const unprepared = tasks.filter(t => ['waiting', 'in_progress'].includes(t.status)).reduce((n, t) => n + t.plannedItems.reduce((sum, i) => sum + i.quantity - i.assetIds.length, 0), 0);
     const label = category === 'equipment' ? '장비' : '리프트권', plan = plans[category], cancelled = tasks.some(t => t.status === 'cancelled');
     return { category, title: label + (pending ? ' 배달 대기 ' + pending + (category === 'equipment' ? '개' : '매') : cancelled ? ' 배달 취소' : ' 배달완료'), pending: pending > 0, canIssue: category === 'liftTicket' && unprepared > 0, summary: pending ? plan.date + ' ' + plan.time + ' · ' + plan.place + (category === 'liftTicket' && unprepared ? ' · 발권 전 ' + unprepared + '매' : '') : cancelled ? '업무 관리에서 취소한 배달입니다.' : '고객 전달 완료', completeLabel: label + ' 배달완료', actionId: order.id + '|' + category };
   });
+  values.exchangeRows = F.snap().exchanges.filter(x => x.orderId === board.state.id).map(x => ({ id: x.id, summary: window.SkiWorkflows.exchanges.summary(x), status: x.status === 'cancelled' ? '취소' : '전달 ' + x.units.filter(u => u.deliveredAt).length + '/' + x.units.length + ' · 회수 ' + x.units.filter(u => u.collectedAt || u.receivedAt).length + '/' + x.units.length + ' · 매장 확인 ' + x.units.filter(u => u.receivedAt).length + '/' + x.units.length, onOpen: () => S.rentalChanges.openRecord(x.id) }));
+  values.hasExchanges = values.exchangeRows.length > 0;
   values.hasDeliveryPlan = values.deliveryRows.length > 0;
   values.needsGear = values.needsGear && plans.equipment?.method !== 'delivery';
   values.needsTickets = values.needsTickets && plans.liftTicket?.method !== 'delivery';

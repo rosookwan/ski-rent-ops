@@ -38,7 +38,7 @@
     return allocation;
   }
   function move(state, p, context) {
-    C.keys(p, ['kind', 'assetIds', 'from', 'to', 'purpose', 'taskId']);
+    C.keys(p, ['kind', 'assetIds', 'from', 'to', 'purpose', 'taskId', 'exchangeId']);
     const kind = C.oneOf(p.kind, ['load', 'deliver', 'collect', 'receive', 'directReturn']);
     const from = location(p.from, state.shopId), to = location(p.to, state.shopId);
     const routes = { load: ['shop:vehicle'], deliver: ['shop:customer', 'vehicle:customer'], collect: ['customer:vehicle'], receive: ['vehicle:shop'], directReturn: ['customer:shop'] };
@@ -62,6 +62,8 @@
     if (purpose && kind !== 'load') C.fail('INVALID_INPUT', '적재할 때만 용도를 함께 지정할 수 있습니다.');
     const before = capture(state, assets);
     for (const asset of assets) {
+      if (asset.exchangeReservationId && kind === 'deliver' && asset.exchangeReservationId !== (p.exchangeId || task?.exchangeId)) C.fail('INVALID_INPUT', '교환품은 연결된 전달 업무에서 처리해 주세요.');
+      if (['load', 'deliver'].includes(kind) && asset.condition === 'damaged') C.fail('INVALID_INPUT', '파손품은 정상 출고할 수 없습니다.');
       if (kind === 'load' && asset.refundId && C.find(state.refunds, asset.refundId).vehicleId !== to.id) C.fail('FORBIDDEN', '환불 담당 차량에 실어 주세요.');
       if (kind === 'deliver') {
         if (asset.refundId) C.fail('TICKET_UNAVAILABLE', '환불 대상으로 지정한 권입니다.');
@@ -72,6 +74,7 @@
         state.allocations.filter(a => a.assetId === asset.id && a.reservationId === from.id && a.fulfilledAt && !a.returnedAt).forEach(a => { a.returnedAt = context.at; });
       }
       asset.location = C.copy(to);
+      if (to.kind === 'shop') asset.componentBaseId = null;
       asset.vehicleOrigin = to.kind === 'vehicle' ? from.kind : null;
       if (!asset.refundId) asset.purpose = purpose || (kind === 'deliver' ? 'delivery' : 'spare');
     }
@@ -87,7 +90,7 @@
   }
   function stock(state, type, p, context) {
     C.store(context);
-    C.keys(p, ['sku', 'quantity', 'ticket', 'location', 'reservationId', 'lineId', 'sourceReference']);
+    C.keys(p, ['sku', 'quantity', 'ticket', 'location', 'reservationId', 'lineId', 'sourceReference', 'size']);
     const sku = C.find(state.catalog, p.sku), count = C.integer(p.quantity, 1, 500);
     if (type === 'ticket.issue' && sku.kind !== 'liftTicket') C.fail('INVALID_INPUT', '발권할 권종을 선택해 주세요.');
     if (type === 'stock.receive' && sku.kind === 'liftTicket') C.fail('INVALID_INPUT', '신규 발권 또는 보유권 등록으로 처리해 주세요.');
@@ -100,7 +103,7 @@
     if (reference && state.stockReferences.includes(reference)) C.fail('ALREADY_EXISTS', '이미 등록한 입고·이관 내역입니다.');
     if (reference) state.stockReferences.push(reference);
     const assets = Array.from({ length: count }, (_, i) => ({ id: 'asset-' + (state.revision + 1) + '-' + (i + 1), lotId: 'lot-' + (state.revision + 1), sku: sku.id, location: C.copy(to), ticket: conditions ? C.copy(conditions) : null,
-      purpose: 'spare', refundId: null, vehicleOrigin: to.kind === 'vehicle' ? 'opening' : null, acquiredAt: context.at,
+      size: C.string(p.size, 24, true), condition: 'ready', purpose: 'spare', refundId: null, vehicleOrigin: to.kind === 'vehicle' ? 'opening' : null, acquiredAt: context.at,
       issuedAt: type === 'ticket.issue' ? context.at : null, lastRevision: state.revision + 1 }));
     state.assets.push(...assets);
     const movement = record(state, context, type, assets, null, to, { assets: [], allocations: [] }, { sourceReference: reference });
@@ -114,6 +117,7 @@
     C.store(context); C.keys(p, type === 'movement.correct' ? ['movementId', 'keepAssetIds', 'reason'] : ['movementId', 'assetIds', 'reason']);
     const movement = C.find(state.movements, p.movementId, '이동 기록'), reason = C.string(p.reason, 300);
     if (!['load', 'deliver', 'collect', 'receive', 'directReturn'].includes(movement.kind) || movement.intakeId || state.forms.some(f => (f.dispatches || []).some(d => d.people.some(p => p.assetIds.some(id => movement.assetIds.includes(id)))))) C.fail('DEPENDENT_MOVEMENT', '입력폼에 배정·지급한 물품은 일반 이동 정정으로 취소할 수 없습니다.');
+    if (movement.exchangeId || (state.exchanges || []).some(x => x.status !== 'cancelled' && x.units.some(u => movement.assetIds.includes(u.oldAssetId) || movement.assetIds.includes(u.newAssetId)))) C.fail('DEPENDENT_MOVEMENT', '장비교환에 연결된 이동은 일반 수량 정정으로 취소할 수 없습니다.');
     const effective = movement.assetIds.filter(id => !movement.reversedAssetIds.includes(id));
     let selected;
     if (type === 'movement.correct') {

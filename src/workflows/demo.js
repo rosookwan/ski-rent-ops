@@ -87,7 +87,8 @@
       let order = orders.get(id);
       if (!order) {
         const owner = state.forms.find(f => f.id === id) || state.reservations.find(r => r.id === id);
-        const issuedIds = [...new Set(movements.filter(m => m.kind === 'deliver' && m.to.id === id).flatMap(m => m.assetIds.filter(a => !m.reversedAssetIds.includes(a))))];
+        const replacedNew = (state.exchanges || []).filter(x => x.orderId === id && x.status !== 'cancelled').flatMap(x => x.units.map(u => u.newAssetId));
+        const issuedIds = [...new Set(movements.filter(m => m.kind === 'deliver' && m.to.id === id).flatMap(m => m.assetIds.filter(a => !m.reversedAssetIds.includes(a) && !replacedNew.includes(a))))];
         if (!owner || !issuedIds.length) return null;
         const bindings = state.catalog.flatMap(sku => {
           const assetIds = state.assets.filter(a => issuedIds.includes(a.id) && a.sku === sku.id).map(a => a.id);
@@ -95,9 +96,20 @@
         });
         order = { id, customer: owner.customer, bindings };
       }
+      order = { ...order, bindings: C.copy(order.bindings) };
+      const exchanges = (state.exchanges || []).filter(x => x.orderId === id);
+      const exchangeOpenQuantity = exchanges.filter(x => x.status !== 'cancelled').reduce((n, x) => n + x.units.filter(u => !u.deliveredAt || !u.receivedAt).length, 0);
+      for (const x of exchanges.filter(x => W.exchanges.kinds[x.kind].component)) {
+        const known = order.bindings.flatMap(b => b.assetIds);
+        const ids = x.units.map(u => u.oldAssetId).filter(a => !known.includes(a) && !exchanges.some(y => y.units.some(u => u.newAssetId === a)));
+        if (ids.length) order.bindings.push({ itemId: x.id, sku: x.sku, assetIds: ids, stagedAssetIds: [], initialVehicleAssetIds: [], item: { id: x.id, label: W.exchanges.kinds[x.kind].label, category: 'component', component: true, plannedQuantity: ids.length, returnPlan: x.returnPlan } });
+      }
       const items = order.bindings.map(b => {
         const stagedIssued = (b.stagedAssetIds || []).filter(id => movements.some(m => m.kind === 'deliver' && m.to.id === order.id && m.assetIds.includes(id) && !m.reversedAssetIds.includes(id)));
-        const rows = state.assets.filter(a => [...b.assetIds, ...stagedIssued].includes(a.id));
+        const tracked = [...new Set([...b.assetIds, ...stagedIssued].map(a => W.exchanges.resolve(state, a, id)))];
+        const exchangePendingQuantity = tracked.filter(a => W.exchanges.pending(state, a, id)).length;
+        b.assetIds = b.assetIds.map(a => W.exchanges.resolve(state, a, id)); b.stagedAssetIds = (b.stagedAssetIds || []).map(a => W.exchanges.resolve(state, a, id));
+        const rows = state.assets.filter(a => tracked.includes(a.id) && !W.exchanges.pending(state, a.id, id));
         const customerQuantity = rows.filter(a => a.location.kind === 'customer' && [id, ...(b.reservationIds || [])].includes(a.location.id)).length;
         const vehicleQuantity = rows.filter(a => {
           if (a.location.kind !== 'vehicle') return false;
@@ -105,11 +117,11 @@
           const collection = history.filter(m => m.kind === 'collect' && customerIds(id).includes(m.from.id)).at(-1) || (b.initialVehicleAssetIds.includes(a.id) ? history.find(m => m.kind === 'stock.opening') : null);
           return !!collection && !history.some(m => m.revision > collection.revision && ['receive', 'deliver'].includes(m.kind));
         }).length;
-        return { ...b.item, issuedQuantity: rows.length, unissuedQuantity: Math.max(0, b.item.plannedQuantity - rows.length), customerQuantity, vehicleQuantity, shopQuantity: rows.length - customerQuantity - vehicleQuantity, returnTarget: rows.length };
+        return { ...b.item, exchangePendingQuantity, issuedQuantity: tracked.length, unissuedQuantity: Math.max(0, b.item.plannedQuantity - tracked.length), customerQuantity, vehicleQuantity, shopQuantity: rows.length - customerQuantity - vehicleQuantity, returnTarget: tracked.length };
       });
       const total = key => items.reduce((n, i) => n + i[key], 0);
-      const status = total('customerQuantity') ? total('shopQuantity') || total('vehicleQuantity') ? 'partial_return' : 'in_use' : total('vehicleQuantity') ? 'awaiting_shop' : total('unissuedQuantity') ? 'awaiting_issue' : 'returned';
-      return { ...order, items, status, complete: status === 'returned', totals: { customerQuantity: total('customerQuantity'), vehicleQuantity: total('vehicleQuantity'), shopQuantity: total('shopQuantity'), unissuedQuantity: total('unissuedQuantity') } };
+      const status = exchangeOpenQuantity ? 'awaiting_exchange' : total('customerQuantity') ? total('shopQuantity') || total('vehicleQuantity') ? 'partial_return' : 'in_use' : total('vehicleQuantity') ? 'awaiting_shop' : total('unissuedQuantity') ? 'awaiting_issue' : 'returned';
+      return { ...order, items, exchangeOpenQuantity, status, complete: status === 'returned', totals: { exchangePendingQuantity: total('exchangePendingQuantity'), customerQuantity: total('customerQuantity'), vehicleQuantity: total('vehicleQuantity'), shopQuantity: total('shopQuantity'), unissuedQuantity: total('unissuedQuantity') } };
     }
     function issueOrder(id) {
       const order = orders.get(id); if (!order) throw new Error('접수를 찾을 수 없습니다.');
@@ -120,7 +132,7 @@
         if (b.item.category === 'liftTicket') continue;
         const used = plan.flatMap(p => p.ids);
         const reserved = snap().tasks.filter(t => t.kind === 'delivery' && ['waiting', 'in_progress'].includes(t.status)).flatMap(remaining);
-        const ids = snap().assets.filter(a => a.sku === b.sku && a.location.kind === 'shop' && !used.includes(a.id) && !reserved.includes(a.id)).slice(0, quantity).map(a => a.id);
+        const ids = snap().assets.filter(a => a.sku === b.sku && a.location.kind === 'shop' && W.exchanges.healthy(a) && !a.componentBaseId && !used.includes(a.id) && !reserved.includes(a.id)).slice(0, quantity).map(a => a.id);
         if (ids.length !== quantity) throw new Error(b.item.label + ' 매장 재고가 부족합니다.');
         plan.push({ b, ids });
       }
@@ -134,12 +146,12 @@
       if (task) return loadDelivery(task.id);
       throw new Error('접수의 장비 배달 예정 정보를 확인해 주세요.');
     }
-    const deliveryTasks = (id, category) => snap().tasks.filter(t => t.orderId === id && t.kind === 'delivery' && t.plannedItems && ['waiting', 'in_progress'].includes(t.status) && t.plannedItems.every(i => (snap().catalog.find(s => s.id === i.sku)?.kind === 'liftTicket') === (category === 'liftTicket')));
+    const deliveryTasks = (id, category) => snap().tasks.filter(t => !t.exchangeId && t.orderId === id && t.kind === 'delivery' && t.plannedItems && ['waiting', 'in_progress'].includes(t.status) && t.plannedItems.every(i => (snap().catalog.find(s => s.id === i.sku)?.kind === 'liftTicket') === (category === 'liftTicket')));
     function deliveryCandidates(id, category) {
       const state = snap(), used = new Set(), reserved = new Set(state.tasks.filter(t => t.kind === 'delivery' && ['waiting', 'in_progress'].includes(t.status)).flatMap(remaining));
       return deliveryTasks(id, category).flatMap(task => task.plannedItems.flatMap(item => {
         const held = assets(remaining(task).filter(id => item.assetIds.includes(id))).filter(a => a.location.kind === 'shop' || a.location.kind === 'vehicle' && a.location.id === task.vehicleId);
-        const available = category === 'liftTicket' ? [] : state.assets.filter(a => a.sku === item.sku && a.location.kind === 'shop' && !reserved.has(a.id) && !used.has(a.id)).slice(0, item.quantity - item.assetIds.length);
+        const available = category === 'liftTicket' ? [] : state.assets.filter(a => a.sku === item.sku && a.location.kind === 'shop' && W.exchanges.healthy(a) && !a.componentBaseId && !reserved.has(a.id) && !used.has(a.id)).slice(0, item.quantity - item.assetIds.length);
         available.forEach(a => used.add(a.id));
         return [...held, ...available].map(a => ({ ...a, taskId: task.id, itemId: item.itemId, needsAssignment: !item.assetIds.includes(a.id) }));
       }));
@@ -162,6 +174,7 @@
     function loadDelivery(taskId) {
       const task = snap().tasks.find(t => t.id === taskId);
       if (!task?.plannedItems || !['waiting', 'in_progress'].includes(task.status)) throw new Error('배달 예정 업무를 확인해 주세요.');
+      if (task.exchangeId) { const ids = assets(remaining(task)).filter(a => a.location.kind === 'shop').map(a => a.id); if (!ids.length) throw new Error('장비교환 화면에서 교환품을 먼저 준비해 주세요.'); return run('stock.move', { kind: 'load', from: shop, to: { kind: 'vehicle', id: task.vehicleId }, assetIds: ids, purpose: 'delivery' }); }
       const category = task.plannedItems.every(i => snap().catalog.find(s => s.id === i.sku).kind === 'liftTicket') ? 'liftTicket' : 'equipment';
       const order = orders.get(task.orderId), rows = deliveryCandidates(order.id, category).filter(a => a.taskId === taskId && a.location.kind === 'shop');
       if (!rows.length) throw new Error(category === 'liftTicket' ? '발권한 리프트권이 없습니다. 먼저 발권·준비해 주세요.' : '새로 실을 매장 장비가 없습니다. 재고를 확인해 주세요.');

@@ -7,7 +7,7 @@
     "dev": "python3 scripts/build.py --serve --port 58148",
     "build": "python3 scripts/build.py",
     "check": "python3 scripts/check.py",
-    "test": "node --test tests/returns-*.test.cjs tests/notifications.test.cjs tests/notification-runtime.test.cjs tests/workflows-domain.test.cjs tests/workflows-service.test.cjs tests/workflows-api.test.cjs tests/workflows-demo.test.cjs",
+    "test": "node --test tests/returns-*.test.cjs tests/notifications.test.cjs tests/notification-runtime.test.cjs tests/workflows-domain.test.cjs tests/workflows-service.test.cjs tests/workflows-api.test.cjs tests/workflows-demo.test.cjs tests/workflows-exchanges.test.cjs",
     "test:visual": "node scripts/visual-check.cjs",
     "test:returns": "node --test tests/returns-*.test.cjs",
     "test:returns:browser": "node scripts/smoke-returns.cjs",
@@ -27,11 +27,12 @@
     "test:notifications": "node --test tests/notifications.test.cjs tests/notification-runtime.test.cjs",
     "test:notifications:ui": "node scripts/smoke-notifications.cjs",
     "test:workflows": "node --test tests/workflows-*.test.cjs",
-    "test:workflows:unit": "node --test tests/workflows-domain.test.cjs tests/workflows-service.test.cjs tests/workflows-api.test.cjs tests/workflows-demo.test.cjs",
+    "test:workflows:unit": "node --test tests/workflows-domain.test.cjs tests/workflows-service.test.cjs tests/workflows-api.test.cjs tests/workflows-demo.test.cjs tests/workflows-exchanges.test.cjs",
     "test:legacy-ui": "node scripts/smoke.cjs all",
     "test:delivery-plan": "node scripts/smoke-delivery-plan.cjs",
     "test:vehicle-board": "node scripts/smoke-vehicle-board.cjs",
-    "test:vehicle-parity": "node scripts/compare-vehicle-reference.cjs"
+    "test:vehicle-parity": "node scripts/compare-vehicle-reference.cjs",
+    "test:rental-changes": "node scripts/smoke-rental-changes.cjs"
   },
   "engines": {
     "node": ">=22.13.0"

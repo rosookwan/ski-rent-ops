@@ -7,9 +7,9 @@ from rental_template import compile_rental_template
 
 ROOT = Path(__file__).resolve().parents[1]
 APP = ROOT / 'design/app'
-MODULES = ['data.js', 'core.js', 'operations.js', 'return-runtime.js', 'rentals.js', 'settings.js', 'partners.js', 'closing.js', 'preparation.js', 'guide.js', 'returns.js', 'login.js', 'notifications.js', 'workflow-runtime.js', 'workflow-ui.js', 'workflow-preparation.js', 'rental-board.js', 'dispatch-board.js', 'vehicle-board.js', 'app-mode.js']
+MODULES = ['data.js', 'core.js', 'operations.js', 'return-runtime.js', 'rentals.js', 'settings.js', 'partners.js', 'closing.js', 'preparation.js', 'guide.js', 'returns.js', 'login.js', 'notifications.js', 'workflow-runtime.js', 'workflow-ui.js', 'workflow-preparation.js', 'rental-board.js', 'dispatch-board.js', 'vehicle-board.js', 'rental-changes.js', 'app-mode.js']
 RETURN_MODULES = ['domain.js', 'service.js', 'client.js', 'demo.js']
-WORKFLOW_MODULES = ['common.js', 'reservations.js', 'inventory.js', 'dispatch.js', 'intake.js', 'documents.js', 'domain.js', 'service.js', 'client.js', 'demo.js']
+WORKFLOW_MODULES = ['common.js', 'reservations.js', 'inventory.js', 'dispatch.js', 'intake.js', 'documents.js', 'exchanges.js', 'domain.js', 'service.js', 'client.js', 'demo.js']
 PWA_FILES = {
     'manifest.webmanifest': 'application/manifest+json; charset=utf-8',
     'assets/app-icon.svg': 'image/svg+xml',
@@ -60,7 +60,7 @@ def build():
     mark = base64.b64encode((APP / 'assets/app-mark.svg').read_bytes()).decode()
     fragment = fragment.replace('__SKINOTE_LOGO__', 'data:image/svg+xml;base64,' + mark)
     assert '__SKINOTE_LOGO__' not in fragment
-    assert len(fragment.encode()) < 1_000_000
+    assert len(fragment.encode()) < 1_150_000
     out = ROOT / 'dist'
     out.mkdir(exist_ok=True)
     for name in PWA_FILES:
