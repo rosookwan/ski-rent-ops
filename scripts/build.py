@@ -9,7 +9,7 @@ ROOT = Path(__file__).resolve().parents[1]
 APP = ROOT / 'design/app'
 MODULES = ['data.js', 'core.js', 'operations.js', 'return-runtime.js', 'rentals.js', 'settings.js', 'partners.js', 'closing.js', 'preparation.js', 'guide.js', 'returns.js', 'login.js', 'notifications.js', 'workflow-runtime.js', 'workflow-ui.js', 'workflow-preparation.js', 'rental-board.js', 'dispatch-board.js', 'vehicle-board.js', 'rental-changes.js', 'app-mode.js']
 RETURN_MODULES = ['domain.js', 'service.js', 'client.js', 'demo.js']
-WORKFLOW_MODULES = ['common.js', 'reservations.js', 'inventory.js', 'dispatch.js', 'intake.js', 'documents.js', 'exchanges.js', 'domain.js', 'service.js', 'client.js', 'demo.js']
+WORKFLOW_MODULES = ['common.js', 'reservations.js', 'inventory.js', 'dispatch.js', 'intake.js', 'documents.js', 'exchanges.js', 'early-returns.js', 'domain.js', 'service.js', 'client.js', 'demo.js']
 PWA_FILES = {
     'manifest.webmanifest': 'application/manifest+json; charset=utf-8',
     'assets/app-icon.svg': 'image/svg+xml',

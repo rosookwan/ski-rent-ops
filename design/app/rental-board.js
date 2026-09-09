@@ -246,7 +246,8 @@ class RentalBoard {
           customer: i.customer > 0 ? i.customer + unit(i.name) : '—', customerStyle: num + (i.customer > 0 && !pre ? 'color:var(--mk-orange-600,#EF3408);' : 'color:var(--mk-neutral-400,#888);font-weight:500;'),
           vehicle: i.vehicle > 0 ? i.vehicle + unit(i.name) : '—', vehicleStyle: num + (i.vehicle > 0 ? 'color:var(--mk-label-spaghetti-fg,#5000D9);' : 'color:var(--mk-neutral-400,#888);font-weight:500;'),
           confirmed: i.confirmed > 0 ? i.confirmed + unit(i.name) : '—', confirmedStyle: num + (i.confirmed > 0 ? 'color:var(--mk-green-700,#15803D);' : 'color:var(--mk-neutral-400,#888);font-weight:500;'),
-          plan: i.customer + i.vehicle + i.unissued > 0 ? rel(i.due) + ' ' + d(i.due) + ' · ' + i.method : '확인 완료',
+          plan: i.customer + i.vehicle + i.unissued > 0 ? rel(i.due) + ' ' + d(i.due) + ' · ' + i.method : i.exchange ? '교환품 전달 대기' : '확인 완료',
+          schedules: (i.schedules || []).length > 1 ? i.schedules.map(p => ({ text: (p.early ? '조기 ' : '') + p.quantity + unit(i.name) + ' · ' + d(p.date) + ' ' + p.time + ' · ' + p.place })) : [],
           planNote: is.text,
           planNoteStyle: 'display:block;margin-top:3px;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;' + (is.color === 'red' ? 'color:var(--mk-red-600,#DC2626);font-weight:600;' : 'color:var(--mk-neutral-500,#6D6D6D);'),
           canPlan: i.customer > 0 || i.unissued > 0,
@@ -281,9 +282,9 @@ class RentalBoard {
         { label: '매장 확인 완료', note: '반납 처리 완료', value: b.confirmed, style: 'display:flex;align-items:center;justify-content:space-between;gap:10px;' + plate + PLATE.green }
       ],
       period: d(o.start) + (o.start !== o.end ? ' ~ ' + d(o.end) : ''),
-      due: rem.length ? rel(rem.map(i => i.due).sort()[0]) + ' · ' + o.slot + (o.time ? ' ' + o.time : '') : '모두 확인 완료',
+      due: rem.length ? rel(rem.map(i => i.due).sort()[0]) + ' · ' + o.slot + (o.time ? ' ' + o.time : '') : o.exchangeOpenQuantity ? '장비교환 확인 필요' : '모두 확인 완료',
       dueNote: rem.length ? rem.map(i => i.method).filter((v, k, a) => a.indexOf(v) === k).join(' · ') + ' · ' + o.place : '',
-      openSchedule: () => this.openForm('schedule'), openExtend: () => this.openForm('extend'), openExchange: () => this.openForm('exchange'), openContact: () => this.openForm('contact'),
+      openSchedule: () => this.openForm('schedule'), openExtend: () => this.openForm('extend'), openExchange: () => this.openForm('exchange'), openEarly: () => S.rentalChanges.openEarly(this.order()), openContact: () => this.openForm('contact'),
 
       dialogError: dlg?.error || '', dialogOpen: !!dlg,
       dialogTitle: dlg ? (form ? form.title : TITLE[dlg.kind]) : '',
@@ -340,11 +341,13 @@ function projectOrders() {
     const items = projected.items.map(i => {
       const binding = bindings.find(b => (b.itemId || b.item?.id) === i.id);
       const assetIds = [...(binding?.assetIds || []), ...(binding?.stagedAssetIds || [])];
-      const task = tasks.find(t => t.assetIds.some(a => assetIds.includes(a)));
+      const itemTasks = tasks.filter(t => F.remaining(t).some(a => assetIds.includes(a)));
+      const task = itemTasks[0];
+      const schedules = itemTasks.map(t => ({ date: t.date, time: t.time, place: t.place, quantity: F.remaining(t).filter(a => assetIds.includes(a)).length, early: !!t.earlyReturnId }));
       const plan = i.returnPlan || {};
       const ticket = i.category === 'liftTicket';
       return { id: i.id, name: ticket ? '리프트권' : i.label, ticket, total: i.plannedQuantity, customer: i.customerQuantity, vehicle: i.vehicleQuantity, confirmed: i.shopQuantity, unissued: i.unissuedQuantity, exchange: i.exchangePendingQuantity || 0,
-        due: task?.date || plan.date || end, method: task || plan.method === 'vehicle' ? '차량 수거' : '직접반납', assetIds,
+        schedules, due: task?.date || plan.date || end, method: task || plan.method === 'vehicle' ? '차량 수거' : '직접반납', assetIds,
         time: task?.time || plan.time || base.time || '16:30', place: task?.place || plan.place || base.place || '매장' };
     });
     const total = key => items.reduce((n, i) => n + i[key], 0);
@@ -354,6 +357,7 @@ function projectOrders() {
     const log = history.slice().reverse().map(m => [new Date(m.at).toLocaleTimeString('ko-KR', { timeZone: 'Asia/Seoul', hour: '2-digit', minute: '2-digit', hour12: false }),
       ({ directReturn: '직접반납 접수', collect: '차량 수거', receive: '차량 인수분 최종 확인', deliver: '장비 지급', correction: '수량 정정' }[m.kind] || m.kind) + ' · ' + m.assetIds.filter(a => relevantIds.includes(a)).length + '개' + (m.reversedAssetIds.length ? ' (정정 ' + m.reversedAssetIds.length + '개)' : ''), m.actor?.role === 'driver' ? '차량' : '카운터']);
     for (const x of snapshot.exchanges.filter(x => x.orderId === id)) log.unshift([new Date(x.createdAt).toLocaleTimeString('ko-KR', { timeZone: 'Asia/Seoul', hour: '2-digit', minute: '2-digit' }), window.SkiWorkflows.exchanges.summary(x) + ' · ' + (x.status === 'cancelled' ? '취소' : '전달 ' + x.units.filter(u => u.deliveredAt).length + ' · 회수 ' + x.units.filter(u => u.collectedAt || u.receivedAt).length + ' · 매장 확인 ' + x.units.filter(u => u.receivedAt).length), '카운터']);
+    for (const r of snapshot.earlyReturns.filter(r => r.orderId === id)) log.unshift([new Date(r.at).toLocaleTimeString('ko-KR', { timeZone: 'Asia/Seoul', hour: '2-digit', minute: '2-digit' }), r.summary + ' · 매장 확인 ' + r.receivedQuantity + '/' + r.assetIds.length, '카운터']);
     const customer = S.workflowCustomer(id);
     return [{ ...base, id, name: base.name || customer.name, phone: base.phone || customer.phone || '', start, end,
       stage, stageLabel: stage === 'pickup' && items.every(i => i.ticket) ? '리프트권 전달 대기' : '',
@@ -505,6 +509,8 @@ function render() {
     return { category, title: label + (pending ? ' 배달 대기 ' + pending + (category === 'equipment' ? '개' : '매') : cancelled ? ' 배달 취소' : ' 배달완료'), pending: pending > 0, canIssue: category === 'liftTicket' && unprepared > 0, summary: pending ? plan.date + ' ' + plan.time + ' · ' + plan.place + (category === 'liftTicket' && unprepared ? ' · 발권 전 ' + unprepared + '매' : '') : cancelled ? '업무 관리에서 취소한 배달입니다.' : '고객 전달 완료', completeLabel: label + ' 배달완료', actionId: order.id + '|' + category };
   });
   values.exchangeRows = F.snap().exchanges.filter(x => x.orderId === board.state.id).map(x => ({ id: x.id, summary: window.SkiWorkflows.exchanges.summary(x), status: x.status === 'cancelled' ? '취소' : '전달 ' + x.units.filter(u => u.deliveredAt).length + '/' + x.units.length + ' · 회수 ' + x.units.filter(u => u.collectedAt || u.receivedAt).length + '/' + x.units.length + ' · 매장 확인 ' + x.units.filter(u => u.receivedAt).length + '/' + x.units.length, onOpen: () => S.rentalChanges.openRecord(x.id) }));
+  values.earlyRows = F.snap().earlyReturns.filter(r => r.orderId === board.state.id).map(r => ({ summary: r.summary, description: (r.method === 'vehicle' ? r.visit.date + ' ' + r.visit.time + ' · ' + r.visit.place + ' · ' : '매장 직접반납 · ') + (r.status === 'rescheduled' ? '일정 변경됨 · 현재 품목 일정 확인' : r.status === 'corrected' ? '반납 수량 정정됨' : '수거 ' + r.collectedQuantity + '/' + r.assetIds.length + ' · 매장 확인 ' + r.receivedQuantity + '/' + r.assetIds.length) }));
+  values.hasEarlyReturns = values.earlyRows.length > 0;
   values.hasExchanges = values.exchangeRows.length > 0;
   values.hasDeliveryPlan = values.deliveryRows.length > 0;
   values.needsGear = values.needsGear && plans.equipment?.method !== 'delivery';

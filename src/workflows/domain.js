@@ -1,14 +1,14 @@
 (function (root, factory) {
-  if (typeof module === 'object' && module.exports) module.exports = factory(require('./common.js'), require('./reservations.js'), require('./inventory.js'), require('./dispatch.js'), require('./intake.js'), require('./documents.js'), require('./exchanges.js'));
-  else root.SkiWorkflows = factory(root.SkiWorkflowCommon, root.SkiWorkflowReservations, root.SkiWorkflowInventory, root.SkiWorkflowDispatch, root.SkiWorkflowIntake, root.SkiWorkflowDocuments, root.SkiWorkflowExchanges);
-})(globalThis, function (C, B, I, D, F, P, E) {
+  if (typeof module === 'object' && module.exports) module.exports = factory(require('./common.js'), require('./reservations.js'), require('./inventory.js'), require('./dispatch.js'), require('./intake.js'), require('./documents.js'), require('./exchanges.js'), require('./early-returns.js'));
+  else root.SkiWorkflows = factory(root.SkiWorkflowCommon, root.SkiWorkflowReservations, root.SkiWorkflowInventory, root.SkiWorkflowDispatch, root.SkiWorkflowIntake, root.SkiWorkflowDocuments, root.SkiWorkflowExchanges, root.SkiWorkflowEarlyReturns);
+})(globalThis, function (C, B, I, D, F, P, E, R) {
   'use strict';
   const catalog = () => [
     { id: 'ski', label: '스키', kind: 'equipment', unit: '대' }, { id: 'board', label: '보드', kind: 'equipment', unit: '대' },
     { id: 'clothing', label: '의류', kind: 'clothing', unit: '벌' }, { id: 'helmet', label: '헬멧', kind: 'helmet', unit: '개' },
     ...[3, 4, 6].map(hours => ({ id: 'ticket-' + hours + 'h', label: hours + '시간권', kind: 'liftTicket', unit: '매', hours }))
   ];
-  const fresh = shopId => ({ schemaVersion: 1, shopId: C.id(shopId), revision: 0, catalog: catalog(), assets: [], reservations: [], allocations: [], movements: [], corrections: [], exchanges: [], refunds: [], tasks: [], sequences: [], forms: [], printJobs: [], deliveries: [], stockReferences: [], events: [], requests: {} });
+  const fresh = shopId => ({ schemaVersion: 1, shopId: C.id(shopId), revision: 0, catalog: catalog(), assets: [], reservations: [], allocations: [], movements: [], corrections: [], exchanges: [], earlyReturns: [], refunds: [], tasks: [], sequences: [], forms: [], printJobs: [], deliveries: [], stockReferences: [], events: [], requests: {} });
   function execute(previous, command, trustedContext) {
     C.context(trustedContext, true); const context = { ...C.copy(trustedContext), at: C.instant(trustedContext.at) };
     C.keys(command, ['type', 'requestId', 'expectedVersion', 'payload']); C.id(command.requestId); C.string(command.type, 50); C.integer(command.expectedVersion, 0, Number.MAX_SAFE_INTEGER);
@@ -28,7 +28,8 @@
     const type = command.type, p = command.payload;
     let result;
     if (type === 'stock.move') E.beforeMove(state, p);
-    if (type.startsWith('exchange.')) result = E.handle(state, type, p, context);
+    if (type.startsWith('earlyReturn.')) result = R.handle(state, type, p, context);
+    else if (type.startsWith('exchange.')) result = E.handle(state, type, p, context);
     else if (type.startsWith('reservation.') || ['ticket.allocate', 'ticket.release'].includes(type)) result = B.handle(state, type, p, context);
     else if (type.startsWith('stock.') || type.startsWith('refund.') || type.startsWith('movement.') || type === 'ticket.issue') result = I.handle(state, type, p, context);
     else if (type.startsWith('task.') || type.startsWith('dispatch.')) result = D.handle(state, type, p, context);
@@ -49,5 +50,5 @@
     state.requests[requestKey] = { fingerprint, result: C.copy(response) };
     return { state, event, duplicate: false, result: response };
   }
-  return { fresh, execute, catalog, reservations: B, inventory: I, dispatch: D, intake: F, documents: P, exchanges: E };
+  return { fresh, execute, catalog, reservations: B, inventory: I, dispatch: D, intake: F, documents: P, exchanges: E, earlyReturns: R };
 });

@@ -65,7 +65,11 @@ const measure = root => [...root.querySelectorAll('h1,h2,button,input,select,str
   }, fixture);
   // Preserve the reference's markup, styles and rendering logic. Only data is
   // matched so dates, physical counts and changed histories cannot mask UI drift.
-  const normalized = original.replace(/const ORDERS = \[[\s\S]*?\n\];/, 'const ORDERS = ' + JSON.stringify(data) + ';');
+  let normalized = original.replace(/const ORDERS = \[[\s\S]*?\n\];/, 'const ORDERS = ' + JSON.stringify(data) + ';');
+  // The explicitly requested early-return entry is the sole new baseline control.
+  // Inject the same button into this isolated comparison, preserving the source file.
+  const exchangeButton = normalized.match(/<button type="button" onClick="{{ openExchange }}"[^>]*>[\s\S]*?<\/button>/)[0];
+  normalized = normalized.replace(exchangeButton, exchangeButton.replace('onClick="{{ openExchange }}"', '').replace('장비 교환</button>', '일부 조기반납</button>') + exchangeButton);
   await ref.route(referenceURL, route => route.fulfill({ contentType: 'text/html; charset=utf-8', body: normalized }));
   await ref.goto(referenceURL, { waitUntil: 'networkidle' });
   await ref.getByRole('heading', { name: '렌탈·반납 현황', exact: true }).waitFor();

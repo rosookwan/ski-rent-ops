@@ -121,5 +121,47 @@ S.action('exchange-cancel', W.safe(id => {
 }));
 S.action('exchange-cancel-confirm', W.safe(id => { if (revision !== F.snap().revision) throw new Error('업무가 변경됐습니다. 다시 확인해 주세요.'); F.run('exchange.cancel', { id, reason: read('cancel-reason') }); W.changed('교환 요청을 취소했습니다.'); }));
 S.action('exchange-dispatch', id => { S.close(); S.go('dispatch'); S.dispatchBoard.selectTask(id + '-new'); });
-S.rentalChanges = { openExchange, openRecord, list };
+
+let earlyOrder = null, earlyRevision = 0, earlyRows = [];
+const earlyRead = key => W.read('early-' + key);
+function openEarly(order) {
+  earlyOrder = order; earlyRevision = F.snap().revision;
+  const state = F.snap(), scheduled = state.tasks.filter(t => t.earlyReturnId && ['waiting','in_progress'].includes(t.status)).flatMap(F.remaining);
+  earlyRows = order.items.map(i => ({ ...i, eligible: F.assets(i.assetIds).filter(a => a.location.kind === 'customer' && F.customerIds(order.id).includes(a.location.id) && !a.exchangeReservationId && !scheduled.includes(a.id)) })).filter(i => i.eligible.length);
+  const quantities = earlyRows.map((i, index) => W.row('<label><input type="checkbox" data-early-check="' + index + '" aria-label="' + e(i.name) + ' 조기반납"> ' + e(i.name) + ' · 선택 가능 ' + i.eligible.length + '</label>', '실제로 조기반납할 품목과 수량', '<input type="number" id="early-qty-' + index + '" data-early-qty="' + index + '" aria-label="' + e(i.name) + ' 조기반납 수량" min="0" max="' + i.eligible.length + '" value="0" style="width:90px;min-height:48px;text-align:center;font-size:20px">')).join('');
+  W.modal('일부 조기반납', '<p><strong>' + e(order.name) + '</strong> · ' + e(order.id) + '</p>' + (quantities || '<p>조기반납할 수 있는 고객 보유 물품이 없습니다. 이미 예약한 조기수거와 진행 중인 장비교환도 확인해 주세요.</p>')
+    + '<div class="wf-form-grid">' + select('조기반납 사유', Object.entries(window.SkiWorkflows.earlyReturns.reasons), 'injury', 'id="early-reason" aria-label="조기반납 사유"')
+    + select('조기반납 방법', [['direct','매장 직접반납'],['vehicle','차량 조기수거 예약']], 'direct', 'id="early-method" aria-label="조기반납 방법"') + '</div>'
+    + field('조기반납 메모', '', 'text', 'id="early-memo" maxlength="200" placeholder="예: 부상으로 일행 1명만 먼저 반납 · 기타는 필수"')
+    + '<div id="early-visit" hidden><div class="wf-form-grid">' + field('조기수거 날짜', S.data.today, 'date', 'id="early-date"') + field('조기수거 시간', '13:00', 'time', 'id="early-time"')
+    + field('조기수거 장소', order.place || '만선 광장', 'text', 'id="early-place" maxlength="160"') + select('조기수거 차량', [['demo-van-1','1호 차량'],['demo-van-2','2호 차량']], F.vehicleId, 'id="early-vehicle" aria-label="조기수거 차량"') + '</div></div>'
+    + '<output id="early-preview" class="wf-hint" aria-live="polite"></output><p class="wf-hint">선택하지 않은 물품의 기존 일정과 대여금액은 유지합니다. 부츠·폴대 교환 이력이 있다면 실제 함께 반납하는 구성품도 선택하세요. 환불 금액은 자동으로 바뀌지 않습니다.</p>', b('취소','close') + b('조기반납 저장','early-save','','primary'));
+  updateEarly();
+}
+function updateEarly() {
+  if (!S.$('#early-method')) return;
+  const selected = earlyRows.filter((i, index) => Number(earlyRead('qty-' + index)) > 0).map((i) => i.name + ' ' + earlyRead('qty-' + earlyRows.indexOf(i)));
+  S.$('#early-visit').hidden = earlyRead('method') !== 'vehicle';
+  S.$('#early-preview').textContent = selected.length ? (earlyRead('method') === 'vehicle' ? '별도 조기수거 예약: ' : '지금 매장에서 받음: ') + selected.join(' · ') : '조기반납할 품목과 수량을 선택해 주세요.';
+  S.$('[data-action="early-save"]').disabled = !selected.length;
+}
+S.root.addEventListener('change', event => {
+  const target = event.target;
+  if (target.dataset.earlyCheck != null) S.$('#early-qty-' + target.dataset.earlyCheck).value = target.checked ? earlyRows[+target.dataset.earlyCheck].eligible.length : 0;
+  if (target.id.startsWith('early-') || target.dataset.earlyCheck != null) updateEarly();
+});
+S.root.addEventListener('input', event => {
+  const target = event.target;
+  if (target.dataset.earlyQty != null) { S.$('[data-early-check="' + target.dataset.earlyQty + '"]').checked = Number(target.value) > 0; updateEarly(); }
+});
+S.action('early-save', W.safe(() => {
+  if (earlyRevision !== F.snap().revision) throw new Error('수량이나 일정이 변경됐습니다. 창을 닫고 다시 확인해 주세요.');
+  const assetIds = earlyRows.flatMap((i, index) => { const q = W.number('early-qty-' + index); if (q > i.eligible.length) throw new Error('선택 가능한 수량을 확인해 주세요.'); return i.eligible.slice(0, q).map(a => a.id); });
+  if (!assetIds.length) throw new Error('조기반납할 품목과 수량을 선택해 주세요.');
+  const method = earlyRead('method');
+  F.run('earlyReturn.create', { id: C.randomId('early-'), orderId: earlyOrder.id, customerName: earlyOrder.name, assetIds, reason: earlyRead('reason'), memo: earlyRead('memo'), method,
+    ...(method === 'vehicle' ? { visit: { date: earlyRead('date'), time: earlyRead('time'), place: earlyRead('place'), vehicleId: earlyRead('vehicle') } } : {}) });
+  W.changed(method === 'vehicle' ? '선택한 수량만 조기수거로 예약했습니다. 나머지 일정은 유지됩니다.' : '선택한 수량을 조기반납 처리했습니다. 나머지 대여와 금액은 유지됩니다.');
+}));
+S.rentalChanges = { openExchange, openRecord, openEarly, list };
 })();

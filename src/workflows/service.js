@@ -8,9 +8,13 @@
     const { event, state, result } = committed;
     const source = { ...event, orderId: result.reservationId || result.taskId || result.formId || 'workflow' };
     const senderScope = event.actor.role === 'driver' ? 'vehicle:' + event.actor.vehicleId : 'store';
-    if (event.type.startsWith('exchange.')) {
+    if (event.type.startsWith('exchange.') || event.type === 'earlyReturn.create') {
       for (const id of result.taskIds || []) { const task = C.find(state.tasks, id); N.closeWhere(notifications, n => n.taskId === id && n.type === 'workflow-task', 'superseded'); N.emit(notifications, source, 'vehicle:' + task.vehicleId, 'workflow-task', task.title, task.memo, { senderScope, taskId: id }); }
       if (event.type === 'exchange.cancel') N.closeWhere(notifications, n => state.tasks.some(t => t.exchangeId === result.exchangeId && t.id === n.taskId), 'cancelled');
+    }
+    if (event.type === 'earlyReturn.create') {
+      N.closeWhere(notifications, n => state.tasks.some(t => t.id === n.taskId && ['cancelled', 'completed'].includes(t.status)) && n.lifecycle === 'active', 'resolved');
+      if (!result.taskIds.length) N.emit(notifications, source, 'store', 'workflow-collection', '일부 조기반납 접수', W.earlyReturns.summary(state, C.find(state.earlyReturns, result.earlyReturnId)), { senderScope, attentionRequired: false });
     }
     if (event.type === 'task.priority') {
       const task = C.find(state.tasks, result.taskId), recipient = event.actor.role === 'store' ? 'vehicle:' + task.vehicleId : 'store';
@@ -78,9 +82,9 @@
         return { ...C.copy(task), customer: C.copy(customer) };
       });
       if (context.actor.role === 'driver') return { revision: current.revision, mode: repository.mode, at: now(), catalog: C.copy(current.catalog), tasks, notifications,
-        exchanges: C.copy((current.exchanges || []).filter(x => x.visit.vehicleId === context.actor.vehicleId)), vehicle: W.inventory.vehicleSummary(current, context.actor.vehicleId, C.day(now()), now()), refunds: current.refunds.filter(r => r.vehicleId === context.actor.vehicleId).map(r => W.inventory.refundSummary(current, r)) };
+        earlyReturns: (current.earlyReturns || []).filter(r => r.visit?.vehicleId === context.actor.vehicleId).map(r => W.earlyReturns.view(current, r)), exchanges: C.copy((current.exchanges || []).filter(x => x.visit.vehicleId === context.actor.vehicleId)), vehicle: W.inventory.vehicleSummary(current, context.actor.vehicleId, C.day(now()), now()), refunds: current.refunds.filter(r => r.vehicleId === context.actor.vehicleId).map(r => W.inventory.refundSummary(current, r)) };
       return { revision: current.revision, mode: repository.mode, at: now(), catalog: C.copy(current.catalog), tasks, notifications, assets: C.copy(current.assets),
-        exchanges: C.copy(current.exchanges || []), reservations: C.copy(current.reservations), allocations: C.copy(current.allocations), refunds: current.refunds.map(r => W.inventory.refundSummary(current, r)),
+        earlyReturns: (current.earlyReturns || []).map(r => W.earlyReturns.view(current, r)), exchanges: C.copy(current.exchanges || []), reservations: C.copy(current.reservations), allocations: C.copy(current.allocations), refunds: current.refunds.map(r => W.inventory.refundSummary(current, r)),
         forms: current.forms.map(f => W.intake.view(current, f, now())), printJobs: C.copy(current.printJobs), deliveries: C.copy(current.deliveries), sequences: C.copy(current.sequences) };
     }
     const service = {
