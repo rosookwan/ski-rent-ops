@@ -74,12 +74,24 @@
     });
   }
   function createOrder(input, shopId, orderId) {
-    keys(input, ['customer', 'rental', 'vehicleId', 'returnPlan', 'items'], 'order');
+    keys(input, ['customer', 'rental', 'vehicleId', 'returnPlan', 'pickupPlan', 'items'], 'order');
     keys(input.customer, ['id', 'name', 'phone'], 'customer');
     keys(input.rental, ['startDate', 'endDate', 'amountWon'], 'rental');
     const rental = { startDate: date(input.rental.startDate), endDate: date(input.rental.endDate), amountWon: input.rental.amountWon ?? 0 };
     if (rental.startDate > rental.endDate || !Number.isSafeInteger(rental.amountWon) || rental.amountWon < 0) fail('INVALID_INPUT', '이용 기간 또는 금액을 확인해 주세요.');
     const defaultPlan = plan(input.returnPlan, { method: 'vehicle', date: rental.endDate });
+    const pickupPlan = {};
+    keys(input.pickupPlan || {}, ['equipment', 'liftTicket'], 'pickupPlan');
+    for (const category of ['equipment', 'liftTicket']) {
+      const raw = input.pickupPlan?.[category] || { method: 'shop' };
+      keys(raw, ['method', 'date', 'time', 'place', 'vehicleId'], 'pickupPlan.' + category);
+      const method = oneOf(raw.method, ['shop', 'delivery'], '수령 방법');
+      if (method === 'shop') pickupPlan[category] = { method };
+      else {
+        if (!/^(?:[01]\d|2[0-3]):[0-5]\d$/.test(raw.time || '')) fail('INVALID_INPUT', '배달 시간을 확인해 주세요.');
+        pickupPlan[category] = { method, date: date(raw.date), time: raw.time, place: text(raw.place, '배달 장소'), vehicleId: id(raw.vehicleId, '배달 차량') };
+      }
+    }
     const seen = new Set();
     const items = list(input.items, 'items').map(raw => {
       keys(raw, ['id', 'label', 'category', 'unit', 'plannedQuantity', 'plannedReturnQuantity', 'usage', 'returnPlan', 'recoveryValueWon'], 'item');
@@ -99,7 +111,7 @@
       return { id: raw.id, label: text(raw.label, '품목 이름'), category, unit: text(raw.unit ?? (category === 'liftTicket' ? '매' : '개'), '단위', 12), plannedQuantity, plannedReturnQuantity, issuedQuantity: 0, returnTarget: 0, vehicleQuantity: 0, shopQuantity: 0, usage, recoveryValueWon,
         returnPlan: plan(raw.returnPlan, { ...defaultPlan, ...(category === 'equipment' ? {} : { method: 'direct', place: '매장' }) }) };
     });
-    return { schemaVersion: 1, id: orderId, shopId, version: 0, customer: { id: id(input.customer.id, 'customer.id'), name: text(input.customer.name, '고객 이름'), phone: input.customer.phone == null ? null : text(input.customer.phone, '연락처', 40) }, rental, vehicleId: input.vehicleId == null ? null : id(input.vehicleId, 'vehicleId'), items, movements: [], events: [] };
+    return { schemaVersion: 1, id: orderId, shopId, version: 0, customer: { id: id(input.customer.id, 'customer.id'), name: text(input.customer.name, '고객 이름'), phone: input.customer.phone == null ? null : text(input.customer.phone, '연락처', 40) }, rental, vehicleId: input.vehicleId == null ? null : id(input.vehicleId, 'vehicleId'), pickupPlan, items, movements: [], events: [] };
   }
   function recalculate(order) {
     for (const item of order.items) { item.vehicleQuantity = 0; item.shopQuantity = 0; }
@@ -259,7 +271,7 @@
     }, { issuedQuantity: 0, returnTarget: 0, vehicleQuantity: 0, shopQuantity: 0, customerQuantity: 0, unissuedQuantity: 0 });
     const complete = totals.unissuedQuantity === 0 && totals.customerQuantity === 0 && totals.vehicleQuantity === 0;
     const status = complete ? (totals.returnTarget ? 'returned' : 'no_return_required') : !totals.issuedQuantity ? 'awaiting_issue' : !totals.customerQuantity && !totals.unissuedQuantity ? 'awaiting_shop' : totals.shopQuantity + totals.vehicleQuantity > 0 ? 'partial_return' : 'in_use';
-    return { id: order.id, shopId: order.shopId, version: order.version, customer: copy(order.customer), vehicleId: order.vehicleId, status, complete, items, totals };
+    return { id: order.id, shopId: order.shopId, version: order.version, customer: copy(order.customer), vehicleId: order.vehicleId, pickupPlan: copy(order.pickupPlan || {}), status, complete, items, totals };
   }
   function execute(current, command, context) {
     keys(command, ['type', 'orderId', 'requestId', 'expectedVersion', 'payload'], 'command');

@@ -488,8 +488,22 @@ function render() {
   board.state.view = isDetail() ? 'detail' : 'list';
   board.state.id = S.state.params.id || board.state.data[0]?.id;
   board.state.tab = S.state.tabs.rental || (board.order().stage === 'pickup' ? 'items' : 'return');
+  S.state.tabs.rental = board.state.tab;
   board.state.query = S.state.filters.rentalQuery || '';
   const values = board.renderVals();
+  const order = F.orders.get(board.state.id), plans = order?.pickupPlan || {};
+  values.deliveryRows = ['equipment', 'liftTicket'].filter(category => plans[category]?.method === 'delivery' && order.bindings.some(b => (b.item.category === 'liftTicket') === (category === 'liftTicket'))).map(category => {
+    const tasks = F.snap().tasks.filter(t => t.orderId === order.id && t.kind === 'delivery' && t.plannedItems && t.plannedItems.every(i => (F.snap().catalog.find(s => s.id === i.sku)?.kind === 'liftTicket') === (category === 'liftTicket')));
+    const pending = tasks.filter(t => ['waiting', 'in_progress'].includes(t.status)).reduce((n, t) => n + F.remainingQuantity(t), 0);
+    const unprepared = tasks.filter(t => ['waiting', 'in_progress'].includes(t.status)).reduce((n, t) => n + t.plannedItems.reduce((sum, i) => sum + i.quantity - i.assetIds.length, 0), 0);
+    const label = category === 'equipment' ? '장비' : '리프트권', plan = plans[category];
+    return { category, title: label + (pending ? ' 배달 대기 ' + pending + (category === 'equipment' ? '개' : '매') : ' 배달완료'), pending: pending > 0, canIssue: category === 'liftTicket' && unprepared > 0, summary: pending ? plan.date + ' ' + plan.time + ' · ' + plan.place + (category === 'liftTicket' && unprepared ? ' · 발권 전 ' + unprepared + '매' : '') : '고객 전달 완료', completeLabel: label + ' 배달완료', actionId: order.id + '|' + category };
+  });
+  values.hasDeliveryPlan = values.deliveryRows.length > 0;
+  values.needsGear = values.needsGear && plans.equipment?.method !== 'delivery';
+  values.needsTickets = values.needsTickets && plans.liftTicket?.method !== 'delivery';
+  values.needsIssue = values.needsGear || values.needsTickets;
+
   if (board.state.dialog?.kind === 'fix') values.dialogLead = '잘못 처리한 수량을 되돌립니다. 직접반납은 고객 보유로, 차량 인수분은 차량 보관으로 돌아갑니다.';
   callbacks = new Map();
   return window.SkiRentalView(values, bind, S.esc);

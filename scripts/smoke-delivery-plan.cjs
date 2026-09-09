@@ -1,0 +1,94 @@
+const { chromium } = require('playwright');
+const assert = require('node:assert/strict');
+const fs = require('node:fs');
+const { chooseTime } = require('./time-picker-helper.cjs');
+
+(async () => {
+  const browser = await chromium.launch({ channel: process.env.SKI_CHROME_CHANNEL || 'chrome', headless: true });
+  const page = await browser.newPage({ viewport: { width: 1366, height: 768 } });
+  const errors = [], writes = [], checks = [];
+  const output = process.env.SKI_DELIVERY_OUTPUT || 'work/delivery-plan'; fs.mkdirSync(output, { recursive: true });
+  page.setDefaultTimeout(10000);
+  page.on('pageerror', e => errors.push(e.message));
+  page.on('request', r => { if (r.method() !== 'GET') writes.push(r.url()); });
+  let frame;
+  const action = name => frame.locator('[data-action="' + name + '"]').click();
+  const click = name => frame.getByRole('button', { name, exact: true }).click();
+  const go = (page, params = {}) => frame.evaluate(({ page, params }) => SkiOps.go(page, params), { page, params });
+  const state = () => frame.evaluate(() => { const F = SkiOps.workflow; return { order: F.projectOrder('R-100'), tasks: F.snap().tasks.filter(t => t.orderId === 'R-100' && t.kind === 'delivery').map(t => ({ ...t, remaining: F.remainingQuantity(t) })), assets: F.snap().assets }; });
+  const pass = name => { checks.push(name); console.log('PASS ' + name); };
+  const shot = async name => { await frame.evaluate(() => document.fonts.ready); await page.screenshot({ path: output + '/' + name + '.png' }); };
+  try {
+    await page.goto(process.env.SKI_DEMO_URL || 'http://127.0.0.1:58148/', { waitUntil: 'networkidle' });
+    frame = page.frames().find(f => f.parentFrame());
+    await action('login-shop'); await go('intake'); await action('representative-done');
+    await action('toggle-period'); await frame.locator('[data-days="2"]').click();
+    await frame.locator('[data-product-tab="lift"]').click();
+    const tomorrow = await frame.evaluate(() => SkiOps.data.day(1));
+    // The use-date control preserves the equipment's two-day physical quantity.
+    await frame.locator('[data-lift-date]').fill(tomorrow);
+    await frame.locator('[data-lift-ticket="afternoon-adult"][data-delta="1"]').click({ clickCount: 1 });
+    await frame.locator('[data-lift-ticket="afternoon-adult"][data-delta="1"]').click();
+    await action('fulfillment');
+    await frame.locator('[data-field="gearPickupMethod"]').selectOption('delivery');
+    await chooseTime(frame, '[data-field="gearPickupTime"]', '18:00');
+    await frame.locator('[data-field="ticketPickupMethod"]').selectOption('delivery');
+    await frame.locator('[data-field="ticketPickupDate"]').fill(tomorrow);
+    await chooseTime(frame, '[data-field="ticketPickupTime"]', '12:00');
+    await shot('intake-delivery-settings-1366');
+    await action('intake-sheet-done');
+    await action('save');
+    if (await frame.locator('[data-action="physical-apply"]').isVisible()) await action('physical-apply');
+    await frame.getByRole('heading', { name: '접수 내용을 저장했어요' }).waitFor();
+    await click('계속 보기');
+    let s = await state(); assert.equal(s.tasks.length, 2); assert.ok(s.tasks.every(t => !t.assetIds.length));
+    assert.equal(s.tasks.find(t => t.id.endsWith('equipment')).plannedItems.reduce((n, i) => n + i.quantity, 0), 2);
+    assert.equal(s.tasks.find(t => t.id.endsWith('liftTicket')).date, tomorrow);
+    await go('dispatch'); assert.equal(await frame.locator('[data-load-id="R-100-delivery-equipment"]').count(), 1);
+    await click('내일'); assert.match(await frame.locator('[data-load-id="R-100-delivery-liftTicket"]').innerText(), /발권 전/);
+    await shot('pending-ticket-1366');
+    pass('new intake creates separate gear/ticket delivery tasks before issuing or loading');
+
+    await go('rental', { id: 'R-100' });
+    assert.equal(await frame.locator('[data-action="wf-order-load"]').count(), 0);
+    await click('장비 배달완료'); await click('모두 선택'); await click('선택 수량 확인');
+    s = await state(); assert.equal(s.order.items.filter(i => i.category !== 'liftTicket').reduce((n, i) => n + i.customerQuantity, 0), 2);
+    assert.equal(s.order.items.find(i => i.category === 'liftTicket').customerQuantity, 0);
+    assert.equal(s.tasks.find(t => t.id.endsWith('liftTicket')).remaining, 2);
+    assert.match(await frame.locator('[data-delivery-category="equipment"]').innerText(), /장비 배달완료/);
+    assert.equal(await frame.getByRole('button', { name: '장비 배달완료', exact: true }).count(), 0);
+    await shot('gear-completed-ticket-pending-1366');
+    await page.setViewportSize({ width: 1024, height: 768 }); await shot('gear-completed-ticket-pending-1024');
+    await page.setViewportSize({ width: 1366, height: 768 });
+    pass('direct gear pickup completes only equipment and leaves ticket completion separate');
+
+    await go('dispatch');
+    const ticketRow = frame.locator('[data-load-id="R-100-delivery-liftTicket"]');
+    await ticketRow.getByRole('button', { name: '발권·준비', exact: true }).click();
+    await frame.locator('[data-action="wf-legacy-ticket-issue"][data-id="R-100|ticket-0"]').click();
+    assert.match(await frame.locator('#wf-ticket-from').inputValue(), new RegExp('^' + tomorrow + 'T12:00'));
+    await click('발권 확인');
+    s = await state(); let ticket = s.tasks.find(t => t.id.endsWith('liftTicket'));
+    assert.equal(ticket.assetIds.length, 1); assert.equal(ticket.remaining, 2);
+    assert.equal(s.assets.find(a => a.id === ticket.assetIds[0]).location.kind, 'shop');
+    await ticketRow.getByRole('button', { name: '실었어요', exact: true }).click();
+    s = await state(); assert.equal(s.assets.find(a => a.id === ticket.assetIds[0]).location.kind, 'vehicle');
+    assert.match(await ticketRow.innerText(), /발권 전/); await shot('partial-ticket-loading-1366');
+    await go('rental', { id: 'R-100' }); await click('리프트권 배달완료'); await click('모두 선택'); await click('선택 수량 확인');
+    s = await state(); assert.equal(s.tasks.find(t => t.id.endsWith('liftTicket')).remaining, 1);
+    assert.equal(s.order.items.find(i => i.category === 'liftTicket').customerQuantity, 1);
+    pass('issuing one ticket keeps it in shop; loading and delivering it leave the unissued ticket pending');
+
+    await click('리프트권 발권·준비');
+    await frame.locator('[data-action="wf-legacy-ticket-issue"][data-id="R-100|ticket-0"]').click();
+    await click('발권 확인'); await click('리프트권 배달완료'); await click('모두 선택'); await click('선택 수량 확인');
+    s = await state(); assert.ok(s.tasks.every(t => t.status === 'completed'));
+    assert.equal(s.order.items.find(i => i.category === 'liftTicket').customerQuantity, 2);
+    await shot('both-completed-1366');
+    await go('dispatch'); assert.equal(await ticketRow.count(), 0);
+    assert.equal(await frame.locator('[data-visit-id="R-100-delivery-liftTicket"]').count(), 1);
+    pass('the last ticket can be handed over from shop; completed delivery leaves the loading queue');
+    assert.deepEqual(errors, []); assert.deepEqual(writes, []);
+    fs.writeFileSync(output + '/smoke.json', JSON.stringify({ checks, errors, writes }, null, 2));
+  } finally { await browser.close(); }
+})().catch(e => { console.error(e); process.exit(1); });

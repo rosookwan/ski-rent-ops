@@ -51,11 +51,12 @@
       task = C.find(state.tasks, p.taskId, '업무'); C.vehicle(context, task.vehicleId);
       if (!['waiting', 'in_progress'].includes(task.status)) C.fail('NO_CHANGE', '종료된 업무입니다.');
       const expectedKind = kind === 'deliver' ? 'delivery' : kind === 'collect' ? 'collection' : null;
-      if (!expectedKind || task.kind !== expectedKind || task.customerId !== (kind === 'deliver' ? to.id : from.id) || task.vehicleId !== (kind === 'deliver' ? from.id : to.id)) C.fail('INVALID_INPUT', '업무의 고객·차량·이동 종류가 맞지 않습니다.');
+      const directPickup = kind === 'deliver' && from.kind === 'shop' && context.actor.role === 'store';
+      if (!expectedKind || task.kind !== expectedKind || task.customerId !== (kind === 'deliver' ? to.id : from.id) || !directPickup && task.vehicleId !== (kind === 'deliver' ? from.id : to.id)) C.fail('INVALID_INPUT', '업무의 고객·차량·이동 종류가 맞지 않습니다.');
     }
     if (context.actor.role === 'driver' && !task) C.fail('FORBIDDEN', '배정된 전달·수거 업무에서 처리해 주세요.');
     const assets = C.ids(p.assetIds).map(id => C.find(state.assets, id, '물품'));
-    if (task?.assetIds.length && assets.some(a => !task.assetIds.includes(a.id))) C.fail('FORBIDDEN', '배정된 물품을 확인해 주세요.');
+    if (task && (task.assetIds.length || task.plannedItems) && assets.some(a => !task.assetIds.includes(a.id))) C.fail('FORBIDDEN', '배정된 물품을 확인해 주세요.');
     if (assets.some(a => !same(a.location, from))) C.fail('QUANTITY_EXCEEDED', '출발 위치에 해당 물품이 없습니다. 최신 수량을 확인해 주세요.');
     const purpose = p.purpose == null ? null : C.oneOf(p.purpose, ['spare', 'delivery']);
     if (purpose && kind !== 'load') C.fail('INVALID_INPUT', '적재할 때만 용도를 함께 지정할 수 있습니다.');

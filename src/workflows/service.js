@@ -59,7 +59,8 @@
     const execute = command => {
       if (command?.type === 'task.save' && command.payload?.orderId) {
         const order = repository.get(context.shopId, command.payload.orderId);
-        if (!order || order.vehicleId !== command.payload.vehicleId) C.fail('INVALID_INPUT', '접수의 담당 차량을 확인해 주세요.');
+        const vehicles = command.payload.kind === 'delivery' ? Object.values(order?.pickupPlan || {}).filter(p => p.method === 'delivery').map(p => p.vehicleId) : [];
+        if (!order || ![order.vehicleId, ...vehicles].includes(command.payload.vehicleId)) C.fail('INVALID_INPUT', '접수의 담당 차량을 확인해 주세요.');
       }
       const result = commit(repository, context.shopId, command, { ...context, at: now() });
       return { ...C.copy(result.result), duplicate: result.duplicate, revision: result.state.revision };

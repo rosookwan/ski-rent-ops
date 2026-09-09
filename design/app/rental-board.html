@@ -151,7 +151,14 @@
 
                 <div style="{{ paneBodyStyle }}">
                   <sc-if value="{{ isItemsTab }}" hint-placeholder-val="{{ false }}">
-                    <sc-if value="{{ needsIssue }}"><div class="rental-issue-actions" style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:18px"><sc-if value="{{ needsGear }}"><button type="button" data-action="wf-order-issue" data-id="{{ orderId }}">장비 지급 확인</button><button type="button" data-action="wf-order-load" data-id="{{ orderId }}">장비 적재·배달</button></sc-if><sc-if value="{{ needsTickets }}"><button type="button" data-action="wf-legacy-ticket" data-id="{{ orderId }}">리프트권 지급</button></sc-if></div></sc-if>
+                    <sc-if value="{{ hasDeliveryPlan }}"><div class="rental-delivery-status" style="display:flex;flex-direction:column;gap:10px;margin-bottom:18px">
+                      <sc-for list="{{ deliveryRows }}" as="delivery"><div class="rental-issue-actions" data-delivery-category="{{ delivery.category }}" style="display:flex;align-items:center;flex-wrap:wrap;gap:10px;padding:12px 14px;border-radius:var(--mk-radius-lg,12px);background:var(--mk-neutral-50,#F8F8F8)">
+                        <div style="flex:1;min-width:180px"><strong style="font-size:16px;font-weight:700">{{ delivery.title }}</strong><p style="margin:4px 0 0;font-size:14px;color:var(--mk-neutral-600,#5D5D5D)">{{ delivery.summary }}</p></div>
+                        <sc-if value="{{ delivery.canIssue }}"><button type="button" data-action="wf-legacy-ticket" data-id="{{ orderId }}">리프트권 발권·준비</button></sc-if>
+                        <sc-if value="{{ delivery.pending }}"><button type="button" data-action="wf-order-delivered" data-id="{{ delivery.actionId }}">{{ delivery.completeLabel }}</button></sc-if>
+                      </div></sc-for>
+                    </div></sc-if>
+                    <sc-if value="{{ needsIssue }}"><div class="rental-issue-actions" style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:18px"><sc-if value="{{ needsGear }}"><button type="button" data-action="wf-order-issue" data-id="{{ orderId }}">장비 지급 확인</button></sc-if><sc-if value="{{ needsTickets }}"><button type="button" data-action="wf-legacy-ticket" data-id="{{ orderId }}">리프트권 지급</button></sc-if></div></sc-if>
                     <div style="display:flex;flex-direction:column;gap:18px">
                       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px">
                         <div style="box-sizing:border-box;padding:14px 16px;border-radius:var(--mk-radius-lg,12px);background:var(--mk-neutral-50,#F8F8F8)">

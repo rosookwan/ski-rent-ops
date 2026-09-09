@@ -28,6 +28,12 @@ function tripReference() {
   html = html.replace("state: done ? '✓ 차에 있음'", "canCollect: j.kind === 'collect' && j.remainingCount > 0, state: j.returnState || (done ? '✓ 차에 있음'")
     .replace("'환불 예정' : '수거 예정'),", "'환불 예정' : '수거 예정')),");
   html = html.replace('returnTeams.filter(j => F.isDone(j)).length', 'returnTeams.filter(j => j.inCar > 0).length');
+  // Requested delivery changes: completed rows leave loading, unissued tickets
+  // retain a pending row and open issuance instead of claiming they were loaded.
+  html = html.replace("all.filter(j => j.kind === 'deliver' || j.kind === 'liftDeliver')", "all.filter(j => !F.isDone(j) && (j.kind === 'deliver' || j.kind === 'liftDeliver'))");
+  html = html.replace("itemsLine(j) + (fromCollect", "itemsLine(j) + (j.needsIssue ? ' · 발권 전 수량 있음' : '') + (fromCollect");
+  html = html.replace("name: j.name + ' 팀',", "name: j.name + ' 팀', loadLabel: j.needsIssue && !j.canLoad ? '발권·준비' : '실었어요',");
+  html = html.replace('>실었어요</button>', '>{{ t.loadLabel }}</button>');
   return html;
 }
 const base = process.env.SKI_DISPATCH_REFERENCE_URL || 'http://127.0.0.1:58150/';
@@ -35,7 +41,7 @@ const referenceURL = base + encodeURIComponent(name);
 const appURL = process.env.SKI_DEMO_URL || 'http://127.0.0.1:58148/';
 const output = path.resolve(process.env.SKI_DISPATCH_OUTPUT || 'work/dispatch-ui-parity');
 fs.mkdirSync(output, { recursive: true });
-fs.writeFileSync(path.join(output, 'reference-adjustments.json'), JSON.stringify({ original: path.join(directory, name), copyChanges, controls: ['추가로 싣기: original 56px/17px load button style in fixed footer', '매장에 내리기: same fixed footer', '수거 수량 입력: original 48px/16px neutral button style'], data: 'Physical remaining, on-vehicle and shop-received counts replace the reference completed=on-vehicle assumption.' }, null, 2));
+fs.writeFileSync(path.join(output, 'reference-adjustments.json'), JSON.stringify({ original: path.join(directory, name), copyChanges, controls: ['추가로 싣기: original 56px/17px load button style in fixed footer', '매장에 내리기: same fixed footer', '수거 수량 입력: original 48px/16px neutral button style', 'Unissued tickets: 발권·준비 using the unchanged loading button style'], data: 'Physical remaining, on-vehicle and shop-received counts replace the reference completed=on-vehicle assumption. Equipment and tickets are separate pending tasks; completed deliveries leave the loading panel.' }, null, 2));
 function pixels(a, b, filename, rounded = false) {
   const x = PNG.sync.read(a), y = PNG.sync.read(b);
   assert.equal(x.width, y.width); assert.equal(x.height, y.height);

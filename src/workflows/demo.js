@@ -38,9 +38,10 @@
       const refund = snap().refunds.find(r => r.id === task.refundId);
       return task.assetIds.filter(id => !(task.fulfilledElsewhereAssetIds || []).includes(id) && !refund?.cancelledAssetIds.includes(id) && !history.some(m => (m.taskId === task.id || (task.refundId && m.refundId === task.refundId)) && m.assetIds.includes(id) && !m.reversedAssetIds.includes(id)));
     };
+    const remainingQuantity = task => remaining(task).length + W.dispatch.unassigned(task);
     function saveTask(payload) { return run('task.save', { vehicleId, date: today, time: '16:30', place: '만선 광장', ...payload }); }
     function importOrder(order, initial = false) {
-      if (orders.has(order.id)) return;
+      if (orders.has(order.id)) { planDeliveries(orders.get(order.id)); return; }
       const copy = C.copy(order); copy.bindings = [];
       for (const item of copy.items) {
         let sku = item.id === 'clothes' ? 'clothing' : item.id;
@@ -64,6 +65,19 @@
         const key = [t.date, t.time, t.place].join('|');
         if (groups.has(key)) { const previous = groups.get(key); saveTask({ ...taskPayload(previous), assetIds: [...previous.assetIds, ...t.assetIds] }); previous.assetIds.push(...t.assetIds); run('task.status', { id: t.id, status: 'cancelled' }); }
         else groups.set(key, C.copy(t));
+      }
+      planDeliveries(copy);
+    }
+    function planDeliveries(order) {
+      for (const category of ['equipment', 'liftTicket']) {
+        const plan = order.pickupPlan?.[category]; if (plan?.method !== 'delivery') continue;
+        const id = order.id + '-delivery-' + category;
+        if (snap().tasks.some(t => t.id === id)) continue;
+        const plannedItems = order.bindings.filter(b => (b.item.category === 'liftTicket') === (category === 'liftTicket')).flatMap(b => {
+          const quantity = b.item.plannedQuantity - b.assetIds.length;
+          return quantity > 0 ? [{ itemId: b.itemId, sku: b.sku, quantity }] : [];
+        });
+        if (plannedItems.length) saveTask({ id, kind: 'delivery', customerId: order.id, orderId: order.id, vehicleId: plan.vehicleId, date: plan.date, time: plan.time, place: plan.place, title: order.customer.name + (category === 'equipment' ? ' 장비 배달' : ' 리프트권 배달'), plannedItems });
       }
     }
     function taskPayload(t) { return Object.fromEntries(['id', 'kind', 'vehicleId', 'date', 'time', 'place', 'customerId', 'title', 'orderId', 'reservationId', 'assetIds'].filter(k => t[k] != null).map(k => [k, t[k]])); }
@@ -98,12 +112,14 @@
     }
     function issueOrder(id) {
       const order = orders.get(id); if (!order) throw new Error('접수를 찾을 수 없습니다.');
+      if (order.pickupPlan?.equipment?.method === 'delivery') throw new Error('배달 예정 장비는 장비 배달완료에서 실제 전달 수량을 확인해 주세요.');
       const plan = [];
       for (const b of order.bindings) {
         const quantity = b.item.plannedQuantity - b.assetIds.length - (b.stagedAssetIds || []).length; if (!quantity) continue;
         if (b.item.category === 'liftTicket') continue;
         const used = plan.flatMap(p => p.ids);
-        const ids = snap().assets.filter(a => a.sku === b.sku && a.location.kind === 'shop' && !used.includes(a.id)).slice(0, quantity).map(a => a.id);
+        const reserved = snap().tasks.filter(t => t.kind === 'delivery' && ['waiting', 'in_progress'].includes(t.status)).flatMap(remaining);
+        const ids = snap().assets.filter(a => a.sku === b.sku && a.location.kind === 'shop' && !used.includes(a.id) && !reserved.includes(a.id)).slice(0, quantity).map(a => a.id);
         if (ids.length !== quantity) throw new Error(b.item.label + ' 매장 재고가 부족합니다.');
         plan.push({ b, ids });
       }
@@ -113,29 +129,79 @@
       for (const [i, p] of plan.entries()) if (p.b.item.returnPlan.method === 'vehicle') { const rp = p.b.item.returnPlan; saveTask({ id: id + '-issued-' + i, kind: 'collection', customerId: id, title: order.customer.name + ' 수거', orderId: id, date: rp.date, time: rp.time || '16:30', place: rp.place || '만선 광장', assetIds: p.ids }); }
     }
     function dispatchOrder(id, details) {
-      const order = orders.get(id), selected = [], plan = [];
-      for (const b of order.bindings.filter(b => b.item.category !== 'liftTicket')) {
-        const quantity = b.item.plannedQuantity - b.assetIds.length - b.stagedAssetIds.length; if (!quantity) continue;
-        const ids = snap().assets.filter(a => a.sku === b.sku && a.location.kind === 'shop' && !selected.includes(a.id)).slice(0, quantity).map(a => a.id);
-        if (ids.length !== quantity) throw new Error('매장 장비 재고가 부족합니다.');
-        selected.push(...ids); plan.push({ b, ids });
+      const task = deliveryTasks(id, 'equipment')[0];
+      if (task) return loadDelivery(task.id);
+      throw new Error('접수의 장비 배달 예정 정보를 확인해 주세요.');
+    }
+    const deliveryTasks = (id, category) => snap().tasks.filter(t => t.orderId === id && t.kind === 'delivery' && t.plannedItems && ['waiting', 'in_progress'].includes(t.status) && t.plannedItems.every(i => (snap().catalog.find(s => s.id === i.sku)?.kind === 'liftTicket') === (category === 'liftTicket')));
+    function deliveryCandidates(id, category) {
+      const state = snap(), used = new Set(), reserved = new Set(state.tasks.filter(t => t.kind === 'delivery' && ['waiting', 'in_progress'].includes(t.status)).flatMap(remaining));
+      return deliveryTasks(id, category).flatMap(task => task.plannedItems.flatMap(item => {
+        const held = assets(remaining(task).filter(id => item.assetIds.includes(id))).filter(a => a.location.kind === 'shop' || a.location.kind === 'vehicle' && a.location.id === task.vehicleId);
+        const available = category === 'liftTicket' ? [] : state.assets.filter(a => a.sku === item.sku && a.location.kind === 'shop' && !reserved.has(a.id) && !used.has(a.id)).slice(0, item.quantity - item.assetIds.length);
+        available.forEach(a => used.add(a.id));
+        return [...held, ...available].map(a => ({ ...a, taskId: task.id, itemId: item.itemId, needsAssignment: !item.assetIds.includes(a.id) }));
+      }));
+    }
+    function scheduleCollection(commit, order, itemId, ids) {
+      const binding = order.bindings.find(b => b.itemId === itemId), plan = binding.item.returnPlan;
+      if (plan.method === 'vehicle') commit('task.save', { id: Client.randomId('order-collect-'), kind: 'collection', customerId: order.id, orderId: order.id, vehicleId: order.vehicleId || vehicleId, date: plan.date, time: plan.time || '16:30', place: plan.place || '만선 광장', title: order.customer.name + ' 수거', assetIds: ids });
+    }
+    function assignCandidates(commit, order, rows) {
+      for (const taskId of new Set(rows.map(a => a.taskId))) {
+        const selected = rows.filter(a => a.taskId === taskId && a.needsAssignment);
+        const items = [...new Set(selected.map(a => a.itemId))].map(itemId => ({ itemId, assetIds: selected.filter(a => a.itemId === itemId).map(a => a.id) }));
+        if (items.length) commit('task.allocate', { id: taskId, items });
+        for (const item of items) scheduleCollection(commit, order, item.itemId, item.assetIds);
       }
-      if (!selected.length) throw new Error('추가로 적재할 장비가 없습니다.');
-      atomic(commit => { commit('stock.move', { kind: 'load', from: shop, to: van, assetIds: selected, purpose: 'delivery' }); commit('task.save', { id: Client.randomId('order-delivery-'), kind: 'delivery', customerId: id, orderId: id, vehicleId, date: details.date, time: details.time, place: details.place, title: order.customer.name + ' 장비 배달', assetIds: selected }); });
-      plan.forEach(({ b, ids }) => b.stagedAssetIds.push(...ids));
+    }
+    function rememberCandidates(order, rows) {
+      for (const a of rows.filter(a => a.needsAssignment)) order.bindings.find(b => b.itemId === a.itemId).stagedAssetIds.push(a.id);
+    }
+    function loadDelivery(taskId) {
+      const task = snap().tasks.find(t => t.id === taskId);
+      if (!task?.plannedItems || !['waiting', 'in_progress'].includes(task.status)) throw new Error('배달 예정 업무를 확인해 주세요.');
+      const category = task.plannedItems.every(i => snap().catalog.find(s => s.id === i.sku).kind === 'liftTicket') ? 'liftTicket' : 'equipment';
+      const order = orders.get(task.orderId), rows = deliveryCandidates(order.id, category).filter(a => a.taskId === taskId && a.location.kind === 'shop');
+      if (!rows.length) throw new Error(category === 'liftTicket' ? '발권한 리프트권이 없습니다. 먼저 발권·준비해 주세요.' : '새로 실을 매장 장비가 없습니다. 재고를 확인해 주세요.');
+      atomic(commit => { assignCandidates(commit, order, rows); commit('stock.move', { kind: 'load', from: shop, to: { kind: 'vehicle', id: task.vehicleId }, assetIds: rows.map(a => a.id), purpose: 'delivery' }); });
+      rememberCandidates(order, rows);
+    }
+    function completeDelivery(id, category, assetIds) {
+      C.oneOf(category, ['equipment', 'liftTicket']); C.ids(assetIds);
+      const order = orders.get(id), candidates = deliveryCandidates(id, category), rows = assetIds.map(id => candidates.find(a => a.id === id));
+      if (rows.some(a => !a)) throw new Error('전달할 물품이 변경됐습니다. 수량을 다시 확인해 주세요.');
+      atomic(commit => {
+        assignCandidates(commit, order, rows);
+        for (const task of deliveryTasks(id, category)) {
+          const selected = rows.filter(a => a.taskId === task.id);
+          for (const key of new Set(selected.map(a => a.location.kind + ':' + a.location.id))) {
+            const group = selected.filter(a => a.location.kind + ':' + a.location.id === key);
+            commit('stock.move', { kind: 'deliver', from: group[0].location, to: { kind: 'customer', id }, assetIds: group.map(a => a.id), taskId: task.id });
+          }
+          if (selected.length && selected.length === remainingQuantity(task)) commit('task.status', { id: task.id, status: 'completed' });
+        }
+      });
+      rememberCandidates(order, rows);
     }
     function issueLegacyTicket(orderId, itemId, values) {
       const order = orders.get(orderId), binding = order.bindings.find(b => b.itemId === itemId);
-      if (!binding || binding.item.category !== 'liftTicket' || !Number.isInteger(values.quantity) || values.quantity < 1 || values.quantity > binding.item.plannedQuantity - binding.assetIds.length) throw new Error('접수의 남은 리프트권 지급 수량을 확인해 주세요.');
+      if (!binding || binding.item.category !== 'liftTicket' || !Number.isInteger(values.quantity) || values.quantity < 1 || values.quantity > binding.item.plannedQuantity - binding.assetIds.length - binding.stagedAssetIds.length) throw new Error('접수의 남은 리프트권 발권 수량을 확인해 주세요.');
+      const task = deliveryTasks(orderId, 'liftTicket').find(t => t.plannedItems.some(i => i.itemId === itemId));
       const local = at => new Date(Date.parse(at) + 9 * 3600000).toISOString();
-      const start = local(values.ticket.validFrom), end = local(values.ticket.validTo), reservationId = Client.randomId('legacy-book-');
+      const start = local(values.ticket.validFrom), end = local(values.ticket.validTo), reservationId = task ? orderId : Client.randomId('legacy-book-'), lineId = Client.randomId('line-');
       const ids = atomic(commit => {
-        commit('reservation.create', { id: reservationId, customer: { name: order.customer.name, phone: order.customer.phone }, orderId, lines: [{ id: 'line', ticketType: values.sku, quantity: values.quantity, useDate: start.slice(0, 10), startTime: start.slice(11, 16), endTime: end.slice(11, 16) }] });
-        const issued = commit('ticket.issue', { ...values, reservationId, lineId: 'line' });
-        commit('stock.move', { kind: 'deliver', from: shop, to: { kind: 'customer', id: reservationId }, assetIds: issued.assetIds });
+        const lines = [{ id: lineId, ticketType: values.sku, quantity: values.quantity, useDate: start.slice(0, 10), startTime: start.slice(11, 16), endTime: end.slice(11, 16) }];
+        if (snap().reservations.some(r => r.id === reservationId)) commit('reservation.addLines', { id: reservationId, lines });
+        else commit('reservation.create', { id: reservationId, customer: { name: order.customer.name, phone: order.customer.phone }, orderId, lines });
+        const issued = commit('ticket.issue', { ...values, reservationId, lineId });
+        if (task) {
+          commit('task.allocate', { id: task.id, items: [{ itemId, assetIds: issued.assetIds }] });
+          scheduleCollection(commit, order, itemId, issued.assetIds);
+        } else commit('stock.move', { kind: 'deliver', from: shop, to: { kind: 'customer', id: reservationId }, assetIds: issued.assetIds });
         return issued.assetIds;
       });
-      binding.assetIds.push(...ids); (binding.reservationIds ||= []).push(reservationId);
+      (task ? binding.stagedAssetIds : binding.assetIds).push(...ids); (binding.reservationIds ||= []).push(reservationId);
     }
     async function createForm(payload) {
       const envelope = await Client.newIntakeCommand(snap(), { id: Client.randomId('form-'), date: today, expiresAt: C.nextDate(C.nextDate(today)) + 'T14:59:59.000Z', ...payload });
@@ -170,7 +236,7 @@
       // Seed assignments are not unread messages; the original priority remains.
       repository.transactNotifications(shopId, notices => { notices.records = notices.records.filter(n => !['workflow-task', 'load', 'intake-submitted'].includes(n.type)); });
     }
-    return { shopId, vehicleId, shop, van, store, driver, snap, run, atomic, assets, ticket, remaining, saveTask, taskPayload, importOrder, projectOrder, issueOrder, issueLegacyTicket, dispatchOrder, customerIds, returnCustomer, orders, tokens, createForm, guest, seed };
+    return { shopId, vehicleId, shop, van, store, driver, snap, run, atomic, assets, ticket, remaining, remainingQuantity, saveTask, taskPayload, importOrder, projectOrder, issueOrder, issueLegacyTicket, dispatchOrder, deliveryTasks, deliveryCandidates, completeDelivery, loadDelivery, customerIds, returnCustomer, orders, tokens, createForm, guest, seed };
   }
   return { create };
 });

@@ -101,12 +101,14 @@ const fs = require('node:fs');
       assert.equal(await dialog().count(), 0);
       const after = await current('morning'); assert.equal(after.items[0].returnPlan.date, tomorrow); assert.equal(after.items[0].returnPlan.method, 'direct');
     });
-    await test('unissued equipment and tickets retain issue and dispatch actions', async () => {
+    await test('planned equipment and tickets have separate delivery completion without a loading action', async () => {
       await frame.locator('[data-order-id="R-022"]').click();
       assert.equal(await frame.getByRole('tab', { name: '장비·리프트권', exact: true }).getAttribute('aria-selected'), 'true');
-      assert.equal(await frame.getByRole('button', { name: '장비 적재·배달', exact: true }).isVisible(), true);
-      assert.equal(await frame.getByRole('button', { name: '리프트권 지급', exact: true }).isVisible(), true);
-      await click('장비 지급 확인');
+      assert.equal(await frame.getByRole('button', { name: '장비 적재·배달', exact: true }).count(), 0);
+      assert.equal(await frame.getByRole('button', { name: '장비 배달완료', exact: true }).isVisible(), true);
+      assert.equal(await frame.getByRole('button', { name: '리프트권 배달완료', exact: true }).isVisible(), true);
+      assert.equal(await frame.getByRole('button', { name: '리프트권 발권·준비', exact: true }).isVisible(), true);
+      await click('장비 배달완료'); await click('모두 선택'); await click('선택 수량 확인');
       const after = await current('R-022'); assert.equal(after.totals.customerQuantity, 3); assert.equal(after.totals.unissuedQuantity, 1);
       await frame.getByRole('tab', { name: '반납 확인', exact: true }).click();
       assert.equal(await frame.getByRole('button', { name: '고객 직접반납 받음', exact: true }).isDisabled(), false);

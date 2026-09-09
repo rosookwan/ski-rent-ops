@@ -24,7 +24,8 @@ function snapshot() {
         const remaining = F.remaining(task), assets = F.assets(task.assetIds), waiting = F.assets(remaining);
         const pickup = task.kind === 'delivery' && waiting.some(a => a.ticket && a.location.kind === 'customer' && a.location.id !== task.customerId);
         const kind = task.kind === 'collection' ? 'collect' : task.kind === 'refund' ? 'liftRefund' : pickup ? 'liftDeliver' : 'deliver';
-        const loaded = task.kind === 'delivery' && assets.length && (task.status === 'completed' || waiting.length && waiting.every(a => a.location.kind === 'vehicle' && a.location.id === vid));
+        const unassigned = (task.plannedItems || []).reduce((n, i) => n + i.quantity - i.assetIds.length, 0);
+        const loaded = task.kind === 'delivery' && assets.length && (task.status === 'completed' || !unassigned && waiting.length && waiting.every(a => a.location.kind === 'vehicle' && a.location.id === vid));
         const loading = history.filter(m => m.kind === 'load' && m.to.id === vid && assets.some(a => m.assetIds.includes(a.id) && !m.reversedAssetIds.includes(a.id))).at(-1);
         const customer = S.workflowCustomer(task.customerId);
         const name = task.customerId && customer.name !== task.customerId ? customer.name : task.title;
@@ -38,9 +39,12 @@ function snapshot() {
           const moves = assetHistory(a), collected = moves.find(m => m.kind === 'collect' && m.taskId === task.id);
           return (task.fulfilledElsewhereAssetIds || []).includes(a.id) || collected && moves.some(m => m.kind === 'receive' && m.revision > collected.revision);
         }).length : 0;
-        jobs.push({ id: task.id, vehicleId: v.id, kind, time: task.time, place: task.place, name, items: counts(remaining.length ? remaining : task.assetIds), dateOffset: offsetOf(date),
+        const quantities = counts(task.status === 'completed' ? task.assetIds : remaining);
+        for (const item of task.plannedItems || []) if (item.quantity > item.assetIds.length) quantities[item.sku] = (quantities[item.sku] || 0) + item.quantity - item.assetIds.length;
+        const needsIssue = (task.plannedItems || []).some(i => i.quantity > i.assetIds.length && state.catalog.find(s => s.id === i.sku)?.kind === 'liftTicket');
+        jobs.push({ id: task.id, vehicleId: v.id, kind, time: task.time, place: task.place, name, items: quantities, dateOffset: offsetOf(date), orderId: task.orderId, needsIssue, canLoad: waiting.some(a => a.location.kind === 'shop'),
           status: task.status === 'completed' ? 'done' : task.status === 'in_progress' ? 'moving' : remaining.length < task.assetIds.length ? 'partial' : 'waiting',
-          loadedAt: loaded ? localTime(loading?.at || task.createdAt) : null, inCar, received, remainingCount: remaining.length,
+          loadedAt: loaded ? localTime(loading?.at || task.createdAt) : null, inCar, received, remainingCount: remaining.length + unassigned,
           returnState: task.kind === 'collection' ? '미수거 ' + remaining.length + ' · 차에 ' + inCar + ' · 매장 인계 ' + received : null,
           carryOver: date < S.data.today, locked: task.status !== 'waiting' || date < S.data.today, taskId: task.id });
       }
@@ -54,13 +58,6 @@ function snapshot() {
       const base = S.data.orders.find(o => o.id === order.id);
       jobs.unshift({ id: 'initial-' + order.id, vehicleId: v.id, kind: 'collect', time: base?.time || '16:30', place: base?.place || '매장 인계 대기', name: order.customer.name, items: counts(held.map(a => a.id)), dateOffset: 0, status: 'done', inCar: held.length, returnState: '✓ 차에 있음', locked: true });
     }
-  }
-  // An unissued rental can be loaded from this panel using the existing atomic
-  // rental dispatch flow. Merely viewing it never creates stock or a task.
-  for (const base of S.data.orders.filter(o => o.pickupMethod === 'delivery')) {
-    const order = F.orders.get(base.id); if (!order) continue;
-    const needed = order.bindings.filter(b => b.item.category !== 'liftTicket').map(b => [b.sku, b.item.plannedQuantity - b.assetIds.length - b.stagedAssetIds.length]).filter(([, n]) => n > 0);
-    if (needed.length) jobs.push({ id: 'planned-' + base.id, vehicleId: 'v1', kind: 'deliver', time: base.pickupTime || '09:00', place: base.deliveryPlace || '만선 광장', name: base.name, items: Object.fromEntries(needed), dateOffset: offsetOf(base.pickup), status: 'waiting', orderId: base.id, loadOnly: true, loadedAt: null });
   }
   const grouped = new Map();
   for (const a of state.assets.filter(a => a.ticket && a.location.kind === 'vehicle')) {
@@ -94,10 +91,9 @@ const fleet = {
   notice(vid, type, message, id) { if (type === 'priority') { currentRevision(); F.run('task.priority', { id, message }); } },
   loadJob(id) {
     currentRevision();
-    const planned = projection.jobs.find(j => j.id === id && j.loadOnly);
-    if (planned) { F.dispatchOrder(planned.orderId, { date: dateAt(planned.dateOffset), time: planned.time, place: planned.place }); return; }
     const task = F.snap().tasks.find(t => t.id === id);
     if (!task || task.kind !== 'delivery' || task.vehicleId !== vehicleId(board.state.vehicle) || !['waiting', 'in_progress'].includes(task.status)) throw new Error('현재 차량의 배달 업무를 확인해 주세요.');
+    if (task.plannedItems) { F.loadDelivery(task.id); return; }
     const assets = F.assets(F.remaining(task)), to = { kind: 'vehicle', id: task.vehicleId };
     if (assets.some(a => !(a.location.kind === 'shop' && a.location.id === F.shopId) && !(a.location.kind === 'vehicle' && a.location.id === task.vehicleId))) throw new Error('고객에게서 수거하거나 담당 차량을 확인해야 하는 물품이 있습니다.');
     const ids = assets.filter(a => a.location.kind === 'shop').map(a => a.id);
@@ -200,7 +196,7 @@ class DispatchBoard {
     const visits = all.filter(j => j.kind !== 'load' && j.kind !== 'handover' && !j.loadOnly);
     const loadedAt = j => j.loadedAt || null;
 
-    const loadTeams = all.filter(j => j.kind === 'deliver' || j.kind === 'liftDeliver');
+    const loadTeams = all.filter(j => !F.isDone(j) && (j.kind === 'deliver' || j.kind === 'liftDeliver'));
     const loadedN = loadTeams.filter(j => j.kind === 'deliver' && loadedAt(j)).length;
     const loadTotal = loadTeams.filter(j => j.kind === 'deliver').length;
     const returnTeams = visits.filter(j => RETURN_KINDS.indexOf(j.kind) >= 0);
@@ -257,13 +253,14 @@ class DispatchBoard {
         const pending = !at && !fromCollect;
         return {
           id: j.id, name: j.name + ' 팀',
-          line: j.time + ' ' + j.place + ' · ' + itemsLine(j) + (fromCollect ? ' · 수거한 권으로 전달, 실을 것 없음' : ''),
+          line: j.time + ' ' + j.place + ' · ' + itemsLine(j) + (j.needsIssue ? ' · 발권 전 수량 있음' : '') + (fromCollect ? ' · 수거한 권으로 전달, 실을 것 없음' : ''),
+          loadLabel: j.needsIssue && !j.canLoad ? '발권·준비' : '실었어요',
           style: 'display:flex;align-items:center;gap:12px;box-sizing:border-box;padding:12px 14px;border-radius:var(--mk-radius-lg,12px);'
             + (pending ? 'background:#fff;box-shadow:inset 0 0 0 3px var(--mk-orange-500,#FE4E10);' : at ? 'background:var(--mk-green-50,#F0FDF4);' : 'background:var(--mk-neutral-50,#F8F8F8);'),
           btnStyle: pending ? 'display:flex;align-items:center;justify-content:center;flex-shrink:0;min-height:56px;padding:0 16px;font-size:17px;font-weight:700;color:#fff;background:var(--mk-orange-500,#FE4E10);border:0;border-radius:var(--mk-radius-md,8px);white-space:nowrap;transition:background 180ms cubic-bezier(.2,0,.2,1);' : 'display:none',
           doneStyle: pending ? 'display:none' : 'flex-shrink:0;text-align:right;font-size:15px;font-weight:700;line-height:1.3;white-space:nowrap;color:' + (at ? 'var(--mk-green-700,#15803D)' : '#6D6D6D'),
           done: at ? '✓ 실림 ' + at : '수거 후',
-          onLoad: () => { F.loadJob(j.id); this.say(j.name + ' 팀 물품을 차에 실었습니다. 차량 화면에 표시됩니다.'); }
+          onLoad: () => { if (j.needsIssue && !j.canLoad) { W.openOrderTickets(j.orderId); return; } F.loadJob(j.id); this.say(j.name + ' 팀 물품을 차에 실었습니다. 차량 화면에 표시됩니다.'); }
         };
       }),
       spareLine: spareText,

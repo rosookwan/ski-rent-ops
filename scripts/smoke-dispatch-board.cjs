@@ -31,12 +31,12 @@ const path = require('node:path');
       await vehicle(2); assert.equal(await visits().count(), 0); assert.match(await frame.locator('.so-dispatch-board').innerText(), /방문 업무가 없습니다/);
       await click('오늘'); await vehicle(1); assert.equal(await visits().count(), original);
     });
-    await test('pending rental delivery loads through the existing atomic rental flow', async () => {
+    await test('registered rental is visible before loading and uses the same task after loading', async () => {
       const before = await frame.evaluate(() => ({ count: SkiOps.workflow.snap().assets.length, revision: SkiOps.workflow.snap().revision }));
-      const planned = frame.locator('[data-load-id="planned-R-022"]'); assert.match(await planned.innerText(), /박준호/);
+      const planned = frame.locator('[data-load-id="R-022-delivery-equipment"]'); assert.match(await planned.innerText(), /박준호/);
       assert.equal(await frame.evaluate(() => SkiOps.workflow.snap().revision), before.revision);
       await planned.getByRole('button', { name: '실었어요' }).click();
-      assert.equal(await planned.count(), 0);
+      assert.equal(await planned.count(), 1);
       const after = await frame.evaluate(() => { const F = SkiOps.workflow; return { task: F.snap().tasks.find(t => t.orderId === 'R-022' && t.kind === 'delivery'), count: F.snap().assets.length }; });
       assert.equal(after.count, before.count); assert.equal(after.task.assetIds.length, 3);
       assert.match(await frame.locator('[data-load-id="' + after.task.id + '"]').innerText(), /실림/);

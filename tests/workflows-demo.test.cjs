@@ -11,7 +11,7 @@ async function demo() {
   const data = context.window.SkiOpsData, repository = createMemoryRepository();
   const store = createService(repository, { shopId: 'demo-shop', actor: { id: 'demo-store', role: 'store' } });
   const driver = createService(repository, { shopId: 'demo-shop', actor: { id: 'demo-driver', role: 'driver', vehicleId: 'demo-van-1' } });
-  seedOperations(store, driver, data.orders); const f = Demo.create(repository, data.today); await f.seed(store.sync().orders); return { f, data };
+  seedOperations(store, driver, data.orders); const f = Demo.create(repository, data.today); await f.seed(store.sync().orders); return { f, data, store, repository };
 }
 test('migrated legacy orders and new vehicle ledger share custody without double counting', async () => {
   const { f } = await demo(); const before = f.snap().revision; f.importOrder(f.orders.get('R-024'), true); assert.equal(f.snap().revision, before);
@@ -75,4 +75,74 @@ test('new customer returns keep their identity and vehicle custody after the las
   assert.equal(f.projectOrder(id).totals.customerQuantity,0); assert.equal(f.projectOrder(id).totals.vehicleQuantity,4); assert.equal(f.projectOrder(id).status,'awaiting_shop');
   f.run('stock.move',{kind:'receive',assetIds:task.assetIds,from:f.van,to:f.shop});
   assert.equal(f.projectOrder(id).totals.vehicleQuantity,0); assert.equal(f.projectOrder(id).totals.shopQuantity,4);
+});
+
+async function deliveryOrder(options = {}) {
+  const d = await demo(), { f, data, store } = d;
+  const id = 'new-delivery', plan = { method: 'delivery', date: data.today, time: '18:00', place: '설천 주차장', vehicleId: 'demo-van-1' };
+  const order = store.execute({ type: 'create', orderId: id, requestId: id + '-create', expectedVersion: 0, payload: {
+    customer: { id: 'new-customer', name: '분리 배달 고객', phone: '010-0000-9999' }, rental: { startDate: data.today, endDate: data.day(1) }, vehicleId: 'demo-van-1',
+    pickupPlan: { equipment: plan, liftTicket: { ...plan, date: data.day(1), time: '12:00', ...options.ticketPlan } },
+    returnPlan: { method: 'vehicle', date: data.day(1), time: '18:00', place: '만선 광장' },
+    items: [{ id: 'ski', label: '스키', category: 'equipment', plannedQuantity: 2, usage: [{ date: data.today, quantity: 2 }, { date: data.day(1), quantity: 2 }] }, { id: 'lift-ticket', label: '주간권 성인', category: 'liftTicket', plannedQuantity: 2, usage: [{ date: data.day(1), quantity: 2 }] }]
+  } }).order;
+  const before = f.snap().assets.length; f.importOrder(order);
+  return { ...d, id, order, before };
+}
+test('new delivery intake creates two real planned tasks with dates, zero stock movement and no duplicates', async () => {
+  const { f, id, order, before, data, store } = await deliveryOrder();
+  const tasks = f.snap().tasks.filter(t => t.orderId === id);
+  assert.equal(tasks.length, 2); assert.equal(f.snap().assets.length, before);
+  assert.equal(store.get(id).pickupPlan.liftTicket.date, data.day(1));
+  assert.equal(tasks.find(t => t.id.endsWith('equipment')).plannedItems[0].quantity, 2, 'usage days must not multiply physical equipment');
+  assert.equal(f.store.board({ vehicleId: f.vehicleId, date: data.day(1) }).pending.find(t => t.orderId === id).remainingQuantity, 2);
+  const revision = f.snap().revision; f.importOrder(order); assert.equal(f.snap().revision, revision);
+  assert.throws(() => f.run('task.status', { id: tasks[0].id, status: 'completed' }), errorCode('QUANTITY_EXCEEDED'));
+});
+test('customer direct pickup completes only selected equipment and keeps future unissued tickets pending', async () => {
+  const { f, id, data } = await deliveryOrder();
+  let rows = f.deliveryCandidates(id, 'equipment'); f.completeDelivery(id, 'equipment', [rows[0].id]);
+  assert.equal(f.projectOrder(id).items.find(i => i.id === 'ski').customerQuantity, 1);
+  assert.equal(f.remainingQuantity(f.deliveryTasks(id, 'equipment')[0]), 1);
+  f.completeDelivery(id, 'equipment', f.deliveryCandidates(id, 'equipment').map(a => a.id));
+  assert.equal(f.deliveryTasks(id, 'equipment').length, 0);
+  const ticket = f.deliveryTasks(id, 'liftTicket')[0]; assert.equal(ticket.date, data.day(1)); assert.equal(f.remainingQuantity(ticket), 2);
+  assert.equal(f.store.history().movements.filter(m => m.taskId?.startsWith(id)).every(m => m.from.kind === 'shop' && m.kind === 'deliver'), true);
+  const revision = f.snap().revision;
+  assert.throws(() => f.completeDelivery(id, 'equipment', [rows[0].id])); assert.equal(f.snap().revision, revision);
+  assert.throws(() => f.completeDelivery(id, 'liftTicket', [rows[0].id])); assert.equal(f.snap().revision, revision);
+  assert.equal(f.snap().tasks.filter(t => t.orderId === id && t.kind === 'collection').flatMap(t => t.assetIds).length, 2);
+});
+test('ticket preparation stays in shop; partial loading and delivery leave unissued tickets on both boards', async () => {
+  const { f, id, data } = await deliveryOrder(); const values = { sku: 'ticket-4h', quantity: 1, ticket: f.ticket(data.day(1), 'ticket-4h', '12:00', '16:00') };
+  f.issueLegacyTicket(id, 'lift-ticket', values);
+  let task = f.deliveryTasks(id, 'liftTicket')[0]; const first = task.assetIds[0];
+  assert.equal(f.assets([first])[0].location.kind, 'shop'); assert.equal(f.projectOrder(id).items.find(i => i.id === 'lift-ticket').issuedQuantity, 0);
+  assert.equal(f.remainingQuantity(task), 2); f.loadDelivery(task.id);
+  f.run('stock.move', { kind: 'deliver', from: f.van, to: { kind: 'customer', id }, taskId: task.id, assetIds: [first] }, 'driver');
+  task = f.deliveryTasks(id, 'liftTicket')[0]; assert.equal(f.remainingQuantity(task), 1);
+  assert.equal(f.store.board({ vehicleId: f.vehicleId, date: data.day(1) }).pending.find(t => t.id === task.id).remainingQuantity, 1);
+  assert.throws(() => f.run('task.status', { id: task.id, status: 'completed' }), errorCode('QUANTITY_EXCEEDED'));
+  f.issueLegacyTicket(id, 'lift-ticket', values);
+  f.completeDelivery(id, 'liftTicket', f.deliveryCandidates(id, 'liftTicket').map(a => a.id));
+  assert.equal(f.deliveryTasks(id, 'liftTicket').length, 0); assert.equal(f.remainingQuantity(f.deliveryTasks(id, 'equipment')[0]), 2);
+  assert.equal(f.projectOrder(id).items.find(i => i.id === 'lift-ticket').customerQuantity, 2);
+  const revision = f.snap().revision; assert.throws(() => f.issueLegacyTicket(id, 'lift-ticket', values)); assert.equal(f.snap().revision, revision);
+});
+test('separate delivery vehicle is preserved and a different driver cannot process it', async () => {
+  const { f, id, data } = await deliveryOrder({ ticketPlan: { vehicleId: 'demo-van-2' } });
+  const task = f.deliveryTasks(id, 'liftTicket')[0];
+  assert.equal(f.store.board({ vehicleId: 'demo-van-2', date: data.day(1) }).pending.find(t => t.id === task.id).remainingQuantity, 2);
+  assert.throws(() => f.run('task.status', { id: task.id, status: 'in_progress' }, 'driver'), errorCode('FORBIDDEN'));
+  const revision = f.snap().revision;
+  assert.throws(() => f.run('task.allocate', { id: task.id, items: [{ itemId: 'lift-ticket', assetIds: f.deliveryCandidates(id, 'equipment').map(a => a.id) }] }));
+  assert.equal(f.snap().revision, revision);
+});
+test('missing equipment stock cannot hide a delivery request or fabricate loaded stock', async () => {
+  const { f, id } = await deliveryOrder();
+  const ids = f.snap().assets.filter(a => a.sku === 'ski' && a.location.kind === 'shop').map(a => a.id);
+  f.run('stock.move', { kind: 'deliver', from: f.shop, to: { kind: 'customer', id: 'other-customer' }, assetIds: ids });
+  const task = f.deliveryTasks(id, 'equipment')[0], revision = f.snap().revision, count = f.snap().assets.length;
+  assert.throws(() => f.loadDelivery(task.id)); assert.equal(f.snap().revision, revision); assert.equal(f.snap().assets.length, count);
+  assert.equal(f.store.board({ vehicleId: f.vehicleId, date: task.date }).pending.find(t => t.id === task.id).remainingQuantity, 2);
 });

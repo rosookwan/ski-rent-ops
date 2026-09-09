@@ -28,7 +28,8 @@
     "test:notifications:ui": "node scripts/smoke-notifications.cjs",
     "test:workflows": "node --test tests/workflows-*.test.cjs",
     "test:workflows:unit": "node --test tests/workflows-domain.test.cjs tests/workflows-service.test.cjs tests/workflows-api.test.cjs tests/workflows-demo.test.cjs",
-    "test:legacy-ui": "node scripts/smoke.cjs all"
+    "test:legacy-ui": "node scripts/smoke.cjs all",
+    "test:delivery-plan": "node scripts/smoke-delivery-plan.cjs"
   },
   "engines": {
     "node": ">=22.13.0"
