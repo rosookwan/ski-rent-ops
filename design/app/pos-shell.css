@@ -1,0 +1,76 @@
+/* Opt-in POS layout. Legacy and public screens retain their existing layout. */
+#ski-ops[data-pos="true"]{font-size:18px;line-height:1.4}
+#ski-ops[data-pos="true"] .so-workspace,
+#ski-ops[data-pos="true"].so-menu-open .so-workspace{display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:64px minmax(0,1fr);height:100%;min-height:0}
+#ski-ops[data-pos="true"] .so-sidebar,
+#ski-ops[data-pos="true"].so-menu-open .so-sidebar{display:contents}
+#ski-ops[data-pos="true"] .so-sidebar>.so-brand,
+#ski-ops[data-pos="true"] .so-sidebar>.so-sidebar-bottom{display:none}
+#ski-ops[data-pos="true"] #so-navigation{grid-row:1;min-width:0;padding:4px 8px;background:#fff;border-bottom:1px solid var(--so-line);overflow:visible}
+#ski-ops[data-pos="true"] .pos-navigation{display:grid;grid-template-columns:repeat(6,minmax(0,1fr)) minmax(104px,1fr) minmax(72px,.7fr);gap:4px;height:56px}
+#ski-ops[data-pos="true"] .pos-nav-button{display:flex;align-items:center;justify-content:center;gap:5px;min-width:0;min-height:56px;padding:6px 4px;border:1px solid transparent;border-radius:12px;background:#fff;color:var(--so-muted);font-size:18px;font-weight:650;white-space:nowrap}
+#ski-ops[data-pos="true"] .pos-nav-button:hover{background:var(--so-bg)}
+#ski-ops[data-pos="true"] .pos-nav-button[aria-current="page"]{background:var(--so-soft);border-color:#ffc7a9;color:var(--so-accent)}
+#ski-ops[data-pos="true"] .pos-nav-step{font-size:16px;line-height:24px;font-variant-numeric:tabular-nums}
+#ski-ops[data-pos="true"] .so-workarea,
+#ski-ops[data-pos="true"].so-menu-open .so-workarea{grid-column:1;grid-row:2;display:grid;grid-template-rows:52px minmax(0,1fr);min-width:0;min-height:0;overflow:visible}
+#ski-ops[data-pos="true"] .so-topbar{position:relative;inset:auto;height:52px;min-height:52px;padding:2px 12px;gap:8px;background:#fff}
+#ski-ops[data-pos="true"] .so-topbar-left{min-width:0;flex-shrink:1;font-size:16px;gap:8px}
+#ski-ops[data-pos="true"] #so-menu-toggle,
+#ski-ops[data-pos="true"] .so-topbar-right>button[data-go]{display:none}
+#ski-ops[data-pos="true"] .so-topbar-right{gap:8px;margin-left:auto}
+#ski-ops[data-pos="true"] .so-topbar button{min-width:48px;min-height:48px;font-size:16px;padding:8px;gap:6px}
+#ski-ops[data-pos="true"] .so-topbar-right button span{display:inline}
+#ski-ops[data-pos="true"] .so-demo-label{display:inline;font-size:16px;padding:4px 8px}
+#ski-ops[data-pos="true"] #so-page-tools{display:flex;align-items:center;min-width:0}
+#ski-ops[data-pos="true"] #so-main{display:block;min-width:0;min-height:0;padding:8px;overflow:visible}
+#ski-ops[data-pos="true"] #so-page{display:block;height:100%;min-height:0;padding:0;overflow:visible}
+#ski-ops[data-pos="true"] .pos-page{display:grid;grid-template-rows:auto minmax(0,1fr) auto;height:100%;min-height:0;min-width:0;gap:8px}
+#ski-ops[data-pos="true"] .pos-page-heading{display:grid;gap:2px;min-width:0}
+#ski-ops[data-pos="true"] .pos-page-heading h1{font-size:24px;font-weight:750;line-height:1.25;letter-spacing:-.03em}
+#ski-ops[data-pos="true"] .pos-page-heading p{font-size:16px;color:var(--so-muted);line-height:1.4;overflow-wrap:anywhere}
+#ski-ops[data-pos="true"] .pos-page-body{display:flex;flex-direction:column;gap:8px;min-width:0;min-height:0}
+#ski-ops[data-pos="true"] .pos-page-footer{display:flex;align-items:center;justify-content:space-between;gap:12px;min-width:0;min-height:65px;border-top:1px solid var(--so-line);padding-top:8px;background:var(--so-bg)}
+#ski-ops[data-pos="true"] .pos-page-footer>div{min-width:0}
+#ski-ops[data-pos="true"] .pos-page-footer .so-actions{flex-wrap:nowrap}
+#ski-ops[data-pos="true"] .pos-button,
+#ski-ops[data-pos="true"] .so-button{min-width:48px;min-height:48px;padding:8px 14px;font-size:18px;font-weight:650;line-height:1.4;white-space:normal}
+#ski-ops[data-pos="true"] .pos-button.primary,
+#ski-ops[data-pos="true"] .so-button.primary{min-height:56px}
+#ski-ops[data-pos="true"] .so-field{font-size:16px;gap:4px}
+#ski-ops[data-pos="true"] input,
+#ski-ops[data-pos="true"] select{min-height:48px;font-size:18px;padding:8px 10px}
+#ski-ops[data-pos="true"] input[type="checkbox"],
+#ski-ops[data-pos="true"] input[type="radio"]{width:24px;min-height:24px;height:24px}
+#ski-ops[data-pos="true"] .pos-label,
+#ski-ops[data-pos="true"] small{font-size:16px;color:var(--so-muted)}
+#ski-ops[data-pos="true"] .pos-paged-list{display:grid;grid-template-rows:minmax(0,1fr) 48px;gap:8px;min-width:0;min-height:0;flex:1}
+#ski-ops[data-pos="true"] .pos-list{display:flex;flex-direction:column;gap:6px;min-width:0;min-height:0}
+#ski-ops[data-pos="true"] .pos-row{display:flex;align-items:center;justify-content:space-between;gap:12px;min-width:0;min-height:60px;padding:6px 12px;border:1px solid var(--so-line);border-radius:12px;background:#fff}
+#ski-ops[data-pos="true"] .pos-row-copy{min-width:0}
+#ski-ops[data-pos="true"] .pos-row strong{font-size:18px;line-height:1.4}
+#ski-ops[data-pos="true"] .pos-row p{font-size:16px;line-height:1.35;color:var(--so-muted);overflow-wrap:anywhere}
+#ski-ops[data-pos="true"] .pos-row-actions{display:flex;gap:6px;flex-shrink:0}
+#ski-ops[data-pos="true"] .pos-pager{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:48px;font-size:16px}
+#ski-ops[data-pos="true"] .pos-pager>div{display:flex;align-items:center;gap:12px}
+#ski-ops[data-pos="true"] .pos-pager .pos-button{min-width:64px;min-height:48px;font-size:16px}
+#ski-ops[data-pos="true"] .pos-empty{padding:18px 12px;font-size:18px;color:var(--so-muted)}
+#ski-ops[data-pos="true"] #so-dialog[open]{display:grid;grid-template-rows:auto minmax(0,1fr);width:min(900px,calc(100% - 24px));max-height:calc(100dvh - 24px);padding:0;overflow:visible}
+#ski-ops[data-pos="true"] #so-dialog .so-dialog-heading{position:relative;min-height:64px;padding:8px 16px;gap:12px}
+#ski-ops[data-pos="true"] #so-dialog .so-dialog-heading h2{font-size:22px;line-height:1.3}
+#ski-ops[data-pos="true"] #so-dialog .so-dialog-heading button{width:48px;height:48px;min-width:48px;min-height:48px}
+#ski-ops[data-pos="true"] #so-dialog-body{display:grid;grid-template-rows:minmax(0,1fr) auto;gap:12px;padding:12px 16px 16px;min-height:0;overflow:visible}
+#ski-ops[data-pos="true"] .pos-modal-body{display:flex;flex-direction:column;gap:12px;min-height:0;min-width:0}
+#ski-ops[data-pos="true"] .pos-modal-footer{display:flex;align-items:center;justify-content:flex-end;gap:8px;min-height:65px;padding-top:8px;border-top:1px solid var(--so-line)}
+#ski-ops[data-pos="true"] .so-toast{position:absolute;top:68px;bottom:auto;left:50%;transform:translateX(-50%);margin:0;font-size:16px;pointer-events:none}
+/* Narrow companion screens use named menu rows without shrinking text. */
+@media(max-width:900px){
+  #ski-ops[data-pos="true"] .so-workspace,
+  #ski-ops[data-pos="true"].so-menu-open .so-workspace{grid-template-rows:120px minmax(0,1fr)}
+  #ski-ops[data-pos="true"] .pos-navigation{grid-template-columns:repeat(4,minmax(0,1fr));height:112px}
+  #ski-ops[data-pos="true"] .so-topbar-right .so-demo-label{display:none}
+  #ski-ops[data-pos="true"] .pos-row{align-items:flex-start}
+}
+
+#ski-ops[data-pos="true"][data-actor="driver"] .pos-page-footer .pos-button.primary,
+#ski-ops[data-pos="true"][data-actor="driver"] .pos-row-actions .pos-button.primary { min-height:72px; }

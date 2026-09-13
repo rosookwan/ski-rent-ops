@@ -5,8 +5,8 @@
   const shopId = 'demo-shop';
   const storeService = window.SkiReturnService.createService(repository, { shopId, actor: { id: 'demo-store', role: 'store' } });
   const driverService = window.SkiReturnService.createService(repository, { shopId, actor: { id: 'demo-driver', role: 'driver', vehicleId: 'demo-van-1' } });
-  const sampleOrderIds = window.SkiReturnDemo.seed(storeService, window.SkiOpsData.today);
-  const operationIds = window.SkiReturnDemo.seedOperations(storeService, driverService, window.SkiOpsData.orders);
+  const sampleOrderIds = window.SkiPosOperating ? [] : window.SkiReturnDemo.seed(storeService, window.SkiOpsData.today);
+  const operationIds = window.SkiPosOperating ? [] : window.SkiReturnDemo.seedOperations(storeService, driverService, window.SkiOpsData.orders);
   const notificationStore = window.SkiNotificationService.createService(repository, { shopId, actor: { id: 'demo-store', role: 'store' } });
   const notificationDriver = window.SkiNotificationService.createService(repository, { shopId, actor: { id: 'demo-driver', role: 'driver', vehicleId: 'demo-van-1' } });
   repository.transactNotifications(shopId, state => {

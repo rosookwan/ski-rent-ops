@@ -1,0 +1,11 @@
+#ski-ops[data-pos="true"] .pos-fulfillment-toolbar{display:flex;align-items:center;gap:8px}
+#ski-ops[data-pos="true"] .pos-quantity{display:flex;align-items:center;gap:6px}
+#ski-ops[data-pos="true"] .pos-quantity>output{min-width:40px;text-align:center;font-weight:750;font-variant-numeric:tabular-nums}
+#ski-ops[data-pos="true"] .pos-quantity>.pos-button{min-width:48px;padding:6px 10px}
+#ski-ops[data-pos="true"] .pos-selected-count{font-size:18px;white-space:nowrap}
+#ski-ops[data-pos="true"] .pos-return-summary{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+#ski-ops[data-pos="true"] .pos-return-summary>div{display:flex;align-items:center;justify-content:space-between;padding:14px;border:1px solid var(--so-line);border-radius:12px;background:white;min-height:60px}
+#ski-ops[data-pos="true"] .pos-return-summary strong{font-size:22px;color:var(--so-accent)}
+#ski-ops[data-pos="true"] .pos-fulfillment-tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+#ski-ops[data-pos="true"] .pos-fulfillment-tabs [aria-pressed="true"]{background:var(--so-soft);border-color:#ffc7a9;color:var(--so-accent)}
+#ski-ops[data-pos="true"] .pos-summary-pages{display:flex;align-items:center;justify-content:space-between;gap:8px}

@@ -62,11 +62,10 @@ function createSqliteRepository(filename) {
     transactWorkflows(shopId, apply) {
       db.exec('BEGIN IMMEDIATE');
       try {
-        const notifications = notificationState(shopId), result = apply(workflowState(shopId), notifications);
+        const previous = workflowState(shopId), notifications = notificationState(shopId), result = apply(previous, notifications);
         if (!result.duplicate) {
           db.prepare('INSERT INTO workflow_state VALUES (?, ?, ?) ON CONFLICT(shop_id) DO UPDATE SET revision = excluded.revision, state_json = excluded.state_json').run(shopId, result.state.revision, JSON.stringify(result.state));
-          const event = result.event;
-          db.prepare('INSERT INTO workflow_events VALUES (?, ?, ?, ?, ?)').run(shopId, event.version, event.actor.role + ':' + event.actor.id, event.requestId, JSON.stringify(event));
+          for (const event of result.state.events.filter(event => event.version > (previous?.revision || 0))) db.prepare('INSERT INTO workflow_events VALUES (?, ?, ?, ?, ?)').run(shopId, event.version, event.actor.role + ':' + event.actor.id, event.requestId, JSON.stringify(event));
           saveNotifications(shopId, notifications);
         }
         db.exec('COMMIT'); return result;

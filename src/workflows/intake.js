@@ -37,6 +37,7 @@
       if (form.access.revokedAt || form.access.expiresAt <= context.at) C.fail('FORM_CLOSED', '입력 링크가 만료되었거나 닫혔습니다.');
       const status = C.oneOf(p.status, ['draft', 'submitted']);
       const submission = { version: (form.submissions.at(-1)?.version || 0) + 1, people: people(p.people, status === 'draft'), status, at: context.at };
+      if (form.orderPersonIds && submission.people.some(person => !form.orderPersonIds.includes(person.id))) C.fail('INVALID_INPUT', '요청받은 일행의 정보만 제출할 수 있습니다.');
       form.submissions.push(submission);
       return { formId: form.id, submissionVersion: submission.version, status };
     }
@@ -90,7 +91,7 @@
         C.keys(row, ['personId', 'assetIds', 'actualFootMm', 'actualEquipmentSize']); const personId = C.find(review.people, row.personId).id;
         if (form.issues.some(i => i.personId === personId) || !form.preparations.some(r => r.reviewVersion === review.version && r.personId === personId)) C.fail('NO_CHANGE', '준비를 마쳤고 아직 지급하지 않은 일행만 선택해 주세요.');
         const assetIds = C.ids(row.assetIds);
-        if (assetIds.some(id => { const a = C.find(state.assets, id); return a.condition === 'damaged' || a.exchangeReservationId || a.componentBaseId; })) C.fail('INVALID_INPUT', '정상 미배정 장비를 선택해 주세요.');
+        if (assetIds.some(id => { const a = C.find(state.assets, id); return a.condition !== 'ready' || a.exchangeReservationId || a.componentBaseId; })) C.fail('INVALID_INPUT', '정상 미배정 장비를 선택해 주세요.');
         if (assetIds.some(id => C.find(state.assets, id).ticket)) C.fail('INVALID_INPUT', '리프트권은 예약 전달에서 처리해 주세요.');
         if ((form.dispatches || []).some(d => d.people.some(person => person.personId === personId) && C.find(state.tasks, d.taskId).status !== 'cancelled')) C.fail('NO_CHANGE', '이미 차량 배달에 배정한 일행입니다.');
         const person = C.find(review.people, personId), expected = [person.equipment, person.clothing ? 'clothing' : null, person.helmet ? 'helmet' : null].filter(Boolean).sort();
@@ -148,7 +149,7 @@
   function publicView(form) {
     const latest = form.submissions.at(-1);
     return { id: form.id, customer: C.copy(form.customer), expectedPeople: form.expectedPeople, date: form.date,
-      submissionVersion: latest?.version || 0, status: latest?.status || 'empty', people: C.copy(latest?.people || []) };
+      submissionVersion: latest?.version || 0, status: latest?.status || 'empty', people: C.copy((latest?.people || form.requestedPeople || []).filter(person => !form.orderPersonIds || form.orderPersonIds.includes(person.id))), requestedPeople: C.copy(form.requestedPeople || []), requestedPersonIds: C.copy(form.orderPersonIds || []), remainingPersonIds: (form.orderPersonIds || []).filter(id => !(latest?.people || []).some(person => person.id === id)) };
   }
   return { handle, latestSubmitted, reviewed, changes, view, publicView };
 });

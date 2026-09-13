@@ -40,10 +40,10 @@ async function readBody(request) {
   try { return JSON.parse(Buffer.concat(chunks).toString('utf8')); }
   catch { throw new ReturnError('INVALID_INPUT', 'JSON 내용을 확인해 주세요.'); }
 }
-function createApiServer({ repository, authenticate, clock, allowedOrigins = [], workflowAdapters = {} }) {
+function createApiServer({ repository, authenticate, clock, allowedOrigins = [], workflowAdapters = {}, uiDirectory = null }) {
   if (typeof authenticate !== 'function') throw new Error('인증 함수를 지정해 주세요.');
   if (!Array.isArray(allowedOrigins) || allowedOrigins.some(origin => typeof origin !== 'string' || !/^https?:\/\//.test(origin) || new URL(origin).origin !== origin)) throw new Error('허용할 화면 출처를 정확한 origin 목록으로 지정해 주세요.');
-  const statuses = { UNAUTHORIZED: 401, FORBIDDEN: 403, NOT_FOUND: 404, ITEM_NOT_FOUND: 404, VERSION_CONFLICT: 409, IDEMPOTENCY_CONFLICT: 409, ALREADY_EXISTS: 409, DEPENDENT_RETURN: 409, DEPENDENT_MOVEMENT: 409, TICKET_UNAVAILABLE: 409, FORM_CLOSED: 410, QUANTITY_EXCEEDED: 409, NO_CHANGE: 409, NO_OUTSTANDING: 409, PAYLOAD_TOO_LARGE: 413 };
+  const statuses = { DAY_CLOSED: 409, USE_UNIFIED_ORDER: 409, MIGRATION_CONFLICT: 409, UNAUTHORIZED: 401, FORBIDDEN: 403, NOT_FOUND: 404, ITEM_NOT_FOUND: 404, VERSION_CONFLICT: 409, IDEMPOTENCY_CONFLICT: 409, ALREADY_EXISTS: 409, DEPENDENT_RETURN: 409, DEPENDENT_MOVEMENT: 409, TICKET_UNAVAILABLE: 409, FORM_CLOSED: 410, QUANTITY_EXCEEDED: 409, NO_CHANGE: 409, NO_OUTSTANDING: 409, PAYLOAD_TOO_LARGE: 413 };
   const server = http.createServer(async (request, response) => {
     const send = (status, data) => {
       response.writeHead(status, { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-store', 'X-Content-Type-Options': 'nosniff' });
@@ -51,9 +51,13 @@ function createApiServer({ repository, authenticate, clock, allowedOrigins = [],
     };
     try {
       const url = new URL(request.url, 'http://localhost');
+      if (uiDirectory && ['/pos', '/pos.html', '/guest', '/guest.html', '/ski-workflows.js'].includes(url.pathname) && request.method === 'GET') {
+        response.writeHead(200, { 'Content-Type': url.pathname === '/ski-workflows.js' ? 'text/javascript; charset=utf-8' : 'text/html; charset=utf-8', 'Cache-Control': 'no-store', 'X-Content-Type-Options': 'nosniff', 'Referrer-Policy': 'no-referrer', 'X-Frame-Options': 'DENY' });
+        response.end(readFileSync(path.join(uiDirectory, url.pathname === '/ski-workflows.js' ? 'ski-workflows.js' : url.pathname.startsWith('/guest') ? 'guest.html' : 'pos.html'))); return;
+      }
       if (url.pathname === '/health' && request.method === 'GET') { send(200, { status: 'ok', service: 'ski-returns', storage: repository.mode }); return; }
       if (request.headers.origin) {
-        if (!allowedOrigins.includes(request.headers.origin)) throw new ReturnError('FORBIDDEN', '허용되지 않은 화면 출처입니다.');
+        if (!allowedOrigins.includes(request.headers.origin) && !(uiDirectory && request.headers.origin === 'http://' + request.headers.host)) throw new ReturnError('FORBIDDEN', '허용되지 않은 화면 출처입니다.');
         response.setHeader('Access-Control-Allow-Origin', request.headers.origin);
         response.setHeader('Vary', 'Origin');
       }
@@ -135,8 +139,8 @@ if (require.main === module) {
     if (!process.env.SKI_RETURNS_ACCESS_FILE) throw new Error('SKI_RETURNS_ACCESS_FILE에 직원별 인증 해시 설정 파일을 지정해 주세요.');
     const config = JSON.parse(readFileSync(process.env.SKI_RETURNS_ACCESS_FILE, 'utf8'));
     const repository = createSqliteRepository(process.env.SKI_RETURNS_DB || path.join(__dirname, '../work/returns/ledger.sqlite'));
-    const server = createApiServer({ repository, authenticate: tokenAuthenticator(config.credentials), allowedOrigins: config.allowedOrigins ?? [] });
-    server.listen(Number(process.env.SKI_RETURNS_PORT || 58149), '127.0.0.1', () => console.log('반납 API 실행: http://127.0.0.1:' + server.address().port + ' (SQLite, 화면 연결 전)'));
+    const server = createApiServer({ repository, authenticate: tokenAuthenticator(config.credentials), allowedOrigins: config.allowedOrigins ?? [], uiDirectory: path.join(__dirname, '../dist') });
+    server.listen(Number(process.env.SKI_RETURNS_PORT || 58149), '127.0.0.1', () => console.log('반납 API 실행: http://127.0.0.1:' + server.address().port + '/pos (SQLite 통합 포스)'));
     const stop = () => server.close(() => { repository.close(); process.exit(0); });
     process.on('SIGTERM', stop); process.on('SIGINT', stop);
   } catch (error) { console.error(error.message); process.exitCode = 1; }

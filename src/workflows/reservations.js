@@ -26,6 +26,7 @@
   }
   function eligible(state, asset, reservationId, lineId) {
     const { line } = lineOf(state, reservationId, lineId), period = windowOf(line);
+    if (asset.condition !== 'ready') return '사용 가능한 상태의 권을 선택해 주세요.';
     if (!asset.ticket || !asset.ticket.acceptedTypes.includes(line.ticketType)) return '사용 조건이 맞지 않는 권입니다.';
     if (asset.location.kind === 'vendor' || asset.refundId) return '환불 대상 권입니다.';
     if (Date.parse(asset.ticket.validFrom) > period.from || Date.parse(asset.ticket.validTo) < period.to) return '권의 유효시간과 예약 이용시간을 확인해 주세요.';

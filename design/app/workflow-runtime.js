@@ -3,7 +3,7 @@
   const F = window.SkiWorkflowDemo.create(S.sharedRepository, S.data.today);
   S.workflow = F;
   S.$('.so-demo-label').textContent = '체험 · 오늘 09시 기준';
-  S.workflowsReady = F.seed(S.returns.initialOrders);
+  S.workflowsReady = window.SkiPosOperating ? Promise.resolve() : F.seed(S.returns.initialOrders);
   const previous = S.returnUI.current;
   S.returnUI.current = id => F.projectOrder(id || S.state.params.id) || previous(id);
   S.returnUI.refresh = async () => {};

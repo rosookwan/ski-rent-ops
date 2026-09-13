@@ -79,6 +79,7 @@
     return {
       mode: repository.mode,
       execute(command) {
+        if ((repository.workflows?.(context.shopId)?.orders || []).some(o => o.id === command?.orderId && o.source === 'return-order-v1')) throw new R.ReturnError('USE_UNIFIED_ORDER', '통합접수로 이관된 기록입니다. 통합접수 화면에서 처리해 주세요.');
         // Ownership, identity and time are taken from the server context, never a request body.
         const result = repository.transact(context.shopId, command?.orderId, current => R.execute(current, command, { ...context, at: clock() }));
         return { order: view(result.order), duplicate: result.duplicate, appliedVersion: result.event.version, requestId: result.event.requestId };

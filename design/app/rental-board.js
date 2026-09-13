@@ -356,9 +356,17 @@ function projectOrders() {
       const task = itemTasks[0];
       const schedules = itemTasks.map(t => ({ date: t.date, time: t.time, place: t.place, quantity: F.remaining(t).filter(a => assetIds.includes(a)).length, early: !!t.earlyReturnId }));
       const plan = i.returnPlan || {};
+      const vehicleAssetIds = F.assets(assetIds).filter(a => {
+        if (a.location.kind !== 'vehicle') return false;
+        const history = movements.filter(m => m.assetIds.includes(a.id) && !m.reversedAssetIds.includes(a.id));
+        const collected = history.filter(m => m.kind === 'collect' && F.customerIds(id).includes(m.from.id)).at(-1)
+          || (binding?.initialVehicleAssetIds?.includes(a.id) ? history.find(m => m.kind === 'stock.opening') : null);
+        return collected && !history.some(m => m.revision > collected.revision && ['receive', 'deliver'].includes(m.kind));
+      }).map(a => a.id);
       const ticket = i.category === 'liftTicket';
       return { id: i.id, name: ticket ? '리프트권' : i.label, label: i.label, ticket, component: !!i.component, usage: i.usage || [], issued: i.issuedQuantity, total: i.plannedQuantity, customer: i.customerQuantity, vehicle: i.vehicleQuantity, confirmed: i.shopQuantity, unissued: i.unissuedQuantity, exchange: i.exchangePendingQuantity || 0,
-        schedules, due: task?.date || plan.date || end, method: task || plan.method === 'vehicle' ? '차량 수거' : '직접반납', assetIds,
+        schedules, due: task?.date || plan.date || end, method: task || plan.method === 'vehicle' ? '차량 수거' : '직접반납', assetIds, vehicleAssetIds,
+        vehicleId: task?.vehicleId || plan.vehicleId || projected.vehicleId || F.vehicleId,
         time: task?.time || plan.time || base.time || '16:30', place: task?.place || plan.place || base.place || '매장' };
     });
     const total = key => items.reduce((n, i) => n + i[key], 0);
@@ -383,7 +391,7 @@ function projectOrders() {
 
 function assetsFor(item, field, orderId) {
   return F.assets(item.assetIds).filter(a => !a.exchangeReservationId && (field === 'customer' ? a.location.kind === 'customer' && F.customerIds(orderId).includes(a.location.id)
-    : field === 'vehicle' ? a.location.kind === 'vehicle' && a.location.id === F.vehicleId
+    : field === 'vehicle' ? a.location.kind === 'vehicle' && item.vehicleAssetIds.includes(a.id)
       : a.location.kind === 'shop' && a.location.id === F.shopId));
 }
 
@@ -393,16 +401,23 @@ function updatePlan(order, selectedItems, plan) {
   const tasks = F.snap().tasks.filter(t => t.kind === 'collection' && !['cancelled', 'completed'].includes(t.status) && t.assetIds.some(id => selected.includes(id)));
   if (tasks.some(t => t.status !== 'waiting')) throw new Error('차량이 진행 중인 수거 업무는 배달·수거 화면에서 먼저 확인해 주세요.');
   const held = F.assets(selected);
+  const visits = new Map();
+  for (const asset of held) {
+    const item = selectedItems.find(i => i.assetIds.includes(asset.id));
+    const vehicleId = tasks.find(t => F.remaining(t).includes(asset.id))?.vehicleId || item.vehicleId;
+    const key = asset.location.id + ':' + vehicleId;
+    if (!visits.has(key)) visits.set(key, { customerId: asset.location.id, vehicleId, assetIds: [] });
+    visits.get(key).assetIds.push(asset.id);
+  }
   if (tasks.length || plan.method === 'vehicle' && held.length) F.atomic(commit => {
     for (const task of tasks) {
       const remaining = F.remaining(task).filter(id => !selected.includes(id));
       if (remaining.length) commit('task.save', { ...F.taskPayload(task), assetIds: task.assetIds.filter(id => !selected.includes(id)) });
       else commit('task.status', { id: task.id, status: 'cancelled' });
     }
-    if (plan.method === 'vehicle') for (const owner of new Set(held.map(a => a.location.id))) commit('task.save', {
-      id: window.SkiWorkflowClient.randomId('rental-plan-'), kind: 'collection', vehicleId: F.vehicleId, customerId: owner, orderId: order.id,
+    if (plan.method === 'vehicle') for (const visit of visits.values()) commit('task.save', {
+      id: window.SkiWorkflowClient.randomId('rental-plan-'), kind: 'collection', ...visit, orderId: order.id,
       title: order.name + ' 수거', date: plan.date, time: plan.time || order.time || '16:30', place: plan.place || order.place || '매장',
-      assetIds: held.filter(a => a.location.id === owner).map(a => a.id)
     });
   });
   if (!F.orders.has(order.id)) {
@@ -410,7 +425,8 @@ function updatePlan(order, selectedItems, plan) {
     if (projected) F.orders.set(order.id, projected);
   }
   for (const binding of F.orders.get(order.id)?.bindings || []) if (selectedItems.some(i => i.id === (binding.itemId || binding.item.id))) {
-    binding.item.returnPlan = { ...binding.item.returnPlan, ...plan };
+    const item = selectedItems.find(i => i.id === (binding.itemId || binding.item.id));
+    binding.item.returnPlan = { ...binding.item.returnPlan, vehicleId: item.vehicleId, ...plan };
   }
 }
 
@@ -481,7 +497,12 @@ board.confirm = function () {
     if (!selected.length) throw new Error('수량을 선택하세요.');
     const ids = selected.map(a => a.id);
     if (dlg.kind === 'direct') F.returnCustomer(order.id, ids);
-    else if (dlg.kind === 'vehicle') F.run('stock.move', { kind: 'receive', from: F.van, to: F.shop, assetIds: ids });
+    else if (dlg.kind === 'vehicle') F.atomic(commit => {
+      for (const vehicleId of new Set(selected.map(a => a.location.id))) commit('stock.move', {
+        kind: 'receive', from: { kind: 'vehicle', id: vehicleId }, to: F.shop,
+        assetIds: selected.filter(a => a.location.id === vehicleId).map(a => a.id)
+      });
+    });
     else {
       const history = F.store.history().movements;
       const corrections = new Map();

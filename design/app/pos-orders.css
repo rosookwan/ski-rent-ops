@@ -1,0 +1,29 @@
+#ski-ops[data-pos="true"] .pos-task-cards{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+#ski-ops[data-pos="true"] .pos-task-cards button{display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:64px;padding:10px 14px;background:#fff;border:1px solid var(--so-line);text-align:left;font-size:18px}
+#ski-ops[data-pos="true"] .pos-task-cards strong{color:var(--so-accent);font-size:24px;white-space:nowrap}
+#ski-ops[data-pos="true"] .pos-search-row{display:flex;align-items:center;gap:12px}
+#ski-ops[data-pos="true"] .pos-search-row input{flex:1;min-width:0;border:1px solid var(--so-line);background:white}
+#ski-ops[data-pos="true"] .pos-customer-strip{display:flex;flex-wrap:wrap;gap:8px 20px;padding:12px;background:#fff;border:1px solid var(--so-line);border-radius:12px;font-size:18px}
+#ski-ops[data-pos="true"] .pos-shortcuts{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px}
+#ski-ops[data-pos="true"] .pos-shortcuts .pos-button{padding:8px;font-size:18px}
+#ski-ops[data-pos="true"] .pos-form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+#ski-ops[data-pos="true"] .pos-form-grid>.pos-info{grid-column:1/-1}
+#ski-ops[data-pos="true"] .pos-form-grid .so-field{display:flex;flex-direction:column}
+#ski-ops[data-pos="true"] .pos-form-grid input,#ski-ops[data-pos="true"] .pos-form-grid select{width:100%;min-width:0;border:1px solid var(--so-line);background:#fff}
+#ski-ops[data-pos="true"] .pos-info{padding:12px 16px;border:1px solid var(--so-line);border-radius:12px;background:#fff;font-size:18px;line-height:1.5}
+#ski-ops[data-pos="true"] .pos-info p{color:var(--so-muted);font-size:16px}
+#ski-ops[data-pos="true"] .pos-error{padding:10px 14px;border:1px solid #edb5a8;border-radius:10px;background:#fff0eb;color:#97361f;font-size:16px;line-height:1.4}
+#ski-ops[data-pos="true"] .pos-add-layout{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:14px;min-height:0;flex:1}
+#ski-ops[data-pos="true"] .pos-entry-panel{display:flex;flex-direction:column;gap:12px;min-height:0}
+#ski-ops[data-pos="true"] .pos-draft-lines{display:flex;flex-direction:column;min-height:0}
+#ski-ops[data-pos="true"] .pos-confirm-summary{display:flex;flex-direction:column;gap:8px;padding:14px;background:#fff;border:1px solid var(--so-line);border-radius:12px;font-size:18px}
+#ski-ops[data-pos="true"] .pos-confirm-summary b{color:var(--so-accent)}
+#ski-ops[data-pos="true"] .pos-page-footer>span{font-size:16px;color:var(--so-muted)}
+@media(max-height:680px){#ski-ops[data-pos="true"] .pos-customer-strip{padding:7px 12px;gap:4px 14px;font-size:16px}#ski-ops[data-pos="true"] .pos-form-grid{gap:8px}#ski-ops[data-pos="true"] .pos-confirm-summary{gap:4px;padding:10px}#ski-ops[data-pos="true"] .pos-task-cards button{padding:8px;min-height:60px}}
+#ski-ops .pos-connection{height:100dvh;display:grid;place-items:center;padding:24px;background:#f2eefb}
+#ski-ops .pos-connection-card{display:flex;flex-direction:column;gap:20px;width:min(540px,100%);padding:32px;border:1px solid var(--so-line);border-radius:20px;background:#fff;font-size:18px}
+#ski-ops .pos-connection-card h1{font-size:30px}
+#ski-ops .pos-connection-card .so-field{font-size:18px}
+#ski-ops .pos-connection-card input{height:56px;font-size:18px}
+#ski-ops .pos-connection-card button{min-height:56px;font-size:18px}
+#ski-ops .pos-task-cards .pos-info{display:flex;flex-direction:column;gap:4px;font-size:16px}

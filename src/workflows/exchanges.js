@@ -14,7 +14,7 @@
   const reasons = { damage: '파손 교체', size: '사이즈 변경', other: '기타' };
   const active = x => x.status !== 'cancelled';
   const rows = state => state.exchanges || [];
-  const healthy = a => a.condition !== 'damaged' && !a.exchangeReservationId;
+  const healthy = a => a.condition === 'ready' && !a.exchangeReservationId;
   function resolve(state, id, orderId) {
     const seen = new Set();
     while (!seen.has(id)) {
@@ -54,7 +54,7 @@
       if (k.component && p.confirmExistingComponent !== true) C.fail('INVALID_INPUT', '대여 세트에 포함된 기존 구성품을 확인해 주세요.');
       const x = { id, orderId: C.id(p.orderId), customerId, customerName: C.string(p.customerName, 60), kind, sku: kind, reason: C.oneOf(p.reason, Object.keys(reasons)),
         oldSize: C.string(p.oldSize, 24, true), newSize: C.string(p.newSize, 24, true), memo: C.string(p.memo, 200, true), method: C.oneOf(p.method, ['shop', 'vehicle']),
-        visit: plan(p.visit), returnPlan: plan(p.returnPlan), status: 'open', units: [], createdAt: context.at, actor: C.copy(context.actor) };
+        visit: plan(p.visit), returnPlan: plan(p.returnPlan), status: 'open', units: [], createdAt: context.at, createdRevision: state.revision + 1, actor: C.copy(context.actor) };
       if ((kind === 'exchange-other' || x.reason === 'other') && !x.memo) C.fail('INVALID_INPUT', '기타 품목·사유는 메모에 내용을 적어 주세요.');
       if (kind !== 'exchange-other' && (!x.oldSize || !x.newSize)) C.fail('INVALID_INPUT', '기존 규격과 새 규격을 입력해 주세요.');
       if (!state.catalog.some(s => s.id === kind)) state.catalog.push({ id: kind, label: k.label, kind: 'equipment', unit: k.unit, component: true });
@@ -88,6 +88,31 @@
     }
     const x = C.find(rows(state), p.id, '교환 요청');
     if (!active(x)) C.fail('NO_CHANGE', '취소된 교환 요청입니다.');
+    if (type === 'exchange.recover') {
+      C.keys(p, ['id', 'movementId', 'assetIds', 'reason']);
+      const movement = C.find(state.movements, p.movementId, '교환 이동');
+      const ids = p.assetIds ? C.ids(p.assetIds) : movement.assetIds.filter(id => !movement.reversedAssetIds.includes(id));
+      const result = I.recoverMovement(state, { movementId: movement.id, assetIds: ids, reason: C.string(p.reason, 300) }, context, x.id);
+      const effective = (id, kind) => state.movements.filter(m => m.revision >= (x.createdRevision || 0) && m.kind === kind && m.assetIds.includes(id) && !m.reversedAssetIds.includes(id));
+      for (const u of x.units) {
+        const delivery = u.newAssetId && effective(u.newAssetId, 'deliver').find(m => m.to.id === x.customerId);
+        const collection = effective(u.oldAssetId, 'collect').find(m => m.from.id === x.customerId);
+        const receipt = [...effective(u.oldAssetId, 'directReturn'), ...effective(u.oldAssetId, 'receive')].sort((a, b) => a.revision - b.revision).at(-1);
+        if (delivery) u.deliveredAt = delivery.at; else delete u.deliveredAt;
+        if (collection) u.collectedAt = collection.at; else delete u.collectedAt;
+        if (receipt) u.receivedAt = receipt.at; else delete u.receivedAt;
+        const old = C.find(state.assets, u.oldAssetId); old.exchangeReservationId = u.receivedAt ? null : x.id;
+        if (u.newAssetId) {
+          const replacement = C.find(state.assets, u.newAssetId); replacement.exchangeReservationId = u.deliveredAt ? null : x.id;
+          if (!u.deliveredAt) for (const task of state.tasks.filter(t => t.exchangeReturnId === x.id && t.assetIds.includes(u.newAssetId))) {
+            task.status = 'cancelled'; task.recoveryCancelled = true; task.changeReason = '교환 전달 오입력 정정';
+          }
+        }
+      }
+      x.status = x.units.every(u => u.deliveredAt && u.receivedAt) ? 'completed' : 'open';
+      (x.recoveries ||= []).push({ movementId: movement.id, assetIds: ids, reason: p.reason, at: context.at, actor: C.copy(context.actor) });
+      return { ...result, orderId: x.orderId, exchangeId: x.id, taskIds: state.tasks.filter(t => t.exchangeId === x.id && ['waiting', 'in_progress'].includes(t.status)).map(t => t.id) };
+    }
     if (type === 'exchange.prepare') {
       C.keys(p, ['id', 'assetIds']); const ids = C.ids(p.assetIds), units = x.units.filter(u => !u.newAssetId);
       if (ids.length > units.length) C.fail('QUANTITY_EXCEEDED', '준비할 교환 수량을 초과했습니다.');
@@ -118,22 +143,24 @@
   function schedule(state, x, u, index, assetId, context) {
     if (u.returnPlan.method !== 'vehicle') return;
     const p = u.returnPlan, id = x.id + '-return-' + index + (assetId === u.oldAssetId ? '-restored' : '');
+    const previous = state.tasks.find(t => t.id === id);
+    if (previous?.recoveryCancelled) { previous.status = 'waiting'; delete previous.recoveryCancelled; }
     D.handle(state, 'task.save', { id, kind: 'collection', customerId: x.customerId, orderId: x.orderId, title: x.customerName + (kinds[x.kind].component ? ' 교환 구성품 반납' : ' 장비 반납'),
       vehicleId: p.vehicleId, date: p.date, time: p.time, place: p.place, assetIds: [assetId] }, context);
     C.find(state.tasks, id).exchangeReturnId = x.id;
   }
-  function beforeMove(state, p) {
+  function beforeMove(state, p, context) {
     const task = p.taskId && C.find(state.tasks, p.taskId), exchangeId = p.exchangeId || task?.exchangeId;
     if (['collect', 'directReturn'].includes(p.kind) && !task?.exchangeId && rows(state).filter(active).some(x => kinds[x.kind].component && x.units.some(u => !u.deliveredAt && (p.assetIds || []).includes(resolve(state, u.baseAssetId, x.orderId))))) C.fail('DEPENDENT_MOVEMENT', '구성품 교환이 진행 중입니다. 교환을 완료하거나 요청을 취소한 뒤 해당 장비를 반납해 주세요.');
     for (const id of p.assetIds || []) {
       const a = C.find(state.assets, id);
-      if (['load', 'deliver'].includes(p.kind) && a.condition === 'damaged') C.fail('INVALID_INPUT', '파손품은 정상 출고할 수 없습니다.');
+      if (['load', 'deliver'].includes(p.kind) && a.condition !== 'ready') C.fail('INVALID_INPUT', '파손품은 정상 출고할 수 없습니다.');
       if (!a.exchangeReservationId) continue;
       const x = C.find(rows(state), a.exchangeReservationId), u = x.units.find(u => u.oldAssetId === id || u.newAssetId === id);
       const isOld = u.oldAssetId === id;
       if (isOld && !['collect', 'directReturn', 'receive'].includes(p.kind) || !isOld && !['load', 'deliver', 'receive'].includes(p.kind)) C.fail('INVALID_INPUT', '교환 물품은 연결된 전달·회수 업무에서 처리해 주세요.');
       if (['deliver', 'collect', 'directReturn'].includes(p.kind)) {
-        if (exchangeId !== x.id || x.method === 'vehicle' && task?.id !== x.id + (isOld ? '-old' : '-new')) C.fail('FORBIDDEN', '교환 물품은 연결된 전달·회수 업무에서 처리해 주세요.');
+        if (exchangeId !== x.id || x.method === 'vehicle' && !(isOld && p.kind === 'directReturn' && context?.actor?.role === 'store') && task?.id !== x.id + (isOld ? '-old' : '-new')) C.fail('FORBIDDEN', '교환 물품은 연결된 전달·회수 업무에서 처리해 주세요.');
         if (!isOld && u.deliveredAt || isOld && (u.collectedAt || u.receivedAt)) C.fail('NO_CHANGE', '이미 처리한 교환 물품입니다.');
         if (!isOld && kinds[x.kind].component && C.find(state.assets, resolve(state, u.baseAssetId, x.orderId)).location.kind !== 'customer') C.fail('INVALID_INPUT', '대여 장비가 이미 반납되었습니다. 교환 요청을 먼저 확인해 주세요.');
       }

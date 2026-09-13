@@ -1,0 +1,32 @@
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="referrer" content="no-referrer"><meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'unsafe-inline'; connect-src 'self'; base-uri 'none'; form-action 'none'"><title>스키노트 · 일행 장비 정보</title><style>
+*{box-sizing:border-box}body{margin:0;background:#f7f7fa;color:#252532;font:18px/1.5 system-ui,sans-serif}main{max-width:680px;margin:auto;padding:24px;display:grid;gap:18px}h1{font-size:26px;margin:0}p{margin:0}label{display:grid;gap:6px;font-size:16px}input,select,button{font:inherit;min-height:52px;border:1px solid #d9d9e1;border-radius:10px;padding:10px;background:white;min-width:0}button{cursor:pointer}button.primary{background:#ff4e00;color:white;border-color:#ff4e00}button:disabled{opacity:.45;cursor:default}.grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}.actions{display:flex;gap:10px;align-items:center;justify-content:space-between}.card{background:white;border:1px solid #e4e4eb;border-radius:14px;padding:16px}.error{background:#fff0eb;color:#982f1a;border:1px solid #eebdad;padding:12px;border-radius:10px}.muted{font-size:16px;color:#6b6b7a}[hidden]{display:none!important}@media(max-width:440px){main{padding:16px}.grid{gap:12px}}
+</style><script src="/ski-workflows.js"></script></head><body><main id="guest"><h1>일행의 장비 정보</h1><p>입력 링크를 확인하고 있습니다.</p></main><script>
+(() => {
+  'use strict';
+  const root = document.getElementById('guest'), params = new URLSearchParams(location.hash.slice(1));
+  window.addEventListener('hashchange', () => location.reload());
+  const e = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  let client, form, index = 0, local = [], submitted = new Set(), pending = null, busy = false;
+  const field = (label, name, value, type='text') => '<label>'+e(label)+'<input data-field="'+name+'" type="'+type+'" value="'+e(value ?? '')+'"'+(type==='number'?' inputmode="numeric"':'')+'></label>';
+  const select = (label,name,values,value) => '<label>'+e(label)+'<select data-field="'+name+'">'+values.map(([id,text])=>'<option value="'+id+'"'+(String(value)===String(id)?' selected':'')+'>'+text+'</option>').join('')+'</select></label>';
+  function capture() { const p=local[index]; if(!p)return; const read=key=>root.querySelector('[data-field="'+key+'"]')?.value;
+    if(read('name')!==undefined) Object.assign(p,{name:read('name'),equipment:read('equipment')||null,heightCm:read('heightCm')?Number(read('heightCm')):null,footMm:read('footMm')?Number(read('footMm')):null,clothing:read('clothing')==='true',clothingSize:read('clothingSize')||'',helmet:read('helmet')==='true'});
+  }
+  function render() {
+    const p=local[index]; if(!p){root.innerHTML='<h1>매장 확인이 필요합니다</h1><p>요청할 일행 정보가 없습니다. 매장에 새 입력 링크를 요청해 주세요.</p>';return;}
+    root.innerHTML='<h1>'+e(form.customer.name)+' 팀 장비 정보</h1><p class="muted">이번에 요청받은 '+local.length+'명만 입력합니다. 모르는 규격은 비워두면 매장에서 확인합니다.</p><div class="actions"><button data-action="prev"'+(!index?' disabled':'')+'>이전</button><strong>'+(index+1)+' / '+local.length+'명</strong><button data-action="next"'+(index===local.length-1?' disabled':'')+'>다음</button></div><div class="card"><div class="grid">'+field('일행 이름·별칭','name',p.name)+select('장비','equipment',[['','장비 없음'],['ski','스키'],['board','보드']],p.equipment||'')+field('키 cm (선택)','heightCm',p.heightCm,'number')+field('발 mm (선택)','footMm',p.footMm,'number')+select('의류','clothing',[['false','필요 없음'],['true','필요함']],p.clothing)+field('의류 사이즈 (선택)','clothingSize',p.clothingSize)+select('헬멧','helmet',[['false','필요 없음'],['true','필요함']],p.helmet)+'</div></div><p id="error" class="error" role="alert" hidden></p><p class="muted">입력 완료 '+submitted.size+'명 · 남음 '+(local.length-submitted.size)+'명</p><button class="primary" data-action="save">'+(pending?'같은 제출 결과 다시 확인':'이 일행 입력 완료')+'</button><p class="muted">장비 지급과 요금 확정은 매장에서 확인합니다.</p>';
+  }
+  const showError = error => { const box=root.querySelector('#error'); if(box){box.hidden=false;box.textContent=error.message;}else root.innerHTML='<h1>입력 링크를 확인해 주세요</h1><p>'+e(error.message)+'</p>'; };
+  root.addEventListener('click',async event=>{const action=event.target.closest('button')?.dataset.action;if(!action||busy)return;
+    capture();if(action==='prev'||action==='next'){index+=action==='prev'?-1:1;render();return;}
+    if(action==='save'){
+      busy=true;
+      try{const nextSubmitted=new Set([...submitted,local[index].id]);const command=pending||window.SkiWorkflowClient.newCommand('intake.submit',form.submissionVersion,{id:form.id,status:'submitted',people:local.filter(p=>nextSubmitted.has(p.id))});pending=command;
+        const result=await client.submit(command);form.submissionVersion=result.submissionVersion;submitted=new Set(command.payload.people.map(p=>p.id));pending=null;
+        if(index<local.length-1)index++;render();
+      }catch(error){if(!['CONNECTION_ERROR','INVALID_RESPONSE'].includes(error.code))pending=null;showError(error);}finally{busy=false;}
+    }
+  });
+  (async()=>{try{client=window.SkiWorkflowClient.createGuestHttpClient({baseUrl:location.origin,shopId:params.get('shop'),formId:params.get('form'),accessToken:params.get('token')});form=await client.get();const requested=form.requestedPeople.length?form.requestedPeople:form.people;local=requested.map(p=>({...p,...form.people.find(old=>old.id===p.id)}));submitted=new Set(form.status==='submitted'?form.people.map(p=>p.id):[]);render();}catch(error){showError(error);}})();
+})();
+</script></body></html>

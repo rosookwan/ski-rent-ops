@@ -7,9 +7,9 @@ from rental_template import compile_rental_template
 
 ROOT = Path(__file__).resolve().parents[1]
 APP = ROOT / 'design/app'
-MODULES = ['data.js', 'core.js', 'operations.js', 'return-runtime.js', 'rentals.js', 'settings.js', 'partners.js', 'closing.js', 'preparation.js', 'guide.js', 'returns.js', 'login.js', 'notifications.js', 'workflow-runtime.js', 'workflow-ui.js', 'workflow-preparation.js', 'rental-board.js', 'dispatch-board.js', 'vehicle-board.js', 'rental-changes.js', 'app-mode.js']
+MODULES = ['data.js', 'core.js', 'operations.js', 'return-runtime.js', 'rentals.js', 'settings.js', 'partners.js', 'closing.js', 'preparation.js', 'guide.js', 'returns.js', 'login.js', 'notifications.js', 'workflow-runtime.js', 'workflow-ui.js', 'workflow-preparation.js', 'rental-board.js', 'dispatch-board.js', 'vehicle-board.js', 'rental-changes.js', 'app-mode.js', 'pos-shell.js', 'pos-runtime.js', 'pos-orders.js', 'pos-finance.js', 'pos-fulfillment.js', 'pos-tickets.js', 'pos-management.js', 'pos-dispatch.js', 'pos-connection.js', 'pos-preinput.js', 'pos-notifications.js', 'pos-keypad.js']
 RETURN_MODULES = ['domain.js', 'service.js', 'client.js', 'demo.js']
-WORKFLOW_MODULES = ['common.js', 'reservations.js', 'inventory.js', 'dispatch.js', 'intake.js', 'documents.js', 'exchanges.js', 'early-returns.js', 'domain.js', 'service.js', 'client.js', 'demo.js']
+WORKFLOW_MODULES = ['common.js', 'reservations.js', 'inventory.js', 'dispatch.js', 'intake.js', 'documents.js', 'exchanges.js', 'early-returns.js', 'orders.js', 'migration.js', 'finance.js', 'management.js', 'order-operations.js', 'order-documents.js', 'ticket-operations.js', 'domain.js', 'service.js', 'client.js', 'demo.js']
 PWA_FILES = {
     'manifest.webmanifest': 'application/manifest+json; charset=utf-8',
     'assets/app-icon.svg': 'image/svg+xml',
@@ -49,6 +49,9 @@ def build():
     fragment += '<script>\n' + dispatch_view + '\n</script>\n'
     fragment += '<style>\n' + (APP / 'vehicle-board.css').read_text() + '\n' + vehicle_hover + '\n</style>\n'
     fragment += '<script>\n' + vehicle_view + '\n</script>\n'
+    for name in ['pos-shell.css', 'pos-orders.css', 'pos-fulfillment.css', 'pos-keypad.css']:
+        if (APP / name).exists():
+            fragment += '<style>\n' + (APP / name).read_text() + '\n</style>\n'
     for name in MODULES:
         if (APP / name).exists():
             source=(APP/name).read_text()
@@ -60,7 +63,7 @@ def build():
     mark = base64.b64encode((APP / 'assets/app-mark.svg').read_bytes()).decode()
     fragment = fragment.replace('__SKINOTE_LOGO__', 'data:image/svg+xml;base64,' + mark)
     assert '__SKINOTE_LOGO__' not in fragment
-    assert len(fragment.encode()) < 1_150_000
+    assert len(fragment.encode()) < 1_750_000
     out = ROOT / 'dist'
     out.mkdir(exist_ok=True)
     for name in PWA_FILES:
@@ -72,6 +75,9 @@ def build():
     icons = (ROOT/'design/vendor/lucide.js').read_text()
     policy = "default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; font-src data:; connect-src 'none'; frame-src 'self' about:; object-src 'none'; form-action 'none'; base-uri 'none'"
     frame = '<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta http-equiv="Content-Security-Policy" content="'+policy+'"><style>@font-face{font-family:Pretendard;src:url(data:font/woff2;base64,'+font+') format("woff2");font-weight:100 900;font-display:swap}html,body{margin:0;padding:0;background:#f7f8fa}body{font-family:Pretendard,sans-serif}button,input,select,textarea{font:inherit}button{margin:0}a{color:inherit}svg{vertical-align:middle}</style><script>'+icons+'</script></head><body>'+fragment+'</body></html>'
+    operating_frame = frame.replace("connect-src 'none'", "connect-src 'self'").replace('<body>', '<body><script>window.SkiPosOperating=true;</script>', 1)
+    (out / 'pos.html').write_text(operating_frame)
+    (out / 'guest.html').write_text((APP / 'pos-guest.html').read_text())
     public_router = "const f=document.querySelector('iframe');f.addEventListener('load',()=>{const view=new URLSearchParams(location.search).get('view');if(['guest-guide','guest-form'].includes(view))f.contentWindow.postMessage({type:'ski-public-route',view},'*');});"
     public_router += "window.addEventListener('message',e=>{if(e.source!==f.contentWindow||e.data?.type!=='ski-print'||typeof e.data.html!=='string'||e.data.html.length>1000000)return;let p=document.getElementById('ski-print-frame');if(p)p.remove();p=document.createElement('iframe');p.id='ski-print-frame';p.title='인쇄용 문서';p.setAttribute('sandbox','allow-same-origin allow-modals');p.style.cssText='position:fixed;left:-10000px;top:0;width:794px;height:1123px';p.onload=()=>{p.contentWindow.addEventListener('afterprint',()=>p.remove(),{once:true});p.contentWindow.focus();p.contentWindow.print();};p.srcdoc=e.data.html;document.body.append(p);});"
     public_router += (APP / 'app-host.js').read_text()
@@ -104,7 +110,9 @@ if __name__ == '__main__':
                         body = (ROOT / 'dist' / resource).read_bytes()
                         content_type = PWA_FILES[resource]
                     else:
-                        body = build().encode()
+                        import subprocess, sys
+                        subprocess.run([sys.executable, str(ROOT / 'scripts/build.py')], check=True, capture_output=True)
+                        body = (ROOT / 'dist/index.html').read_bytes()
                         content_type = 'text/html; charset=utf-8'
                 except Exception:
                     self.send_error(500); raise

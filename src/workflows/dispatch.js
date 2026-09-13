@@ -4,7 +4,7 @@
 })(globalThis, function (C) {
   'use strict';
   const waiting = task => task.status === 'waiting';
-  const fulfilled = (state, task, id) => (task.fulfilledElsewhereAssetIds || []).includes(id) || state.movements.some(m => (m.taskId === task.id || (task.refundId && m.refundId === task.refundId)) && m.assetIds.includes(id) && !m.reversedAssetIds.includes(id));
+  const fulfilled = (state, task, id) => (task.fulfilledElsewhereAssetIds || []).includes(id) || state.movements.some(m => (m.taskId === task.id || (task.refundId && m.refundId === task.refundId)) && m.kind === ({delivery:'deliver',collection:'collect',refund:'refund'}[task.kind]) && m.assetIds.includes(id) && !m.reversedAssetIds.includes(id));
   const unassigned = task => (task.plannedItems || []).reduce((n, i) => n + i.quantity - i.assetIds.length, 0);
   function ordered(state, vehicleId, date) {
     const rows = state.tasks.filter(t => t.vehicleId === vehicleId && t.date === date && waiting(t)).sort((a, b) => a.time.localeCompare(b.time) || a.id.localeCompare(b.id));
@@ -29,7 +29,7 @@
       const next = { id: C.id(p.id), kind: C.oneOf(p.kind, ['delivery', 'collection']), vehicleId: C.id(p.vehicleId), date: C.date(p.date), time: C.time(p.time),
         place: C.string(p.place), customerId: C.id(p.customerId), title: C.string(p.title, 100), orderId: p.orderId ? C.id(p.orderId) : null,
         reservationId: p.reservationId ? C.find(state.reservations, p.reservationId).id : null, assetIds: p.assetIds?.length ? C.ids(p.assetIds) : [], status: 'waiting', createdAt: previous?.createdAt || context.at };
-      next.assetIds.forEach(id => { const a = C.find(state.assets, id); if (next.kind === 'delivery' && (a.condition === 'damaged' || a.exchangeReservationId)) C.fail('INVALID_INPUT', '정상 미배정 장비를 선택해 주세요.'); });
+      next.assetIds.forEach(id => { const a = C.find(state.assets, id); if (next.kind === 'delivery' && (a.condition !== 'ready' || a.exchangeReservationId)) C.fail('INVALID_INPUT', '정상 미배정 장비를 선택해 주세요.'); });
       if (previous?.plannedItems) {
         if (p.plannedItems && C.canonical(p.plannedItems) !== C.canonical(previous.plannedItems) || C.canonical(next.assetIds) !== C.canonical(previous.assetIds)) C.fail('INVALID_INPUT', '접수 예정 수량은 물품 배정에서 처리해 주세요.');
         next.plannedItems = C.copy(previous.plannedItems);
@@ -41,6 +41,7 @@
         });
         if (new Set(next.plannedItems.map(i => i.itemId)).size !== next.plannedItems.length) C.fail('INVALID_INPUT', '예정 품목이 중복되었습니다.');
       }
+      if (previous && previous.vehicleId !== next.vehicleId && previous.assetIds.some(id => { const a = C.find(state.assets, id); return a.location.kind === 'vehicle' && a.location.id === previous.vehicleId; })) C.fail('DEPENDENT_MOVEMENT', '현재 차량에 실린 물품을 매장에 내린 후 담당 차량을 변경해 주세요.');
       if (previous) Object.assign(previous, next); else state.tasks.push(next);
       return { taskId: next.id, vehicleId: next.vehicleId, previousVehicleId };
     }
@@ -57,7 +58,7 @@
         for (const id of ids) {
           const asset = C.find(state.assets, id), sku = C.find(state.catalog, item.sku);
           if (asset.sku !== item.sku && !(sku.kind === 'liftTicket' && asset.ticket)) C.fail('INVALID_INPUT', '접수 품목과 배정 물품이 다릅니다.');
-          if (asset.condition === 'damaged' || asset.exchangeReservationId) C.fail('INVALID_INPUT', '정상 미배정 재고를 선택해 주세요.');
+          if (asset.condition !== 'ready' || asset.exchangeReservationId) C.fail('INVALID_INPUT', '정상 미배정 재고를 선택해 주세요.');
           if (!(asset.location.kind === 'shop' || asset.location.kind === 'vehicle' && asset.location.id === task.vehicleId) || asset.refundId) C.fail('INVALID_INPUT', '매장 또는 담당 차량의 물품을 선택해 주세요.');
           if (state.tasks.some(t => t.kind === 'delivery' && ['waiting', 'in_progress'].includes(t.status) && t.assetIds.includes(id) && !fulfilled(state, t, id))) C.fail('ALREADY_EXISTS', '다른 배달에 배정된 물품입니다.');
           if (asset.ticket && !state.allocations.some(a => a.assetId === id && a.reservationId === task.customerId && a.status === 'active' && !a.fulfilledAt)) C.fail('TICKET_UNAVAILABLE', '고객에게 발권·배정한 리프트권을 선택해 주세요.');
@@ -104,7 +105,7 @@
     C.id(vehicleId); C.date(date);
     const all = state.tasks.filter(t => t.vehicleId === vehicleId && t.date === date);
     const pending = ordered(state, vehicleId, date).map((t, index) => {
-      const remainingAssetIds = t.assetIds.filter(id => !(t.fulfilledElsewhereAssetIds || []).includes(id) && !(t.refundId && C.find(state.refunds, t.refundId).cancelledAssetIds.includes(id)) && !state.movements.some(m => (m.taskId === t.id || (t.refundId && m.refundId === t.refundId)) && m.assetIds.includes(id) && !m.reversedAssetIds.includes(id)));
+      const remainingAssetIds = t.assetIds.filter(id => !(t.fulfilledElsewhereAssetIds || []).includes(id) && !(t.refundId && C.find(state.refunds, t.refundId).cancelledAssetIds.includes(id)) && !state.movements.some(m => (m.taskId === t.id || (t.refundId && m.refundId === t.refundId)) && m.kind === ({delivery:'deliver',collection:'collect',refund:'refund'}[t.kind]) && m.assetIds.includes(id) && !m.reversedAssetIds.includes(id)));
       return { ...C.copy(t), rank: index + 1, remainingAssetIds, remainingQuantity: remainingAssetIds.length + unassigned(t),
         customer: C.copy(state.reservations.find(r => r.id === t.customerId)?.customer || state.forms.find(f => f.id === t.customerId)?.customer || null) };
     });

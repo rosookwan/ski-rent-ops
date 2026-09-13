@@ -4,6 +4,7 @@
 })(globalThis, function (C, B) {
   'use strict';
   const same = (a, b) => a.kind === b.kind && a.id === b.id;
+  const isReady = asset => asset.condition === 'ready';
   function location(value, shopId) {
     C.keys(value, ['kind', 'id']); C.oneOf(value.kind, ['shop', 'vehicle', 'customer', 'vendor']); C.id(value.id);
     if (value.kind === 'shop' && value.id !== shopId) C.fail('FORBIDDEN', '다른 매장으로 이동할 수 없습니다.');
@@ -27,12 +28,46 @@
     assets.forEach(a => { a.lastRevision = state.revision + 1; }); state.movements.push(movement);
     return movement;
   }
+  const pendingAllocations = (state, asset) => state.allocations.filter(a => a.assetId === asset.id && a.status === 'active' && !a.fulfilledAt)
+      .sort((a, b) => B.windowOf(B.lineOf(state, a.reservationId, a.lineId).line).from - B.windowOf(B.lineOf(state, b.reservationId, b.lineId).line).from);
+  function pendingDeliveries(state, asset) {
+    return state.tasks.filter(task => task.kind === 'delivery' && ['waiting', 'in_progress'].includes(task.status) && task.assetIds.includes(asset.id)
+      && !(task.fulfilledElsewhereAssetIds || []).includes(asset.id)
+      && !state.movements.some(m => m.kind === 'deliver' && m.taskId === task.id && m.assetIds.includes(asset.id) && !m.reversedAssetIds.includes(asset.id)));
+  }
+  function allocationAvailable(state, asset, options = {}) {
+    if (asset.orderPreparation) {
+      const binding = asset.orderPreparation, task = state.tasks.find(row => row.id === options.taskId);
+      const ownDelivery = options.kind === 'deliver' && options.to?.kind === 'customer' && options.to.id === binding.orderId;
+      const ownLoad = options.kind === 'load' && task?.orderId === binding.orderId && ((task.plannedItems || []).some(item => item.itemId === binding.lineId && item.assetIds.includes(asset.id))
+        || (task.lineItems || []).some(item => item.lineId === binding.lineId && item.assetIds.includes(asset.id)));
+      if (!ownDelivery && !ownLoad) return false;
+    }
+    const claims = pendingDeliveries(state, asset);
+    if (!claims.length) return true;
+    let task = claims.find(t => t.id === options.taskId);
+    // Legacy exchange loading identifies its task through the reserved replacement.
+    if (!task && !options.taskId && options.kind === 'load' && asset.exchangeReservationId) {
+      task = claims.find(t => t.exchangeId === asset.exchangeReservationId && t.vehicleId === options.to?.id);
+    }
+    if (!task) return false;
+    if (options.kind === 'load' && task.vehicleId !== options.to?.id || options.kind === 'deliver' && task.customerId !== options.to?.id) return false;
+    if (claims.length === 1) return true;
+    // A transferable ticket may serve distinct, nonoverlapping reservations in order.
+    if (!asset.ticket) return false;
+    const allocations = pendingAllocations(state, asset);
+    return allocations[0]?.reservationId === task.customerId && claims.every(t => allocations.some(a => a.reservationId === t.customerId))
+      && new Set(claims.map(t => t.customerId)).size === claims.length;
+  }
+  function allocatable(state, asset, options = {}) {
+    if (!isReady(asset) || asset.refundId && !(options.kind === 'load' && C.find(state.refunds, asset.refundId).vehicleId === options.to?.id)) return false;
+    if (asset.exchangeReservationId && options.kind !== 'load' && asset.exchangeReservationId !== options.exchangeId && !state.tasks.some(t => t.id === options.taskId && t.exchangeId === asset.exchangeReservationId)) return false;
+    return allocationAvailable(state, asset, options);
+  }
   function deliveryAllocation(state, asset, customerId, at) {
     if (!asset.ticket) return null;
     if (asset.refundId || asset.location.kind === 'vendor' || Date.parse(asset.ticket.validTo) < Date.parse(at)) C.fail('TICKET_UNAVAILABLE', '환불 대상이거나 유효기간이 지난 권입니다.');
-    const rows = state.allocations.filter(a => a.assetId === asset.id && a.status === 'active' && !a.fulfilledAt)
-      .sort((a, b) => B.windowOf(B.lineOf(state, a.reservationId, a.lineId).line).from - B.windowOf(B.lineOf(state, b.reservationId, b.lineId).line).from);
-    const allocation = rows[0];
+    const allocation = pendingAllocations(state, asset)[0];
     if (!allocation || allocation.reservationId !== customerId) C.fail('TICKET_UNAVAILABLE', '먼저 전달할 고객에게 권을 배정해 주세요.');
     if (B.windowOf(B.lineOf(state, allocation.reservationId, allocation.lineId).line).to < Date.parse(at)) C.fail('TICKET_UNAVAILABLE', '예약 이용시간이 지났습니다.');
     return allocation;
@@ -50,9 +85,9 @@
     if (p.taskId) {
       task = C.find(state.tasks, p.taskId, '업무'); C.vehicle(context, task.vehicleId);
       if (!['waiting', 'in_progress'].includes(task.status)) C.fail('NO_CHANGE', '종료된 업무입니다.');
-      const expectedKind = kind === 'deliver' ? 'delivery' : kind === 'collect' ? 'collection' : null;
+      const expectedKind = ['load', 'deliver'].includes(kind) ? 'delivery' : kind === 'collect' ? 'collection' : null;
       const directPickup = kind === 'deliver' && from.kind === 'shop' && context.actor.role === 'store';
-      if (!expectedKind || task.kind !== expectedKind || task.customerId !== (kind === 'deliver' ? to.id : from.id) || !directPickup && task.vehicleId !== (kind === 'deliver' ? from.id : to.id)) C.fail('INVALID_INPUT', '업무의 고객·차량·이동 종류가 맞지 않습니다.');
+      if (!expectedKind || task.kind !== expectedKind || kind !== 'load' && task.customerId !== (kind === 'deliver' ? to.id : from.id) || !directPickup && task.vehicleId !== (kind === 'deliver' ? from.id : to.id)) C.fail('INVALID_INPUT', '업무의 고객·차량·이동 종류가 맞지 않습니다.');
     }
     if (context.actor.role === 'driver' && !task) C.fail('FORBIDDEN', '배정된 전달·수거 업무에서 처리해 주세요.');
     const assets = C.ids(p.assetIds).map(id => C.find(state.assets, id, '물품'));
@@ -62,8 +97,9 @@
     if (purpose && kind !== 'load') C.fail('INVALID_INPUT', '적재할 때만 용도를 함께 지정할 수 있습니다.');
     const before = capture(state, assets);
     for (const asset of assets) {
+      if (['load', 'deliver'].includes(kind) && !allocationAvailable(state, asset, p)) C.fail('ALREADY_EXISTS', '다른 배달 업무에 배정된 물품입니다. 연결된 배달에서 처리하거나 배정을 해제해 주세요.');
       if (asset.exchangeReservationId && kind === 'deliver' && asset.exchangeReservationId !== (p.exchangeId || task?.exchangeId)) C.fail('INVALID_INPUT', '교환품은 연결된 전달 업무에서 처리해 주세요.');
-      if (['load', 'deliver'].includes(kind) && asset.condition === 'damaged') C.fail('INVALID_INPUT', '파손품은 정상 출고할 수 없습니다.');
+      if (['load', 'deliver'].includes(kind) && !isReady(asset)) C.fail('INVALID_INPUT', '파손·분실·세척·점검 중인 물품은 출고할 수 없습니다. 매장에서 준비 완료를 확인해 주세요.');
       if (kind === 'load' && asset.refundId && C.find(state.refunds, asset.refundId).vehicleId !== to.id) C.fail('FORBIDDEN', '환불 담당 차량에 실어 주세요.');
       if (kind === 'deliver') {
         if (asset.refundId) C.fail('TICKET_UNAVAILABLE', '환불 대상으로 지정한 권입니다.');
@@ -86,7 +122,10 @@
       scheduled.fulfilledElsewhereAssetIds = [...new Set([...(scheduled.fulfilledElsewhereAssetIds || []), ...assets.filter(a => scheduled.assetIds.includes(a.id)).map(a => a.id)])];
       if (scheduled.assetIds.every(id => scheduled.fulfilledElsewhereAssetIds.includes(id) || state.movements.some(m => m.taskId === scheduled.id && m.assetIds.includes(id) && !m.reversedAssetIds.includes(id)))) scheduled.status = 'completed';
     }
-    return { movementId: record(state, context, kind, assets, from, to, before, { taskId: task?.id || null }).id, assetIds: assets.map(a => a.id) };
+    const movementId = record(state, context, kind, assets, from, to, before, { taskId: kind === 'load' ? null : task?.id || null,
+      ...(kind === 'load' && task ? { allocationTaskId: task.id } : {}) }).id;
+    if (kind === 'deliver') assets.forEach(asset => { delete asset.orderPreparation; });
+    return { movementId, assetIds: assets.map(a => a.id) };
   }
   function stock(state, type, p, context) {
     C.store(context);
@@ -113,11 +152,16 @@
     }
     return { movementId: movement.id, assetIds: assets.map(a => a.id) };
   }
-  function undo(state, type, p, context) {
+  function undo(state, type, p, context, scope = null) {
     C.store(context); C.keys(p, type === 'movement.correct' ? ['movementId', 'keepAssetIds', 'reason'] : ['movementId', 'assetIds', 'reason']);
     const movement = C.find(state.movements, p.movementId, '이동 기록'), reason = C.string(p.reason, 300);
-    if (!['load', 'deliver', 'collect', 'receive', 'directReturn'].includes(movement.kind) || movement.intakeId || state.forms.some(f => (f.dispatches || []).some(d => d.people.some(p => p.assetIds.some(id => movement.assetIds.includes(id)))))) C.fail('DEPENDENT_MOVEMENT', '입력폼에 배정·지급한 물품은 일반 이동 정정으로 취소할 수 없습니다.');
-    if (movement.exchangeId || (state.exchanges || []).some(x => x.status !== 'cancelled' && x.units.some(u => movement.assetIds.includes(u.oldAssetId) || movement.assetIds.includes(u.newAssetId)))) C.fail('DEPENDENT_MOVEMENT', '장비교환에 연결된 이동은 일반 수량 정정으로 취소할 수 없습니다.');
+    if (!['load', 'deliver', 'collect', 'receive', 'directReturn'].includes(movement.kind) || !scope?.exchangeId && (movement.intakeId || state.forms.some(f => (f.dispatches || []).some(d => d.people.some(p => p.assetIds.some(id => movement.assetIds.includes(id))))))) C.fail('DEPENDENT_MOVEMENT', '입력폼에 배정·지급한 물품은 일반 이동 정정으로 취소할 수 없습니다.');
+    if (!scope?.exchangeId && (movement.exchangeId || (state.exchanges || []).some(x => x.status !== 'cancelled' && x.units.some(u => movement.assetIds.includes(u.oldAssetId) || movement.assetIds.includes(u.newAssetId))))) C.fail('DEPENDENT_MOVEMENT', '장비교환에 연결된 이동은 일반 수량 정정으로 취소할 수 없습니다.');
+    if (scope?.exchangeId) {
+      const exchange = C.find(state.exchanges, scope.exchangeId);
+      const selected = p.assetIds || movement.assetIds;
+      if (exchange.status === 'cancelled' || movement.revision < (exchange.createdRevision || 0) || selected.some(id => !exchange.units.some(u => u.oldAssetId === id || u.newAssetId === id))) C.fail('FORBIDDEN', '연결된 교환 이동만 정정할 수 있습니다.');
+    }
     const effective = movement.assetIds.filter(id => !movement.reversedAssetIds.includes(id));
     let selected;
     if (type === 'movement.correct') {
@@ -130,7 +174,11 @@
       const asset = C.find(state.assets, assetId);
       if (asset.lastRevision !== movement.revision) C.fail('DEPENDENT_MOVEMENT', '이후 이동·배정 기록이 있어 먼저 그 기록을 확인해야 합니다.');
       const before = C.find(movement.before.assets, assetId);
-      Object.assign(asset, C.copy(before), { lastRevision: state.revision + 1 });
+      // lastRevision tracks the effective causal state of this asset, not its
+      // latest audit write. Restoring it allows the immediately preceding move
+      // to be undone; state.revision and corrections retain every undo event.
+      for (const key of Object.keys(asset)) delete asset[key];
+      Object.assign(asset, C.copy(before));
       state.allocations = state.allocations.filter(a => a.assetId !== assetId).concat(C.copy(movement.before.allocations.filter(a => a.assetId === assetId)));
     }
     movement.reversedAssetIds.push(...selected);
@@ -214,7 +262,7 @@
       return { sku: sku.id, label: sku.label, kind: sku.kind, unit: sku.unit, current: rows.length,
         fromShop: rows.filter(a => a.vehicleOrigin === 'shop').length, fromCustomer: rows.filter(a => a.vehicleOrigin === 'customer').length,
         opening: rows.filter(a => a.vehicleOrigin === 'opening').length, refundPending: rows.filter(a => a.refundId).length,
-        availableToDeliver: rows.filter(a => !a.refundId && (!a.ticket || (at ? Date.parse(a.ticket.validTo) > Date.parse(at) : C.day(a.ticket.validTo) >= date))).length,
+        availableToDeliver: rows.filter(a => isReady(a) && !a.refundId && (!a.ticket || (at ? Date.parse(a.ticket.validTo) > Date.parse(at) : C.day(a.ticket.validTo) >= date))).length,
         recoveredToday: state.movements.filter(m => m.kind === 'collect' && m.to.id === vehicleId && C.day(m.at) === date)
           .reduce((n, m) => n + m.assetIds.filter(id => !m.reversedAssetIds.includes(id) && C.find(state.assets, id).sku === sku.id).length, 0) };
     });
@@ -224,14 +272,17 @@
         return { allocationId: v.id, reservationId: reservation.id, customer: C.copy(reservation.customer), useDate: line.useDate, startTime: line.startTime || null, endTime: line.endTime || null };
       }) })) };
   }
-  function select(state, from, items) {
+  function select(state, from, items, options = {}) {
     location(from, state.shopId); const selected = [];
     for (const item of C.list(items, 50)) {
       C.keys(item, ['sku', 'quantity', 'lotId', 'purpose', 'refundId']); C.find(state.catalog, item.sku); C.integer(item.quantity, 1, 500);
       if (item.lotId) C.id(item.lotId);
       if (item.purpose) C.oneOf(item.purpose, ['spare', 'delivery', 'refund']);
       if (item.refundId) C.id(item.refundId);
-      const candidates = state.assets.filter(a => same(a.location, from) && a.sku === item.sku && (!item.lotId || a.lotId === item.lotId) && (!item.purpose || a.purpose === item.purpose) && (!item.refundId || a.refundId === item.refundId) && !selected.includes(a.id));
+      const outbound = options.kind ? ['load', 'deliver'].includes(options.kind) : from.kind === 'shop';
+      const task = options.taskId ? C.find(state.tasks, options.taskId, '업무') : null;
+      const candidates = state.assets.filter(a => same(a.location, from) && a.sku === item.sku && (!item.lotId || a.lotId === item.lotId) && (!item.purpose || a.purpose === item.purpose) && (!item.refundId || a.refundId === item.refundId) && !selected.includes(a.id)
+        && (!task || !task.assetIds.length && !task.plannedItems || task.assetIds.includes(a.id)) && (!outbound || allocatable(state, a, options)));
       if (new Set(candidates.map(a => C.canonical({ ticket: a.ticket, purpose: a.purpose, refundId: a.refundId }))).size > 1) C.fail('AMBIGUOUS_STOCK', '사용 조건이나 용도가 다른 권이 있습니다. 표시된 권 묶음과 용도를 선택해 주세요.');
       if (candidates.length < item.quantity) C.fail('QUANTITY_EXCEEDED', '보관 수량보다 많이 선택했습니다.');
       selected.push(...candidates.slice(0, item.quantity).map(a => a.id));
@@ -246,5 +297,5 @@
       amountWon: refund.attempts.reduce((n, attempt) => n + attempt.amountWon, 0),
       status: !remainingQuantity ? refund.completedAssetIds.length ? 'completed' : 'cancelled' : lastAttemptFailed ? 'incomplete' : refund.completedAssetIds.length ? 'partial' : 'pending' };
   }
-  return { handle, move, location, same, vehicleSummary, select, refundSummary };
+  return { handle, move, recoverMovement: (state, p, context, exchangeId) => undo(state, 'movement.undo', p, context, { exchangeId: C.id(exchangeId) }), location, same, isReady, vehicleSummary, select, allocatable, allocationAvailable, refundSummary };
 });

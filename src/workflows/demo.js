@@ -178,7 +178,7 @@
       const category = task.plannedItems.every(i => snap().catalog.find(s => s.id === i.sku).kind === 'liftTicket') ? 'liftTicket' : 'equipment';
       const order = orders.get(task.orderId), rows = deliveryCandidates(order.id, category).filter(a => a.taskId === taskId && a.location.kind === 'shop');
       if (!rows.length) throw new Error(category === 'liftTicket' ? '발권한 리프트권이 없습니다. 먼저 발권·준비해 주세요.' : '새로 실을 매장 장비가 없습니다. 재고를 확인해 주세요.');
-      atomic(commit => { assignCandidates(commit, order, rows); commit('stock.move', { kind: 'load', from: shop, to: { kind: 'vehicle', id: task.vehicleId }, assetIds: rows.map(a => a.id), purpose: 'delivery' }); });
+      atomic(commit => { assignCandidates(commit, order, rows); commit('stock.move', { kind: 'load', from: shop, to: { kind: 'vehicle', id: task.vehicleId }, assetIds: rows.map(a => a.id), purpose: 'delivery', taskId: task.id }); });
       rememberCandidates(order, rows);
     }
     function completeDelivery(id, category, assetIds) {

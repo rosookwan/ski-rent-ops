@@ -3,7 +3,7 @@
   const S = window.SkiOps, { esc, icon } = S, runtime = S.notificationRuntime, C = window.SkiNotificationClient;
   const role = () => S.state.page === 'vehicle' ? 'driver' : 'store';
   const service = () => runtime[role()];
-  const active = () => S.state.authenticated && !['login', 'guest-form', 'guest-guide'].includes(S.state.page);
+  const active = () => !S.posData && S.state.authenticated && !['login', 'guest-form', 'guest-guide'].includes(S.state.page);
   const unread = row => row.lifecycle === 'active' && !row.acknowledgedAt;
   const incoming = () => service().sync(0).records;
   const metadata = {

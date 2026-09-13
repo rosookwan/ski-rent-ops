@@ -1,0 +1,119 @@
+'use strict';
+const assert = require('node:assert/strict');
+const { chromium } = require('playwright');
+const { once } = require('node:events');
+const { createHash } = require('node:crypto');
+const { mkdtempSync, mkdirSync, rmSync, writeFileSync } = require('node:fs');
+const { tmpdir } = require('node:os');
+const path = require('node:path');
+const { createApiServer, tokenAuthenticator } = require('../server/returns-api.cjs');
+const { createSqliteRepository } = require('../server/returns-repository.cjs');
+const { createHttpClient, newCommand } = require('../src/workflows/client.js');
+const OUT = path.resolve('work/pos-operating'); mkdirSync(OUT, { recursive: true });
+const temp = mkdtempSync(path.join(tmpdir(), 'ski-pos-browser-'));
+const token = 'local-browser-integration-store-'.padEnd(48, 'x'), driverToken = 'local-browser-integration-driver-'.padEnd(48, 'x');
+const hash = value => createHash('sha256').update(value).digest('hex');
+let server, repository, browser;
+const errors = [], checks = [];
+async function main() {
+  repository = createSqliteRepository(path.join(temp, 'ops.sqlite'));
+  server = createApiServer({ repository, authenticate: tokenAuthenticator([
+    { tokenHash: hash(token), shopId: 'real-test-shop', actor: { id: 'manager', role: 'store', permissions: ['closing.reopen'] } },
+    { tokenHash: hash(driverToken), shopId: 'real-test-shop', actor: { id: 'driver-2', role: 'driver', vehicleId: 'van-2' } }
+  ]), clock: () => '2026-09-13T01:00:00.000Z', uiDirectory: path.resolve('dist') });
+  server.listen(0, '127.0.0.1'); await once(server, 'listening');
+  const baseUrl = 'http://127.0.0.1:' + server.address().port, client = createHttpClient({ baseUrl, token });
+  const command = async (type, payload) => client.execute(newCommand(type, await client.snapshot(), payload));
+  await command('stock.receive', { sku: 'ski', quantity: 8 });
+  browser = await chromium.launch({ channel: 'chrome', headless: true });
+  async function login(access = token) {
+    const page = await browser.newPage({ viewport: { width: 1024, height: 600 } });
+    page.on('pageerror', error => errors.push(error.message)); await page.goto(baseUrl + '/pos');
+    await page.locator('#pos-access-key').fill(access); await page.locator('[data-action="pos-connect"]').click(); await page.locator('.pos-page').waitFor();
+    return page;
+  }
+  const page = await login();
+  assert.equal((await client.snapshot()).orders.length, 0);
+  assert.equal(await page.evaluate(() => window.SkiOps.posData.snapshot.orders.length), 0); checks.push('Operating login uses API records without demo seed');
+  async function geometry(name) {
+    await page.evaluate(() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve))));
+    const result = await page.evaluate(() => {
+      const root = document.querySelector('#so-dialog[open]') || document.querySelector('.pos-page');
+      return [...root.querySelectorAll('h1,h2,p,input,select,button,output,.pos-page-footer,.pos-row')].filter(el => {
+        if (!el.getClientRects().length) return false;
+        const rect = el.getBoundingClientRect(); return rect.bottom > innerHeight + 1 || rect.right > innerWidth + 1 || rect.top < -1 || rect.left < -1 || el.scrollWidth > el.clientWidth + 2 && getComputedStyle(el).overflowX !== 'visible';
+      }).map(el => ({ tag: el.tagName, text: el.textContent.slice(0, 60), bottom: el.getBoundingClientRect().bottom }));
+    });
+    assert.deepEqual(result, [], name + ' overflow'); await page.screenshot({ path: path.join(OUT, name + '.png') });
+  }
+  await page.locator('[data-action="pos-new"]').click();
+  await page.locator('[data-pos-input="name"]').fill('통합접수 검증팀'); await page.locator('[data-pos-input="phone"]').fill('010-1234-5678');
+  await page.locator('[data-action="pos-draft-next"]').click(); await page.locator('[data-action="pos-person-add"]').click();
+  await page.locator('[data-pos-input="unitWon"]').fill('10000'); await page.locator('[data-action="pos-line-add"]').click();
+  await page.locator('[data-action="pos-draft-next"]').click(); await geometry('01-intake-review-1024x600');
+  await page.locator('[data-action="pos-draft-save"]').click(); await page.locator('[data-action="pos-add"]').waitFor();
+  let order = (await client.snapshot()).orders[0], originalLine = structuredClone(order.lines[0]);
+  await page.locator('[data-action="pos-issue"]').click(); await page.locator('[data-action="pos-fulfillment-confirm"]').click();
+  await page.locator('[data-action="pos-add"]').waitFor(); assert.equal((await client.snapshot()).orders[0].totals.customerQuantity, 1); checks.push('New reception and physical issue persist through operating UI');
+  await page.locator('[data-action="pos-add"]').click(); await page.locator('[data-action="pos-date"][data-id="tomorrow"]').click(); await page.locator('[data-action="pos-draft-next"]').click();
+  await page.locator('[data-action="pos-person-add"]').click(); await page.locator('[data-pos-input="unitWon"]').fill('12000'); await page.locator('[data-action="pos-line-add"]').click();
+  await page.locator('[data-action="pos-draft-next"]').click(); await page.locator('[data-action="pos-draft-save"]').click(); await page.locator('[data-action="pos-add"]').waitFor();
+  order = (await client.snapshot()).orders[0]; assert.equal(order.people.length, 2); assert.equal(order.lines.length, 2); assert.deepEqual(order.lines[0].price, originalLine.price); assert.equal(order.lines[1].start, '2026-09-14'); checks.push('Next-day companion adds independent dates and price under same number');
+  await geometry('02-late-arrival-detail-1024x600');
+  await page.locator('[data-action="pos-money"]').click(); await page.locator('[data-pos-input="moneyAmount"]').fill('10000'); await page.locator('[data-action="pos-money-review"]').click(); await geometry('03-payment-confirm-1024x600');
+  await page.locator('[data-action="pos-money-save"]').click(); await page.locator('#so-dialog').waitFor({ state: 'hidden' });
+  assert.equal((await client.snapshot()).orders[0].finance.dueWon, 12000); checks.push('Actual partial payment leaves added batch balance');
+  const second = await login(); await second.locator('[data-go="order-detail"]').first().click();
+  await command('finance.payment', { id: 'second-terminal-payment', orderId: order.id, kind: 'payment', amountWon: 1000, method: 'transfer' });
+  await page.locator('[data-action="pos-return-all"]').click(); await page.locator('[data-action="pos-fulfillment-confirm"]').click();
+  await page.locator('[data-fulfillment-error]:visible').waitFor(); assert.match(await page.locator('[data-fulfillment-error]:visible').innerText(), /변경|최신/);
+  assert.equal((await client.snapshot()).orders[0].totals.customerQuantity, 1); checks.push('Stale screen rejects confirmation without moving stock');
+  await page.locator('#so-dialog [aria-label="창 닫기"]').click();
+  await page.evaluate(() => window.SkiOps.posData.refresh());
+  await page.locator('[data-action="pos-return-all"]').click(); await geometry('04-return-confirm-1024x600'); await page.locator('[data-action="pos-fulfillment-confirm"]').click(); await page.locator('[data-action="pos-add"]').waitFor();
+  order = (await client.snapshot()).orders[0]; assert.equal(order.totals.customerQuantity, 0); assert.equal(order.totals.unissuedQuantity, 1); assert.equal(order.finance.dueWon, 11000); checks.push('Two-action full return preserves next-day issue and unpaid balance');
+  await page.waitForFunction(() => !window.SkiOps.posData.busy);
+  let lostResponse = false;
+  await page.route('**/api/workflows/commands', async route => { const response = await route.fetch(); assert.equal(response.status(), 200); lostResponse = true; await route.abort('failed'); });
+  const uncertain = await page.evaluate(async id => { try { await window.SkiOps.posData.execute('finance.payment', { id: 'lost-response-payment', orderId: id, kind: 'payment', amountWon: 500, method: 'cash' }); return null; } catch (error) { return error.code || error.message; } }, order.id);
+  assert.equal(uncertain, 'CONNECTION_ERROR'); assert.equal(lostResponse, true);
+  assert.equal((await client.snapshot()).orders[0].finance.netPaidWon, 11500);
+  const stored = await page.evaluate(() => Object.entries(localStorage).filter(([key]) => key.startsWith('ski-pos-pending-v1:')));
+  assert.equal(stored.length, 1); assert.ok(!JSON.stringify(stored).includes(token)); assert.ok(!JSON.stringify(stored).includes('lost-response-payment'));
+  await page.unroute('**/api/workflows/commands'); await page.reload(); await page.locator('#pos-access-key').fill(token); await page.locator('[data-action="pos-connect"]').click();
+  await page.locator('[data-action="pos-retry"]').first().waitFor(); await page.locator('[data-action="pos-retry"]').first().click();
+  await page.waitForFunction(() => window.SkiOps.posData.pending === null);
+  assert.equal((await client.snapshot()).orders[0].finance.netPaidWon, 11500);
+  assert.equal(await page.evaluate(() => Object.keys(localStorage).filter(key => key.startsWith('ski-pos-pending-v1:')).length), 0);
+  checks.push('Lost payment response survives reload encrypted and retries the identical request without duplicate payment');
+  await page.waitForFunction(() => !window.SkiOps.posData.busy);
+  await page.evaluate(() => window.SkiOps.go('intake')); await page.locator('[data-action="pos-new"]').click();
+  await page.locator('[data-pos-input="name"]').fill('응답 유실 신규 접수'); await page.locator('[data-pos-input="phone"]').fill('010-4321-8765'); await page.locator('[data-action="pos-draft-next"]').click();
+  await page.locator('[data-pos-input="unitWon"]').fill('10000'); await page.locator('[data-action="pos-line-add"]').click(); await page.locator('[data-action="pos-draft-next"]').click();
+  await page.route('**/api/workflows/commands', async route => { const response = await route.fetch(); assert.equal(response.status(), 200); await route.abort('failed'); });
+  await page.locator('[data-action="pos-draft-save"]').click(); await page.waitForFunction(() => window.SkiOps.posData.pending && !window.SkiOps.posData.busy);
+  assert.equal((await client.snapshot()).orders.length, 2); await page.unroute('**/api/workflows/commands');
+  await page.locator('#so-page-tools [data-action="pos-retry"]').click();
+  await page.waitForFunction(() => window.SkiOps.state.page === 'order-detail' && !window.SkiOps.posOrders.state.draft);
+  assert.equal(await page.locator('[data-action="pos-draft-save"]').count(), 0); assert.equal((await client.snapshot()).orders.length, 2);
+  checks.push('Uncertain new reception retry opens its saved order and clears only its completed draft');
+  const fresh = await client.snapshot(), original = fresh.orders.find(o => o.id === order.id), available = fresh.assets.find(a => a.sku === 'ski' && a.location.kind === 'shop' && !a.orderPreparation);
+  await command('ops.dispatch', { id: 'driver-live-test', orderId: original.id, lineItems: [{ lineId: original.lines[1].id, assetIds: [available.id] }], vehicleId: 'van-2', date: '2026-09-13', time: '09:00', place: '실제 차량 화면 확인' });
+  const driverPage = await login(driverToken); const driverSnapshot = await driverPage.evaluate(() => window.SkiOps.posData.snapshot);
+  assert.equal(driverSnapshot.orders, undefined); assert.equal(driverSnapshot.finance, undefined); assert.equal(driverSnapshot.actor.vehicleId, 'van-2'); checks.push('Driver session receives only scoped vehicle data');
+  await driverPage.locator('[data-action="pos-task"][data-id="driver-live-test"]').click();
+  const primary = driverPage.locator('[data-action="pos-task-complete"]'); assert.ok((await primary.boundingBox()).height >= 72);
+  await driverPage.screenshot({ path: path.join(OUT, '05-driver-task-1024x600.png') }); await primary.click();
+  await driverPage.waitForFunction(() => !window.SkiOps.posData.busy && window.SkiOps.state.page === 'dispatch');
+  assert.equal((await client.snapshot()).orders.find(o => o.id === order.id).totals.customerQuantity, 1);
+  checks.push('Driver uses its 72px actual-delivery action to complete an assigned physical task through API');
+
+  await page.reload(); await page.locator('#pos-access-key').waitFor(); assert.equal(await page.locator('#pos-access-key').inputValue(), ''); checks.push('Refresh clears credential and requires authentication');
+  const saved = repository.workflows('real-test-shop');
+  await new Promise(resolve => server.close(resolve)); repository.close();
+  repository = createSqliteRepository(path.join(temp, 'ops.sqlite')); assert.deepEqual(repository.workflows('real-test-shop'), saved); checks.push('SQLite restart preserves complete order, physical and money history');
+  assert.deepEqual(errors, []);
+  writeFileSync(path.join(OUT, 'result.json'), JSON.stringify({ checks, errors, storage: 'sqlite', surface: 'operating /pos', viewport: '1024x600' }, null, 2));
+  console.log(JSON.stringify({ passed: checks.length, errors, output: OUT }));
+}
+main().catch(error => { console.error(error.stack); writeFileSync(path.join(OUT, 'failure.json'), JSON.stringify({ checks, errors, error: error.stack }, null, 2)); process.exitCode = 1; }).finally(async () => { await browser?.close(); if (server?.listening) await new Promise(resolve => server.close(resolve)); try { repository?.close(); } catch {} rmSync(temp, { recursive: true, force: true }); });

@@ -6,7 +6,7 @@
   function project(notifications, committed) {
     if (committed.duplicate) return;
     const { event, state, result } = committed;
-    const source = { ...event, orderId: result.reservationId || result.taskId || result.formId || 'workflow' };
+    const source = { ...event, orderId: result.orderId || result.reservationId || result.taskId || result.formId || 'workflow' };
     const senderScope = event.actor.role === 'driver' ? 'vehicle:' + event.actor.vehicleId : 'store';
     if (event.type.startsWith('exchange.') || event.type === 'earlyReturn.create') {
       for (const id of result.taskIds || []) { const task = C.find(state.tasks, id); N.closeWhere(notifications, n => n.taskId === id && n.type === 'workflow-task', 'superseded'); N.emit(notifications, source, 'vehicle:' + task.vehicleId, 'workflow-task', task.title, task.memo, { senderScope, taskId: id }); }
@@ -53,11 +53,25 @@
       for (const recipient of ['store', ...(vehicleId ? ['vehicle:' + vehicleId] : [])]) N.emit(notifications, source, recipient, 'workflow-correction', '물품 이동 기록이 정정됐어요', '정정 ' + result.correctedAssetIds.length + '개 · 현재 보관 수량을 확인해 주세요.', { senderScope, movementId: m.id });
     }
     if (event.type === 'refund.complete') N.emit(notifications, source, 'store', 'vendor-refund', '리프트권 환불 처리', '완료 ' + result.completed + '매 · 남음 ' + result.remaining + '매', { senderScope, refundId: result.refundId });
+    if (event.type.startsWith('ops.') || event.type.startsWith('tickets.')) {
+      for (const id of [...new Set([...(result.taskIds || []), ...(result.collectionTaskIds || []), ...(result.taskId ? [result.taskId] : [])])]) {
+        const task = state.tasks.find(t => t.id === id); if (!task || !['waiting', 'in_progress'].includes(task.status)) continue;
+        N.closeWhere(notifications, n => n.taskId === id && n.type === 'workflow-task', 'superseded');
+        N.emit(notifications, source, 'vehicle:' + task.vehicleId, 'workflow-task', task.title, [task.date, task.time, task.place].join(' · '), { senderScope, taskId: id });
+      }
+      for (const movement of state.movements.filter(m => m.revision === event.version && ['load', 'collect', 'deliver'].includes(m.kind))) {
+        const recipient = movement.kind === 'load' ? 'vehicle:' + movement.to.id : 'store';
+        N.emit(notifications, source, recipient, movement.kind === 'load' ? 'load' : 'workflow-collection', { load: '차량에 물품을 실었어요', collect: '차량 수거 내역', deliver: '고객 전달 내역' }[movement.kind], '실제 이동 ' + movement.assetIds.length + '개', { senderScope, movementId: movement.id, taskId: movement.taskId });
+      }
+    }
+    if (event.type === 'docs.formApply') N.closeWhere(notifications, n => n.formId === result.formId && n.type === 'intake-submitted', 'resolved');
+    N.closeWhere(notifications, n => n.taskId && ['priority', 'help', 'workflow-task'].includes(n.type) && state.tasks.some(t => t.id === n.taskId && ['completed', 'cancelled'].includes(t.status)), 'resolved');
     if (event.type === 'intake.submit' && result.status === 'submitted') N.emit(notifications, source, 'store', 'intake-submitted', C.find(state.forms, result.formId).customer.name + ' · 입력폼 제출', '제출본 ' + result.submissionVersion + '을 확인해 주세요.', { senderScope: 'customer', formId: result.formId });
   }
   function commit(repository, shopId, command, context) {
     return repository.transactWorkflows(shopId, (current, notifications) => {
-      const result = W.execute(current, command, context); project(notifications, result); return result;
+      const actualContext = command?.type === 'legacy.migrate' ? { ...context, legacyOrders: repository.list(shopId) } : context;
+      const result = W.execute(current, command, actualContext); project(notifications, result); return result;
     });
   }
   function createService(repository, trustedContext, clock = () => new Date().toISOString(), adapters = {}) {
@@ -66,9 +80,10 @@
     const now = () => C.instant(clock());
     const execute = command => {
       if (command?.type === 'task.save' && command.payload?.orderId) {
-        const order = repository.get(context.shopId, command.payload.orderId);
+        const unified = (state().orders || []).find(o => o.id === command.payload.orderId);
+        const order = unified || repository.get(context.shopId, command.payload.orderId);
         const vehicles = command.payload.kind === 'delivery' ? Object.values(order?.pickupPlan || {}).filter(p => p.method === 'delivery').map(p => p.vehicleId) : [];
-        if (!order || ![order.vehicleId, ...vehicles].includes(command.payload.vehicleId)) C.fail('INVALID_INPUT', '접수의 담당 차량을 확인해 주세요.');
+        if (!order || !unified && ![order.vehicleId, ...vehicles].includes(command.payload.vehicleId)) C.fail('INVALID_INPUT', '접수의 담당 차량을 확인해 주세요.');
       }
       const result = commit(repository, context.shopId, command, { ...context, at: now() });
       return { ...C.copy(result.result), duplicate: result.duplicate, revision: result.state.revision };
@@ -78,12 +93,12 @@
     function snapshot() {
       const current = state(), notifications = notify();
       const tasks = current.tasks.filter(t => context.actor.role === 'store' || t.vehicleId === context.actor.vehicleId).map(task => {
-        const customer = current.reservations.find(r => r.id === task.customerId)?.customer || current.forms.find(f => f.id === task.customerId)?.customer || null;
-        return { ...C.copy(task), customer: C.copy(customer) };
+        const customer = (current.orders || []).find(o => o.id === task.customerId || o.id === task.orderId)?.customer || current.reservations.find(r => r.id === task.customerId)?.customer || current.forms.find(f => f.id === task.customerId)?.customer || null;
+        return { ...C.copy(task), customer: C.copy(customer), remainingAssetIds: task.assetIds.filter(id => !W.dispatch.fulfilled(current, task, id)), unassignedQuantity: W.dispatch.unassigned(task), physicalAssets: C.copy(current.assets.filter(a => task.assetIds.includes(a.id) && !W.dispatch.fulfilled(current, task, a.id) && (context.actor.role === 'store' || a.location.kind === 'shop' || a.location.kind === 'vehicle' && a.location.id === context.actor.vehicleId || a.location.kind === 'customer' && a.location.id === task.customerId))) };
       });
-      if (context.actor.role === 'driver') return { revision: current.revision, mode: repository.mode, at: now(), catalog: C.copy(current.catalog), tasks, notifications,
+      if (context.actor.role === 'driver') return { revision: current.revision, mode: repository.mode, actor: C.copy(context.actor), shopId: context.shopId, at: now(), catalog: C.copy(current.catalog), tasks, notifications,
         earlyReturns: (current.earlyReturns || []).filter(r => r.visit?.vehicleId === context.actor.vehicleId).map(r => W.earlyReturns.view(current, r)), exchanges: C.copy((current.exchanges || []).filter(x => x.visit.vehicleId === context.actor.vehicleId)), vehicle: W.inventory.vehicleSummary(current, context.actor.vehicleId, C.day(now()), now()), refunds: current.refunds.filter(r => r.vehicleId === context.actor.vehicleId).map(r => W.inventory.refundSummary(current, r)) };
-      return { revision: current.revision, mode: repository.mode, at: now(), catalog: C.copy(current.catalog), tasks, notifications, assets: C.copy(current.assets),
+      return { revision: current.revision, mode: repository.mode, actor: C.copy(context.actor), shopId: context.shopId, at: now(), catalog: C.copy(current.catalog), tasks, notifications, assets: C.copy(current.assets), orders: W.orders.list(current).map(o => ({ ...o, finance: W.finance.summary(current, o.id) })), finance: W.finance.day(current, C.day(now()), W.management.summary(current).partners), closings: W.finance.closings(current), management: W.management.summary(current), migrations: C.copy(current.migrations || []),
         earlyReturns: (current.earlyReturns || []).map(r => W.earlyReturns.view(current, r)), exchanges: C.copy(current.exchanges || []), reservations: C.copy(current.reservations), allocations: C.copy(current.allocations), refunds: current.refunds.map(r => W.inventory.refundSummary(current, r)),
         forms: current.forms.map(f => W.intake.view(current, f, now())), printJobs: C.copy(current.printJobs), deliveries: C.copy(current.deliveries), sequences: C.copy(current.sequences) };
     }
@@ -91,7 +106,7 @@
       mode: repository.mode, execute, snapshot,
       prepareMove(options) {
         C.keys(options, ['kind', 'from', 'to', 'items', 'purpose', 'taskId']); const current = state();
-        const assetIds = W.inventory.select(current, options.from, options.items), { items, ...rest } = options;
+        const assetIds = W.inventory.select(current, options.from, options.items, options), { items, ...rest } = options;
         const payload = { ...rest, assetIds }, command = { type: 'stock.move', requestId: 'preview-' + current.revision, expectedVersion: current.revision, payload };
         const preview = W.execute(current, command, { ...context, at: now() });
         const vehicleId = options.to.kind === 'vehicle' ? options.to.id : options.from.kind === 'vehicle' ? options.from.id : null;
@@ -113,14 +128,14 @@
         return { ...W.dispatch.board(state(), ownVehicle(options.vehicleId), options.date || C.day(now()), options.selectedTaskId), notifications: notify() };
       },
       intake(formId) { C.store(context); const current = state(); return W.intake.view(current, C.find(current.forms, formId), now()); },
-      print(jobId) { C.store(context); const job = C.find(state().printJobs, jobId); return { job: C.copy(job), html: W.documents.html(job.document) }; },
+      print(jobId) { C.store(context); const job = C.find(state().printJobs, jobId); return { job: C.copy(job), html: (job.document.template === 'order-preparation-v1' ? W.orderDocuments : W.documents).html(job.document) }; },
       async dispatchPrint(jobId) {
         C.store(context); const job = C.find(state().printJobs, jobId);
         if (!adapters.printer || job.status !== 'queued') return { ...service.print(jobId), transportConfigured: !!adapters.printer };
         const record = (status, device = '') => execute({ type: 'print.record', requestId: 'printer-status-' + state().revision + '-' + status, expectedVersion: state().revision, payload: { id: jobId, status, device } });
         record('dispatched');
         try {
-          const receipt = await adapters.printer.print({ idempotencyKey: context.shopId + ':' + job.id, document: C.copy(job.document), html: W.documents.html(job.document) });
+          const receipt = await adapters.printer.print({ idempotencyKey: context.shopId + ':' + job.id, document: C.copy(job.document), html: (job.document.template === 'order-preparation-v1' ? W.orderDocuments : W.documents).html(job.document) });
           C.oneOf(receipt?.status, ['dispatched', 'confirmed']); record(receipt.status, C.string(receipt.device, 100));
         } catch { record('unknown'); }
         return { ...service.print(jobId), transportConfigured: true };

@@ -72,6 +72,37 @@
       sendFormLink: envelope => request('/api/workflows/forms/send', envelope) };
     client.prepareMove = payload => request('/api/workflows/moves/preview', payload);
     client.dispatchPrint = id => request('/api/workflows/prints/dispatch', { id });
+    // Keep uncertain writes across reloads without persisting the staff key or
+    // readable customer/payment data on a shared POS browser.
+    const storage = options.pendingStorage === undefined ? globalThis.localStorage : options.pendingStorage;
+    let pendingCrypto;
+    async function pendingKey() {
+      if (!pendingCrypto) pendingCrypto = (async () => {
+        const identity = options.baseUrl + ':' + options.token;
+        const bytes = await globalThis.crypto.subtle.digest('SHA-256', new TextEncoder().encode('ski-pos-encryption-v1:' + identity));
+        const lookup = await globalThis.crypto.subtle.digest('SHA-256', new TextEncoder().encode('ski-pos-lookup-v1:' + identity));
+        const digest = [...new Uint8Array(lookup)].map(b => b.toString(16).padStart(2, '0')).join('');
+        return { name: 'ski-pos-pending-v1:' + digest, key: await globalThis.crypto.subtle.importKey('raw', bytes, 'AES-GCM', false, ['encrypt', 'decrypt']) };
+      })();
+      return pendingCrypto;
+    }
+    client.persistPending = async command => {
+      if (!storage) return;
+      try {
+        const { name, key } = await pendingKey(), iv = globalThis.crypto.getRandomValues(new Uint8Array(12));
+        const data = await globalThis.crypto.subtle.encrypt({ name: 'AES-GCM', iv }, key, new TextEncoder().encode(JSON.stringify(command)));
+        storage.setItem(name, JSON.stringify({ iv: [...iv], data: [...new Uint8Array(data)] }));
+      } catch { throw new R.ApiError('PENDING_STORAGE_ERROR', '처리 복구 기록을 저장하지 못했습니다. 브라우저 저장 공간을 확인한 뒤 다시 시도해 주세요.'); }
+    };
+    client.restorePending = async () => {
+      if (!storage) return null;
+      try {
+        const { name, key } = await pendingKey(), raw = storage.getItem(name); if (!raw) return null;
+        const value = JSON.parse(raw), data = await globalThis.crypto.subtle.decrypt({ name: 'AES-GCM', iv: new Uint8Array(value.iv) }, key, new Uint8Array(value.data));
+        return JSON.parse(new TextDecoder().decode(data));
+      } catch { throw new R.ApiError('PENDING_STORAGE_ERROR', '앞선 처리 복구 기록을 읽지 못했습니다. 이 기기의 기록을 관리자와 확인해 주세요.'); }
+    };
+    client.clearPending = async () => { if (storage) storage.removeItem((await pendingKey()).name); };
     for (const name of ['sync', 'reservations', 'vehicle', 'board', 'history', 'report']) client[name] = (query = {}) => request('/api/workflows/' + name + '?' + new URLSearchParams(query));
     return withWatch(client);
   }

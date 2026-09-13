@@ -1,0 +1,593 @@
+{
+  "generatedAt": "2026-09-12T23:56:24.063Z",
+  "mode": "static memory demonstration; screenshots are not evidence of physical hardware",
+  "checks": [
+    {
+      "key": "home",
+      "viewport": [
+        1024,
+        600
+      ],
+      "overflow": [],
+      "bodyScroll": false
+    },
+    {
+      "key": "intake",
+      "viewport": [
+        1024,
+        600
+      ],
+      "overflow": [],
+      "bodyScroll": false
+    },
+    {
+      "key": "preparation",
+      "viewport": [
+        1024,
+        600
+      ],
+      "overflow": [],
+      "bodyScroll": false
+    },
+    {
+      "key": "rentals",
+      "viewport": [
+        1024,
+        600
+      ],
+      "overflow": [],
+      "bodyScroll": false
+    },
+    {
+      "key": "returns",
+      "viewport": [
+        1024,
+        600
+      ],
+      "overflow": [],
+      "bodyScroll": false
+    },
+    {
+      "key": "closing",
+      "viewport": [
+        1024,
+        600
+      ],
+      "overflow": [],
+      "bodyScroll": false
+    },
+    {
+      "key": "dispatch",
+      "viewport": [
+        1024,
+        600
+      ],
+      "overflow": [],
+      "bodyScroll": false
+    },
+    {
+      "key": "management",
+      "viewport": [
+        1024,
+        600
+      ],
+      "overflow": [],
+      "bodyScroll": false
+    },
+    {
+      "key": "home",
+      "viewport": [
+        1024,
+        768
+      ],
+      "overflow": [],
+      "bodyScroll": false
+    },
+    {
+      "key": "intake",
+      "viewport": [
+        1024,
+        768
+      ],
+      "overflow": [],
+      "bodyScroll": false
+    },
+    {
+      "key": "preparation",
+      "viewport": [
+        1024,
+        768
+      ],
+      "overflow": [],
+      "bodyScroll": false
+    },
+    {
+      "key": "rentals",
+      "viewport": [
+        1024,
+        768
+      ],
+      "overflow": [],
+      "bodyScroll": false
+    },
+    {
+      "key": "returns",
+      "viewport": [
+        1024,
+        768
+      ],
+      "overflow": [],
+      "bodyScroll": false
+    },
+    {
+      "key": "closing",
+      "viewport": [
+        1024,
+        768
+      ],
+      "overflow": [],
+      "bodyScroll": false
+    },
+    {
+      "key": "dispatch",
+      "viewport": [
+        1024,
+        768
+      ],
+      "overflow": [],
+      "bodyScroll": false
+    },
+    {
+      "key": "management",
+      "viewport": [
+        1024,
+        768
+      ],
+      "overflow": [],
+      "bodyScroll": false
+    },
+    {
+      "key": "home",
+      "viewport": [
+        1366,
+        768
+      ],
+      "overflow": [],
+      "bodyScroll": false
+    },
+    {
+      "key": "intake",
+      "viewport": [
+        1366,
+        768
+      ],
+      "overflow": [],
+      "bodyScroll": false
+    },
+    {
+      "key": "preparation",
+      "viewport": [
+        1366,
+        768
+      ],
+      "overflow": [],
+      "bodyScroll": false
+    },
+    {
+      "key": "rentals",
+      "viewport": [
+        1366,
+        768
+      ],
+      "overflow": [],
+      "bodyScroll": false
+    },
+    {
+      "key": "returns",
+      "viewport": [
+        1366,
+        768
+      ],
+      "overflow": [],
+      "bodyScroll": false
+    },
+    {
+      "key": "closing",
+      "viewport": [
+        1366,
+        768
+      ],
+      "overflow": [],
+      "bodyScroll": false
+    },
+    {
+      "key": "dispatch",
+      "viewport": [
+        1366,
+        768
+      ],
+      "overflow": [],
+      "bodyScroll": false
+    },
+    {
+      "key": "management",
+      "viewport": [
+        1366,
+        768
+      ],
+      "overflow": [],
+      "bodyScroll": false
+    },
+    {
+      "key": "group-30",
+      "viewport": [
+        1024,
+        600
+      ],
+      "overflow": [],
+      "bodyScroll": false
+    },
+    {
+      "key": "group-review",
+      "viewport": [
+        1024,
+        600
+      ],
+      "overflow": [],
+      "bodyScroll": false
+    },
+    {
+      "key": "order-detail",
+      "viewport": [
+        1024,
+        600
+      ],
+      "overflow": [],
+      "bodyScroll": false
+    },
+    {
+      "key": "preinput",
+      "viewport": [
+        1024,
+        600
+      ],
+      "overflow": [],
+      "bodyScroll": false
+    },
+    {
+      "key": "notifications",
+      "viewport": [
+        1024,
+        600
+      ],
+      "overflow": [],
+      "bodyScroll": false
+    },
+    {
+      "key": "tomorrow-100",
+      "viewport": [
+        1024,
+        600
+      ],
+      "overflow": [],
+      "bodyScroll": false
+    },
+    {
+      "key": "twelve-products",
+      "viewport": [
+        1024,
+        600
+      ],
+      "overflow": [],
+      "bodyScroll": false
+    }
+  ],
+  "errors": [],
+  "screens": [
+    {
+      "title": "오늘 할 일",
+      "detail": "준비·반납·차량 입고·정산 대기를 모아서 시작합니다.",
+      "file": "home-1024x600.png",
+      "size": "1024×600"
+    },
+    {
+      "title": "1. 접수·예약",
+      "detail": "대표자·접수번호로 기존 팀을 찾고 늦은 일행을 추가합니다.",
+      "file": "intake-1024x600.png",
+      "size": "1024×600"
+    },
+    {
+      "title": "2. 준비·지급",
+      "detail": "미지급 품목이 남은 팀을 바로 찾습니다.",
+      "file": "preparation-1024x600.png",
+      "size": "1024×600"
+    },
+    {
+      "title": "3. 이용 중·변경",
+      "detail": "현재 이용 내역에서 추가 대여·연장·문제 해결로 이어집니다.",
+      "file": "rentals-1024x600.png",
+      "size": "1024×600"
+    },
+    {
+      "title": "4. 반납·회수",
+      "detail": "고객 보유와 차량 입고 대기를 구분합니다.",
+      "file": "returns-1024x600.png",
+      "size": "1024×600"
+    },
+    {
+      "title": "5. 정산·마감",
+      "detail": "수납·보증금·미처리 인계와 마감 이력을 확인합니다.",
+      "file": "closing-1024x600.png",
+      "size": "1024×600"
+    },
+    {
+      "title": "차량 운행",
+      "detail": "담당 차량·날짜별 실제 배달·수거 업무를 처리합니다.",
+      "file": "dispatch-1024x600.png",
+      "size": "1024×600"
+    },
+    {
+      "title": "관리",
+      "detail": "재고·정비·거래처·고객·운영 설정을 모았습니다.",
+      "file": "management-1024x600.png",
+      "size": "1024×600"
+    },
+    {
+      "title": "오늘 할 일",
+      "detail": "준비·반납·차량 입고·정산 대기를 모아서 시작합니다.",
+      "file": "home-1024x768.png",
+      "size": "1024×768"
+    },
+    {
+      "title": "1. 접수·예약",
+      "detail": "대표자·접수번호로 기존 팀을 찾고 늦은 일행을 추가합니다.",
+      "file": "intake-1024x768.png",
+      "size": "1024×768"
+    },
+    {
+      "title": "2. 준비·지급",
+      "detail": "미지급 품목이 남은 팀을 바로 찾습니다.",
+      "file": "preparation-1024x768.png",
+      "size": "1024×768"
+    },
+    {
+      "title": "3. 이용 중·변경",
+      "detail": "현재 이용 내역에서 추가 대여·연장·문제 해결로 이어집니다.",
+      "file": "rentals-1024x768.png",
+      "size": "1024×768"
+    },
+    {
+      "title": "4. 반납·회수",
+      "detail": "고객 보유와 차량 입고 대기를 구분합니다.",
+      "file": "returns-1024x768.png",
+      "size": "1024×768"
+    },
+    {
+      "title": "5. 정산·마감",
+      "detail": "수납·보증금·미처리 인계와 마감 이력을 확인합니다.",
+      "file": "closing-1024x768.png",
+      "size": "1024×768"
+    },
+    {
+      "title": "차량 운행",
+      "detail": "담당 차량·날짜별 실제 배달·수거 업무를 처리합니다.",
+      "file": "dispatch-1024x768.png",
+      "size": "1024×768"
+    },
+    {
+      "title": "관리",
+      "detail": "재고·정비·거래처·고객·운영 설정을 모았습니다.",
+      "file": "management-1024x768.png",
+      "size": "1024×768"
+    },
+    {
+      "title": "오늘 할 일",
+      "detail": "준비·반납·차량 입고·정산 대기를 모아서 시작합니다.",
+      "file": "home-1366x768.png",
+      "size": "1366×768"
+    },
+    {
+      "title": "1. 접수·예약",
+      "detail": "대표자·접수번호로 기존 팀을 찾고 늦은 일행을 추가합니다.",
+      "file": "intake-1366x768.png",
+      "size": "1366×768"
+    },
+    {
+      "title": "2. 준비·지급",
+      "detail": "미지급 품목이 남은 팀을 바로 찾습니다.",
+      "file": "preparation-1366x768.png",
+      "size": "1366×768"
+    },
+    {
+      "title": "3. 이용 중·변경",
+      "detail": "현재 이용 내역에서 추가 대여·연장·문제 해결로 이어집니다.",
+      "file": "rentals-1366x768.png",
+      "size": "1366×768"
+    },
+    {
+      "title": "4. 반납·회수",
+      "detail": "고객 보유와 차량 입고 대기를 구분합니다.",
+      "file": "returns-1366x768.png",
+      "size": "1366×768"
+    },
+    {
+      "title": "5. 정산·마감",
+      "detail": "수납·보증금·미처리 인계와 마감 이력을 확인합니다.",
+      "file": "closing-1366x768.png",
+      "size": "1366×768"
+    },
+    {
+      "title": "차량 운행",
+      "detail": "담당 차량·날짜별 실제 배달·수거 업무를 처리합니다.",
+      "file": "dispatch-1366x768.png",
+      "size": "1366×768"
+    },
+    {
+      "title": "관리",
+      "detail": "재고·정비·거래처·고객·운영 설정을 모았습니다.",
+      "file": "management-1366x768.png",
+      "size": "1366×768"
+    },
+    {
+      "title": "30명 일행 한 번에 접수",
+      "detail": "실명 입력 없이 30명에게 사람별 품목 행을 생성합니다. 목록은 페이지로 나누고 합계와 확정은 고정합니다.",
+      "file": "group-30-1024x600.png",
+      "size": "1024×600"
+    },
+    {
+      "title": "추가 전 최종 확인",
+      "detail": "이번 인원·품목·기간·청구액을 확인한 뒤 저장합니다.",
+      "file": "group-review-1024x600.png",
+      "size": "1024×600"
+    },
+    {
+      "title": "통합접수 상세",
+      "detail": "일행 추가, 사전입력, 기간 변경, 수납과 문제 해결을 한 접수에서 이어갑니다.",
+      "file": "order-detail-1024x600.png",
+      "size": "1024×600"
+    },
+    {
+      "title": "사전입력·준비표",
+      "detail": "이번 차수에서 새로 입력할 일행만 요청합니다.",
+      "file": "preinput-1024x600.png",
+      "size": "1024×600"
+    },
+    {
+      "title": "업무 알림",
+      "detail": "현재 저장소의 업무 알림을 페이지로 확인하고 해당 업무를 엽니다.",
+      "file": "notifications-1024x600.png",
+      "size": "1024×600"
+    },
+    {
+      "title": "내일 100팀 · 긴 이름",
+      "detail": "오늘 준비와 내일 도착을 나누고, 긴 이름과 많은 기록도 페이지로 확인합니다.",
+      "file": "tomorrow-100-1024x600.png",
+      "size": "1024×600"
+    },
+    {
+      "title": "12종 품목 · 개별 일정",
+      "detail": "여러 품목의 수량과 일정이 별도 행으로 유지됩니다.",
+      "file": "twelve-products-1024x600.png",
+      "size": "1024×600"
+    },
+    {
+      "file": "evidence-02-late-arrival-detail-1024x600.png",
+      "title": "기존 팀에 다음날 일행 추가",
+      "detail": "로컬 API·SQLite 검증 데이터. 첫날 반납과 다음날 추가분·잔액을 같은 접수에서 확인합니다.",
+      "size": "1024×600",
+      "source": "work/pos-operating/02-late-arrival-detail-1024x600.png"
+    },
+    {
+      "file": "evidence-04-return-confirm-1024x600.png",
+      "title": "전량 반납 확인",
+      "detail": "로컬 API·SQLite 검증 데이터. 실제로 받은 대상과 수량을 확인합니다.",
+      "size": "1024×600",
+      "source": "work/pos-operating/04-return-confirm-1024x600.png"
+    },
+    {
+      "file": "evidence-03-payment-confirm-1024x600.png",
+      "title": "수납 금액 확인",
+      "detail": "로컬 API·SQLite 검증 데이터. 외부 단말 처리는 실제 결과를 확인한 뒤 기록합니다.",
+      "size": "1024×600",
+      "source": "work/pos-operating/03-payment-confirm-1024x600.png"
+    },
+    {
+      "file": "evidence-05-driver-task-1024x600.png",
+      "title": "기사의 실제 전달 처리",
+      "detail": "로컬 API의 담당 차량 업무. 주요 전달 버튼 72px 이상을 확인했습니다.",
+      "size": "1024×600",
+      "source": "work/pos-operating/05-driver-task-1024x600.png"
+    },
+    {
+      "file": "evidence-two-vehicle-received.png",
+      "title": "여러 차량 입고 후 확인",
+      "detail": "체험 데이터. 차량별 보관과 매장 입고를 구분합니다.",
+      "size": "1024×600",
+      "source": "work/pos-fulfillment/two-vehicle-received.png"
+    },
+    {
+      "file": "evidence-partial-extension.png",
+      "title": "부분반납 후 남은 물품만 연장",
+      "detail": "체험 데이터. 반납된 물품과 기존 청구를 유지하고 남은 실물에 연장을 적용합니다.",
+      "size": "1024×600",
+      "source": "work/pos-partial-extension/partial-extension.png"
+    },
+    {
+      "file": "evidence-cancelled-ticket-stock.png",
+      "title": "미지급 리프트권 취소 후 실물",
+      "detail": "체험 데이터. 접수 취소와 남아 있는 실물의 후속 처리를 분리합니다.",
+      "size": "1024×600",
+      "source": "work/pos-tickets/cancelled-ticket-stock.png"
+    },
+    {
+      "file": "evidence-reassigned-ticket-issued.png",
+      "title": "회수한 권의 재배정·지급",
+      "detail": "체험 데이터. 이용 조건을 확인한 뒤 다른 판매행에 연결합니다.",
+      "size": "1024×600",
+      "source": "work/pos-tickets/reassigned-ticket-issued.png"
+    },
+    {
+      "file": "evidence-ticket-stock-500.png",
+      "title": "500개 보관권 · 768px",
+      "detail": "체험 데이터. 많은 보관권을 페이지로 나누고 다음 처리 버튼을 고정합니다.",
+      "size": "1024×768",
+      "source": "work/pos-final-paint/ticket-stock-500.png"
+    },
+    {
+      "file": "evidence-money-1024x600.png",
+      "title": "수납 숫자판 · 600px",
+      "detail": "체험 데이터. 고객·이전 값·새 값과 취소·적용을 고정합니다.",
+      "size": "1024×600",
+      "source": "work/pos-keypad/money-1024x600.png"
+    },
+    {
+      "file": "evidence-money-1024x768.png",
+      "title": "수납 숫자판 · 768px",
+      "detail": "체험 데이터. 원래 수납 화면과 입력값을 보존합니다.",
+      "size": "1024×768",
+      "source": "work/pos-keypad/money-1024x768.png"
+    },
+    {
+      "file": "evidence-04-late-request-1024x600.png",
+      "title": "추가 일행만 사전입력 요청",
+      "detail": "로컬 API·SQLite 검증 데이터. 최신 추가 차수의 신규 인원만 요청합니다.",
+      "size": "1024×600",
+      "source": "work/pos-preinput/04-late-request-1024x600.png"
+    },
+    {
+      "file": "evidence-02-public-partial-390x844.png",
+      "title": "고객의 부분 사전입력",
+      "detail": "공개 고객 API 검증 데이터. 고정된 일행을 한 명씩 제출합니다.",
+      "size": "390×844",
+      "source": "work/pos-preinput/02-public-partial-390x844.png"
+    },
+    {
+      "file": "evidence-05-a4-preview-1024x600.png",
+      "title": "준비표 인쇄 미리보기",
+      "detail": "로컬 API 검증 데이터. 실제 종이 출력 성공을 뜻하지 않습니다.",
+      "size": "1024×600",
+      "source": "work/pos-preinput/05-a4-preview-1024x600.png"
+    },
+    {
+      "file": "evidence-partner-agreements-1024-600.png",
+      "title": "거래처 약정·명시 상계",
+      "detail": "체험 데이터. 채권·채무와 실제 돈, 실물 대여를 나누어 봅니다.",
+      "size": "1024×600",
+      "source": "work/screens/pos-management/partner-agreements-1024-600.png"
+    },
+    {
+      "file": "evidence-closing-partners-1024-600.png",
+      "title": "마감에 보존한 거래처 잔액",
+      "detail": "체험 데이터. 이후 거래처 장부가 바뀌어도 당시 마감표를 유지합니다.",
+      "size": "1024×600",
+      "source": "work/screens/pos-management/closing-partners-1024-600.png"
+    },
+    {
+      "file": "evidence-inventory-1024-600.png",
+      "title": "재고·정비",
+      "detail": "체험 데이터. 세척·점검·분실 상태와 대여 가능 수량을 구분합니다.",
+      "size": "1024×600",
+      "source": "work/screens/pos-management/inventory-1024-600.png"
+    }
+  ]
+}
