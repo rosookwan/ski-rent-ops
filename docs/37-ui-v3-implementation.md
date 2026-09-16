@@ -82,3 +82,10 @@ npm run dev
 ```bash
 npm run test:pos:operating && npm run test:pos:fulfillment && npm run test:pos:tickets && npm run test:pos:management && npm run test:pos:preinput && npm run test:pos:keypad && npm run pos:screens
 ```
+
+## 8. 배포 (2026-09-16)
+
+- `main`에 `4fd3444`(UI v3 반영)를 푸시하자 Pages 워크플로 [35089085630](https://github.com/rosookwan/ski-rent-ops/actions/runs/35089085630)이 `Validate connected workflow rules and migrations` 단계에서 실패했다. 원인은 앞선 커밋 `1e27f7c`가 `test:workflows:unit`을 `tests/workflows-*.test.cjs` 글롭으로 바꾸면서 Playwright가 필요한 `tests/workflows-browser.test.cjs`까지 포함한 것이다. Pages 워크플로는 `npm ci`도 Chrome도 설치하지 않으므로 `Cannot find module 'playwright'`로 멈췄다.
+- `f69773b`에서 유닛 스크립트가 브라우저 테스트 파일을 제외하도록 고치고(`test:workflows:browser`로 분리, `npm test`는 그대로 전부 실행) 다시 푸시했다. 워크플로 [35089585109](https://github.com/rosookwan/ski-rent-ops/actions/runs/35089585109) 성공, 로컬 유닛 178개 통과.
+- [공개 페이지](https://rosookwan.github.io/ski-rent-ops/) HTTP 200. 공개 `index.html` SHA-256 `969e3d5460a56bc589ff413516af0c42d316286faa8c6e426196c94d66bab9db`, `pos.html` SHA-256 `484d17e216e489c3481e028211a448f59c2e388610e66803b50959e8a732b464`가 검증한 로컬 빌드와 같다. 공개 HTML에 새 레일 항목 9개가 들어 있다.
+- 사용자 소유 미추적 문서 `docs/25-label-printer-purchase-notes.md`는 커밋하지 않았다. Pages는 브라우저 메모리 체험 방식이며 운영 저장·API 배포가 아니다.
