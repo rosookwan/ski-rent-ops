@@ -99,3 +99,4 @@ npm run test:pos:operating && npm run test:pos:fulfillment && npm run test:pos:t
 - `배달·수거 처리`: 변경 없음(−/+ 수량, 72px 확정 버튼, 전화).
 - 촬영·검사: `npm run pos:screens:driver`(새 스크립트 `scripts/capture-pos-driver.cjs`)가 실제 API 서버에 기사로 로그인해 1024×520 / 1024×600 / 1280×720에서 5장을 찍고 넘침·본문 스크롤·레일 숨김·행 수를 검사한다 → `docs/pos-ui-v3/driver-*.png`, `driver-screens.json`. 최소 버튼 48px.
 - 재검증: `npm run check`, operating 12 · fulfillment 16 통과.
+- 배포: `a8a1dca` 푸시 → Pages 워크플로 35159038215 성공. 공개 `index.html` SHA-256 `ab2b7d40011532721d3f9931a856cd7bbd6add2da001bfdfaafecdac7b752a5a`, `pos.html` SHA-256 `765b2817cd364e45ae5e7dd4534e7f5defa26187c8504e1c25bc0e0cebe260d5`가 로컬 빌드와 일치.
