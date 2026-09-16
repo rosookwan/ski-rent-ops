@@ -6,7 +6,7 @@
   const LIMIT = Number.MAX_SAFE_INTEGER;
   const conditions = ['ready', 'cleaning', 'inspection', 'repair', 'lost'];
   const lists = ['assetEvents', 'customerProfiles', 'settingVersions', 'partners', 'partnerLoans', 'partnerReturns', 'partnerMoney', 'partnerLendings', 'partnerReceipts', 'partnerAgreements', 'partnerOffsets'];
-  const defaults = () => ({ rates: [], places: [], vehicles: [], returnTimes: [], staff: [], nightCutoff: null });
+  const defaults = () => ({ rates: [], places: [], vehicles: [], returnTimes: [], staff: [], nightCutoff: null, store: { name: '', phone: '', address: '', link: '' } });
   const sum = values => values.reduce((total, value) => C.integer(total + value, 0, LIMIT), 0);
   function initialize(state) {
     for (const key of lists) {
@@ -112,6 +112,7 @@
         return { id: C.id(row.id), name, role, phone: row.phone ? C.customer({ name, phone: row.phone }).phone : '', vehicleId: row.vehicleId == null ? null : C.id(row.vehicleId) };
       }), 'id', '직원');
       if (key === 'nightCutoff') next.nightCutoff = value == null ? null : C.time(value);
+      if (key === 'store') { C.keys(value || {}, ['name', 'phone', 'address', 'link']); next.store = { name: C.string(value?.name ?? '', 60, true), phone: C.string(value?.phone ?? '', 24, true), address: C.string(value?.address ?? '', 160, true), link: C.string(value?.link ?? '', 200, true) }; }
     }
     if (next.staff.some(staff => staff.vehicleId && (staff.role !== 'driver' || !next.vehicles.some(vehicle => vehicle.id === staff.vehicleId)))) C.fail('INVALID_INPUT', '기사님의 담당 차량을 등록한 차량에서 선택해 주세요.');
     const version = state.settingVersions.length + 1;

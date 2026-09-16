@@ -42,7 +42,7 @@
       S.workflow.run('management.settings', { patch: {
         rates: [['ski',20000],['board',20000],['clothing',10000],['visor',10000],['helmet',5000],['goggles',5000],['pads',5000],['ticket-3h',35000],['ticket-4h',45000],['ticket-6h',55000]].map(([sku,unitWon]) => ({sku,unitWon})),
         places: ['만선 티롤 앞','설천 주차장','만선 광장'], vehicles: [{id:'demo-van-1',name:'1호 차량'},{id:'demo-van-2',name:'2호 차량'}],
-        returnTimes: [{id:'afternoon',label:'오후타임 후',time:'16:30',dayOffset:0},{id:'night',label:'야간타임 후',time:'22:00',dayOffset:0},{id:'next-morning',label:'익일 오전',time:'09:00',dayOffset:1}], staff: [], nightCutoff: null
+        returnTimes: [{id:'afternoon',label:'오후타임 후',time:'16:30',dayOffset:0},{id:'night',label:'야간타임 후',time:'22:00',dayOffset:0},{id:'next-morning',label:'익일 오전',time:'09:00',dayOffset:1}], staff: [], nightCutoff: null, store: { name: '우리 스키샵', phone: '033-000-0000', address: '', link: '' }
       } });
     }
     await refresh();

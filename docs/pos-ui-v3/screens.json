@@ -1,0 +1,609 @@
+{
+  "generatedAt": "2026-09-16T11:02:06.998Z",
+  "mode": "static memory demonstration; screenshots are not evidence of physical hardware",
+  "checks": [
+    {
+      "key": "home",
+      "viewport": [
+        1024,
+        600
+      ],
+      "overflow": [],
+      "bodyScroll": false
+    },
+    {
+      "key": "intake",
+      "viewport": [
+        1024,
+        600
+      ],
+      "overflow": [],
+      "bodyScroll": false
+    },
+    {
+      "key": "preparation",
+      "viewport": [
+        1024,
+        600
+      ],
+      "overflow": [],
+      "bodyScroll": false
+    },
+    {
+      "key": "rentals",
+      "viewport": [
+        1024,
+        600
+      ],
+      "overflow": [],
+      "bodyScroll": false
+    },
+    {
+      "key": "returns",
+      "viewport": [
+        1024,
+        600
+      ],
+      "overflow": [],
+      "bodyScroll": false
+    },
+    {
+      "key": "closing",
+      "viewport": [
+        1024,
+        600
+      ],
+      "overflow": [],
+      "bodyScroll": false
+    },
+    {
+      "key": "tickets",
+      "viewport": [
+        1024,
+        600
+      ],
+      "overflow": [],
+      "bodyScroll": false
+    },
+    {
+      "key": "dispatch",
+      "viewport": [
+        1024,
+        600
+      ],
+      "overflow": [],
+      "bodyScroll": false
+    },
+    {
+      "key": "management",
+      "viewport": [
+        1024,
+        600
+      ],
+      "overflow": [],
+      "bodyScroll": false
+    },
+    {
+      "key": "settings",
+      "viewport": [
+        1024,
+        600
+      ],
+      "overflow": [],
+      "bodyScroll": false
+    },
+    {
+      "key": "closing-history",
+      "viewport": [
+        1024,
+        600
+      ],
+      "overflow": [],
+      "bodyScroll": false
+    },
+    {
+      "key": "home",
+      "viewport": [
+        1024,
+        768
+      ],
+      "overflow": [],
+      "bodyScroll": false
+    },
+    {
+      "key": "intake",
+      "viewport": [
+        1024,
+        768
+      ],
+      "overflow": [],
+      "bodyScroll": false
+    },
+    {
+      "key": "preparation",
+      "viewport": [
+        1024,
+        768
+      ],
+      "overflow": [],
+      "bodyScroll": false
+    },
+    {
+      "key": "rentals",
+      "viewport": [
+        1024,
+        768
+      ],
+      "overflow": [],
+      "bodyScroll": false
+    },
+    {
+      "key": "returns",
+      "viewport": [
+        1024,
+        768
+      ],
+      "overflow": [],
+      "bodyScroll": false
+    },
+    {
+      "key": "closing",
+      "viewport": [
+        1024,
+        768
+      ],
+      "overflow": [],
+      "bodyScroll": false
+    },
+    {
+      "key": "tickets",
+      "viewport": [
+        1024,
+        768
+      ],
+      "overflow": [],
+      "bodyScroll": false
+    },
+    {
+      "key": "dispatch",
+      "viewport": [
+        1024,
+        768
+      ],
+      "overflow": [],
+      "bodyScroll": false
+    },
+    {
+      "key": "management",
+      "viewport": [
+        1024,
+        768
+      ],
+      "overflow": [],
+      "bodyScroll": false
+    },
+    {
+      "key": "settings",
+      "viewport": [
+        1024,
+        768
+      ],
+      "overflow": [],
+      "bodyScroll": false
+    },
+    {
+      "key": "closing-history",
+      "viewport": [
+        1024,
+        768
+      ],
+      "overflow": [],
+      "bodyScroll": false
+    },
+    {
+      "key": "home",
+      "viewport": [
+        1366,
+        768
+      ],
+      "overflow": [],
+      "bodyScroll": false
+    },
+    {
+      "key": "intake",
+      "viewport": [
+        1366,
+        768
+      ],
+      "overflow": [],
+      "bodyScroll": false
+    },
+    {
+      "key": "preparation",
+      "viewport": [
+        1366,
+        768
+      ],
+      "overflow": [],
+      "bodyScroll": false
+    },
+    {
+      "key": "rentals",
+      "viewport": [
+        1366,
+        768
+      ],
+      "overflow": [],
+      "bodyScroll": false
+    },
+    {
+      "key": "returns",
+      "viewport": [
+        1366,
+        768
+      ],
+      "overflow": [],
+      "bodyScroll": false
+    },
+    {
+      "key": "closing",
+      "viewport": [
+        1366,
+        768
+      ],
+      "overflow": [],
+      "bodyScroll": false
+    },
+    {
+      "key": "tickets",
+      "viewport": [
+        1366,
+        768
+      ],
+      "overflow": [],
+      "bodyScroll": false
+    },
+    {
+      "key": "dispatch",
+      "viewport": [
+        1366,
+        768
+      ],
+      "overflow": [],
+      "bodyScroll": false
+    },
+    {
+      "key": "management",
+      "viewport": [
+        1366,
+        768
+      ],
+      "overflow": [],
+      "bodyScroll": false
+    },
+    {
+      "key": "settings",
+      "viewport": [
+        1366,
+        768
+      ],
+      "overflow": [],
+      "bodyScroll": false
+    },
+    {
+      "key": "closing-history",
+      "viewport": [
+        1366,
+        768
+      ],
+      "overflow": [],
+      "bodyScroll": false
+    },
+    {
+      "key": "group-30",
+      "viewport": [
+        1024,
+        600
+      ],
+      "overflow": [],
+      "bodyScroll": false
+    },
+    {
+      "key": "group-review",
+      "viewport": [
+        1024,
+        600
+      ],
+      "overflow": [],
+      "bodyScroll": false
+    },
+    {
+      "key": "order-detail",
+      "viewport": [
+        1024,
+        600
+      ],
+      "overflow": [],
+      "bodyScroll": false
+    },
+    {
+      "key": "preinput",
+      "viewport": [
+        1024,
+        600
+      ],
+      "overflow": [],
+      "bodyScroll": false
+    },
+    {
+      "key": "notifications",
+      "viewport": [
+        1024,
+        600
+      ],
+      "overflow": [],
+      "bodyScroll": false
+    },
+    {
+      "key": "tomorrow-100",
+      "viewport": [
+        1024,
+        600
+      ],
+      "overflow": [],
+      "bodyScroll": false
+    },
+    {
+      "key": "twelve-products",
+      "viewport": [
+        1024,
+        600
+      ],
+      "overflow": [],
+      "bodyScroll": false
+    }
+  ],
+  "errors": [],
+  "screens": [
+    {
+      "title": "오늘 할 일",
+      "detail": "9단계 업무 카드와 지금 급한 일을 한 화면에서 시작합니다.",
+      "file": "home-1024x600.png",
+      "size": "1024×600"
+    },
+    {
+      "title": "1 접수·예약",
+      "detail": "수령 시간대별 카드 · 오늘/내일/전체 · 달력 · 정렬.",
+      "file": "intake-1024x600.png",
+      "size": "1024×600"
+    },
+    {
+      "title": "2 준비·지급",
+      "detail": "사이즈 요청·지급·수납 버튼을 카드마다 하나씩 둡니다.",
+      "file": "preparation-1024x600.png",
+      "size": "1024×600"
+    },
+    {
+      "title": "3 이용 중·변경",
+      "detail": "이용 중 팀의 기간·수거 변경과 교환 진행을 확인합니다.",
+      "file": "rentals-1024x600.png",
+      "size": "1024×600"
+    },
+    {
+      "title": "4 반납·회수",
+      "detail": "반납 타임별 카드 · 모두 받음 · 차량 입고 확인.",
+      "file": "returns-1024x600.png",
+      "size": "1024×600"
+    },
+    {
+      "title": "5 정산·마감",
+      "detail": "수납 대기·보증금·거래처 카드와 마감 확정.",
+      "file": "closing-1024x600.png",
+      "size": "1024×600"
+    },
+    {
+      "title": "리프트권",
+      "detail": "발권 필요 · 지급 대기 · 사용 중 · 보관 권을 카드로 확인합니다.",
+      "file": "tickets-1024x600.png",
+      "size": "1024×600"
+    },
+    {
+      "title": "차량 운행",
+      "detail": "차량별 배달·수거 카드와 보관 물품.",
+      "file": "dispatch-1024x600.png",
+      "size": "1024×600"
+    },
+    {
+      "title": "관리",
+      "detail": "재고·거래처·고객·매장 설정·인쇄물·마감 이력 6장.",
+      "file": "management-1024x600.png",
+      "size": "1024×600"
+    },
+    {
+      "title": "매장 설정",
+      "detail": "왼쪽 항목 탭 · 매장 정보 탭 추가.",
+      "file": "settings-1024x600.png",
+      "size": "1024×600"
+    },
+    {
+      "title": "마감 이력",
+      "detail": "날짜별 마감표 카드.",
+      "file": "closing-history-1024x600.png",
+      "size": "1024×600"
+    },
+    {
+      "title": "오늘 할 일",
+      "detail": "9단계 업무 카드와 지금 급한 일을 한 화면에서 시작합니다.",
+      "file": "home-1024x768.png",
+      "size": "1024×768"
+    },
+    {
+      "title": "1 접수·예약",
+      "detail": "수령 시간대별 카드 · 오늘/내일/전체 · 달력 · 정렬.",
+      "file": "intake-1024x768.png",
+      "size": "1024×768"
+    },
+    {
+      "title": "2 준비·지급",
+      "detail": "사이즈 요청·지급·수납 버튼을 카드마다 하나씩 둡니다.",
+      "file": "preparation-1024x768.png",
+      "size": "1024×768"
+    },
+    {
+      "title": "3 이용 중·변경",
+      "detail": "이용 중 팀의 기간·수거 변경과 교환 진행을 확인합니다.",
+      "file": "rentals-1024x768.png",
+      "size": "1024×768"
+    },
+    {
+      "title": "4 반납·회수",
+      "detail": "반납 타임별 카드 · 모두 받음 · 차량 입고 확인.",
+      "file": "returns-1024x768.png",
+      "size": "1024×768"
+    },
+    {
+      "title": "5 정산·마감",
+      "detail": "수납 대기·보증금·거래처 카드와 마감 확정.",
+      "file": "closing-1024x768.png",
+      "size": "1024×768"
+    },
+    {
+      "title": "리프트권",
+      "detail": "발권 필요 · 지급 대기 · 사용 중 · 보관 권을 카드로 확인합니다.",
+      "file": "tickets-1024x768.png",
+      "size": "1024×768"
+    },
+    {
+      "title": "차량 운행",
+      "detail": "차량별 배달·수거 카드와 보관 물품.",
+      "file": "dispatch-1024x768.png",
+      "size": "1024×768"
+    },
+    {
+      "title": "관리",
+      "detail": "재고·거래처·고객·매장 설정·인쇄물·마감 이력 6장.",
+      "file": "management-1024x768.png",
+      "size": "1024×768"
+    },
+    {
+      "title": "매장 설정",
+      "detail": "왼쪽 항목 탭 · 매장 정보 탭 추가.",
+      "file": "settings-1024x768.png",
+      "size": "1024×768"
+    },
+    {
+      "title": "마감 이력",
+      "detail": "날짜별 마감표 카드.",
+      "file": "closing-history-1024x768.png",
+      "size": "1024×768"
+    },
+    {
+      "title": "오늘 할 일",
+      "detail": "9단계 업무 카드와 지금 급한 일을 한 화면에서 시작합니다.",
+      "file": "home-1366x768.png",
+      "size": "1366×768"
+    },
+    {
+      "title": "1 접수·예약",
+      "detail": "수령 시간대별 카드 · 오늘/내일/전체 · 달력 · 정렬.",
+      "file": "intake-1366x768.png",
+      "size": "1366×768"
+    },
+    {
+      "title": "2 준비·지급",
+      "detail": "사이즈 요청·지급·수납 버튼을 카드마다 하나씩 둡니다.",
+      "file": "preparation-1366x768.png",
+      "size": "1366×768"
+    },
+    {
+      "title": "3 이용 중·변경",
+      "detail": "이용 중 팀의 기간·수거 변경과 교환 진행을 확인합니다.",
+      "file": "rentals-1366x768.png",
+      "size": "1366×768"
+    },
+    {
+      "title": "4 반납·회수",
+      "detail": "반납 타임별 카드 · 모두 받음 · 차량 입고 확인.",
+      "file": "returns-1366x768.png",
+      "size": "1366×768"
+    },
+    {
+      "title": "5 정산·마감",
+      "detail": "수납 대기·보증금·거래처 카드와 마감 확정.",
+      "file": "closing-1366x768.png",
+      "size": "1366×768"
+    },
+    {
+      "title": "리프트권",
+      "detail": "발권 필요 · 지급 대기 · 사용 중 · 보관 권을 카드로 확인합니다.",
+      "file": "tickets-1366x768.png",
+      "size": "1366×768"
+    },
+    {
+      "title": "차량 운행",
+      "detail": "차량별 배달·수거 카드와 보관 물품.",
+      "file": "dispatch-1366x768.png",
+      "size": "1366×768"
+    },
+    {
+      "title": "관리",
+      "detail": "재고·거래처·고객·매장 설정·인쇄물·마감 이력 6장.",
+      "file": "management-1366x768.png",
+      "size": "1366×768"
+    },
+    {
+      "title": "매장 설정",
+      "detail": "왼쪽 항목 탭 · 매장 정보 탭 추가.",
+      "file": "settings-1366x768.png",
+      "size": "1366×768"
+    },
+    {
+      "title": "마감 이력",
+      "detail": "날짜별 마감표 카드.",
+      "file": "closing-history-1366x768.png",
+      "size": "1366×768"
+    },
+    {
+      "title": "30명 일행 한 번에 접수",
+      "detail": "실명 입력 없이 30명에게 사람별 품목 행을 생성합니다. 목록은 페이지로 나누고 합계와 확정은 고정합니다.",
+      "file": "group-30-1024x600.png",
+      "size": "1024×600"
+    },
+    {
+      "title": "추가 전 최종 확인",
+      "detail": "이번 인원·품목·기간·청구액을 확인한 뒤 저장합니다.",
+      "file": "group-review-1024x600.png",
+      "size": "1024×600"
+    },
+    {
+      "title": "통합접수 상세",
+      "detail": "일행 추가, 사전입력, 기간 변경, 수납과 문제 해결을 한 접수에서 이어갑니다.",
+      "file": "order-detail-1024x600.png",
+      "size": "1024×600"
+    },
+    {
+      "title": "사전입력·준비표",
+      "detail": "이번 차수에서 새로 입력할 일행만 요청합니다.",
+      "file": "preinput-1024x600.png",
+      "size": "1024×600"
+    },
+    {
+      "title": "업무 알림",
+      "detail": "현재 저장소의 업무 알림을 페이지로 확인하고 해당 업무를 엽니다.",
+      "file": "notifications-1024x600.png",
+      "size": "1024×600"
+    },
+    {
+      "title": "내일 100팀 · 긴 이름",
+      "detail": "오늘 준비와 내일 도착을 나누고, 긴 이름과 많은 기록도 페이지로 확인합니다.",
+      "file": "tomorrow-100-1024x600.png",
+      "size": "1024×600"
+    },
+    {
+      "title": "12종 품목 · 개별 일정",
+      "detail": "여러 품목의 수량과 일정이 별도 행으로 유지됩니다.",
+      "file": "twelve-products-1024x600.png",
+      "size": "1024×600"
+    }
+  ]
+}

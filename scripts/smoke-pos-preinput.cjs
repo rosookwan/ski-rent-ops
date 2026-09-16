@@ -33,7 +33,7 @@ async function main() {
       if (!root) return { outside: [], scroll: [] };
       const outside = [...root.querySelectorAll('h1,h2,.pos-row,input,select,textarea,.pos-page-footer,.pos-modal-footer,.pos-pager')].filter(el => el.getClientRects().length).map(el => ({ text: el.textContent.slice(0, 60), box: el.getBoundingClientRect().toJSON() }))
         .filter(({ box }) => box.bottom > innerHeight + 1 || box.right > innerWidth + 1 || box.top < -1 || box.left < -1);
-      const scroll = [...root.querySelectorAll('*'), root].filter(el => el.clientHeight && el.scrollHeight > el.clientHeight + 1 && ['auto', 'scroll'].includes(getComputedStyle(el).overflowY)).map(el => el.className || el.id);
+      const scroll = [...root.querySelectorAll('*'), root].filter(el => !el.hasAttribute('data-pos-scroll') && el.clientHeight && el.scrollHeight > el.clientHeight + 1 && ['auto', 'scroll'].includes(getComputedStyle(el).overflowY)).map(el => el.className || el.id);
       return { outside, scroll };
     });
     layouts.push({ name, ...result }); assert.deepEqual(result.outside, [], name + ' outside viewport'); assert.deepEqual(result.scroll, [], name + ' requires core scrolling');

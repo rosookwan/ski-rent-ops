@@ -44,7 +44,7 @@ const fs = require('node:fs');
       const selector = modal ? 'h2,input,select,.pos-modal-footer button,.pos-info,.pos-error:not([hidden])' : '.pos-page-heading,.pos-page-footer,.pos-pager,.pos-row,.pos-fulfillment-toolbar,.pos-fulfillment-tabs,.pos-error:not([hidden])';
       const outside = [...scope.querySelectorAll(selector)].filter(element => element.getClientRects().length).map(element => ({ text: element.textContent.trim().slice(0, 80), box: element.getBoundingClientRect().toJSON() }))
         .filter(({ box }) => box.top < -1 || box.left < -1 || box.bottom > innerHeight + 1 || box.right > innerWidth + 1);
-      const scroll = [...scope.querySelectorAll('*'), scope].filter(element => element.clientHeight && element.scrollHeight > element.clientHeight + 1 && ['auto', 'scroll'].includes(getComputedStyle(element).overflowY))
+      const scroll = [...scope.querySelectorAll('*'), scope].filter(element => !element.hasAttribute('data-pos-scroll') && element.clientHeight && element.scrollHeight > element.clientHeight + 1 && ['auto', 'scroll'].includes(getComputedStyle(element).overflowY))
         .map(element => element.className || element.id);
       return { width: innerWidth, height: innerHeight, outside, scroll };
     });

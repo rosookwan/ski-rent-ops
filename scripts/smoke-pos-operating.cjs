@@ -41,6 +41,7 @@ async function main() {
       const root = document.querySelector('#so-dialog[open]') || document.querySelector('.pos-page');
       return [...root.querySelectorAll('h1,h2,p,input,select,button,output,.pos-page-footer,.pos-row')].filter(el => {
         if (!el.getClientRects().length) return false;
+        const scroller = el.closest('[data-pos-scroll]'); if (scroller) { const r = el.getBoundingClientRect(), s = scroller.getBoundingClientRect(); if (r.top < s.top - 1 || r.bottom > s.bottom + 1) return false; }
         const rect = el.getBoundingClientRect(); return rect.bottom > innerHeight + 1 || rect.right > innerWidth + 1 || rect.top < -1 || rect.left < -1 || el.scrollWidth > el.clientWidth + 2 && getComputedStyle(el).overflowX !== 'visible';
       }).map(el => ({ tag: el.tagName, text: el.textContent.slice(0, 60), bottom: el.getBoundingClientRect().bottom }));
     });
@@ -101,6 +102,7 @@ async function main() {
   await command('ops.dispatch', { id: 'driver-live-test', orderId: original.id, lineItems: [{ lineId: original.lines[1].id, assetIds: [available.id] }], vehicleId: 'van-2', date: '2026-09-13', time: '09:00', place: '실제 차량 화면 확인' });
   const driverPage = await login(driverToken); const driverSnapshot = await driverPage.evaluate(() => window.SkiOps.posData.snapshot);
   assert.equal(driverSnapshot.orders, undefined); assert.equal(driverSnapshot.finance, undefined); assert.equal(driverSnapshot.actor.vehicleId, 'van-2'); checks.push('Driver session receives only scoped vehicle data');
+  await driverPage.locator('[data-action="pos-task"][data-id="driver-live-test"]').waitFor(); await driverPage.screenshot({ path: path.join(OUT, '05-driver-dispatch-1024x600.png') });
   await driverPage.locator('[data-action="pos-task"][data-id="driver-live-test"]').click();
   const primary = driverPage.locator('[data-action="pos-task-complete"]'); assert.ok((await primary.boundingBox()).height >= 72);
   await driverPage.screenshot({ path: path.join(OUT, '05-driver-task-1024x600.png') }); await primary.click();

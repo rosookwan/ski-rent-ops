@@ -38,8 +38,42 @@
     rows.sort((a, b) => Number(b.order.id === state.orderId) - Number(a.order.id === state.orderId) || a.line.start.localeCompare(b.line.start));
     return P.page('재배정할 접수·품목 선택', title(asset) + ' · ' + period(asset) + ' · 실제 지급은 배정 후 별도로 확인합니다.', P.pager(rows, 'ticket-target', ({ order, line }) => P.row(order.customer.name + ' · ' + title({ sku: line.sku }), O.lineDescription(order, line) + ' · 미지급 ' + line.unissuedQuantity + '매', button('이 판매행 선택', 'pos-ticket-assign', order.id + '|' + line.id)), size()) + errorBox(), button('보관권 목록', 'pos-ticket-back'));
   }
-  S.register('ticket-stock', { title: '회수권·발권처 반환', pos: true, parent: 'returns', render: stockPage });
-  S.register('ticket-target', { title: '회수권 재배정', pos: true, parent: 'preparation', render: targetPage });
+  const isTicket = line => line.category === 'liftTicket' || D.snapshot.catalog.find(sku => sku.id === line.sku)?.kind === 'liftTicket';
+  let listFilter = 'all', listQuery = '';
+  function ticketRows() {
+    const q = listQuery.replace(/[\s-]/g, '').toLowerCase();
+    return D.snapshot.orders.flatMap(order => order.lines.filter(line => isTicket(line) && line.cancelledQuantity < line.quantity).map(line => {
+      const allocated = D.snapshot.allocations.filter(a => a.reservationId === order.id && a.status === 'active' && !a.fulfilledAt && (line.reservationBindings || []).some(b => b.lineId === a.lineId)).length;
+      const need = Math.max(0, line.unissuedQuantity - allocated), stored = [...(line.vehicleAssetIds || []), ...(line.shopAssetIds || [])].length;
+      const stage = need ? 'issue' : line.unissuedQuantity ? 'hand' : line.customerQuantity ? 'using' : stored ? 'stored' : 'done';
+      return { order, line, allocated, need, stored, stage };
+    })).filter(row => (row.order.customer.name + row.order.customer.phone + (row.order.receiptNo || row.order.id) + title({ sku: row.line.sku })).replace(/[\s-]/g, '').toLowerCase().includes(q));
+  }
+  function ticketCard(row) {
+    const { order, line, need, stage } = row, badge = { issue: ['발권 필요', 'red'], hand: ['지급 대기', 'orange'], using: ['사용 중', 'blue'], stored: ['보관 · 회수 대기', 'purple'], done: ['지급 완료', 'green'] }[stage];
+    const action = stage === 'issue' ? button('발권 ' + need + '매', 'pos-ticket-open-issue', order.id, 'soft') : stage === 'hand' ? button('지급 ' + line.unissuedQuantity + '매', 'pos-ticket-open-issue', order.id, 'soft') : stage === 'using' ? button('회수 ' + line.customerQuantity + '매', 'pos-ticket-open-return', order.id) : stage === 'stored' ? button('보관 권 확인', 'pos-ticket-stock', order.id) : O.go('접수 상세', 'order-detail', order.id);
+    return P.card({ tone: ['red', 'orange', 'green'].includes(badge[1]) ? badge[1] : '', badge, name: order.customer.name + ' 팀', phone: order.customer.phone || '', meta: (order.receiptNo || order.id) + ' · ' + line.start.slice(5).replace('-', '/') + ' 이용 · ' + title({ sku: line.sku }),
+      items: [[O.itemText(line), O.lineState(line)[0], O.lineState(line)[1]], ['발권·배정 ' + row.allocated + '매 · 지급 ' + line.issuedQuantity + '매 · 보관 ' + row.stored + '매', '', 'grey']],
+      money: order.finance.dueWon ? [['미수 ' + S.money(order.finance.dueWon), 'red']] : [], actions: action, go: { page: 'order-detail', id: order.id } });
+  }
+  function ticketsPage() {
+    const rows = ticketRows(), stock = D.snapshot.assets.filter(a => a.ticket && ['shop', 'vehicle'].includes(a.location.kind)).length;
+    const count = stage => rows.filter(r => r.stage === stage).length, need = rows.reduce((n, r) => n + r.need, 0), hand = rows.filter(r => r.stage === 'hand').reduce((n, r) => n + r.line.unissuedQuantity, 0);
+    const shown = listFilter === 'all' ? rows : rows.filter(r => r.stage === listFilter);
+    const groups = [['issue', '발권 필요'], ['hand', '지급 대기'], ['using', '사용 중'], ['stored', '보관 · 회수 대기'], ['done', '지급 완료']].map(([stage, name]) => ({ title: name, sub: shown.filter(r => r.stage === stage).length + '건', cards: shown.filter(r => r.stage === stage).map(ticketCard) }));
+    const toolbar = P.search('pos-tickets-search', listQuery, '이름 · 접수번호 · 권종') + P.toolbarLabel('발권일')
+      + P.group(P.chip('전체', 'pos-tickets-filter', 'all', listFilter === 'all', rows.length) + P.chip('발권 필요', 'pos-tickets-filter', 'issue', listFilter === 'issue', count('issue')) + P.chip('지급 대기', 'pos-tickets-filter', 'hand', listFilter === 'hand', count('hand')) + P.chip('사용 중', 'pos-tickets-filter', 'using', listFilter === 'using', count('using')));
+    return P.page('리프트권', '', P.cards(groups, { empty: listQuery ? '검색 결과 없음' : '리프트권 접수 없음' }),
+      '<span>' + e('발권 필요 ' + need + '매 · 지급 대기 ' + hand + '매 · 보관 권 ' + stock + '매') + '</span><div class="so-actions">' + button('보관 권 ' + stock + '매', 'pos-ticket-stock') + (D.pending ? button('같은 요청 다시 확인', 'pos-retry', '', 'soft') : button('최신 기록 확인', 'pos-refresh')) + '</div>',
+      { toolbar, wait: need ? '발권 ' + need + '매' : hand ? '지급 ' + hand + '매' : '없음', sums: [['발권 필요', need + '매', need ? 'red' : ''], ['지급 대기', hand + '매', hand ? 'orange' : ''], ['보관 권', stock + '매', stock ? 'purple' : '']] });
+  }
+  S.search('pos-tickets-search', value => { listQuery = value; const cursor = S.$('[data-search="pos-tickets-search"]')?.selectionStart; S.render(); const el = S.$('[data-search="pos-tickets-search"]'); el?.focus(); if (el && cursor != null) el.setSelectionRange(cursor, cursor); });
+  S.action('pos-tickets-filter', value => { listFilter = value; S.render(); });
+  S.action('pos-ticket-open-issue', id => F.open('issue', id));
+  S.action('pos-ticket-open-return', id => F.open('return', id));
+  S.register('tickets', { title: '리프트권', pos: true, render: ticketsPage });
+  S.register('ticket-stock', { title: '회수권·발권처 반환', pos: true, parent: 'tickets', render: stockPage });
+  S.register('ticket-target', { title: '회수권 재배정', pos: true, parent: 'tickets', render: targetPage });
   S.action('pos-ticket-stock', id => { S.close(); state.orderId = D.order(id)?.id || null; state.tab = 'all'; S.go('ticket-stock'); });
   S.action('pos-ticket-all', () => { state.orderId = null; S.render(); });
   S.action('pos-ticket-tab', tab => { state.tab = tab; S.render(); });
