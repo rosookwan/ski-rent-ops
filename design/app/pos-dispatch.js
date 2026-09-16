@@ -22,20 +22,30 @@
       items: taskItems(task), lines: [['남은 물품 ' + remaining + '개' + (task.unassignedQuantity ? ' · 미배정 ' + task.unassignedQuantity + '개' : ''), task.unassignedQuantity ? 'orange' : '']],
       actions: b('업무 처리', 'pos-task', task.id, driver() ? 'primary' : 'soft') });
   }
+  // Driver tablet (1024×520~600): compact paged rows instead of cards; the store board keeps cards.
+  const driverRows = () => innerHeight < 560 ? 3 : innerHeight < 700 ? 4 : innerHeight < 740 ? 5 : 6;
+  function taskRow(task) {
+    const late = task.date < D.today, remaining = task.remainingAssetIds.length + task.unassignedQuantity, day = task.date.slice(5).replace('-', '/');
+    const title = task.time + ' · ' + (task.customer?.name ? task.customer.name + ' 팀' : task.title) + ' · ' + names[task.kind] + (late ? ' · 지연 ' + day : task.date !== D.today ? ' · ' + day : '');
+    const items = taskItems(task).map(([text]) => text).join(' · ');
+    return P.row(title, task.place + ' · 남은 물품 ' + remaining + '개' + (items ? ' · ' + items : '') + (task.unassignedQuantity ? ' · 미배정 ' + task.unassignedQuantity + '개' : ''), b('업무 처리', 'pos-task', task.id, 'primary'));
+  }
   function render() {
     const all = D.snapshot.tasks.filter(active), q = query.replace(/[\s-]/g, '').toLowerCase();
     const tasks = all.filter(t => inPeriod(t.date) && (!vehicle || t.vehicleId === vehicle) && ((t.customer?.name || '') + (t.customer?.phone || '') + t.place + (t.title || '')).replace(/[\s-]/g, '').toLowerCase().includes(q)).sort((a, b) => a.date.localeCompare(b.date) || a.time.localeCompare(b.time));
     const deliveries = tasks.filter(t => t.kind === 'delivery').length, collections = tasks.filter(t => t.kind === 'collection').length, late = tasks.filter(t => t.date < D.today).length;
     const inVehicle = D.snapshot.assets ? D.snapshot.assets.filter(a => a.location.kind === 'vehicle' && (!vehicle || a.location.id === vehicle)).length : (D.snapshot.vehicle?.assets || []).length;
-    const groups = driver() ? [{ title: '방문 순서', sub: tasks.length + '건', cards: tasks.map(taskCard) }]
-      : vehicles().map(([id, name]) => ({ title: name, sub: tasks.filter(t => t.vehicleId === id).length + '건', cards: tasks.filter(t => t.vehicleId === id).map(taskCard) })).concat([{ title: '차량 미지정', sub: '', cards: tasks.filter(t => !vehicles().some(([id]) => id === t.vehicleId)).map(taskCard) }]);
     const counts = { today: all.filter(t => t.date <= D.today && (!vehicle || t.vehicleId === vehicle)).length, tomorrow: all.filter(t => t.date === nextDate(D.today) && (!vehicle || t.vehicleId === vehicle)).length, all: all.filter(t => !vehicle || t.vehicleId === vehicle).length };
-    const toolbar = P.search('pos-dispatch-search', query, '이름 · 장소 · 연락처 뒷자리') + P.toolbarLabel('운행일')
-      + P.group(P.chip('오늘·이전', 'pos-dispatch-period', 'today', !date && period === 'today', counts.today) + P.chip('내일', 'pos-dispatch-period', 'tomorrow', !date && period === 'tomorrow', counts.tomorrow) + P.chip('전체', 'pos-dispatch-period', 'all', !date && period === 'all', counts.all) + P.chip(date ? date.slice(5).replace('-', '/') : '달력', 'pos-dispatch-pick-date', '', !!date, null, 'is-date'))
-      + (driver() ? P.toolbarLabel(vehicleName(D.snapshot.actor.vehicleId)) : P.group(P.chip('전체 차량', 'pos-dispatch-vehicle', '', !vehicle, null, 'is-sort') + vehicles().map(([id, name]) => P.chip(name, 'pos-dispatch-vehicle', id, vehicle === id, null, 'is-sort')).join('')));
+    const periodChips = P.group(P.chip('오늘·이전', 'pos-dispatch-period', 'today', !date && period === 'today', counts.today) + P.chip('내일', 'pos-dispatch-period', 'tomorrow', !date && period === 'tomorrow', counts.tomorrow) + P.chip('전체', 'pos-dispatch-period', 'all', !date && period === 'all', counts.all) + P.chip(date ? date.slice(5).replace('-', '/') : '달력', 'pos-dispatch-pick-date', '', !!date, null, 'is-date'));
+    const summary = (driver() ? vehicleName(D.snapshot.actor.vehicleId) + ' · ' : '') + '운행 ' + tasks.length + '건 · 배달 ' + deliveries + '건 · 수거 ' + collections + '건 · 지연 ' + late + '건 · 차량 보관 ' + inVehicle + '개';
+    const options = { wait: late ? '지연 ' + late + '건' : tasks.length ? '남은 ' + tasks.length + '건' : '없음', sums: [['배달', deliveries + '건', deliveries ? 'blue' : ''], ['수거', collections + '건', collections ? 'orange' : ''], ['차량 보관', inVehicle + '개', inVehicle ? 'purple' : '']] };
+    const refresh = D.pending ? b('같은 요청 다시 확인', 'pos-retry', '', 'soft') : b('최신 업무 확인', 'pos-refresh');
+    if (driver()) return P.page('차량 운행', '', P.pager(tasks, 'dispatch-tasks', taskRow, driverRows()), '<span>' + e(summary) + '</span><div class="so-actions">' + b('보관 물품 보기', 'pos-vehicle-stock') + refresh + '</div>', { ...options, toolbar: P.toolbarLabel('운행일') + periodChips + P.toolbarLabel(vehicleName(D.snapshot.actor.vehicleId)) });
+    const groups = vehicles().map(([id, name]) => ({ title: name, sub: tasks.filter(t => t.vehicleId === id).length + '건', cards: tasks.filter(t => t.vehicleId === id).map(taskCard) })).concat([{ title: '차량 미지정', sub: '', cards: tasks.filter(t => !vehicles().some(([id]) => id === t.vehicleId)).map(taskCard) }]);
+    const toolbar = P.search('pos-dispatch-search', query, '이름 · 장소 · 연락처 뒷자리') + P.toolbarLabel('운행일') + periodChips
+      + P.group(P.chip('전체 차량', 'pos-dispatch-vehicle', '', !vehicle, null, 'is-sort') + vehicles().map(([id, name]) => P.chip(name, 'pos-dispatch-vehicle', id, vehicle === id, null, 'is-sort')).join(''));
     return P.page('차량 운행', '', P.cards(groups, { empty: query ? '검색 결과 없음' : '운행 업무 없음', emptyNote: '이 조건의 배달·수거 없음', emptyAction: period !== 'all' || vehicle || date ? b('전체 보기', 'pos-dispatch-period', 'all', 'primary') : '' }),
-      '<span>' + e('운행 ' + tasks.length + '건 · 배달 ' + deliveries + '건 · 수거 ' + collections + '건 · 지연 ' + late + '건 · 차량 보관 ' + inVehicle + '개') + '</span><div class="so-actions">' + b('보관 물품 보기', 'pos-vehicle-stock') + (D.pending ? b('같은 요청 다시 확인', 'pos-retry', '', 'soft') : b('최신 업무 확인', 'pos-refresh')) + (!driver() ? b('배달할 팀 찾기', 'pos-dispatch-find', '', 'primary') : '') + '</div>',
-      { toolbar, wait: late ? '지연 ' + late + '건' : tasks.length ? '남은 ' + tasks.length + '건' : '없음', sums: [['배달', deliveries + '건', deliveries ? 'blue' : ''], ['수거', collections + '건', collections ? 'orange' : ''], ['차량 보관', inVehicle + '개', inVehicle ? 'purple' : '']] });
+      '<span>' + e(summary) + '</span><div class="so-actions">' + b('보관 물품 보기', 'pos-vehicle-stock') + refresh + b('배달할 팀 찾기', 'pos-dispatch-find', '', 'primary') + '</div>', { ...options, toolbar });
   }
   S.search('pos-dispatch-search', value => { query = value; const cursor = S.$('[data-search="pos-dispatch-search"]')?.selectionStart; S.render(); const el = S.$('[data-search="pos-dispatch-search"]'); el?.focus(); if (el && cursor != null) el.setSelectionRange(cursor, cursor); });
   S.action('pos-dispatch-period', value => { period = value; date = ''; S.render(); });
@@ -95,7 +105,7 @@
     const assets = driver() ? D.snapshot.vehicle?.assets || [] : D.snapshot.assets.filter(a => a.location.kind === 'vehicle' && (!vehicle || a.location.id === vehicle));
     const orders = (D.snapshot.orders || []).filter(o => o.totals.vehicleQuantity > 0);
     const body = driver()
-      ? P.cards([{ title: '지금 차에 있는 수량', sub: assets.length + '개', cards: D.snapshot.vehicle.totals.filter(t => t.current).map(t => P.card({ name: t.label + ' ' + t.current + t.unit, badge: ['차량 보관', 'purple'], lines: [['매장 적재 ' + t.fromShop + ' · 고객 회수 ' + t.fromCustomer, ''], ['환불 대기 ' + t.refundPending + ' · 전달 가능 ' + t.availableToDeliver, t.refundPending ? 'orange' : '']] })) }], { empty: '차량 보관 없음' })
+      ? P.pager(D.snapshot.vehicle.totals.filter(t => t.current), 'vehicle-stock', t => P.row(t.label + ' ' + t.current + t.unit + ' · 차량 보관', '매장 적재 ' + t.fromShop + ' · 고객 회수 ' + t.fromCustomer + ' · 환불 대기 ' + t.refundPending + ' · 전달 가능 ' + t.availableToDeliver), driverRows())
       : P.cards([{ title: '매장 입고 대기', sub: orders.length + '팀 · 차량 보관 ' + assets.length + '개', cards: orders.map(o => P.card({ tone: 'orange', badge: ['차량 보관 중', 'purple'], name: o.customer.name + ' 팀', phone: o.customer.phone || '', meta: (o.receiptNo || o.id) + ' · 매장 입고 대기 ' + o.totals.vehicleQuantity + '개', items: U.items(o), actions: b('차량 입고 확인 ' + o.totals.vehicleQuantity + '개', 'pos-receive', o.id, 'soft'), go: { page: 'order-detail', id: o.id } })) }], { empty: '매장 입고 대기 없음', emptyNote: '차량 보관 ' + assets.length + '개' });
     return P.page('차량 보관 물품', '', body, '<span>' + e('차량 보관 ' + assets.length + '개 · 입고 대기 ' + orders.length + '팀') + '</span><div class="so-actions">' + U.go('차량 업무', 'dispatch') + (!driver() ? b('리프트권 회수·재사용', 'pos-ticket-stock') : '') + '</div>', { wait: orders.length ? '입고 ' + orders.length + '팀' : '없음', sums: [['차량 보관', assets.length + '개', assets.length ? 'purple' : '']] });
   }

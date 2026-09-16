@@ -43,6 +43,7 @@
     "test:pos:preinput": "node scripts/smoke-pos-preinput.cjs",
     "test:pos:keypad": "node scripts/smoke-pos-keypad.cjs",
     "pos:screens": "node scripts/capture-pos-release.cjs",
+    "pos:screens:driver": "node scripts/capture-pos-driver.cjs",
     "pos:backup": "node scripts/backup-workflows.cjs"
   },
   "engines": {

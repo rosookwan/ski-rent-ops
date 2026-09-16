@@ -1,0 +1,70 @@
+{
+  "generatedAt": "2026-09-16T22:41:27.854Z",
+  "results": [
+    {
+      "key": "dispatch",
+      "file": "driver-dispatch-1024x520.png",
+      "viewport": [
+        1024,
+        520
+      ],
+      "outside": [],
+      "bodyScroll": false,
+      "rows": 3,
+      "smallestButton": 48,
+      "rail": false
+    },
+    {
+      "key": "dispatch",
+      "file": "driver-dispatch-1024x600.png",
+      "viewport": [
+        1024,
+        600
+      ],
+      "outside": [],
+      "bodyScroll": false,
+      "rows": 4,
+      "smallestButton": 48,
+      "rail": false
+    },
+    {
+      "key": "dispatch",
+      "file": "driver-dispatch-1280x720.png",
+      "viewport": [
+        1280,
+        720
+      ],
+      "outside": [],
+      "bodyScroll": false,
+      "rows": 5,
+      "smallestButton": 48,
+      "rail": false
+    },
+    {
+      "key": "task",
+      "file": "driver-task-1024x520.png",
+      "viewport": [
+        1024,
+        520
+      ],
+      "outside": [],
+      "bodyScroll": false,
+      "rows": 2,
+      "smallestButton": 48,
+      "rail": false
+    },
+    {
+      "key": "stock",
+      "file": "driver-stock-1024x520.png",
+      "viewport": [
+        1024,
+        520
+      ],
+      "outside": [],
+      "bodyScroll": false,
+      "rows": 2,
+      "smallestButton": 48,
+      "rail": false
+    }
+  ]
+}

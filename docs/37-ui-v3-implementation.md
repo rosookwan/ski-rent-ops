@@ -89,3 +89,13 @@ npm run test:pos:operating && npm run test:pos:fulfillment && npm run test:pos:t
 - `f69773b`에서 유닛 스크립트가 브라우저 테스트 파일을 제외하도록 고치고(`test:workflows:browser`로 분리, `npm test`는 그대로 전부 실행) 다시 푸시했다. 워크플로 [35089585109](https://github.com/rosookwan/ski-rent-ops/actions/runs/35089585109) 성공, 로컬 유닛 178개 통과.
 - [공개 페이지](https://rosookwan.github.io/ski-rent-ops/) HTTP 200. 공개 `index.html` SHA-256 `969e3d5460a56bc589ff413516af0c42d316286faa8c6e426196c94d66bab9db`, `pos.html` SHA-256 `484d17e216e489c3481e028211a448f59c2e388610e66803b50959e8a732b464`가 검증한 로컬 빌드와 같다. 공개 HTML에 새 레일 항목 9개가 들어 있다.
 - 사용자 소유 미추적 문서 `docs/25-label-printer-purchase-notes.md`는 커밋하지 않았다. Pages는 브라우저 메모리 체험 방식이며 운영 저장·API 배포가 아니다.
+
+## 9. 차량 화면은 행 목록으로 유지 (2026-09-17)
+
+기사 태블릿은 브라우저 주소창을 빼면 1024×520 정도라 카드 목록이 한 번에 2건밖에 보이지 않았다. 사용자 결정에 따라 **기사 로그인 화면은 카드 예외**로 두고 이전 행 목록으로 되돌렸다. 매장 POS의 `차량 운행` 보드는 카드 그대로다.
+
+- `차량 운행`(기사): 행 목록 페이지. 한 행에 `시간 · 팀 · 배달/수거`, 아래 줄에 `장소 · 남은 물품 N개 · 품목`, 오른쪽에 보라색 56px `업무 처리`. 화면 높이 520 → 3행, 600 → 4행, 720 → 5행, 그 이상 6행. 필터 줄은 오늘·이전/내일/전체/달력만 두고 검색은 뺐다. 하단 요약에 담당 차량을 표시한다.
+- `차량 보관`(기사): 품목별 행 목록.
+- `배달·수거 처리`: 변경 없음(−/+ 수량, 72px 확정 버튼, 전화).
+- 촬영·검사: `npm run pos:screens:driver`(새 스크립트 `scripts/capture-pos-driver.cjs`)가 실제 API 서버에 기사로 로그인해 1024×520 / 1024×600 / 1280×720에서 5장을 찍고 넘침·본문 스크롤·레일 숨김·행 수를 검사한다 → `docs/pos-ui-v3/driver-*.png`, `driver-screens.json`. 최소 버튼 48px.
+- 재검증: `npm run check`, operating 12 · fulfillment 16 통과.

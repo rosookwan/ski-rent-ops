@@ -207,8 +207,10 @@
 #ski-ops[data-pos="true"][data-actor="driver"] .so-sidebar{display:none}
 #ski-ops[data-pos="true"][data-actor="driver"] .so-workarea{grid-column:1}
 #ski-ops[data-pos="true"][data-actor="driver"] .pos-page-footer .pos-button.primary,
-#ski-ops[data-pos="true"][data-actor="driver"] .pos-row-actions .pos-button.primary,
 #ski-ops[data-pos="true"][data-actor="driver"] .pos-card-actions .pos-button.primary{min-height:72px;font-size:20px;border-radius:14px;box-shadow:2px 10px 18px rgba(95,51,225,.35)}
+#ski-ops[data-pos="true"][data-actor="driver"] .pos-row-actions .pos-button.primary{min-height:56px;padding:0 22px;font-size:18px;border-radius:12px;box-shadow:2px 8px 14px rgba(95,51,225,.3)}
+#ski-ops[data-pos="true"][data-actor="driver"] .pos-row strong{font-size:19px}
+#ski-ops[data-pos="true"][data-actor="driver"] .pos-row span{font-size:16px}
 #ski-ops[data-pos="true"][data-actor="driver"] .pos-page-footer .pos-button{min-height:64px;font-size:18px}
 #ski-ops[data-pos="true"][data-actor="driver"] .pos-page-footer{height:88px;min-height:88px}
 /* Toolbar sums (detail screen) stay visible at every POS width; the header sums hide below 1100px instead. */
