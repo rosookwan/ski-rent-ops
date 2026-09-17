@@ -106,3 +106,4 @@ npm run test:pos:operating && npm run test:pos:fulfillment && npm run test:pos:t
 체험판 로그인의 `차량 화면` 버튼이 매장 쪽 `차량 보관` 화면(레일 있음, 카드)으로 이어져 기사 화면을 볼 수 없었다. 이제 `차량 화면`을 누르면 체험 저장소의 **기사 계정(1호 차량)** 으로 바뀌어 기사 태블릿과 같은 행 목록·보라색 화면이 나오고, `나가기 → 매장 POS`로 돌아오면 매장 계정으로 복귀한다. 운영 빌드(`pos.html`)에는 영향이 없다. 상단 상태 표시는 `체험 · 기사 화면 · 1호 차량`이다.
 
 - `npm run pos:screens`에 체험 기사 진입 검사와 촬영(`driver-demo-1024x600.png`)을 추가했다: 레일이 사라지고 `data-actor="driver"`가 되는지, 매장 POS로 돌아오면 레일이 다시 보이는지 확인한다.
+- 배포: `0323785` 푸시 → Pages 워크플로 35167761549 성공. 공개 `index.html` SHA-256 `666e04872d23406e5c81dcf02993fe22e1f7fbc77229fd6c93c7e0bd19e0504e`, `pos.html` SHA-256 `b46b673ed51c7dd5c510f4d9df28ad20a06fff85fc5cc8681c854e73ab51c4fa`가 로컬 빌드와 일치. 공개 페이지 로그인의 `차량 화면`으로 기사 행 목록 확인 가능.
