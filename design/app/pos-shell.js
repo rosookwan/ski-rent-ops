@@ -21,7 +21,7 @@
     method: { cash: '현금', card: '카드', transfer: '계좌이체' }
   });
   const pageKey = key => S.state.page + ':' + key;
-  const driver = () => window.SkiPosOperating && S.posData?.snapshot?.actor?.role === 'driver';
+  const driver = () => S.posData?.snapshot?.actor?.role === 'driver';
   function navigation(active, registered) {
     if (driver()) return '';
     const management = S.state.workspace === 'management';

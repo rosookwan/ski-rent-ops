@@ -43,6 +43,13 @@ const escape = value => String(value).replace(/[&<>\"]/g, ch => ({ '&': '&amp;',
     await capture('order-detail', '통합접수 상세', '일행 추가, 사전입력, 기간 변경, 수납과 문제 해결을 한 접수에서 이어갑니다.');
     await frame.locator('[data-action="pos-preinput"]').click(); await capture('preinput', '사전입력·준비표', '이번 차수에서 새로 입력할 일행만 요청합니다.');
     await frame.evaluate(() => window.SkiOps.go('home')); await frame.locator('#pos-notice-bell').click(); await capture('notifications', '업무 알림', '현재 저장소의 업무 알림을 페이지로 확인하고 해당 업무를 엽니다.');
+    await frame.evaluate(() => window.SkiOps.close());
+    // Demo driver entry: 나가기 → 차량 화면 must show the driver row list without the rail, and 매장 POS must bring the rail back.
+    await frame.locator('.so-topbar [data-action="logout"]').click(); await frame.locator('[data-action="login-vehicle"]').click(); await frame.locator('[data-pos-list-key="dispatch-tasks"]').waitFor();
+    assert.equal(await frame.evaluate(() => document.querySelector('#ski-ops').dataset.actor), 'driver'); assert.equal(await frame.locator('.pos-rail').count(), 0);
+    await capture('driver-demo', '차량 화면 (체험 기사 로그인)', '로그인 화면의 차량 화면으로 들어가면 기사 태블릿과 같은 행 목록을 봅니다.');
+    await frame.locator('.so-topbar [data-action="logout"]').click(); await frame.locator('[data-action="login-shop"]').click(); await frame.locator('.pos-rail').waitFor();
+    assert.equal(await frame.evaluate(() => document.querySelector('#ski-ops').dataset.actor), 'store');
     await frame.evaluate(async () => {
       const S = window.SkiOps, date = window.SkiWorkflowCommon.nextDate(S.posData.today);
       for (let i = 0; i < 12; i++) S.workflow.run('catalog.add', { id: 'qa-gear-' + i, label: '확인 장비 ' + (i + 1), kind: 'equipment', unit: '개' });

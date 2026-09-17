@@ -100,3 +100,9 @@ npm run test:pos:operating && npm run test:pos:fulfillment && npm run test:pos:t
 - 촬영·검사: `npm run pos:screens:driver`(새 스크립트 `scripts/capture-pos-driver.cjs`)가 실제 API 서버에 기사로 로그인해 1024×520 / 1024×600 / 1280×720에서 5장을 찍고 넘침·본문 스크롤·레일 숨김·행 수를 검사한다 → `docs/pos-ui-v3/driver-*.png`, `driver-screens.json`. 최소 버튼 48px.
 - 재검증: `npm run check`, operating 12 · fulfillment 16 통과.
 - 배포: `a8a1dca` 푸시 → Pages 워크플로 35159038215 성공. 공개 `index.html` SHA-256 `ab2b7d40011532721d3f9931a856cd7bbd6add2da001bfdfaafecdac7b752a5a`, `pos.html` SHA-256 `765b2817cd364e45ae5e7dd4534e7f5defa26187c8504e1c25bc0e0cebe260d5`가 로컬 빌드와 일치.
+
+## 10. 체험판(Pages)에서 기사 화면 보기 (2026-09-17)
+
+체험판 로그인의 `차량 화면` 버튼이 매장 쪽 `차량 보관` 화면(레일 있음, 카드)으로 이어져 기사 화면을 볼 수 없었다. 이제 `차량 화면`을 누르면 체험 저장소의 **기사 계정(1호 차량)** 으로 바뀌어 기사 태블릿과 같은 행 목록·보라색 화면이 나오고, `나가기 → 매장 POS`로 돌아오면 매장 계정으로 복귀한다. 운영 빌드(`pos.html`)에는 영향이 없다. 상단 상태 표시는 `체험 · 기사 화면 · 1호 차량`이다.
+
+- `npm run pos:screens`에 체험 기사 진입 검사와 촬영(`driver-demo-1024x600.png`)을 추가했다: 레일이 사라지고 `data-actor="driver"`가 되는지, 매장 POS로 돌아오면 레일이 다시 보이는지 확인한다.

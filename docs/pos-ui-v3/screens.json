@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-16T11:02:06.998Z",
+  "generatedAt": "2026-09-17T00:41:09.790Z",
   "mode": "static memory demonstration; screenshots are not evidence of physical hardware",
   "checks": [
     {
@@ -345,6 +345,15 @@
       "bodyScroll": false
     },
     {
+      "key": "driver-demo",
+      "viewport": [
+        1024,
+        600
+      ],
+      "overflow": [],
+      "bodyScroll": false
+    },
+    {
       "key": "tomorrow-100",
       "viewport": [
         1024,
@@ -591,6 +600,12 @@
       "title": "업무 알림",
       "detail": "현재 저장소의 업무 알림을 페이지로 확인하고 해당 업무를 엽니다.",
       "file": "notifications-1024x600.png",
+      "size": "1024×600"
+    },
+    {
+      "title": "차량 화면 (체험 기사 로그인)",
+      "detail": "로그인 화면의 차량 화면으로 들어가면 기사 태블릿과 같은 행 목록을 봅니다.",
+      "file": "driver-demo-1024x600.png",
       "size": "1024×600"
     },
     {

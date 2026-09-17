@@ -47,6 +47,23 @@
     }
     await refresh();
   });
+  // Demo (Pages) only: the login screen's 매장 POS / 차량 화면 buttons swap the local client
+  // between the seeded store actor and the seeded driver actor (demo-van-1), so the driver
+  // tablet screens can be previewed without an API server. The operating build never runs this.
+  if (!window.SkiPosOperating) {
+    const storeClient = client, F = S.workflow;
+    let driverClient = null;
+    async function enter(role, target) {
+      if (pending || busy) { S.toast('처리 결과를 먼저 확인한 뒤 화면을 바꿔 주세요.'); return; }
+      const next = role === 'driver' ? (driverClient ||= C.createLocalClient(F.driver, S.sharedRepository)) : storeClient;
+      if (next !== client) { client = next; noticeClient = S.notificationRuntime?.client?.(role) || noticeClient; await refresh(); }
+      S.state.authenticated = true; S.state.afterLogin = null;
+      const label = S.$('.so-demo-label'); if (label) label.textContent = role === 'driver' ? '체험 · 기사 화면 · ' + (F.vehicleId === 'demo-van-1' ? '1호 차량' : F.vehicleId) : '체험 · 오늘 09시 기준';
+      S.go(target.page, target.params || {}, true, target.workspace || 'pos');
+    }
+    S.action('login-shop', () => { const target = S.state.afterLogin; enter('store', { page: target?.page || 'home', params: target?.params, workspace: target?.workspace }).catch(error => S.toast(error.message)); });
+    S.action('login-vehicle', () => enter('driver', { page: 'dispatch' }).catch(error => S.toast(error.message)));
+  }
   S.action('pos-refresh', async () => {
     try { await refresh(); S.render(); S.toast('최신 기록을 불러왔습니다. 입력 중인 내용은 유지됩니다.'); }
     catch (error) { S.toast(error.message); }
