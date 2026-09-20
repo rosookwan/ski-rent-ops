@@ -1,0 +1,26 @@
+{
+  "project": "ski-rent-ops · 스키노트 POS",
+  "library": "design/higgsfield/pos-main-v1",
+  "workspace": {
+    "id": "a3cca891-ff82-4041-9d9a-0584cef69319",
+    "type": "private",
+    "name": null,
+    "note": "프로젝트 전용 워크스페이스 없음. 2026-09-20 사용자 결정으로 개인 워크스페이스에서 생성. 이 job id 목록이 프로젝트 소속의 기준이다."
+  },
+  "generation": { "model": "gpt_image_2_5", "variant": "flare", "quality": "high", "resolution": "2k", "aspect_ratio": "27:16", "output": "2592×1536", "creditsPerImage": 3 },
+  "download": {
+    "status": "blocked",
+    "reason": "이 세션의 네트워크 정책이 d8j0ntlcm91z4.cloudfront.net(결과 CDN)을 차단(CONNECT 403)해 PNG를 저장소에 내려받지 못했다. URL과 job id만 등록한다. 세션 환경의 허용 도메인에 위 호스트를 추가하면 내려받아 PNG를 함께 보관할 수 있다."
+  },
+  "rounds": [
+    {
+      "round": 1,
+      "purpose": "앵커(P01 오늘 할 일) 후보 2장",
+      "submittedAt": "2026-09-20T23:22Z",
+      "jobs": [
+        { "code": "P01", "variant": "a", "job_id": "0825a73c-f0ab-4035-8bc7-06667de280fa", "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J2y32mXmk1jhAd5qmEsy69365Q/hf_20260920_232215_0825a73c-f0ab-4035-8bc7-06667de280fa.png", "status": "completed", "credits": 3, "review": "사용자 확인 대기" },
+        { "code": "P01", "variant": "b", "job_id": "c3d25061-b53f-4893-91ad-a0c079305cd4", "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J2y32mXmk1jhAd5qmEsy69365Q/hf_20260920_232215_c3d25061-b53f-4893-91ad-a0c079305cd4.png", "status": "completed", "credits": 3, "review": "사용자 확인 대기" }
+      ]
+    }
+  ]
+}
