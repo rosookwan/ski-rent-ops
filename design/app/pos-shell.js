@@ -284,9 +284,25 @@
     body.replaceChildren(content);
     if (footer.childNodes.length) body.append(footer);
   }
-  function modal(title, body, footer = '') {
-    S.modal(title, '<div class="pos-modal-body">' + body + '</div>' + (footer ? '<footer class="pos-modal-footer">' + footer + '</footer>' : ''));
+  function modal(title, body, footer = '', sub = '') {
+    S.modal(title, '<div class="pos-modal-body">' + (sub ? '<p class="pos-modal-sub">' + e(sub) + '</p>' : '') + body + '</div>' + (footer ? '<footer class="pos-modal-footer">' + footer + '</footer>' : ''));
+    fitPage(S.$('#so-dialog'));
   }
+  // Option buttons that fill a hidden input, so windows can offer choices without a drop-down (read them like any other input).
+  const choice = (name, values, value) => '<div class="pos-choice"><input type="hidden" data-pos-input="' + e(name) + '" value="' + e(value) + '">' + values.map(([id, text]) => '<button type="button" class="so-button pos-button pos-option" data-action="pos-choice" data-id="' + e(id) + '" aria-pressed="' + (String(id) === String(value)) + '">' + e(text) + '</button>').join('') + '</div>';
+  S.action('pos-choice', (value, target) => { const box = target.closest('.pos-choice'); box.querySelector('input').value = value; box.querySelectorAll('button').forEach(button => button.setAttribute('aria-pressed', String(button === target))); });
+  // Month calendar window (P30): every day is one 52px button with its count; no native date picker.
+  let calendarState = null;
+  function calendar(options) { calendarState = { ...options, month: (options.selected || options.today).slice(0, 7) }; drawCalendar(); }
+  function drawCalendar() {
+    const c = calendarState, [year, month] = c.month.split('-').map(Number), lead = new Date(Date.UTC(year, month - 1, 1)).getUTCDay(), days = new Date(Date.UTC(year, month, 0)).getUTCDate();
+    const move = (label, name, delta) => '<button type="button" class="so-button pos-button" data-action="pos-calendar-move" data-id="' + delta + '" aria-label="' + name + '">' + label + '</button>';
+    const cells = Array.from({ length: lead }, () => '<span></span>');
+    for (let day = 1; day <= days; day++) { const date = c.month + '-' + String(day).padStart(2, '0'), n = c.count?.(date) || 0; cells.push('<button type="button" class="pos-cal-day" data-action="' + e(c.action) + '" data-id="' + date + '" aria-pressed="' + (date === c.selected) + '"' + (date === c.today ? ' data-today="true"' : '') + '><b>' + day + '</b>' + (n ? '<small>' + n + e(c.unit || '팀') + '</small>' : '') + '</button>'); }
+    modal(c.title, '<div class="pos-cal-head">' + move('‹', '이전 달', -1) + '<strong>' + year + '년 ' + month + '월</strong>' + move('›', '다음 달', 1) + '<span></span>' + (c.clear ? button(c.clear[0], c.clear[1]) : '') + '</div>'
+      + '<div class="pos-cal-grid is-week">' + ['일', '월', '화', '수', '목', '금', '토'].map(day => '<span>' + day + '</span>').join('') + '</div><div class="pos-cal-grid">' + cells.join('') + '</div>');
+  }
+  S.action('pos-calendar-move', delta => { const c = calendarState; if (!c) return; const [year, month] = c.month.split('-').map(Number), next = new Date(Date.UTC(year, month - 1 + Number(delta), 1)); c.month = next.toISOString().slice(0, 7); drawCalendar(); });
   S.action('pos-page-change', (delta, target) => {
     const key = target.dataset.posKey;
     const modalList = target.closest('#so-dialog .pos-paged-list');
@@ -299,7 +315,7 @@
     const container = S.$('.pos-cards[data-pos-cards]'); if (!container) return;
     setPage('cards', getPage('cards') + Number(delta), { render: false }); layoutCards(container, delta);
   });
-  S.pos = Object.freeze({ navigation, page, button, row, pager, getPage, setPage, modal, prepareModal, card, orderCard, tile, lineRow, cards, fitPage, badge, search, chip, chipGo, toolbarLabel, group, terms, storeName, menus,
+  S.pos = Object.freeze({ navigation, page, button, row, pager, getPage, setPage, modal, prepareModal, card, orderCard, tile, lineRow, cards, fitPage, choice, calendar, badge, search, chip, chipGo, toolbarLabel, group, terms, storeName, menus,
     field: (label, value = '', type = 'text', attrs = '') => S.field(e(label), value, type, attrs),
     label: value => '<span class="pos-label">' + e(value) + '</span>'
   });

@@ -69,4 +69,14 @@ const METRICS = ['smallText', 'clippedText', 'halfCut', 'shortTargets', 'scrolli
 const LABELS = { smallText: '① 16px 미만 글자', clippedText: '② 잘린 글자', halfCut: '③ 반쯤 잘린 카드·행', shortTargets: '④ 낮은 누르는 곳', scrolling: '⑤ 스크롤' };
 const count = rows => rows.reduce((n, row) => n + (row.count || 1), 0);
 const totals = rules => Object.fromEntries(METRICS.map(metric => [metric, count(rules?.[metric] || [])]));
-module.exports = { measure, METRICS, LABELS, totals };
+// Smoke suites call recorder(...).add(name, pageOrFrame) next to their own layout checks, so every window they open is measured too.
+function recorder(suite, options) {
+  const fs = require('node:fs'), path = require('node:path'), file = path.resolve('work', 'pos-rules', suite + '.json'), checks = [];
+  fs.mkdirSync(path.dirname(file), { recursive: true });
+  return { async add(name, target) {
+    const rules = await target.evaluate(measure, options || { minFont: 16, minTarget: 52 }), viewport = await target.evaluate(() => [innerWidth, innerHeight, !!document.querySelector('#so-dialog[open]')]);
+    checks.push({ key: suite + ':' + name, viewport: viewport.slice(0, 2), modal: viewport[2], rules, ruleTotals: totals(rules) });
+    fs.writeFileSync(file, JSON.stringify({ generatedAt: new Date().toISOString(), checks }, null, 2));
+  } };
+}
+module.exports = { measure, METRICS, LABELS, totals, recorder };

@@ -326,7 +326,7 @@
       const discount = d.lines.reduce((n, l) => n + (l.price.discountWon || 0), 0);
       return '<div class="pos-split is-items"><section class="pos-panel">' + panelHead('품목 선택', '누르면 1개씩 늘어납니다', g.pager) + g.html + '<div class="pos-panel-foot">' + btn('일행마다 다르게 입력', 'pos-people-many') + btn('직접 입력', 'pos-line-detail') + '</div></section>'
         + '<section class="pos-panel pos-summary">' + panelHead('이번 접수 내역', '', miniPager('pos-draft-line-page', index, count)) + '<div class="pos-draft-rows">' + (rows || '<p class="pos-panel-note">왼쪽에서 품목을 누르세요</p>') + '</div>'
-        + '<div class="pos-option-row is-tight"><span>이용 일수</span><div>' + [1, 2, 3].map(n => option(n + '일', 'pos-plan-pick', 'days:' + n, days === n)).join('') + (days > 3 ? option(days + '일', 'pos-draft-dates', '', true) : '') + '</div></div>'
+        + '<div class="pos-option-row is-tight"><span>이용 일수</span><div>' + [1, 2, 3].map(n => option(n + '일', 'pos-plan-pick', 'days:' + n, days === n)).join('') + option(days > 3 ? days + '일' : '직접', 'pos-draft-days-open', '', days > 3) + '</div></div>'
         + (discount ? '<div class="pos-summary-line"><span>할인</span><b>' + e(won(discount)) + '</b></div>' : '') + '<div class="pos-summary-total"><span>합계</span><b>' + e(won(draftTotal())) + '</b></div>' + errorBox() + '</section></div>';
     }
     const rowsOf = [{ id: '', name: '팀 공용' }, ...people], current = rowsOf.find(p => p.id === d.personId) || rowsOf[1] || rowsOf[0]; d.personId = current.id;
@@ -344,7 +344,7 @@
     const preset = settings.returnTimes.find(t => t.time === back.time && (t.dayOffset || 0) === (d.returnOffset || 0) && back.date === addDays(d.end, t.dayOffset || 0));
     const left = '<section class="pos-panel pos-options">'
       + row('수령일', option('오늘 ' + short(D.today), 'pos-plan-pick', 'day:' + D.today, d.start === D.today) + option('내일 ' + short(nextDate(D.today)), 'pos-plan-pick', 'day:' + nextDate(D.today), d.start === nextDate(D.today)) + option(d.start > nextDate(D.today) || d.start < D.today ? short(d.start) : '달력', 'pos-draft-dates', '', d.start > nextDate(D.today) || d.start < D.today))
-      + row('이용 일수', [1, 2, 3].map(n => option(n + '일', 'pos-plan-pick', 'days:' + n, days === n)).join('') + option(days > 3 ? days + '일' : '직접', 'pos-draft-dates', '', days > 3))
+      + row('이용 일수', [1, 2, 3].map(n => option(n + '일', 'pos-plan-pick', 'days:' + n, days === n)).join('') + option(days > 3 ? days + '일' : '직접', 'pos-draft-days-open', '', days > 3))
       + row('수령 시간', (d.start === D.today ? option('지금', 'pos-plan-pick', 'time:now', !pick.time || pick.now === true) : '') + times.map(t => option(t, 'pos-plan-pick', 'time:' + t, pick.time === t && !pick.now)).join('') + option(customTime && !pick.now ? pick.time : '직접', 'pos-draft-plan', 'pickup', !!customTime && !pick.now))
       + row('수령 장소', option('매장 수령', 'pos-plan-pick', 'place:', pick.method === 'shop') + shown.map(place => option(place, 'pos-plan-pick', 'place:' + place, pick.method === 'delivery' && pick.place === place)).join('') + (places.length > 3 || customPlace ? option(customPlace ? pick.place : '더 보기', 'pos-draft-plan', 'pickup-place', customPlace) : ''))
       + row('반납 시간', settings.returnTimes.slice(0, 3).map(t => option(t.label, 'pos-plan-pick', 'return:' + t.id, preset?.id === t.id, t.time)).join('') + (preset ? option('직접', 'pos-draft-plan', 'return', false) : option(short(back.date), 'pos-draft-plan', 'return', true, back.time))) + '</section>';
@@ -370,8 +370,11 @@
   S.search('pos-orders', value => { state.query = value; P.setPage('orders', 0, { render: false }); const cursor = S.$('[data-search="pos-orders"]')?.selectionStart; S.render(); const el = S.$('[data-search="pos-orders"]'); el?.focus(); if (el && cursor != null) el.setSelectionRange(cursor, cursor); });
   S.action('pos-period', value => { state.period = value; state.date = ''; P.setPage('orders', 0, { render: false }); S.render(); });
   S.action('pos-sort', value => { state.sort = value; S.render(); });
-  S.action('pos-pick-date', () => P.modal('날짜로 보기', '<div class="pos-form-grid">' + input('날짜', 'listDate', state.date || D.today, 'date') + '</div>' + errorBox(), btn('해제', 'pos-pick-date-clear') + btn('취소', 'close') + btn('이 날짜만 보기', 'pos-pick-date-save', '', 'primary')));
-  S.action('pos-pick-date-save', () => { try { const value = read('listDate'); window.SkiWorkflowCommon.date(value); state.date = value; S.close(); S.render(); } catch (err) { error(err); } });
+  S.action('pos-pick-date', () => {
+    const kind = S.state.page, back = ['returns', 'rentals'].includes(kind), list = rows().filter(o => keep(o, kind));
+    P.calendar({ title: '날짜로 보기 · ' + (back ? '반납일' : '수령일'), selected: state.date, today: D.today, action: 'pos-pick-date-save', clear: state.date ? ['전체 날짜 보기', 'pos-pick-date-clear'] : null, count: date => list.filter(o => (back ? returnDate(o) : pickupDate(o)) === date).length });
+  });
+  S.action('pos-pick-date-save', value => { try { const date = value || read('listDate'); window.SkiWorkflowCommon.date(date); state.date = date; S.close(); S.render(); } catch (err) { error(err); } });
   S.action('pos-pick-date-clear', () => { state.date = ''; S.close(); S.render(); });
   S.action('pos-detail-tab', tab => { state.detailTab = tab; S.render(); });
   S.action('pos-noop', () => {});
@@ -451,14 +454,17 @@
   S.action('pos-plan-pick', value => {
     const d = state.draft, at = value.indexOf(':'), kind = value.slice(0, at), id = value.slice(at + 1), settings = settingsOf(); syncDates();
     if (kind === 'day') { setDates(id, dayCount(d)); if (id !== D.today && (!d.pickupPlan.time || d.pickupPlan.now)) { d.pickupPlan.time = '09:00'; d.pickupPlan.now = false; } d.same = false; }
-    else if (kind === 'days') setDates(d.start, Number(id));
+    else if (kind === 'days') { setDates(d.start, Number(id)); S.close(); }
     else if (kind === 'time') { const now = id === 'now', vehicle = d.pickupPlan.method === 'delivery'; d.pickupPlan.now = now; d.pickupPlan.time = now ? (vehicle ? nowTime() : null) : id; }
     else if (kind === 'place') { const p = d.pickupPlan, r = d.returnPlan; if (!id) { p.method = 'shop'; p.place = '매장'; delete p.vehicleId; if (p.now) p.time = null; r.method = 'direct'; r.place = '매장'; delete r.vehicleId; } else { const vehicleId = p.vehicleId || settings.vehicles[0]?.id; if (!vehicleId) { S.toast('매장 설정에 차량을 먼저 등록해 주세요'); return; } p.method = 'delivery'; p.place = id; p.vehicleId = vehicleId; if (!p.time) p.time = nowTime(); r.method = 'vehicle'; r.place = id; r.vehicleId = r.vehicleId || vehicleId; } }
     else if (kind === 'return') { const t = settings.returnTimes.find(row => row.id === id); if (!t) return; d.returnOffset = t.dayOffset || 0; d.returnPlan.time = t.time; d.returnPlan.auto = true; d.returnPlan.date = addDays(d.end, d.returnOffset); }
     S.render();
   });
-  S.action('pos-draft-dates', () => { const d = state.draft; P.modal('이용 날짜', '<div class="pos-form-grid">' + input('이용 시작일', 'start', d.start, 'date') + input('이용 종료일', 'end', d.end, 'date') + '</div>' + errorBox(), btn('취소', 'close') + btn('날짜 적용', 'pos-draft-dates-save', '', 'primary')); });
-  S.action('pos-draft-dates-save', () => { try { const d = state.draft, start = read('start'), end = read('end'); window.SkiWorkflowCommon.date(start); window.SkiWorkflowCommon.date(end); if (end < start) throw new Error('종료일을 시작일 이후로 선택해 주세요.'); d.start = start; d.end = end; d.same = false; if (start !== D.today && d.pickupPlan && (!d.pickupPlan.time || d.pickupPlan.now)) { d.pickupPlan.time = '09:00'; d.pickupPlan.now = false; } syncDates(); S.close(); S.render(); } catch (err) { error(err); } });
+  S.action('pos-draft-dates', () => P.calendar({ title: '수령일 선택', selected: state.draft.start, today: D.today, action: 'pos-draft-start' }));
+  S.action('pos-draft-start', date => { const d = state.draft; if (date < D.today) { S.toast('오늘 이후 날짜를 골라 주세요'); return; } setDates(date, dayCount(d)); d.same = false; if (date !== D.today && d.pickupPlan && (!d.pickupPlan.time || d.pickupPlan.now)) { d.pickupPlan.time = '09:00'; d.pickupPlan.now = false; } S.close(); S.render(); });
+  const daysModal = n => P.modal('이용 일수', '<div class="pos-stepper is-large"><button type="button" class="so-button pos-button" data-action="pos-draft-days" data-id="' + (n - 1) + '" aria-label="하루 줄이기"' + (n > 1 ? '' : ' disabled') + '>−</button><b>' + n + '</b><span>일</span><button type="button" class="so-button pos-button" data-action="pos-draft-days" data-id="' + (n + 1) + '" aria-label="하루 늘리기"' + (n < 30 ? '' : ' disabled') + '>+</button></div><p class="pos-info">' + e(short(state.draft.start) + ' ~ ' + short(addDays(state.draft.start, n - 1)) + ' 이용') + '</p>', btn('취소', 'close') + btn(n + '일 적용', 'pos-plan-pick', 'days:' + n, 'primary'));
+  S.action('pos-draft-days-open', () => daysModal(Math.max(4, dayCount(state.draft))));
+  S.action('pos-draft-days', value => daysModal(Math.max(1, Math.min(30, Number(value)))));
   let planEdit = null;
   function planModal(kind) {
     const d = state.draft;
@@ -484,7 +490,6 @@
     const row = (k, parts, fit = 'parts', tone = '') => '<div><dt>' + e(k) + '</dt><dd data-tone="' + tone + '" data-fit="' + fit + '" data-parts="' + e(JSON.stringify(parts.filter(Boolean))) + '">' + e(parts.filter(Boolean).join(' · ')) + '</dd></div>';
     P.modal('접수 완료 · ' + (o.receiptNo || o.id), '<dl class="pos-summary-list is-done">' + row('대표자', [o.customer.name + ' 팀', o.people.length ? o.people.length + '명' : '']) + row('대여 품목', summary.items, 'items') + row('일정', [summary.pickup + ' 수령', summary.back + ' 반납']) + row('사이즈 입력', [pending ? pending + '명 미입력' : '입력할 일행 없음'], 'parts', pending ? 'orange' : '') + '</dl>'
       + '<div class="pos-summary-total"><span>합계</span><b>' + e(won(summary.total)) + '</b></div>', (pending ? btn('사이즈 입력 요청', 'pos-preinput', o.id) : '') + btn('접수 상세', 'close') + go('접수 목록', 'intake', '', 'primary'));
-    P.fitPage(S.$('#so-dialog'));
   }
   S.action('pos-draft-save', async () => {
     const d = state.draft; if (!d) return;

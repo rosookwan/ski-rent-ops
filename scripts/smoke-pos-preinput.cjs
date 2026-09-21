@@ -11,6 +11,7 @@ const { createApiServer, tokenAuthenticator } = require('../server/returns-api.c
 const { createSqliteRepository } = require('../server/returns-repository.cjs');
 const { createHttpClient, createGuestHttpClient, newCommand } = require('../src/workflows/client.js');
 const OUT = path.resolve('work/pos-preinput'); mkdirSync(OUT, { recursive: true });
+const uiRules = require('./pos-ui-rules.cjs').recorder('preinput');
 const temp = mkdtempSync(path.join(tmpdir(), 'ski-preinput-browser-')), token = 'local-preinput-browser-test-'.padEnd(48, 'x');
 const checks = [], errors = [], layouts = [];
 let repository, server, staticServer, browser, smsCalls = 0, printCalls = 0;
@@ -36,7 +37,7 @@ async function main() {
       const scroll = [...root.querySelectorAll('*'), root].filter(el => !el.hasAttribute('data-pos-scroll') && el.clientHeight && el.scrollHeight > el.clientHeight + 1 && ['auto', 'scroll'].includes(getComputedStyle(el).overflowY)).map(el => el.className || el.id);
       return { outside, scroll };
     });
-    layouts.push({ name, ...result }); assert.deepEqual(result.outside, [], name + ' outside viewport'); assert.deepEqual(result.scroll, [], name + ' requires core scrolling');
+    layouts.push({ name, ...result }); assert.deepEqual(result.outside, [], name + ' outside viewport'); assert.deepEqual(result.scroll, [], name + ' requires core scrolling'); if (surface === page) await uiRules.add(name, page);
     await page.screenshot({ path: path.join(OUT, name + '.png') });
   }
   await page.goto(baseUrl + '/pos'); await page.locator('#pos-access-key').fill(token); await action('pos-connect').click(); await page.locator('.pos-page').waitFor();

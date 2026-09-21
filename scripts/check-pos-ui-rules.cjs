@@ -10,11 +10,13 @@ const scope = JSON.parse(fs.readFileSync(path.join(__dirname, 'pos-ui-rules-scop
 const read = file => fs.existsSync(path.join(dir, file)) ? JSON.parse(fs.readFileSync(path.join(dir, file), 'utf8')) : null;
 const entries = [
   ...(read('screens.json')?.checks || []).map(check => ({ source: 'pos', key: check.key, viewport: check.viewport.join('x'), rules: check.rules })),
-  ...(read('driver-screens.json')?.results || []).map(result => ({ source: 'driver', key: 'driver-' + result.key, viewport: result.viewport.join('x'), rules: result.rules }))
+  ...(read('driver-screens.json')?.results || []).map(result => ({ source: 'driver', key: 'driver-' + result.key, viewport: result.viewport.join('x'), rules: result.rules })),
+  // Windows and screens the smoke suites walked through (work/pos-rules/*.json, written by recorder() while they run).
+  ...(fs.existsSync(path.resolve('work/pos-rules')) ? fs.readdirSync(path.resolve('work/pos-rules')).filter(name => name.endsWith('.json')).flatMap(name => JSON.parse(fs.readFileSync(path.resolve('work/pos-rules', name), 'utf8')).checks.map(check => ({ source: 'smoke', key: 'smoke:' + check.key, viewport: check.viewport.join('x'), rules: check.rules }))) : [])
 ].filter(entry => entry.rules);
 if (!entries.length) { console.error('규칙 측정값이 없습니다. 먼저 npm run pos:screens (와 pos:screens:driver)를 실행하세요: ' + dir); process.exit(1); }
 const count = rows => rows.reduce((n, row) => n + (row.count || 1), 0);
-const enforced = (entry, metric) => scope.enforce.some(rule => (rule.keys === '*' || rule.keys.includes(entry.key)) && (rule.metrics === '*' || rule.metrics.includes(metric)) && (!rule.viewports || rule.viewports === '*' || rule.viewports.includes(entry.viewport)));
+const enforced = (entry, metric) => scope.enforce.some(rule => (rule.keys === '*' || rule.keys.some(key => key.endsWith('*') ? entry.key.startsWith(key.slice(0, -1)) : key === entry.key)) && (rule.metrics === '*' || rule.metrics.includes(metric)) && (!rule.viewports || rule.viewports === '*' || rule.viewports.includes(entry.viewport)));
 const failures = [], table = [];
 for (const entry of entries) {
   const row = { 화면: entry.key, 크기: entry.viewport };

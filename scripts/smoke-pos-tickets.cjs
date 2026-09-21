@@ -6,6 +6,7 @@ const fs = require('node:fs');
   const browser = await chromium.launch({ channel: process.env.SKI_CHROME_CHANNEL || 'chrome', headless: true });
   const page = await browser.newPage({ viewport: { width: 1024, height: 600 } });
   const output = process.env.SKI_TICKETS_OUTPUT || 'work/pos-tickets';
+  const uiRules = require('./pos-ui-rules.cjs').recorder('tickets');
   const checks = [], errors = [], writes = [], layouts = [];
   let frame;
   fs.mkdirSync(output, { recursive: true });
@@ -48,7 +49,7 @@ const fs = require('node:fs');
         .map(element => element.className || element.id);
       return { width: innerWidth, height: innerHeight, outside, scroll };
     });
-    layouts.push({ name, ...result }); assert.deepEqual(result.outside, [], name + ': content outside viewport'); assert.deepEqual(result.scroll, [], name + ': core needs scrolling');
+    layouts.push({ name, ...result }); assert.deepEqual(result.outside, [], name + ': content outside viewport'); assert.deepEqual(result.scroll, [], name + ': core needs scrolling'); await uiRules.add(name, frame);
   }
   const test = async (name, run) => { if (process.env.SKI_TICKETS_FILTER && !new RegExp(process.env.SKI_TICKETS_FILTER).test(name)) return; await fresh(); await run(); checks.push(name); console.log('PASS ' + name); };
   const openCorrection = async movementId => {

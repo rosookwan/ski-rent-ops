@@ -111,4 +111,11 @@
 #ski-ops[data-pos="true"] .pos-draft-row>div:first-child{flex:1 1 0;display:flex;flex-direction:column;min-width:0}
 #ski-ops[data-pos="true"] .pos-draft-row strong{overflow:hidden;font-size:var(--pos-fs-body);font-weight:700;letter-spacing:-.02em;line-height:24px;white-space:nowrap}
 #ski-ops[data-pos="true"] .pos-draft-row span{overflow:hidden;font-size:var(--pos-fs-min);line-height:20px;color:var(--so-muted);white-space:nowrap;font-variant-numeric:tabular-nums}
-
+#ski-ops[data-pos="true"] .pos-money-head{display:flex;align-items:baseline;gap:14px;font-size:var(--pos-fs-body);font-weight:600;color:var(--so-muted)}
+#ski-ops[data-pos="true"] .pos-money-head b{font-size:32px;font-weight:700;letter-spacing:-.03em;line-height:38px;color:var(--so-ink);font-variant-numeric:tabular-nums}
+#ski-ops[data-pos="true"] .pos-money-head b[data-tone="red"]{color:var(--tone-red)}
+#ski-ops[data-pos="true"] .pos-money-head b[data-tone="green"]{color:var(--tone-green)}
+#ski-ops[data-pos="true"] .pos-money-head b[data-tone="blue"]{color:var(--tone-blue)}
+#ski-ops[data-pos="true"] .pos-stepper.is-large{justify-content:center;gap:14px;padding:8px 0}
+#ski-ops[data-pos="true"] .pos-stepper.is-large b{min-width:72px;font-size:40px}
+#ski-ops[data-pos="true"] .pos-stepper.is-large .pos-button{min-width:72px;min-height:64px}

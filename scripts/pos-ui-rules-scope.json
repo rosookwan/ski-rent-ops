@@ -48,6 +48,17 @@
       ],
       "metrics": "*",
       "viewports": "*"
+    },
+    {
+      "since": "M5 (2026-09-21)",
+      "keys": [
+        "smoke:operating:*",
+        "smoke:fulfillment:*",
+        "smoke:tickets:*",
+        "smoke:preinput:*"
+      ],
+      "metrics": "*",
+      "viewports": "*"
     }
   ]
 }

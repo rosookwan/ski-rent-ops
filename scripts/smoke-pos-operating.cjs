@@ -10,6 +10,7 @@ const { createApiServer, tokenAuthenticator } = require('../server/returns-api.c
 const { createSqliteRepository } = require('../server/returns-repository.cjs');
 const { createHttpClient, newCommand } = require('../src/workflows/client.js');
 const OUT = path.resolve('work/pos-operating'); mkdirSync(OUT, { recursive: true });
+const uiRules = require('./pos-ui-rules.cjs').recorder('operating');
 const temp = mkdtempSync(path.join(tmpdir(), 'ski-pos-browser-'));
 const token = 'local-browser-integration-store-'.padEnd(48, 'x'), driverToken = 'local-browser-integration-driver-'.padEnd(48, 'x');
 const hash = value => createHash('sha256').update(value).digest('hex');
@@ -45,7 +46,7 @@ async function main() {
         const rect = el.getBoundingClientRect(); return rect.bottom > innerHeight + 1 || rect.right > innerWidth + 1 || rect.top < -1 || rect.left < -1 || el.scrollWidth > el.clientWidth + 2 && getComputedStyle(el).overflowX !== 'visible';
       }).map(el => ({ tag: el.tagName, text: el.textContent.slice(0, 60), bottom: el.getBoundingClientRect().bottom }));
     });
-    assert.deepEqual(result, [], name + ' overflow'); await page.screenshot({ path: path.join(OUT, name + '.png') });
+    assert.deepEqual(result, [], name + ' overflow'); await page.screenshot({ path: path.join(OUT, name + '.png') }); await uiRules.add(name, page);
   }
   await page.locator('[data-action="pos-new"]').click();
   await page.locator('[data-pos-input="name"]').fill('통합접수 검증팀'); await page.locator('[data-pos-input="phone"]').fill('010-1234-5678');

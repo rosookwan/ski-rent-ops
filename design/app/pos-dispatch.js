@@ -52,8 +52,8 @@
   S.search('pos-dispatch-search', value => { query = value; const cursor = S.$('[data-search="pos-dispatch-search"]')?.selectionStart; S.render(); const el = S.$('[data-search="pos-dispatch-search"]'); el?.focus(); if (el && cursor != null) el.setSelectionRange(cursor, cursor); });
   S.action('pos-dispatch-period', value => { period = value; date = ''; S.render(); });
   S.action('pos-dispatch-vehicle', value => { vehicle = value; S.render(); });
-  S.action('pos-dispatch-pick-date', () => P.modal('운행일 선택', '<div class="pos-form-grid">' + U.input('운행일', 'dispatchDate', date || D.today, 'date') + '</div>' + U.errorBox(), b('해제', 'pos-dispatch-date-clear') + b('취소', 'close') + b('이 날짜만 보기', 'pos-dispatch-date-save', '', 'primary')));
-  S.action('pos-dispatch-date-save', () => { try { const value = U.read('dispatchDate'); window.SkiWorkflowCommon.date(value); date = value; S.close(); S.render(); } catch (err) { U.error(err); } });
+  S.action('pos-dispatch-pick-date', () => P.calendar({ title: '운행일 선택', selected: date, today: D.today, action: 'pos-dispatch-date-save', unit: '건', clear: date ? ['전체 날짜 보기', 'pos-dispatch-date-clear'] : null, count: day => D.snapshot.tasks.filter(t => t.date === day && ['waiting', 'in_progress'].includes(t.status)).length }));
+  S.action('pos-dispatch-date-save', value => { try { const picked = value || U.read('dispatchDate'); window.SkiWorkflowCommon.date(picked); date = picked; S.close(); S.render(); } catch (err) { U.error(err); } });
   S.action('pos-dispatch-date-clear', () => { date = ''; S.close(); S.render(); });
   S.change('pos-dispatch-date', value => { date = value; S.render(); });
   S.change('pos-dispatch-vehicle', value => { vehicle = value; S.render(); });
