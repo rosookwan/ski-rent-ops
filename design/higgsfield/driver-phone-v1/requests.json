@@ -1,0 +1,130 @@
+{
+  "project": "ski-rent-ops · 스키노트 POS",
+  "library": "design/higgsfield/driver-phone-v1",
+  "createdAt": "2026-09-21",
+  "purpose": "기사(차량) 화면의 휴대폰 시안. 태블릿이 없을 때 휴대폰으로 같은 일을 할 수 있게, pos-rest-v1의 기사 태블릿 화면(D01~D03)과 같은 디자인을 세로 한 줄로 옮긴다.",
+  "frame": {
+    "css": "360×640 (세로)",
+    "why": "작은 안드로이드폰(360×800)에서 브라우저 주소창이 보일 때의 표시 영역. 가장 빡빡한 조건이며, 화면이 더 길면 줄 수만 늘어난다(쪽 나눔은 높이로 계산).",
+    "aspect_ratio": "9:16"
+  },
+  "generation": {
+    "model": "gpt_image_2_5",
+    "variant": "flare",
+    "quality": "high",
+    "resolution": "2k",
+    "aspect_ratio": "9:16",
+    "creditsPerImage": 3,
+    "order": "wave 1 = D11 기준 화면 → 직접 검수 → wave 2 = D11의 job id를 첫 참조로 넣어 D12 · D13 · D14"
+  },
+  "references": {
+    "tabletDriverScreens": {
+      "D01": "27c00e31-e89a-4c9c-b8f1-a7628c8da874",
+      "D02": "ad282bec-bb3c-4302-98be-b795ffae040c",
+      "D03": "577f76b0-1eca-4709-9f5e-18ab05437d74"
+    },
+    "note": "이 묶음에서 먼저 만든 기준 화면 D11의 job id는 검수 뒤에 채웠다. 제출에 쓴 값 그대로다."
+  },
+  "screens": [
+    {
+      "code": "D11",
+      "title": "기사 휴대폰 · 차량 운행",
+      "wave": 1,
+      "file": "d11-phone-dispatch.png",
+      "aspect_ratio": "9:16",
+      "model": "gpt_image_2_5",
+      "params": {
+        "quality": "high",
+        "resolution": "2k",
+        "variant": "flare"
+      },
+      "references": [
+        {
+          "code": "D01",
+          "job_id": "27c00e31-e89a-4c9c-b8f1-a7628c8da874"
+        },
+        {
+          "code": "D02",
+          "job_id": "ad282bec-bb3c-4302-98be-b795ffae040c"
+        }
+      ],
+      "note": "휴대폰 기준 화면. 한 줄에 업무 하나, 오른쪽에 보라 '업무 처리'. 360×640에서 4줄 + 쪽수.",
+      "prompt": "High-fidelity UI design mockup of one screen of 스키노트, a web app for a Korean ski rental shop. This is the DRIVER screen used on a SMARTPHONE in the delivery van, held upright. The screen is shown flat and straight-on and fills the whole portrait canvas edge to edge: no phone body, no bezel, no notch, no status bar, no browser chrome, no hands, no perspective. Design frame 360×640 px portrait (the visible area of a small Android phone while the browser address bar is showing), so everything is large, nothing is cut off at any edge and nothing scrolls.\nUse the attached reference image(s): they show the TABLET version of this same driver screen. Keep the visual system IDENTICAL and adapt only the layout to one narrow column: page background #F4F4F2, white rows and cards with 16px radius and a 1px hairline #E3E3E3, near-black text #1A1A1A, gray text #5D5D5D, accent purple #5F33E1 for the active chip and the solid primary buttons (white bold text), NO orange anywhere; status colors always paired with a text label (red #B42318, amber #B45309, green #247A3D, blue #0074D9); Pretendard-like Korean sans-serif; simple 2px Lucide-like line icons. There is NO left rail and no side panel. Side padding is 16px.\nSizes for older drivers: smallest text 16px, body 18px, names and titles 22px bold, key numbers 32px bold, every touch target at least 52px tall, the primary button 64px tall. On this 360px-wide frame a 16px Korean character is about 1/22 of the screen width and a 22px character about 1/16 of it: draw the text at that real size and do NOT shrink it to fit more on a line. Never use an ellipsis or clipped text, and never show a half-cut row.\nAll UI text is Korean and must be rendered crisp and spelled EXACTLY as written below. No English UI labels, no lorem ipsum, no watermark, no annotations, no extra screens, only ONE phone screen.\nScreen: 차량 운행 (the driver's job list).\nHeader 56px, white with a bottom hairline: at the left the purple 16px bold wordmark 스키노트 and the bold 22px title \"차량 운행\"; at the right a white outlined square bell button 48px with a red badge 3, and a white outlined button \"나가기\" 48px tall with a door icon.\nChips row 60px: three filter chips 52px tall with 16px bold labels: solid purple \"오늘·이전 7\", white \"내일 0\", white \"달력\" with a calendar icon.\nPager row 56px: at the left 16px gray text \"1호 차량 · 남은 7건\"; at the right a compact pager: white outlined square button \"‹\" 52px, 18px text \"1 / 2쪽\", white outlined square button \"›\" 52px.\nList: exactly four white rows, each 88px tall, full width, 8px gaps. In each row the left side has three lines: line 1 in 22px bold \"시간 · 팀\"; line 2 a small job-type badge (16px bold on a tinted background) followed by the place in 16px gray; line 3 the items in 16px gray. The right side of the row is a solid purple button 64px tall and about 96px wide with the white 18px bold label \"업무 처리\".\nRow 1: \"09:00 · 김민재 팀\"; blue badge \"배달\" then \"만선 광장\"; \"스키 2 · 의류 1\". Row 2: \"09:40 · 박서윤 팀\"; blue badge \"배달\" then \"설천 주차장\"; \"스키 2 · 의류 1\". Row 3: \"10:20 · 이도윤 팀\"; blue badge \"배달\" then \"만선 티롤 앞\"; \"보드 2 · 의류 1\". Row 4: \"16:30 · 김영희 팀\"; amber badge \"수거\" then \"만선 티롤 앞\"; \"스키 2 · 의류 2 · 헬멧 1\".\nFooter 72px, white with a top hairline: two white outlined buttons of equal width side by side, 56px tall with 18px bold labels: \"차량 보관\" and \"최신 업무 확인\". There is no solid purple button in the footer; the purple action is on each row."
+    },
+    {
+      "code": "D12",
+      "title": "기사 휴대폰 · 배달 처리",
+      "wave": 2,
+      "file": "d12-phone-task.png",
+      "aspect_ratio": "9:16",
+      "model": "gpt_image_2_5",
+      "params": {
+        "quality": "high",
+        "resolution": "2k",
+        "variant": "flare"
+      },
+      "references": [
+        {
+          "code": "D11",
+          "job_id": "da4b1b02-abe6-4b78-b09e-953f7fd243c3"
+        },
+        {
+          "code": "D02",
+          "job_id": "ad282bec-bb3c-4302-98be-b795ffae040c"
+        }
+      ],
+      "note": "한 팀의 전달 수량을 큰 −/+ 로 고르고, 맨 아래 폭 전체 보라 버튼으로 확정.",
+      "prompt": "High-fidelity UI design mockup of one screen of 스키노트, a web app for a Korean ski rental shop. This is the DRIVER screen used on a SMARTPHONE in the delivery van, held upright. The screen is shown flat and straight-on and fills the whole portrait canvas edge to edge: no phone body, no bezel, no notch, no status bar, no browser chrome, no hands, no perspective. Design frame 360×640 px portrait (the visible area of a small Android phone while the browser address bar is showing), so everything is large, nothing is cut off at any edge and nothing scrolls.\nUse the attached reference image(s): they show the TABLET version of this same driver screen. Keep the visual system IDENTICAL and adapt only the layout to one narrow column: page background #F4F4F2, white rows and cards with 16px radius and a 1px hairline #E3E3E3, near-black text #1A1A1A, gray text #5D5D5D, accent purple #5F33E1 for the active chip and the solid primary buttons (white bold text), NO orange anywhere; status colors always paired with a text label (red #B42318, amber #B45309, green #247A3D, blue #0074D9); Pretendard-like Korean sans-serif; simple 2px Lucide-like line icons. There is NO left rail and no side panel. Side padding is 16px.\nSizes for older drivers: smallest text 16px, body 18px, names and titles 22px bold, key numbers 32px bold, every touch target at least 52px tall, the primary button 64px tall. On this 360px-wide frame a 16px Korean character is about 1/22 of the screen width and a 22px character about 1/16 of it: draw the text at that real size and do NOT shrink it to fit more on a line. Never use an ellipsis or clipped text, and never show a half-cut row.\nAll UI text is Korean and must be rendered crisp and spelled EXACTLY as written below. No English UI labels, no lorem ipsum, no watermark, no annotations, no extra screens, only ONE phone screen.\nThe FIRST reference image is the phone job list of this app (same phone design system); the second is the tablet version of this screen.\nScreen: 배달 처리 (handing over the items of one delivery job).\nHeader 56px, white with a bottom hairline: at the left a white outlined button \"‹ 목록\" 48px tall, then the bold 22px title \"배달 처리\"; at the right a white outlined square bell button 48px with a red badge 3.\nTeam card (white, 16px radius): line 1 = 22px bold \"김민재 팀\" with a blue badge \"배달 3개\" at the right end; line 2 = 16px gray \"9/17 09:00 · 만선 광장\"; line 3 = 18px \"010-1234-1000\"; under it two white outlined buttons of equal width side by side, 52px tall with 18px bold labels: \"전화\" with a phone icon and \"출발 문자\" with a message icon.\nItem rows: two white rows 76px tall with 8px gap. Each row has at the left a 20px bold item name with a 16px gray caption under it, and at the right a stepper made of two 56px square white outlined buttons \"−\" and \"+\" with a 28px bold quantity between them. Row 1: \"스키\" caption \"남음 2 · 차량 보관\" quantity 2. Row 2: \"의류\" caption \"남음 1 · 차량 보관\" quantity 1.\nUnder the rows a light-amber strip with an amber warning icon and two lines of 16px dark-amber text: \"예약금 65,000원 미수\" and \"수납은 매장에서\".\nBottom action area, white with a top hairline, pinned to the bottom edge: first a full-width white outlined button 56px tall \"못 받음·고객 부재\", and under it the full-width solid purple primary button 64px tall with a white 20px bold label \"실제 전달 확정 3개\"."
+    },
+    {
+      "code": "D13",
+      "title": "기사 휴대폰 · 차량 보관",
+      "wave": 2,
+      "file": "d13-phone-stock.png",
+      "aspect_ratio": "9:16",
+      "model": "gpt_image_2_5",
+      "params": {
+        "quality": "high",
+        "resolution": "2k",
+        "variant": "flare"
+      },
+      "references": [
+        {
+          "code": "D11",
+          "job_id": "da4b1b02-abe6-4b78-b09e-953f7fd243c3"
+        },
+        {
+          "code": "D03",
+          "job_id": "577f76b0-1eca-4709-9f5e-18ab05437d74"
+        }
+      ],
+      "note": "지금 차에 실린 물품. 숫자 4칸(2×2)과 품목 4줄, 맨 아래 매장 입고.",
+      "prompt": "High-fidelity UI design mockup of one screen of 스키노트, a web app for a Korean ski rental shop. This is the DRIVER screen used on a SMARTPHONE in the delivery van, held upright. The screen is shown flat and straight-on and fills the whole portrait canvas edge to edge: no phone body, no bezel, no notch, no status bar, no browser chrome, no hands, no perspective. Design frame 360×640 px portrait (the visible area of a small Android phone while the browser address bar is showing), so everything is large, nothing is cut off at any edge and nothing scrolls.\nUse the attached reference image(s): they show the TABLET version of this same driver screen. Keep the visual system IDENTICAL and adapt only the layout to one narrow column: page background #F4F4F2, white rows and cards with 16px radius and a 1px hairline #E3E3E3, near-black text #1A1A1A, gray text #5D5D5D, accent purple #5F33E1 for the active chip and the solid primary buttons (white bold text), NO orange anywhere; status colors always paired with a text label (red #B42318, amber #B45309, green #247A3D, blue #0074D9); Pretendard-like Korean sans-serif; simple 2px Lucide-like line icons. There is NO left rail and no side panel. Side padding is 16px.\nSizes for older drivers: smallest text 16px, body 18px, names and titles 22px bold, key numbers 32px bold, every touch target at least 52px tall, the primary button 64px tall. On this 360px-wide frame a 16px Korean character is about 1/22 of the screen width and a 22px character about 1/16 of it: draw the text at that real size and do NOT shrink it to fit more on a line. Never use an ellipsis or clipped text, and never show a half-cut row.\nAll UI text is Korean and must be rendered crisp and spelled EXACTLY as written below. No English UI labels, no lorem ipsum, no watermark, no annotations, no extra screens, only ONE phone screen.\nThe FIRST reference image is the phone job list of this app (same phone design system); the second is the tablet version of this screen.\nScreen: 차량 보관 (what is in the van right now).\nHeader 56px, white with a bottom hairline: at the left a white outlined button \"‹ 목록\" 48px tall, then the bold 22px title \"차량 보관\" followed by a light-purple pill with purple 16px bold text \"보관 21개\"; at the right a white outlined square bell button 48px with a red badge 3.\nNumber tiles: four white tiles in 2 columns × 2 rows with 12px gaps, each 76px tall, with a 16px gray label and a 32px bold number under it: \"장비\" \"8\", \"의류\" \"6\", \"헬멧\" \"3\", \"리프트권\" \"4매\".\nItem rows: four white rows 64px tall with 8px gaps; each row has a 20px bold line at the left with a 16px gray caption under it, and a status badge (16px bold) at the right end: \"스키 6대\" caption \"배달 예정 6\" blue badge \"배달 예정\"; \"보드 2대\" caption \"수거 보관 2\" amber badge \"매장 입고 대기\"; \"의류 6벌\" caption \"배달 3 · 수거 3\" blue badge \"배달 예정\"; \"헬멧 3개\" caption \"수거 보관 3\" amber badge \"매장 입고 대기\".\nBottom action area, white with a top hairline, pinned to the bottom edge: the full-width solid purple primary button 64px tall with a white 20px bold label \"매장 입고 8개\"."
+    },
+    {
+      "code": "D14",
+      "title": "기사 휴대폰 · 못 받음·방문 결과",
+      "wave": 2,
+      "file": "d14-phone-visit-result.png",
+      "aspect_ratio": "9:16",
+      "model": "gpt_image_2_5",
+      "params": {
+        "quality": "high",
+        "resolution": "2k",
+        "variant": "flare"
+      },
+      "references": [
+        {
+          "code": "D11",
+          "job_id": "da4b1b02-abe6-4b78-b09e-953f7fd243c3"
+        },
+        {
+          "code": "D02",
+          "job_id": "ad282bec-bb3c-4302-98be-b795ffae040c"
+        }
+      ],
+      "note": "휴대폰의 팝업은 아래에서 올라오는 판. 타이핑 없이 선택 버튼으로 방문 결과와 다음 약속을 남긴다.",
+      "prompt": "High-fidelity UI design mockup of one screen of 스키노트, a web app for a Korean ski rental shop. This is the DRIVER screen used on a SMARTPHONE in the delivery van, held upright. The screen is shown flat and straight-on and fills the whole portrait canvas edge to edge: no phone body, no bezel, no notch, no status bar, no browser chrome, no hands, no perspective. Design frame 360×640 px portrait (the visible area of a small Android phone while the browser address bar is showing), so everything is large, nothing is cut off at any edge and nothing scrolls.\nUse the attached reference image(s): they show the TABLET version of this same driver screen. Keep the visual system IDENTICAL and adapt only the layout to one narrow column: page background #F4F4F2, white rows and cards with 16px radius and a 1px hairline #E3E3E3, near-black text #1A1A1A, gray text #5D5D5D, accent purple #5F33E1 for the active chip and the solid primary buttons (white bold text), NO orange anywhere; status colors always paired with a text label (red #B42318, amber #B45309, green #247A3D, blue #0074D9); Pretendard-like Korean sans-serif; simple 2px Lucide-like line icons. There is NO left rail and no side panel. Side padding is 16px.\nSizes for older drivers: smallest text 16px, body 18px, names and titles 22px bold, key numbers 32px bold, every touch target at least 52px tall, the primary button 64px tall. On this 360px-wide frame a 16px Korean character is about 1/22 of the screen width and a 22px character about 1/16 of it: draw the text at that real size and do NOT shrink it to fit more on a line. Never use an ellipsis or clipped text, and never show a half-cut row.\nAll UI text is Korean and must be rendered crisp and spelled EXACTLY as written below. No English UI labels, no lorem ipsum, no watermark, no annotations, no extra screens, only ONE phone screen.\nThe FIRST reference image is the phone job list of this app (same phone design system); the second is the tablet version of the task screen.\nScreen: a BOTTOM SHEET over the phone screen 배달 처리. The parent screen (header with a white outlined button \"‹ 목록\", the bold title \"배달 처리\" and a bell button; under it the top of a white team card \"김민재 팀\") is visible only in the top 100px and is dimmed by a 45% black overlay.\nThe bottom sheet is a white panel attached to the bottom edge, full width, about 540px tall, with 20px radius on its top corners and a small gray grabber bar at its top center. Inside: a 22px bold title \"못 받음·방문 결과\" with a 16px gray subtitle under it \"김민재 팀 · 물품 수량 이동 없음\", and a 48px square outlined close button with an X icon at the top right.\nThen option groups; each group is an 18px bold label with option buttons 56px tall and 18px labels under it (a selected option has a near-black fill and white text, the others are white outlined). \"방문 결과\": first row two buttons of equal width \"고객 부재\" (selected) and \"장소 변경\", second row one full-width button \"물품을 받지 못함\". \"다음 방문일\": three buttons of equal width \"오늘 다시\" (selected), \"내일\", \"달력\". \"다음 시간\": three buttons of equal width \"16:30\", \"17:00\" (selected), \"직접 입력\". Then an info row with a light-gray background: 16px gray label \"다음 장소\", 18px bold \"만선 광장\", and a white outlined button \"변경\" 52px tall at the right end.\nBottom button row of the sheet: a white outlined button \"취소\" about 96px wide and, filling the rest of the row, the solid purple primary button with a white 16px bold label \"방문 결과·다음 약속 저장\"; both 64px tall."
+    }
+  ]
+}

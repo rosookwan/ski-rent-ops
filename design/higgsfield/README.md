@@ -27,6 +27,7 @@
 | 모델 | `gpt_image_2_5` (variant `flare`) · 한글 글자 렌더링과 참조 이미지 편집이 되는 모델 |
 | 품질·해상도 | quality `high`, resolution `2k` |
 | 비율 | `27:16` (1.6875) · 1024×600 POS 표시 영역(1.7067)에 가장 가까운 지원 비율 |
+| 비율(휴대폰) | `9:16` · 세로 화면. 기준 360×640(작은 휴대폰에서 주소창이 보일 때). 출력 1520×2688 |
 | 비용 | 장당 3 크레딧 (`get_cost` 사전 확인값, 2026-09-20) |
 | 일관성 | 첫 화면(앵커)을 먼저 만들고, 나머지는 앵커 결과의 job id를 `image_references`로 넘겨 같은 셸·색·글자 크기를 유지한다. |
 
@@ -47,3 +48,4 @@
 |---|---|---|---|
 | `pos-main-v1/` | POS 메인 화면 8종 + 목록 비교안 1종 | [docs/38-higgsfield-pos-main-screens.md](../../docs/38-higgsfield-pos-main-screens.md) | 9장 생성·검수 완료 (2026-09-21, 14장·42 크레딧) · [보기](pos-main-v1/index.html) |
 | `pos-rest-v1/` | 나머지 화면 33종: 포스 화면 9 · 팝업 13 · 관리 8 · 기사 태블릿 3 | [docs/40-higgsfield-pos-rest-screens.md](../../docs/40-higgsfield-pos-rest-screens.md) | 같은 템플릿(앵커 P01) + 기준 화면 4종(P02R 카드 목록 · M01 관리 · P20 팝업 · D01 기사) · [보기](pos-rest-v1/index.html) |
+| `driver-phone-v1/` | 기사 휴대폰 화면 4종(차량 운행 · 배달 처리 · 차량 보관 · 못 받음·방문 결과) · 세로 9:16 · 기준 360×640 | [docs/41-higgsfield-driver-phone-screens.md](../../docs/41-higgsfield-driver-phone-screens.md) | 4장 · 12 크레딧 · 재생성 0 · 실제 크기 검사 포함 · [보기](driver-phone-v1/index.html) |
