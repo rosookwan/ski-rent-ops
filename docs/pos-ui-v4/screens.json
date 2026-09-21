@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-21T05:14:21.740Z",
+  "generatedAt": "2026-09-21T06:48:50.790Z",
   "mode": "static memory demonstration; screenshots are not evidence of physical hardware",
   "checks": [
     {
@@ -1203,6 +1203,56 @@
       }
     },
     {
+      "key": "intake-place",
+      "viewport": [
+        1024,
+        600
+      ],
+      "overflow": [],
+      "bodyScroll": false,
+      "rules": {
+        "minFont": 16,
+        "minTarget": 52,
+        "smallText": [],
+        "clippedText": [],
+        "halfCut": [],
+        "shortTargets": [],
+        "scrolling": []
+      },
+      "ruleTotals": {
+        "smallText": 0,
+        "clippedText": 0,
+        "halfCut": 0,
+        "shortTargets": 0,
+        "scrolling": 0
+      }
+    },
+    {
+      "key": "intake-confirm",
+      "viewport": [
+        1024,
+        600
+      ],
+      "overflow": [],
+      "bodyScroll": false,
+      "rules": {
+        "minFont": 16,
+        "minTarget": 52,
+        "smallText": [],
+        "clippedText": [],
+        "halfCut": [],
+        "shortTargets": [],
+        "scrolling": []
+      },
+      "ruleTotals": {
+        "smallText": 0,
+        "clippedText": 0,
+        "halfCut": 0,
+        "shortTargets": 0,
+        "scrolling": 0
+      }
+    },
+    {
       "key": "intake-done",
       "viewport": [
         1024,
@@ -1254,6 +1304,81 @@
     },
     {
       "key": "preinput",
+      "viewport": [
+        1024,
+        600
+      ],
+      "overflow": [],
+      "bodyScroll": false,
+      "rules": {
+        "minFont": 16,
+        "minTarget": 52,
+        "smallText": [],
+        "clippedText": [],
+        "halfCut": [],
+        "shortTargets": [],
+        "scrolling": []
+      },
+      "ruleTotals": {
+        "smallText": 0,
+        "clippedText": 0,
+        "halfCut": 0,
+        "shortTargets": 0,
+        "scrolling": 0
+      }
+    },
+    {
+      "key": "settings-places",
+      "viewport": [
+        1024,
+        600
+      ],
+      "overflow": [],
+      "bodyScroll": false,
+      "rules": {
+        "minFont": 16,
+        "minTarget": 52,
+        "smallText": [],
+        "clippedText": [],
+        "halfCut": [],
+        "shortTargets": [],
+        "scrolling": []
+      },
+      "ruleTotals": {
+        "smallText": 0,
+        "clippedText": 0,
+        "halfCut": 0,
+        "shortTargets": 0,
+        "scrolling": 0
+      }
+    },
+    {
+      "key": "settings-template",
+      "viewport": [
+        1024,
+        600
+      ],
+      "overflow": [],
+      "bodyScroll": false,
+      "rules": {
+        "minFont": 16,
+        "minTarget": 52,
+        "smallText": [],
+        "clippedText": [],
+        "halfCut": [],
+        "shortTargets": [],
+        "scrolling": []
+      },
+      "ruleTotals": {
+        "smallText": 0,
+        "clippedText": 0,
+        "halfCut": 0,
+        "shortTargets": 0,
+        "scrolling": 0
+      }
+    },
+    {
+      "key": "settings-discounts",
       "viewport": [
         1024,
         600
@@ -1669,6 +1794,18 @@
       "size": "1024×600"
     },
     {
+      "title": "수령 장소 선택",
+      "detail": "구역을 바꿔 가며 장소를 큰 버튼으로 고릅니다. 장소가 늘어도 접수 화면은 구역 버튼만 보입니다.",
+      "file": "intake-place-1024x600.png",
+      "size": "1024×600"
+    },
+    {
+      "title": "접수 확정 · 할인과 수납",
+      "detail": "장비와 리프트권을 나눠 할인 하나와 결제 수단을 고르고 그 자리에서 수납합니다. 나중에 수납도 됩니다.",
+      "file": "intake-confirm-1024x600.png",
+      "size": "1024×600"
+    },
+    {
       "title": "접수 완료",
       "detail": "접수번호와 품목·일정·합계를 보여 주고 다음 할 일로 이어집니다.",
       "file": "intake-done-1024x600.png",
@@ -1684,6 +1821,24 @@
       "title": "사전입력·준비표",
       "detail": "이번 차수에서 새로 입력할 일행만 요청합니다.",
       "file": "preinput-1024x600.png",
+      "size": "1024×600"
+    },
+    {
+      "title": "매장 설정 · 수령 장소(구역별)",
+      "detail": "구역 칩으로 나눠 그 구역의 장소만 봅니다. 스키장 템플릿으로 처음 값을 채웁니다.",
+      "file": "settings-places-1024x600.png",
+      "size": "1024×600"
+    },
+    {
+      "title": "스키장 템플릿",
+      "detail": "스키장을 고르면 구역 · 장소 · 반납 타임 · 리프트권 권종이 채워집니다. 요금과 할인은 그대로.",
+      "file": "settings-template-1024x600.png",
+      "size": "1024×600"
+    },
+    {
+      "title": "매장 설정 · 할인",
+      "detail": "장비당(하루 기준) · % · 금액 · 리프트권 % — 접수 확정 창의 할인 버튼으로 나옵니다.",
+      "file": "settings-discounts-1024x600.png",
       "size": "1024×600"
     },
     {

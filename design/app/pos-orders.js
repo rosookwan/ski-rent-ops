@@ -336,22 +336,31 @@
       + '<div class="pos-panel-foot">' + btn('일행 추가', 'pos-person-add') + btn('여러 명', 'pos-people-many') + (d.people.length ? btn('빼기', 'pos-person-remove') : '') + '</div></section>'
       + '<section class="pos-panel">' + panelHead((at >= 0 ? (at + 1) + ' ' : '') + current.name, '품목 선택', g.pager) + g.html + '<div class="pos-panel-foot">' + (at > 0 ? btn('앞사람과 같게', 'pos-person-copy', 'prev') : '') + (at >= 0 && empty ? btn('남은 ' + empty + '명 모두 같게', 'pos-person-copy', 'rest') : '') + btn('직접 입력', 'pos-line-detail') + '</div>' + errorBox() + '</section></div>';
   }
+  const isLift = l => sku(l.sku)?.kind === 'liftTicket';
+  const areaOfPlace = place => settingsOf().areas?.find(area => area.places.includes(place));
+  const shortPlace = (place, area) => area && place.startsWith(area.name + ' ') ? place.slice(area.name.length + 1) : place;
   function scheduleStep(d, name) {
     syncDates();
-    const settings = settingsOf(), days = dayCount(d), pick = d.pickupPlan, back = d.returnPlan, places = settings.places || [], shown = places.slice(0, places.length > 3 ? 2 : 3);
+    const settings = settingsOf(), days = dayCount(d), pick = d.pickupPlan, back = d.returnPlan, areas = (settings.areas || []).filter(area => area.places.length || area.id === areaOfPlace(pick.place)?.id);
     const row = (label, html) => '<div class="pos-option-row"><span>' + e(label) + '</span><div>' + html + '</div></div>';
-    const times = ['09:00', '12:00', '17:00'], customTime = pick.time && !times.includes(pick.time), customPlace = pick.method === 'delivery' && !shown.includes(pick.place);
-    const preset = settings.returnTimes.find(t => t.time === back.time && (t.dayOffset || 0) === (d.returnOffset || 0) && back.date === addDays(d.end, t.dayOffset || 0));
+    const times = ['09:00', '12:00', '17:00'], customTime = pick.time && !times.includes(pick.time);
+    // Pickup place: the shop plus one button per area; the places themselves are picked in a window, so ten or more places never crowd this row (docs/44).
+    const chosen = pick.method === 'delivery' ? areaOfPlace(pick.place) : null, shownAreas = areas.slice(0, areas.length > 3 ? 2 : 3), hiddenChosen = pick.method === 'delivery' && !shownAreas.some(area => area.id === chosen?.id);
+    const areaButton = area => area.id === chosen?.id ? option(area.name, 'pos-place-open', area.id, true, shortPlace(pick.place, area)) : option(area.name + ' ›', 'pos-place-open', area.id, false);
+    const placeRow = option('매장 수령', 'pos-plan-pick', 'place:', pick.method === 'shop') + shownAreas.map(areaButton).join('') + (areas.length > 3 || hiddenChosen ? (hiddenChosen ? option(chosen?.name || '직접 입력', 'pos-place-open', chosen?.id || '', true, shortPlace(pick.place, chosen)) : option('더 보기 ›', 'pos-place-open', areas[2].id, false)) : '') + (areas.length ? '' : option('장소 입력', 'pos-draft-plan', 'pickup-place', pick.method === 'delivery', pick.method === 'delivery' ? pick.place : ''));
+    // Return time: every preset from the store settings; when the row is too narrow the rest moves into a window.
+    const presets = settings.returnTimes, room = innerWidth >= 1000 ? 4 : 3, preset = presets.find(t => t.time === back.time && (t.dayOffset || 0) === (d.returnOffset || 0) && back.date === addDays(d.end, t.dayOffset || 0));
+    const shownTimes = presets.length <= room ? presets : presets.slice(0, room - 1), returnButton = t => option(t.label, 'pos-plan-pick', 'return:' + t.id, preset?.id === t.id, t.time);
+    const returnRow = shownTimes.map(returnButton).join('') + (presets.length > room ? (preset && !shownTimes.includes(preset) ? option(preset.label, 'pos-return-open', '', true, preset.time) : option('더 보기 ›', 'pos-return-open', '', false)) : '') + (preset ? option('직접', 'pos-draft-plan', 'return', false) : option(short(back.date), 'pos-draft-plan', 'return', true, back.time));
     const left = '<section class="pos-panel pos-options">'
       + row('수령일', option('오늘 ' + short(D.today), 'pos-plan-pick', 'day:' + D.today, d.start === D.today) + option('내일 ' + short(nextDate(D.today)), 'pos-plan-pick', 'day:' + nextDate(D.today), d.start === nextDate(D.today)) + option(d.start > nextDate(D.today) || d.start < D.today ? short(d.start) : '달력', 'pos-draft-dates', '', d.start > nextDate(D.today) || d.start < D.today))
       + row('이용 일수', [1, 2, 3].map(n => option(n + '일', 'pos-plan-pick', 'days:' + n, days === n)).join('') + option(days > 3 ? days + '일' : '직접', 'pos-draft-days-open', '', days > 3))
       + row('수령 시간', (d.start === D.today ? option('지금', 'pos-plan-pick', 'time:now', !pick.time || pick.now === true) : '') + times.map(t => option(t, 'pos-plan-pick', 'time:' + t, pick.time === t && !pick.now)).join('') + option(customTime && !pick.now ? pick.time : '직접', 'pos-draft-plan', 'pickup', !!customTime && !pick.now))
-      + row('수령 장소', option('매장 수령', 'pos-plan-pick', 'place:', pick.method === 'shop') + shown.map(place => option(place, 'pos-plan-pick', 'place:' + place, pick.method === 'delivery' && pick.place === place)).join('') + (places.length > 3 || customPlace ? option(customPlace ? pick.place : '더 보기', 'pos-draft-plan', 'pickup-place', customPlace) : ''))
-      + row('반납 시간', settings.returnTimes.slice(0, 3).map(t => option(t.label, 'pos-plan-pick', 'return:' + t.id, preset?.id === t.id, t.time)).join('') + (preset ? option('직접', 'pos-draft-plan', 'return', false) : option(short(back.date), 'pos-draft-plan', 'return', true, back.time))) + '</section>';
-    const discount = d.lines.reduce((n, l) => n + (l.price.discountWon || 0), 0);
+      + row('수령 장소', placeRow) + row('반납 시간', returnRow) + '</section>';
+    const gearWon = d.lines.filter(l => !isLift(l)).reduce((n, l) => n + amount(l), 0), liftWon = d.lines.filter(isLift).reduce((n, l) => n + amount(l), 0);
     const info = [['대표자', [name, d.customer.phone]], ['대여 품목', itemsSummary(d.lines)], ['이용', [short(d.start) + (d.end !== d.start ? '~' + short(d.end) : ''), days + '일', draftPeople().length ? '일행 ' + draftPeople().length + '명' : '']], ['수령', [(short(pick.date) + ' ' + (pick.time || '')).trim(), pick.method === 'delivery' ? pick.place : '매장 수령']], ['반납', [short(back.date) + ' ' + back.time, back.method === 'vehicle' ? '차량 수거' : '매장 직접']]];
     const right = '<section class="pos-panel pos-summary">' + panelHead(d.orderId ? '추가 요약' : '접수 요약') + '<dl class="pos-summary-list">' + info.map(([k, v]) => '<div><dt>' + e(k) + '</dt><dd data-fit="' + (k === '대여 품목' ? 'items' : 'parts') + '" data-parts="' + e(JSON.stringify(v.filter(Boolean))) + '">' + e(v.filter(Boolean).join(' · ')) + '</dd></div>').join('') + '</dl>'
-      + (discount ? '<div class="pos-summary-line"><span>할인</span><b>' + e(won(discount)) + '</b></div>' : '') + '<div class="pos-summary-total"><span>' + (d.orderId ? '이번 청구' : '합계') + '</span><b>' + e(won(draftTotal())) + '</b></div>' + errorBox() + '</section>';
+      + '<div class="pos-summary-split">' + (gearWon && liftWon ? '<div class="pos-summary-line"><span>장비 대여</span><b>' + e(won(gearWon)) + '</b></div><div class="pos-summary-line"><span>리프트권</span><b>' + e(won(liftWon)) + '</b></div>' : '') + '<div class="pos-summary-total"><span>' + (d.orderId ? '이번 청구' : '합계') + '</span><b>' + e(won(draftTotal())) + '</b></div></div>' + errorBox() + '</section>';
     return '<div class="pos-split is-wide">' + left + right + '</div>';
   }
   function intake() {
@@ -363,7 +372,7 @@
       + '<div class="pos-toolbar-group pos-steps">' + stepNames.map(([label, value], i) => '<button type="button" class="pos-chip" data-action="pos-draft-step" data-id="' + i + '" aria-pressed="' + (d.step === i) + '">' + (i < d.step ? S.icon('circle-check') : '') + '<span data-fit="alts" data-alts="' + e(JSON.stringify([(i + 1) + ' ' + label + (value ? ' · ' + value : ''), (i + 1) + ' ' + label])) + '">' + e((i + 1) + ' ' + label + (value ? ' · ' + value : '')) + '</span></button>').join('') + '</div>';
     const next = d.step === 0 ? btn('다음 · 품목', 'pos-draft-next', '', 'primary') : d.step === 1 ? btn('다음 · 일정·장소', 'pos-draft-next', '', 'primary') : btn((o ? '추가 확정' : '접수 확정') + ' · ' + won(draftTotal()), 'pos-draft-save', '', 'primary');
     const at = people.findIndex(p => p.id === d.personId), following = d.step === 1 && people.length > 1 ? people[(at + 1) % people.length] : null;
-    const foot = d.step === 0 && !o ? [d.customer.name || '고객을 찾거나 새로 입력', d.customer.phone] : d.step === 1 && people.length ? ['입력 ' + people.filter(p => d.lines.some(l => l.personId === p.id)).length + ' / ' + people.length + '명', '합계 ' + won(draftTotal())] : [name + ' 팀', people.length ? (o ? '새 일행 ' + d.people.length + '명' : '일행 ' + people.length + '명') : '', d.step === 2 ? '품목 ' + quantity + '개' : short(d.start) + ' 수령'];
+    const foot = d.step === 0 && !o ? [d.customer.name || '고객을 찾거나 새로 입력', d.customer.phone] : d.step === 1 && people.length ? ['입력 ' + people.filter(p => d.lines.some(l => l.personId === p.id)).length + ' / ' + people.length + '명', '합계 ' + won(draftTotal())] : [name + ' 팀', people.length ? (o ? '새 일행 ' + d.people.length + '명' : '일행 ' + people.length + '명') : '', d.step === 2 ? '품목 ' + quantity + '개' : short(d.start) + ' 수령', d.step === 2 ? '할인과 결제는 다음 창에서' : ''];
     return P.page(o ? '일행·장비 추가' : '새 접수', '', body, '<span>' + e(foot.filter(Boolean).join(' · ')) + '</span><div class="so-actions">' + btn('취소', 'pos-draft-cancel') + (following ? btn('다음 일행 · ' + following.name, 'pos-draft-pick-person', following.id) : '') + next + '</div>',
       { toolbar, title: o ? '일행·장비 추가' : '', wait: (d.step + 1) + ' / 3 단계', waitLabel: '', sums: [['이번 청구', won(draftTotal())]] });
   }
@@ -451,15 +460,32 @@
     } catch (err) { error(err); }
   });
   // Step 3 options. Anything beyond the buttons (another date, time, vehicle or place) opens the existing schedule window.
-  S.action('pos-plan-pick', value => {
+  const pickPlan = value => {
     const d = state.draft, at = value.indexOf(':'), kind = value.slice(0, at), id = value.slice(at + 1), settings = settingsOf(); syncDates();
     if (kind === 'day') { setDates(id, dayCount(d)); if (id !== D.today && (!d.pickupPlan.time || d.pickupPlan.now)) { d.pickupPlan.time = '09:00'; d.pickupPlan.now = false; } d.same = false; }
-    else if (kind === 'days') { setDates(d.start, Number(id)); S.close(); }
+    else if (kind === 'days') setDates(d.start, Number(id));
     else if (kind === 'time') { const now = id === 'now', vehicle = d.pickupPlan.method === 'delivery'; d.pickupPlan.now = now; d.pickupPlan.time = now ? (vehicle ? nowTime() : null) : id; }
-    else if (kind === 'place') { const p = d.pickupPlan, r = d.returnPlan; if (!id) { p.method = 'shop'; p.place = '매장'; delete p.vehicleId; if (p.now) p.time = null; r.method = 'direct'; r.place = '매장'; delete r.vehicleId; } else { const vehicleId = p.vehicleId || settings.vehicles[0]?.id; if (!vehicleId) { S.toast('매장 설정에 차량을 먼저 등록해 주세요'); return; } p.method = 'delivery'; p.place = id; p.vehicleId = vehicleId; if (!p.time) p.time = nowTime(); r.method = 'vehicle'; r.place = id; r.vehicleId = r.vehicleId || vehicleId; } }
+    else if (kind === 'place') { const p = d.pickupPlan, r = d.returnPlan; if (!id) { p.method = 'shop'; p.place = '매장'; delete p.vehicleId; if (p.now) p.time = null; r.method = 'direct'; r.place = '매장'; delete r.vehicleId; } else { const vehicleId = p.vehicleId || settings.vehicles[0]?.id; if (!vehicleId) { S.toast('매장 설정에 차량을 먼저 등록해 주세요'); return; } p.method = 'delivery'; p.place = id; p.vehicleId = vehicleId; if (!p.time) { p.time = nowTime(); p.now = true; } r.method = 'vehicle'; r.place = id; r.vehicleId = r.vehicleId || vehicleId; } }
     else if (kind === 'return') { const t = settings.returnTimes.find(row => row.id === id); if (!t) return; d.returnOffset = t.dayOffset || 0; d.returnPlan.time = t.time; d.returnPlan.auto = true; d.returnPlan.date = addDays(d.end, d.returnOffset); }
-    S.render();
-  });
+    S.close(); S.render();
+  };
+  S.action('pos-plan-pick', pickPlan);
+  // Pickup place window (S06): area chips, places as big buttons three across, paged when an area has more than nine.
+  let placePick = null;
+  function placeWindow() {
+    const areas = settingsOf().areas || [], area = areas.find(row => row.id === placePick.areaId) || areas[0], per = 9, count = Math.max(1, Math.ceil((area?.places.length || 0) / per)), index = Math.min(placePick.page, count - 1);
+    const cells = (area?.places || []).slice(index * per, index * per + per).map(place => '<button type="button" class="so-button pos-button pos-option pos-place" data-action="pos-place-choose" data-id="' + e(place) + '" aria-pressed="' + (placePick.place === place) + '"><span data-fit="words">' + e(shortPlace(place, area)) + '</span></button>').join('');
+    P.modal('수령 장소 · ' + (area?.name || ''), '<div class="pos-choice">' + areas.map(row => '<button type="button" class="so-button pos-button pos-option" data-action="pos-place-area" data-id="' + e(row.id) + '" aria-pressed="' + (row.id === area?.id) + '">' + e(row.name + ' ' + row.places.length) + '</button>').join('') + '</div>'
+      + (cells ? '<div class="pos-place-grid">' + cells + '</div>' : '<p class="pos-info">이 구역에 등록한 장소가 없습니다 · 매장 설정에서 추가</p>')
+      + '<div class="pos-panel-foot"><span>' + e((area?.name || '') + ' ' + (area?.places.length || 0) + '곳 · 장소는 매장 설정에서 추가') + '</span>' + miniPager('pos-place-page', index, count) + '</div>' + errorBox(),
+      btn('취소', 'close') + btn('직접 입력', 'pos-draft-plan', 'pickup-place') + btn('매장 수령으로', 'pos-plan-pick', 'place:') + btn('이 장소로 선택', 'pos-place-save', '', 'primary'), '차량이 배달하고 수거하는 장소');
+  }
+  S.action('pos-place-open', id => { const d = state.draft; syncDates(); placePick = { areaId: id || areaOfPlace(d.pickupPlan.place)?.id || '', place: d.pickupPlan.method === 'delivery' ? d.pickupPlan.place : '', page: 0 }; placeWindow(); });
+  S.action('pos-place-area', id => { placePick.areaId = id; placePick.page = 0; placeWindow(); });
+  S.action('pos-place-page', delta => { placePick.page = Math.max(0, placePick.page + Number(delta)); placeWindow(); });
+  S.action('pos-place-choose', place => { placePick.place = place; placeWindow(); });
+  S.action('pos-place-save', () => { if (!placePick.place) { error('장소를 하나 골라 주세요.'); return; } pickPlan('place:' + placePick.place); });
+  S.action('pos-return-open', () => { const d = state.draft, presets = settingsOf().returnTimes; P.modal('반납 시간', '<div class="pos-place-grid">' + presets.map(t => '<button type="button" class="so-button pos-button pos-option is-two pos-place" data-action="pos-plan-pick" data-id="return:' + e(t.id) + '" aria-pressed="' + (d.returnPlan?.time === t.time && (d.returnOffset || 0) === (t.dayOffset || 0)) + '"><span>' + e(t.label) + '</span><b>' + e(t.time) + '</b></button>').join('') + '</div>', btn('취소', 'close') + btn('직접 입력', 'pos-draft-plan', 'return'), '반납 타임은 매장 설정에서 추가'); });
   S.action('pos-draft-dates', () => P.calendar({ title: '수령일 선택', selected: state.draft.start, today: D.today, action: 'pos-draft-start' }));
   S.action('pos-draft-start', date => { const d = state.draft; if (date < D.today) { S.toast('오늘 이후 날짜를 골라 주세요'); return; } setDates(date, dayCount(d)); d.same = false; if (date !== D.today && d.pickupPlan && (!d.pickupPlan.time || d.pickupPlan.now)) { d.pickupPlan.time = '09:00'; d.pickupPlan.now = false; } S.close(); S.render(); });
   const daysModal = n => P.modal('이용 일수', '<div class="pos-stepper is-large"><button type="button" class="so-button pos-button" data-action="pos-draft-days" data-id="' + (n - 1) + '" aria-label="하루 줄이기"' + (n > 1 ? '' : ' disabled') + '>−</button><b>' + n + '</b><span>일</span><button type="button" class="so-button pos-button" data-action="pos-draft-days" data-id="' + (n + 1) + '" aria-label="하루 늘리기"' + (n < 30 ? '' : ' disabled') + '>+</button></div><p class="pos-info">' + e(short(state.draft.start) + ' ~ ' + short(addDays(state.draft.start, n - 1)) + ' 이용') + '</p>', btn('취소', 'close') + btn(n + '일 적용', 'pos-plan-pick', 'days:' + n, 'primary'));
@@ -488,18 +514,65 @@
   function doneModal(id, summary) {
     const o = D.order(id); if (!o) return; const pending = sizePending(o);
     const row = (k, parts, fit = 'parts', tone = '') => '<div><dt>' + e(k) + '</dt><dd data-tone="' + tone + '" data-fit="' + fit + '" data-parts="' + e(JSON.stringify(parts.filter(Boolean))) + '">' + e(parts.filter(Boolean).join(' · ')) + '</dd></div>';
-    P.modal('접수 완료 · ' + (o.receiptNo || o.id), '<dl class="pos-summary-list is-done">' + row('대표자', [o.customer.name + ' 팀', o.people.length ? o.people.length + '명' : '']) + row('대여 품목', summary.items, 'items') + row('일정', [summary.pickup + ' 수령', summary.back + ' 반납']) + row('사이즈 입력', [pending ? pending + '명 미입력' : '입력할 일행 없음'], 'parts', pending ? 'orange' : '') + '</dl>'
+    P.modal('접수 완료 · ' + (o.receiptNo || o.id), '<dl class="pos-summary-list is-done">' + row('대표자', [o.customer.name + ' 팀', o.people.length ? o.people.length + '명' : '']) + row('대여 품목', summary.items, 'items') + row('일정', [summary.pickup + ' 수령', summary.back + ' 반납']) + row('수납', summary.paid?.length ? summary.paid : ['나중에 수납 · 미수 ' + won(summary.total)], 'parts', summary.paid?.length ? '' : 'orange') + row('사이즈 입력', [pending ? pending + '명 미입력' : '입력할 일행 없음'], 'parts', pending ? 'orange' : '') + '</dl>'
       + '<div class="pos-summary-total"><span>합계</span><b>' + e(won(summary.total)) + '</b></div>', (pending ? btn('사이즈 입력 요청', 'pos-preinput', o.id) : '') + btn('접수 상세', 'close') + go('접수 목록', 'intake', '', 'primary'));
   }
-  S.action('pos-draft-save', async () => {
+  // 접수 확정 창 (S07R · docs/44): gear and lift tickets are settled separately — one discount each (never stacked) and their own payment method.
+  const methodNames = { card: '카드', cash: '현금', transfer: '계좌이체' };
+  function confirmMath(d) {
+    const c = d.confirm, presets = settingsOf().discounts || [], days = dayCount(d), perUnit = Object.fromEntries(presets.filter(row => row.kind === 'perUnit').map(row => [row.sku, row.amountWon]));
+    const rows = d.lines.map(l => ({ id: l.id, sku: l.sku, quantity: l.quantity, unitWon: l.price.unitWon, days, ticket: isLift(l) }));
+    const gear = c.gear.kind === 'perUnit' ? { kind: 'perUnit', perUnit } : c.gear.kind === 'percent' && c.gear.percent ? { kind: 'percent', percent: c.gear.percent } : c.gear.kind === 'amount' && c.gear.amountWon ? { kind: 'amount', amountWon: c.gear.amountWon } : { kind: 'none' };
+    const result = window.SkiWorkflowManagement.applyDiscounts(rows, { gear, lift: { percent: c.lift.percent || 0 } }), manual = l => l.price.discountWon || 0, gross = l => amount(l) + manual(l);
+    const cut = l => Math.min(gross(l), manual(l) + result.lines[l.id]), part = lift => { const list = d.lines.filter(l => isLift(l) === lift), grossWon = list.reduce((n, l) => n + gross(l), 0), discountWon = list.reduce((n, l) => n + cut(l), 0); return { list, grossWon, discountWon, dueWon: grossWon - discountWon }; };
+    return { cut, gear: part(false), lift: part(true), perUnit };
+  }
+  function confirmWindow() {
+    const d = state.draft, c = d.confirm, o = d.orderId ? D.order(d.orderId) : null, name = o?.customer.name || d.customer.name, m = confirmMath(d), presets = settingsOf().discounts || [], total = m.gear.dueWon + m.lift.dueWon;
+    const pick = (label, part, value, on, sub) => '<button type="button" class="so-button pos-button pos-option' + (sub ? ' is-two' : '') + '" data-action="pos-confirm-discount" data-id="' + part + ':' + value + '" aria-pressed="' + (on ? 'true' : 'false') + '">' + (sub ? '<span>' + e(label) + '</span><b>' + e(sub) + '</b>' : e(label)) + '</button>';
+    const methods = part => '<div class="pos-choice">' + Object.entries(methodNames).map(([id, text]) => '<button type="button" class="so-button pos-button pos-option" data-action="pos-confirm-method" data-id="' + part + ':' + id + '" aria-pressed="' + (c[part + 'Method'] === id) + '">' + text + '</button>').join('') + '</div>';
+    const card = (title, part, p, buttons) => '<section class="pos-confirm-card"><div class="pos-confirm-head"><strong>' + title + '</strong><b>' + e(won(p.grossWon)) + '</b></div><span class="pos-confirm-label">할인</span><div class="pos-choice">' + buttons + '</div>'
+      + '<div class="pos-confirm-line"><span data-fit="items" data-parts="' + e(JSON.stringify(itemsSummary(p.list))) + '">' + e(itemsSummary(p.list).join(' · ')) + '</span><b>' + (p.discountWon ? '−' + e(won(p.discountWon)) : '할인 없음') + '</b></div><span class="pos-confirm-label">결제 수단</span>' + methods(part) + '<div class="pos-confirm-due"><span>받을 금액</span><b>' + e(won(p.dueWon)) + '</b></div></section>';
+    const perUnitText = Object.keys(m.perUnit).length ? '하루 ' + won(Math.max(...Object.values(m.perUnit))) : '설정 없음', liftPresets = presets.filter(row => row.kind === 'liftPercent').slice(0, 3);
+    const gearButtons = pick('없음', 'gear', 'none', c.gear.kind === 'none') + pick('장비당 할인', 'gear', 'perUnit', c.gear.kind === 'perUnit', perUnitText) + pick('% 할인', 'gear', 'percent', c.gear.kind === 'percent', c.gear.kind === 'percent' ? c.gear.percent + '%' : '선택') + pick('금액 할인', 'gear', 'amount', c.gear.kind === 'amount', c.gear.kind === 'amount' ? won(c.gear.amountWon) : '선택');
+    const liftCustom = c.lift.percent && !liftPresets.some(row => row.percent === c.lift.percent), liftButtons = pick('없음', 'lift', '0', !c.lift.percent) + liftPresets.map(row => pick(row.percent + '%', 'lift', String(row.percent), c.lift.percent === row.percent)).join('') + (liftCustom || !liftPresets.length || presets.filter(row => row.kind === 'liftPercent').length > 3 ? pick(liftCustom ? c.lift.percent + '%' : '직접', 'lift', 'choose', !!liftCustom) : '');
+    const paid = {}; for (const part of ['gear', 'lift']) if (m[part].dueWon) paid[c[part + 'Method']] = (paid[c[part + 'Method']] || 0) + m[part].dueWon;
+    const summary = ['할인 ' + won(m.gear.discountWon + m.lift.discountWon), ...Object.entries(paid).map(([id, value]) => methodNames[id] + ' ' + won(value))];
+    P.modal(name + ' 팀 · ' + (o ? '추가 확정' : '접수 확정'), '<div class="pos-confirm-cards' + (m.gear.list.length && m.lift.list.length ? '' : ' is-one') + '">' + (m.gear.list.length ? card('장비 대여', 'gear', m.gear, gearButtons) : '') + (m.lift.list.length ? card('리프트권', 'lift', m.lift, liftButtons) : '') + '</div>'
+      + '<div class="pos-confirm-total"><span data-fit="parts" data-parts="' + e(JSON.stringify(summary)) + '">' + e(summary.join(' · ')) + '</span><span>합계</span><b>' + e(won(total)) + '</b></div>' + errorBox(),
+      btn('취소', 'close') + btn('나중에 수납', 'pos-confirm-save', 'later') + btn(total ? '수납하고 ' + (o ? '추가 확정' : '접수 확정') + ' · ' + won(total) : (o ? '추가 확정' : '접수 확정'), 'pos-confirm-save', 'pay', 'primary'),
+      [short(d.start) + ' 수령', dayCount(d) + '일', '품목 ' + d.lines.reduce((n, l) => n + l.quantity, 0) + '개', '할인과 결제 수단을 고르세요'].join(' · '));
+    S.$('#so-dialog')?.classList.add('is-wide');
+  }
+  S.action('pos-draft-save', () => { const d = state.draft; if (!d) return; syncDates(); d.confirm = d.confirm || { gear: { kind: 'none' }, lift: { percent: 0 }, gearMethod: 'card', liftMethod: 'cash' }; confirmWindow(); });
+  S.action('pos-confirm-method', value => { const [part, method] = value.split(':'); state.draft.confirm[part + 'Method'] = method; confirmWindow(); });
+  // % and amount discounts open a small chooser with the store's presets and a direct entry; the chosen value shows on the button.
+  function chooseWindow(part, kind) {
+    const presets = (settingsOf().discounts || []).filter(row => row.kind === (part === 'lift' ? 'liftPercent' : kind)), percent = kind !== 'amount';
+    P.modal((part === 'lift' ? '리프트권 ' : '장비 ') + (percent ? '% 할인' : '금액 할인'), (presets.length ? '<div class="pos-place-grid">' + presets.map(row => '<button type="button" class="so-button pos-button pos-option pos-place" data-action="pos-confirm-value" data-id="' + part + ':' + kind + ':' + (percent ? row.percent : row.amountWon) + '">' + e(percent ? row.percent + '%' : won(row.amountWon)) + '</button>').join('') + '</div>' : '<p class="pos-info">매장 설정 · 할인에 넣어 둔 값이 없습니다</p>')
+      + '<div class="pos-form-grid">' + input(percent ? '직접 입력 (%)' : '직접 입력 (원)', 'confirmValue', '', 'number', percent ? 'min="1" max="100" inputmode="numeric"' : 'min="1" inputmode="numeric"') + '<div class="so-field">&nbsp;' + btn('이 값으로', 'pos-confirm-value', part + ':' + kind + ':input') + '</div></div>' + errorBox(), btn('‹ 접수 확정 창으로', 'pos-confirm-back'), percent ? '합계의 몇 %를 뺍니다 · 10원 미만 버림' : '장비 총 금액에서 뺍니다');
+  }
+  S.action('pos-confirm-back', confirmWindow);
+  S.action('pos-confirm-discount', value => { const [part, kind] = value.split(':'), c = state.draft.confirm; if (part === 'lift') { if (kind === 'choose') { chooseWindow('lift', 'percent'); return; } c.lift.percent = Number(kind) || 0; } else if (kind === 'none' || kind === 'perUnit') c.gear = { kind }; else { chooseWindow('gear', kind); return; } confirmWindow(); });
+  S.action('pos-confirm-value', value => { try { const [part, kind, raw] = value.split(':'), n = Number(raw === 'input' ? read('confirmValue') : raw), c = state.draft.confirm; window.SkiWorkflowCommon.integer(n, 1, kind === 'amount' ? Number.MAX_SAFE_INTEGER : 100); if (part === 'lift') c.lift.percent = n; else c.gear = kind === 'amount' ? { kind, amountWon: n } : { kind, percent: n }; confirmWindow(); } catch (err) { error(err.message?.includes('정수') || !err.message ? '값을 확인해 주세요.' : err); } });
+  S.action('pos-confirm-save', async mode => {
     const d = state.draft; if (!d) return;
-    try { syncDates(); const pickupPlan = planOut(d.pickupPlan), returnPlan = planOut(d.returnPlan);
-      const batch = { id: D.id('batch'), label: d.orderId ? '추가 접수 · ' + d.start : '첫 접수', lines: d.lines.map(l => ({ ...l, pickupPlan, ...(sku(l.sku)?.kind === 'liftTicket' ? {} : { returnPlan }) })) };
-      const summary = { items: itemsSummary(d.lines), total: draftTotal(), pickup: (short(pickupPlan.date) + ' ' + (pickupPlan.time || '')).trim(), back: short(returnPlan.date) + ' ' + returnPlan.time };
+    try { syncDates(); const m = confirmMath(d), c = d.confirm, pickupPlan = planOut(d.pickupPlan), returnPlan = planOut(d.returnPlan);
+      const lines = d.lines.map(l => ({ ...l, price: { ...l.price, discountWon: m.cut(l) }, pickupPlan, ...(isLift(l) ? {} : { returnPlan }) }));
+      const batch = { id: D.id('batch'), label: d.orderId ? '추가 접수 · ' + d.start : '첫 접수', lines };
+      const summary = { items: itemsSummary(d.lines), total: m.gear.dueWon + m.lift.dueWon, pickup: (short(pickupPlan.date) + ' ' + (pickupPlan.time || '')).trim(), back: short(returnPlan.date) + ' ' + returnPlan.time, paid: [] };
       const result = await D.execute(d.orderId ? 'order.add' : 'order.create', { ...(d.orderId ? { orderId: d.orderId } : { id: D.id('R'), customer: d.customer }), people: d.people, batch });
-      const created = !d.orderId; state.draft = null; state.detailTab = 'items'; S.go('order-detail', { id: result.orderId });
-      if (created) doneModal(result.orderId, summary); else S.toast('같은 접수에 저장 완료 · 준비·지급으로 이어서 진행');
-    } catch (err) { error(err); }
+      const created = !d.orderId, payer = d.orderId ? D.order(d.orderId)?.customer.name : d.customer.name; state.draft = null; state.detailTab = 'items';
+      let payError = null;
+      if (mode === 'pay') for (const part of ['gear', 'lift']) { // one payment record per part, each with its own method, allocated to its own lines
+        const allocations = m[part].list.map(l => ({ lineId: l.id, amountWon: amount(l) + (l.price.discountWon || 0) - m.cut(l) })).filter(row => row.amountWon > 0), amountWon = allocations.reduce((n, row) => n + row.amountWon, 0);
+        if (!amountWon) continue;
+        try { await D.execute('finance.payment', { id: D.id('payment'), orderId: result.orderId, kind: 'payment', amountWon, method: c[part + 'Method'], payer, allocations }); summary.paid.push(methodNames[c[part + 'Method']] + ' ' + won(amountWon)); } catch (err) { payError = err; break; }
+      }
+      S.go('order-detail', { id: result.orderId });
+      if (payError) S.toast('접수는 저장했습니다 · 수납 기록은 실패 — 접수 상세의 수납·환불에서 다시 해 주세요');
+      else if (created) doneModal(result.orderId, summary); else S.toast(summary.paid.length ? '추가 확정 · 수납 ' + summary.paid.join(' · ') : '같은 접수에 저장 완료 · 준비·지급으로 이어서 진행');
+    } catch (err) { if (D.pending) { S.close(); S.render(); } error(err); } // an uncertain result must leave the header's "앞선 처리 다시 확인" reachable
   });
   S.action('pos-line', id => {
     const o = D.order(), l = o.lines.find(l => l.id === id);

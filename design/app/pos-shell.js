@@ -136,7 +136,9 @@
       el.textContent = parts.slice(0, k).join(' · ') + (items && k < parts.length ? ' 외 ' + (parts.length - k) + '종' : '');
       if (el.scrollWidth <= el.clientWidth + 1) return;
     }
-    if (items && parts.length > 1) el.textContent = '품목 ' + parts.length + '종';
+    if (items && parts.length > 1) { el.textContent = '품목 ' + parts.length + '종'; return; }
+    // Even the first part is too long (a very long name): whole words drop from its end.
+    for (const words = String(parts[0] || '').split(' '); words.length > 1 && el.scrollWidth > el.clientWidth + 1;) { words.pop(); el.textContent = words.join(' '); }
   }
   function fitCard(card) {
     const name = card.querySelector('.pos-card-name'), phone = card.querySelector('.pos-card-phone'), over = el => el && el.scrollWidth > el.clientWidth + 1;
@@ -270,6 +272,7 @@
     if (footer.childNodes.length) body.append(footer);
   }
   function modal(title, body, footer = '', sub = '') {
+    S.$('#so-dialog')?.classList.remove('is-wide'); // only the confirm window asks for the wide frame, right after opening
     S.modal(title, '<div class="pos-modal-body">' + (sub ? '<p class="pos-modal-sub">' + e(sub) + '</p>' : '') + body + '</div>' + (footer ? '<footer class="pos-modal-footer">' + footer + '</footer>' : ''));
     fitPage(S.$('#so-dialog'));
   }

@@ -49,13 +49,20 @@ const escape = value => String(value).replace(/[&<>\"]/g, ch => ({ '&': '&amp;',
     await frame.locator('[data-action="pos-grid-add"][data-id="ski"]').click(); await frame.locator('[data-action="pos-person-copy"][data-id="rest"]').click();
     await capture('group-30', '30명 일행 한 번에 접수', '실명 없이 30명을 만들고, 한 사람의 품목을 남은 일행 모두에게 같게 넣습니다. 일행 목록은 쪽으로 나눕니다.');
     await frame.locator('[data-action="pos-draft-next"]').click(); await capture('group-review', '새 접수 3 · 일정·장소', '수령일·이용 일수·수령 시간·장소·반납 시간을 버튼으로 고르고 합계를 확인합니다.');
-    await frame.locator('[data-action="pos-draft-save"]').click(); await frame.locator('#so-dialog[open] [data-go="intake"]').waitFor();
+    await frame.locator('[data-action="pos-place-open"]').first().click(); await capture('intake-place', '수령 장소 선택', '구역을 바꿔 가며 장소를 큰 버튼으로 고릅니다. 장소가 늘어도 접수 화면은 구역 버튼만 보입니다.');
+    await frame.locator('[data-action="pos-place-choose"]').first().click(); await frame.locator('[data-action="pos-place-save"]').click();
+    await frame.locator('[data-action="pos-draft-save"]').click(); await frame.locator('[data-action="pos-confirm-discount"][data-id="gear:perUnit"]').click();
+    await capture('intake-confirm', '접수 확정 · 할인과 수납', '장비와 리프트권을 나눠 할인 하나와 결제 수단을 고르고 그 자리에서 수납합니다. 나중에 수납도 됩니다.');
+    await frame.locator('[data-action="pos-confirm-save"][data-id="pay"]').click(); await frame.locator('#so-dialog[open] [data-go="intake"]').waitFor();
     await capture('intake-done', '접수 완료', '접수번호와 품목·일정·합계를 보여 주고 다음 할 일로 이어집니다.');
     await frame.locator('#so-dialog [data-action="close"]').last().click(); await frame.locator('[data-action="pos-add"]').waitFor();
     assert.equal(await frame.evaluate(() => window.SkiOps.posData.order().people.length), 30);
     assert.equal(await frame.evaluate(() => window.SkiOps.posData.order().lines.length), 30);
     await capture('order-detail', '통합접수 상세', '일행 추가, 사전입력, 기간 변경, 수납과 문제 해결을 한 접수에서 이어갑니다.');
     await frame.locator('[data-action="pos-preinput"]').click(); await capture('preinput', '사전입력·준비표', '이번 차수에서 새로 입력할 일행만 요청합니다.');
+    await frame.evaluate(() => window.SkiOps.go('settings')); await frame.locator('[data-action="pm-settings-tab"][data-id="places"]').click(); await capture('settings-places', '매장 설정 · 수령 장소(구역별)', '구역 칩으로 나눠 그 구역의 장소만 봅니다. 스키장 템플릿으로 처음 값을 채웁니다.');
+    await frame.locator('[data-action="pm-template"]').click(); await capture('settings-template', '스키장 템플릿', '스키장을 고르면 구역 · 장소 · 반납 타임 · 리프트권 권종이 채워집니다. 요금과 할인은 그대로.'); await frame.locator('#so-dialog [data-action="close"]').first().click();
+    await frame.locator('[data-action="pm-settings-tab"][data-id="discounts"]').click(); await capture('settings-discounts', '매장 설정 · 할인', '장비당(하루 기준) · % · 금액 · 리프트권 % — 접수 확정 창의 할인 버튼으로 나옵니다.');
     await frame.evaluate(() => window.SkiOps.go('home')); await frame.locator('#pos-notice-bell').click(); await capture('notifications', '업무 알림', '현재 저장소의 업무 알림을 페이지로 확인하고 해당 업무를 엽니다.');
     await frame.evaluate(() => window.SkiOps.close());
     // Demo driver entry: 나가기 → 차량 화면 must show the driver row list without the rail, and 매장 POS must bring the rail back.
