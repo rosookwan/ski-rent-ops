@@ -1,0 +1,160 @@
+{
+  "project": "ski-rent-ops · 스키노트 시스템 관리 콘솔",
+  "library": "design/higgsfield/admin-console-v1",
+  "workspace": {
+    "id": "a3cca891-ff82-4041-9d9a-0584cef69319",
+    "type": "private",
+    "name": null,
+    "note": "개인 워크스페이스 그대로(별도 선택 없음)."
+  },
+  "generation": {
+    "model": "gpt_image_2_5",
+    "variant": "flare",
+    "quality": "high",
+    "resolution": "2k",
+    "aspect_ratio": "16:9",
+    "output": "2688×1520",
+    "creditsPerImage": 3
+  },
+  "anchors": {
+    "shell": "A02",
+    "popupParent": "A04",
+    "note": "A02를 먼저 만들어 검수한 뒤 A03~A06의 참조로, A04를 팝업 두 장의 참조로 넘겼다."
+  },
+  "review": {
+    "date": "2026-09-21",
+    "method": "미리보기로 구조 · 문구 확인",
+    "regenerated": 0,
+    "policy": "구조 결함 없음. 한 낱말 오기(A03 `정제`)와 어두운 배경의 오탈자는 기록만. 실제 크기 검사는 하지 않음 — 이 화면은 MacBook 브라우저에서만 쓰고(사용자 · 2026-09-21) 구현 요청이 아직 없다."
+  },
+  "final": [
+    {
+      "code": "A01",
+      "title": "관리자 로그인(숨은 진입 화면)",
+      "wave": 1,
+      "file": "a01-admin-login.png",
+      "preview": "a01-admin-login.jpg",
+      "job_id": "7dce0eef-f7ee-45ec-84ff-dab19b88a71c",
+      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J2y32mXmk1jhAd5qmEsy69365Q/hf_20260921_073155_7dce0eef-f7ee-45ec-84ff-dab19b88a71c.png",
+      "references": [],
+      "verdict": "통과",
+      "review": "셸 없는 어두운 배경 + 흰 카드. `스키노트` · 빨간 `시스템 관리` 표시, 아이디 · 비밀번호 · `로그인`, 잠금 · 기록 안내, 아래 `매장 화면으로 돌아가기`. 숨은 진입 방법은 화면에 적지 않는다.",
+      "regenerations": 0
+    },
+    {
+      "code": "A02",
+      "title": "현황(대시보드 · 셸 기준 화면)",
+      "wave": 1,
+      "file": "a02-admin-overview.png",
+      "preview": "a02-admin-overview.jpg",
+      "job_id": "3fba9cf0-294e-4166-bf56-faa8dbb8f264",
+      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J2y32mXmk1jhAd5qmEsy69365Q/hf_20260921_073154_3fba9cf0-294e-4166-bf56-faa8dbb8f264.png",
+      "references": [],
+      "verdict": "통과 · 셸 기준 화면",
+      "review": "어두운 사이드바(메뉴 6개 · 활성 표시는 주황 막대) + 흰 헤더(제목 · 찾기 · 마지막 확인). 숫자 카드 4개, `만료 임박 라이선스` 표, `최근 사용 내역`, 아래 시스템 상태 줄. 나머지 화면의 참조로 사용.",
+      "regenerations": 0
+    },
+    {
+      "code": "A03",
+      "title": "라이선스 관리",
+      "wave": 2,
+      "file": "a03-admin-licenses.png",
+      "preview": "a03-admin-licenses.jpg",
+      "job_id": "66345a61-3662-499b-a3e0-d7ad64d69096",
+      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J2y32mXmk1jhAd5qmEsy69365Q/hf_20260921_073751_66345a61-3662-499b-a3e0-d7ad64d69096.png",
+      "references": [
+        "A02"
+      ],
+      "verdict": "통과(메모)",
+      "review": "찾기 + 상태 칩 + `라이선스 발급`, 표 7행 + 쪽수, 오른쪽에 고른 매장 상세와 `기간 연장` · `단말 수 변경` · `정지` · 빨간 `삭제`. 메모: 마지막 행의 상태 알약이 `정제`로 그려짐(`정지`의 오기 · 칩과 버튼은 바름) — 기록만.",
+      "regenerations": 0
+    },
+    {
+      "code": "A04",
+      "title": "계정 관리",
+      "wave": 2,
+      "file": "a04-admin-accounts.png",
+      "preview": "a04-admin-accounts.jpg",
+      "job_id": "4c6cabc2-8ed9-43fc-b1ae-c1a92ade07a9",
+      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J2y32mXmk1jhAd5qmEsy69365Q/hf_20260921_073751_4c6cabc2-8ed9-43fc-b1ae-c1a92ade07a9.png",
+      "references": [
+        "A02"
+      ],
+      "verdict": "통과",
+      "review": "찾기 · 매장 고르기 · 역할 칩 · `계정 생성`, 표 8행(아이디 · 이름 · 매장 · 역할 · 상태 · 마지막 접속), 행마다 `비밀번호 초기화` · `정지` · 빨간 `삭제`(admin 행은 초기화만).",
+      "regenerations": 0
+    },
+    {
+      "code": "A05",
+      "title": "스키장 템플릿 관리",
+      "wave": 2,
+      "file": "a05-admin-templates.png",
+      "preview": "a05-admin-templates.jpg",
+      "job_id": "e16a952a-3573-4e2e-b69f-a3cd7b368d19",
+      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J2y32mXmk1jhAd5qmEsy69365Q/hf_20260921_073750_e16a952a-3573-4e2e-b69f-a3cd7b368d19.png",
+      "references": [
+        "A02"
+      ],
+      "verdict": "통과",
+      "review": "왼쪽 템플릿 목록(적용 매장 수) + `새 템플릿`, 오른쪽 편집기: 이름, 탭 셋(`구역 · 수령 장소` · `반납 타임` · `리프트권 권종`), 구역마다 장소 칩과 `+ 장소 추가`, `+ 구역 추가`, 안내 줄, `템플릿 삭제` · `되돌리기` · `저장`.",
+      "regenerations": 0
+    },
+    {
+      "code": "A06",
+      "title": "사용 내역(로그) 조회",
+      "wave": 2,
+      "file": "a06-admin-logs.png",
+      "preview": "a06-admin-logs.jpg",
+      "job_id": "01c1dbee-d3c1-4e09-8955-c864f093ccab",
+      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J2y32mXmk1jhAd5qmEsy69365Q/hf_20260921_073752_01c1dbee-d3c1-4e09-8955-c864f093ccab.png",
+      "references": [
+        "A02"
+      ],
+      "verdict": "통과",
+      "review": "기간 칩 · 매장 · 계정 · 내용 찾기 · `CSV 내려받기`, 종류 칩(건수), 표 8행 + 쪽수, 오른쪽 상세에 시각 · 매장 · 계정 · 기기 · 주소와 `바꾸기 전 / 바꾼 뒤`.",
+      "regenerations": 0
+    },
+    {
+      "code": "A07",
+      "title": "팝업 · 계정 생성",
+      "wave": 3,
+      "file": "a07-popup-account-create.png",
+      "preview": "a07-popup-account-create.jpg",
+      "job_id": "ab12be63-160f-44b5-8bdc-d72da68ff189",
+      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J2y32mXmk1jhAd5qmEsy69365Q/hf_20260921_074141_ab12be63-160f-44b5-8bdc-d72da68ff189.png",
+      "references": [
+        "A04"
+      ],
+      "verdict": "통과",
+      "review": "계정 화면 위 창: 매장 · 역할 선택 버튼 · 이름 · 아이디(쓸 수 있는지 표시) · 임시 비밀번호(`다시 만들기` · `복사`) · 첫 로그인 때 비밀번호 바꾸기 · 라이선스 한도 안내. 어두운 배경의 작은 오탈자는 배경이라 기록만.",
+      "regenerations": 0
+    },
+    {
+      "code": "A08",
+      "title": "팝업 · 삭제 확인",
+      "wave": 3,
+      "file": "a08-popup-delete-confirm.png",
+      "preview": "a08-popup-delete-confirm.jpg",
+      "job_id": "7cfc1b13-39d1-4178-a07a-abe824063f35",
+      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J2y32mXmk1jhAd5qmEsy69365Q/hf_20260921_074141_7cfc1b13-39d1-4178-a07a-abe824063f35.png",
+      "references": [
+        "A04"
+      ],
+      "verdict": "통과",
+      "review": "되돌릴 수 없는 삭제: `지워지는 것 / 남는 것`을 나눠 보이고 아이디를 직접 입력해야 빨간 `삭제`가 눌린다. `삭제 대신 정지`를 옆에 둔다. 주황 버튼 없음.",
+      "regenerations": 0
+    }
+  ],
+  "discarded": [],
+  "credits": {
+    "perImage": 3,
+    "images": 8,
+    "total": 24,
+    "balanceBefore": 1414,
+    "balanceAfter": 1390
+  },
+  "storage": {
+    "here": "가벼운 미리보기(.jpg · 폭 1600px)만 둔다. final[].preview가 그 파일이다.",
+    "originals": "원본 PNG(2688×1520)는 브랜치 claude/pos-ui-improvement-q9yqku의 같은 폴더와 힉스필드(각 항목의 url)에 있다."
+  }
+}
