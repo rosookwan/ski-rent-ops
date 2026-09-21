@@ -25,7 +25,8 @@ button{font:inherit;letter-spacing:inherit;min-height:52px;border:0;border-radiu
 .btns{display:flex;gap:6px;min-width:0}.minus{color:#b42318;font-weight:700}.take{display:flex;justify-content:space-between;align-items:baseline;box-shadow:inset 0 1px 0 #e3e3e3;padding-top:6px;color:#5d5d5d;font-weight:600}.take b{color:#1a1a1a;font-size:28px;line-height:34px}
 .dfoot{display:flex;justify-content:flex-end;gap:8px;padding-top:6px}.chips{display:flex;gap:8px}.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.grid button{min-height:64px;font-size:20px}
 .note{color:#5d5d5d;line-height:22px}
-body[data-show="s06"] #d6,body[data-show="s07"] #d7{display:flex}
+body[data-show="s06"] #d6,body[data-show="s07"] #d7,body[data-show="s08"] #d8{display:flex}
+.people{display:flex;flex-direction:column;gap:6px}.person{display:flex;align-items:center;gap:12px;min-height:64px;padding:6px 8px 6px 14px;border-radius:12px;box-shadow:inset 0 0 0 1px #e3e3e3;min-width:0}.person strong{flex:0 1 auto;min-width:0;overflow:hidden;white-space:nowrap;font-size:20px}.person>span:not(.btns):not(.done){flex:1 1 0;min-width:0;overflow:hidden;white-space:nowrap;color:#5d5d5d}.person>b{flex:0 0 auto;font-size:20px;white-space:nowrap}.person .btns{flex:0 0 150px}.done{flex:0 0 96px;text-align:center;background:#247a3d;color:#fff;border-radius:999px;font-weight:700;line-height:32px}.person>.sec{flex:0 0 96px}
 </style>
 <body>
 <div class="frame"><div class="rail"></div><div class="work">
@@ -53,11 +54,20 @@ body[data-show="s06"] #d6,body[data-show="s07"] #d7{display:flex}
   <div class="dfoot"><button class="sec">취소</button><button class="sec">매장 수령으로</button><button class="primary">이 장소로 선택</button></div></div></div></div>
 <div class="dim" id="d7"><div class="dlg" id="dlg7" style="--w:880px"><header><h2>아주 긴 이름의 단체 접수 대표자 팀 · 접수 확정</h2><button>✕</button></header><div class="in"><p class="sub">9/21 수령 · 2일 · 품목 7개 · 할인과 결제 수단을 고르세요</p>
   <div class="cards">
-    <div class="card"><div class="head"><span>장비 대여</span><b>1,160,000원</b></div><span class="lab">할인</span><div class="btns"><button class="opt">없음</button><button class="opt on" style="flex:1.7 1 0">장비당 할인</button><button class="opt">10%</button><button class="opt">20%</button><button class="opt">30%</button></div><div class="line"><span>스키 3 · 의류 2 · 2일</span><span class="minus">−30,000원</span></div><span class="lab">결제 수단</span><div class="btns"><button class="opt on">카드</button><button class="opt">현금</button><button class="opt">계좌이체</button></div><div class="take"><span>받을 금액</span><b>1,130,000원</b></div></div>
+    <div class="card"><div class="head"><span>장비 대여</span><b>1,160,000원</b></div><span class="lab">할인</span><div class="btns"><button class="opt" style="flex:.6 1 0">없음</button><button class="opt two on"><small>장비당 할인</small><b>하루 5,000원</b></button><button class="opt two"><small>% 할인</small><b>선택</b></button><button class="opt two"><small>금액 할인</small><b>−100,000원</b></button></div><div class="line"><span>스키 3 · 의류 2 · 2일</span><span class="minus">−30,000원</span></div><span class="lab">결제 수단</span><div class="btns"><button class="opt on">카드</button><button class="opt">현금</button><button class="opt">계좌이체</button></div><div class="take"><span>받을 금액</span><b>1,130,000원</b></div></div>
     <div class="card"><div class="head"><span>리프트권</span><b>70,000원</b></div><span class="lab">할인</span><div class="btns"><button class="opt">없음</button><button class="opt">20%</button><button class="opt on">25%</button><button class="opt">27%</button></div><div class="line"><span>3시간권 2매</span><span class="minus">−17,500원</span></div><span class="lab">결제 수단</span><div class="btns"><button class="opt">카드</button><button class="opt on">현금</button><button class="opt">계좌이체</button></div><div class="take"><span>받을 금액</span><b>52,500원</b></div></div>
   </div>
   <div class="line total"><span id="split">할인 47,500원 · 카드 1,130,000원 · 현금 52,500원</span><span>합계 <b>1,182,500원</b></span></div>
-  <div class="dfoot"><button class="sec">취소</button><button class="sec">나중에 수납</button><button class="primary">수납하고 접수 확정 · 1,182,500원</button></div></div></div></div>
+  <div class="dfoot"><button class="sec">취소</button><button class="sec">나중에 수납</button><button class="sec">나눠서 결제</button><button class="primary">수납하고 접수 확정 · 1,182,500원</button></div></div></div></div>
+<div class="dim" id="d8"><div class="dlg" id="dlg8" style="--w:880px"><header><h2>아주 긴 이름의 단체 접수 대표자 팀 · 나눠서 결제</h2><button>✕</button></header><div class="in"><p class="sub">받을 금액 1,170,500원 · 일행 7명 · 사람마다 따로 결제합니다</p>
+  <div class="row" style="gap:8px"><div class="chips" style="flex:1 1 0"><button class="opt on">일행별</button><button class="opt">똑같이 나누기</button><button class="opt">금액 직접 나누기</button></div><span style="flex:0 0 auto;display:flex;gap:6px;align-items:center;font-weight:600"><button style="width:52px">‹</button> 1 / 3쪽 <button style="width:52px">›</button></span></div>
+  <div class="people">
+    <div class="person"><strong>김민수</strong><span>스키 1 · 의류 1 · 3시간권 1</span><b>1,070,250원</b><span class="btns"><button class="opt on">카드</button><button class="opt">현금</button></span><span class="done">결제 완료</span></div>
+    <div class="person"><strong>한국대학교 스키동아리 회장</strong><span>스키 1 · 의류 1 · 3시간권 1</span><b>70,250원</b><span class="btns"><button class="opt">카드</button><button class="opt on">현금</button></span><button class="sec">결제</button></div>
+    <div class="person"><strong>박지호</strong><span>스키 1</span><b>30,000원</b><span class="btns"><button class="opt on">카드</button><button class="opt">현금</button></span><button class="sec">결제</button></div>
+  </div>
+  <div class="line total"><span>결제 완료 1명 · 1,070,250원</span><span>남은 금액 <b>100,250원</b></span></div>
+  <div class="dfoot"><button class="sec">‹ 접수 확정 창으로</button><button class="sec">남은 금액은 나중에 수납</button><button class="primary">다음 결제 · 한국대학교 스키동아리 회장 70,250원</button></div></div></div></div>
 </div>
 <script>document.body.dataset.show=location.hash.slice(1)||'s05';</script>
 </body></html>
