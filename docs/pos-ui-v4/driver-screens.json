@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-21T05:01:06.803Z",
+  "generatedAt": "2026-09-21T05:05:32.425Z",
   "results": [
     {
       "key": "dispatch",
@@ -123,6 +123,180 @@
       "viewport": [
         1024,
         520
+      ],
+      "outside": [],
+      "bodyScroll": false,
+      "rows": 2,
+      "smallestButton": 56,
+      "rail": false,
+      "rules": {
+        "minFont": 16,
+        "minTarget": 56,
+        "smallText": [],
+        "clippedText": [],
+        "halfCut": [],
+        "shortTargets": [],
+        "scrolling": []
+      },
+      "ruleTotals": {
+        "smallText": 0,
+        "clippedText": 0,
+        "halfCut": 0,
+        "shortTargets": 0,
+        "scrolling": 0
+      }
+    },
+    {
+      "key": "phone-dispatch",
+      "file": "driver-phone-dispatch-360x640.png",
+      "viewport": [
+        360,
+        640
+      ],
+      "outside": [],
+      "bodyScroll": false,
+      "rows": 4,
+      "smallestButton": 56,
+      "rail": false,
+      "rules": {
+        "minFont": 16,
+        "minTarget": 56,
+        "smallText": [],
+        "clippedText": [],
+        "halfCut": [],
+        "shortTargets": [],
+        "scrolling": []
+      },
+      "ruleTotals": {
+        "smallText": 0,
+        "clippedText": 0,
+        "halfCut": 0,
+        "shortTargets": 0,
+        "scrolling": 0
+      }
+    },
+    {
+      "key": "phone-dispatch",
+      "file": "driver-phone-dispatch-390x740.png",
+      "viewport": [
+        390,
+        740
+      ],
+      "outside": [],
+      "bodyScroll": false,
+      "rows": 5,
+      "smallestButton": 56,
+      "rail": false,
+      "rules": {
+        "minFont": 16,
+        "minTarget": 56,
+        "smallText": [],
+        "clippedText": [],
+        "halfCut": [],
+        "shortTargets": [],
+        "scrolling": []
+      },
+      "ruleTotals": {
+        "smallText": 0,
+        "clippedText": 0,
+        "halfCut": 0,
+        "shortTargets": 0,
+        "scrolling": 0
+      }
+    },
+    {
+      "key": "phone-dispatch",
+      "file": "driver-phone-dispatch-412x780.png",
+      "viewport": [
+        412,
+        780
+      ],
+      "outside": [],
+      "bodyScroll": false,
+      "rows": 5,
+      "smallestButton": 56,
+      "rail": false,
+      "rules": {
+        "minFont": 16,
+        "minTarget": 56,
+        "smallText": [],
+        "clippedText": [],
+        "halfCut": [],
+        "shortTargets": [],
+        "scrolling": []
+      },
+      "ruleTotals": {
+        "smallText": 0,
+        "clippedText": 0,
+        "halfCut": 0,
+        "shortTargets": 0,
+        "scrolling": 0
+      }
+    },
+    {
+      "key": "phone-task",
+      "file": "driver-phone-task-360x640.png",
+      "viewport": [
+        360,
+        640
+      ],
+      "outside": [],
+      "bodyScroll": false,
+      "rows": 2,
+      "smallestButton": 56,
+      "rail": false,
+      "rules": {
+        "minFont": 16,
+        "minTarget": 56,
+        "smallText": [],
+        "clippedText": [],
+        "halfCut": [],
+        "shortTargets": [],
+        "scrolling": []
+      },
+      "ruleTotals": {
+        "smallText": 0,
+        "clippedText": 0,
+        "halfCut": 0,
+        "shortTargets": 0,
+        "scrolling": 0
+      }
+    },
+    {
+      "key": "phone-visit",
+      "file": "driver-phone-visit-360x640.png",
+      "viewport": [
+        360,
+        640
+      ],
+      "outside": [],
+      "bodyScroll": false,
+      "rows": 0,
+      "smallestButton": 56,
+      "rail": false,
+      "rules": {
+        "minFont": 16,
+        "minTarget": 56,
+        "smallText": [],
+        "clippedText": [],
+        "halfCut": [],
+        "shortTargets": [],
+        "scrolling": []
+      },
+      "ruleTotals": {
+        "smallText": 0,
+        "clippedText": 0,
+        "halfCut": 0,
+        "shortTargets": 0,
+        "scrolling": 0
+      }
+    },
+    {
+      "key": "phone-stock",
+      "file": "driver-phone-stock-360x640.png",
+      "viewport": [
+        360,
+        640
       ],
       "outside": [],
       "bodyScroll": false,

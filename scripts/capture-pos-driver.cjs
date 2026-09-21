@@ -46,7 +46,7 @@ async function main() {
   await page.goto(baseUrl + '/pos'); await page.locator('#pos-access-key').fill(driverToken); await page.locator('[data-action="pos-connect"]').click(); await page.locator('.pos-page').waitFor();
   assert.equal(await page.evaluate(() => window.SkiOps.posData.snapshot.actor.role), 'driver');
   async function capture(key, width, height) {
-    await page.setViewportSize({ width, height }); await page.evaluate(() => window.SkiOps.render());
+    await page.setViewportSize({ width, height }); await page.evaluate(() => { if (!document.querySelector('#so-dialog[open]')) window.SkiOps.render(); });
     await page.evaluate(() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve))));
     const geometry = await page.evaluate(() => {
       const root = document.querySelector('#so-dialog[open]') || document.querySelector('.pos-page');
@@ -65,6 +65,13 @@ async function main() {
   await page.setViewportSize({ width: 1024, height: 520 }); await page.evaluate(() => window.SkiOps.go('dispatch'));
   await page.locator('[data-action="pos-task"]').first().click(); await page.locator('[data-action="pos-task-complete"]').waitFor(); await capture('task', 1024, 520);
   await page.evaluate(() => window.SkiOps.go('vehicle')); await page.locator('[data-pos-list-key="vehicle-stock"]').waitFor(); await capture('stock', 1024, 520);
+  // Phones (docs/41): the same driver screens under 600px wide. 360×640 is the baseline; the list shows whole rows only.
+  for (const [width, height] of [[360, 640], [390, 740], [412, 780]]) { await page.setViewportSize({ width, height }); await page.evaluate(() => window.SkiOps.go('dispatch')); await capture('phone-dispatch', width, height); }
+  assert.equal(results.find(r => r.key === 'phone-dispatch' && r.viewport[1] === 640).rows, 4);
+  await page.setViewportSize({ width: 360, height: 640 }); await page.evaluate(() => window.SkiOps.go('dispatch'));
+  await page.locator('[data-action="pos-task"]').first().click(); await page.locator('[data-action="pos-task-complete"]').waitFor(); await capture('phone-task', 360, 640);
+  await page.locator('[data-action="pos-task-visit"]').click(); await page.locator('#so-dialog[open]').waitFor(); await capture('phone-visit', 360, 640); await page.locator('#so-dialog [data-action="close"]').first().click();
+  await page.evaluate(() => window.SkiOps.go('vehicle')); await page.locator('[data-pos-list-key="vehicle-stock"]').waitFor(); await capture('phone-stock', 360, 640);
   assert.deepEqual(errors, []);
   writeFileSync(path.join(OUT, 'driver-screens.json'), JSON.stringify({ generatedAt: new Date().toISOString(), results }, null, 2));
   console.log(JSON.stringify({ screenshots: results.length, rows: results.map(r => [r.key, r.viewport.join('x'), r.rows]), smallestButton: Math.min(...results.map(r => r.smallestButton)), output: OUT }));

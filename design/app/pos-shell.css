@@ -386,3 +386,41 @@
 #ski-ops[data-pos="true"][data-actor="driver"] .pos-page-footer{height:88px;min-height:88px}
 /* Toolbar sums (detail screen) stay visible at every POS width; the header sums hide below 1100px instead. */
 #ski-ops[data-pos="true"] .pos-toolbar .pos-sum,#ski-ops[data-pos="true"] .pos-toolbar .pos-sum:nth-of-type(n+3){display:flex}
+/* Driver phone (UI v4 · docs/41): the same driver screens under 600px wide. Header keeps 스키노트 · 제목 · 종 · 나가기, lists use three-line rows, the confirm button spans the bottom. */
+@media (max-width:599px){
+#ski-ops[data-pos="true"][data-actor="driver"]{--pos-header:56px}
+#ski-ops[data-pos="true"][data-actor="driver"] .pos-shop,
+#ski-ops[data-pos="true"][data-actor="driver"] .pos-mark,
+#ski-ops[data-pos="true"][data-actor="driver"] #so-page-tools,
+#ski-ops[data-pos="true"][data-actor="driver"] .pos-toolbar-label,
+#ski-ops[data-pos="true"][data-actor="driver"] .pos-toolbar .pos-chip[data-id="all"],
+#ski-ops[data-pos="true"][data-actor="driver"] .pos-page-footer>span,
+#ski-ops[data-pos="true"][data-actor="driver"] .pos-pager>span{display:none}
+#ski-ops[data-pos="true"][data-actor="driver"] .pos-page-body{padding:4px 12px}
+#ski-ops[data-pos="true"][data-actor="driver"] .pos-toolbar{padding:4px 12px;gap:6px}
+#ski-ops[data-pos="true"][data-actor="driver"] .pos-toolbar .pos-chip{flex:1 1 0;justify-content:center;padding:0 6px}
+#ski-ops[data-pos="true"][data-actor="driver"] .pos-paged-list{gap:4px}
+#ski-ops[data-pos="true"][data-actor="driver"] .pos-list{gap:4px}
+#ski-ops[data-pos="true"][data-actor="driver"] .pos-pager{justify-content:center}
+#ski-ops[data-pos="true"][data-actor="driver"] .pos-row.is-phone{height:88px;min-height:88px;padding:6px 8px 6px 12px;gap:8px}
+#ski-ops[data-pos="true"][data-actor="driver"] .pos-row.is-phone .pos-row-copy{flex:1 1 0;display:flex;flex-direction:column;gap:3px}
+#ski-ops[data-pos="true"][data-actor="driver"] .pos-row.is-phone strong{overflow:hidden;font-size:20px;line-height:24px;white-space:nowrap}
+#ski-ops[data-pos="true"][data-actor="driver"] .pos-row.is-phone p{display:flex;align-items:center;gap:8px;min-width:0;overflow:hidden;line-height:22px;white-space:nowrap}
+#ski-ops[data-pos="true"][data-actor="driver"] .pos-row.is-phone p>span:last-child{flex:1 1 0;min-width:0;overflow:hidden}
+#ski-ops[data-pos="true"][data-actor="driver"] .pos-row.is-phone .pos-button.primary{min-width:96px;min-height:64px;padding:0 10px}
+#ski-ops[data-pos="true"][data-actor="driver"] .so-topbar-right>button{width:auto;min-width:var(--pos-touch);padding:0 10px;white-space:nowrap}
+#ski-ops[data-pos="true"][data-actor="driver"] .pos-page-footer{flex-wrap:wrap;align-content:center;row-gap:8px;height:auto;min-height:80px;padding:8px 12px}
+#ski-ops[data-pos="true"][data-actor="driver"] .pos-page-footer .so-actions{flex:1 1 100%;display:flex;gap:8px}
+#ski-ops[data-pos="true"][data-actor="driver"] .pos-page-footer .so-actions:empty{display:none}
+#ski-ops[data-pos="true"][data-actor="driver"] .so-notice-count{top:2px;right:2px}
+#ski-ops[data-pos="true"][data-actor="driver"] #so-dialog[open]{width:calc(100% - 16px);max-width:none;max-height:calc(100dvh - 16px);margin:auto auto 8px}
+#ski-ops[data-pos="true"][data-actor="driver"] #so-dialog .so-dialog-heading{min-width:0;padding:14px 16px 0}
+#ski-ops[data-pos="true"][data-actor="driver"] #so-dialog .so-dialog-heading h2{min-width:0;font-size:var(--pos-fs-title)}
+#ski-ops[data-pos="true"][data-actor="driver"] #so-dialog-body{padding:8px 16px 16px;gap:8px}
+#ski-ops[data-pos="true"][data-actor="driver"] #so-dialog .pos-form-grid{grid-template-columns:minmax(0,1fr);gap:6px}
+#ski-ops[data-pos="true"][data-actor="driver"] .pos-modal-footer{min-height:0;padding-top:4px}
+#ski-ops[data-pos="true"][data-actor="driver"] .pos-modal-footer .pos-button.primary{flex:1 1 auto;min-height:64px}
+#ski-ops[data-pos="true"][data-actor="driver"] .pos-page-footer .so-actions .pos-button:not(.primary){flex:1 1 auto;min-height:var(--pos-touch);font-size:var(--pos-fs-min)}
+#ski-ops[data-pos="true"][data-actor="driver"] .pos-page-footer .so-actions .pos-button.primary{min-height:64px}
+#ski-ops[data-pos="true"][data-actor="driver"] .pos-page-footer .so-actions .pos-button{flex:1 1 0;min-width:0;padding:0 6px;white-space:nowrap}
+}
