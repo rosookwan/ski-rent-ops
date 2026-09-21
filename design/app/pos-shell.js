@@ -2,7 +2,7 @@
   'use strict';
   const S = window.SkiOps, e = S.esc;
   const pages = new Map(), limits = new Map(), listRenders = new Map();
-  // Fixed 96px rail: nine POS entries in work order, 관리 pinned to the bottom. 관리 swaps the rail to the management menu.
+  // Fixed rail (112px, 96px under 1000px wide): nine POS entries in work order, 관리 pinned to the bottom. 관리 swaps the rail to the management menu.
   const menus = [
     ['home', '오늘 할 일', '', 'clipboard-check'], ['intake', '접수·예약', '1', 'user-plus'], ['preparation', '준비·지급', '2', 'package'],
     ['rentals', '이용·변경', '3', 'refresh-cw'], ['returns', '반납·회수', '4', 'package-check'], ['closing', '정산·마감', '5', 'wallet'],
@@ -40,15 +40,17 @@
   function header(options) {
     const tools = S.$('#so-page-tools'), left = S.$('.so-topbar-left');
     if (left) {
+      // Same header on every screen: 스키노트 · 매장명 · 화면 제목 (docs/42 2-4).
       let shop = left.querySelector('.pos-shop');
       if (!shop) { shop = document.createElement('span'); shop.className = 'pos-shop'; left.insertBefore(shop, S.$('#so-breadcrumb')); }
+      if (!left.querySelector('.pos-mark')) { const mark = document.createElement('span'); mark.className = 'pos-mark'; mark.textContent = '스키노트'; left.insertBefore(mark, shop); }
       shop.textContent = storeName();
     }
     if (!tools) return;
     const D = S.posData;
     let html = D?.pending ? '<button type="button" class="pos-search-entry" data-action="pos-retry">앞선 처리 다시 확인</button>' : '';
     if (options.wait != null) html += '<span class="pos-wait"><span>처리 대기</span><strong>' + e(options.wait) + '</strong></span>';
-    for (const [label, value, tone] of options.sums || []) html += '<span class="pos-sum"><span>' + e(label) + '</span><strong' + (tone ? ' style="color:var(--tone-' + e(tone) + ')"' : '') + '>' + e(value) + '</strong></span>';
+    for (const [label, value, tone] of options.sums || []) html += '<span class="pos-sum"><span>' + e(label) + '</span><strong' + (tone ? ' data-tone="' + e(tone) + '"' : '') + '>' + e(value) + '</strong></span>';
     if (options.wait == null && !options.sums && !D?.pending) html += '<button type="button" data-go="rentals" class="pos-search-entry">' + S.icon('search') + '고객 찾기</button>';
     tools.innerHTML = html; tools.hidden = false;
   }

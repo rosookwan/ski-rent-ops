@@ -1,0 +1,150 @@
+{
+  "generatedAt": "2026-09-21T03:41:29.904Z",
+  "results": [
+    {
+      "key": "dispatch",
+      "file": "driver-dispatch-1024x520.png",
+      "viewport": [
+        1024,
+        520
+      ],
+      "outside": [],
+      "bodyScroll": false,
+      "rows": 3,
+      "smallestButton": 56,
+      "rail": false,
+      "rules": {
+        "minFont": 16,
+        "minTarget": 56,
+        "smallText": [],
+        "clippedText": [],
+        "halfCut": [],
+        "shortTargets": [],
+        "scrolling": []
+      },
+      "ruleTotals": {
+        "smallText": 0,
+        "clippedText": 0,
+        "halfCut": 0,
+        "shortTargets": 0,
+        "scrolling": 0
+      }
+    },
+    {
+      "key": "dispatch",
+      "file": "driver-dispatch-1024x600.png",
+      "viewport": [
+        1024,
+        600
+      ],
+      "outside": [],
+      "bodyScroll": false,
+      "rows": 4,
+      "smallestButton": 56,
+      "rail": false,
+      "rules": {
+        "minFont": 16,
+        "minTarget": 56,
+        "smallText": [],
+        "clippedText": [],
+        "halfCut": [],
+        "shortTargets": [],
+        "scrolling": []
+      },
+      "ruleTotals": {
+        "smallText": 0,
+        "clippedText": 0,
+        "halfCut": 0,
+        "shortTargets": 0,
+        "scrolling": 0
+      }
+    },
+    {
+      "key": "dispatch",
+      "file": "driver-dispatch-1280x720.png",
+      "viewport": [
+        1280,
+        720
+      ],
+      "outside": [],
+      "bodyScroll": false,
+      "rows": 5,
+      "smallestButton": 56,
+      "rail": false,
+      "rules": {
+        "minFont": 16,
+        "minTarget": 56,
+        "smallText": [],
+        "clippedText": [],
+        "halfCut": [],
+        "shortTargets": [],
+        "scrolling": []
+      },
+      "ruleTotals": {
+        "smallText": 0,
+        "clippedText": 0,
+        "halfCut": 0,
+        "shortTargets": 0,
+        "scrolling": 0
+      }
+    },
+    {
+      "key": "task",
+      "file": "driver-task-1024x520.png",
+      "viewport": [
+        1024,
+        520
+      ],
+      "outside": [],
+      "bodyScroll": false,
+      "rows": 2,
+      "smallestButton": 56,
+      "rail": false,
+      "rules": {
+        "minFont": 16,
+        "minTarget": 56,
+        "smallText": [],
+        "clippedText": [],
+        "halfCut": [],
+        "shortTargets": [],
+        "scrolling": []
+      },
+      "ruleTotals": {
+        "smallText": 0,
+        "clippedText": 0,
+        "halfCut": 0,
+        "shortTargets": 0,
+        "scrolling": 0
+      }
+    },
+    {
+      "key": "stock",
+      "file": "driver-stock-1024x520.png",
+      "viewport": [
+        1024,
+        520
+      ],
+      "outside": [],
+      "bodyScroll": false,
+      "rows": 2,
+      "smallestButton": 56,
+      "rail": false,
+      "rules": {
+        "minFont": 16,
+        "minTarget": 56,
+        "smallText": [],
+        "clippedText": [],
+        "halfCut": [],
+        "shortTargets": [],
+        "scrolling": []
+      },
+      "ruleTotals": {
+        "smallText": 0,
+        "clippedText": 0,
+        "halfCut": 0,
+        "shortTargets": 0,
+        "scrolling": 0
+      }
+    }
+  ]
+}

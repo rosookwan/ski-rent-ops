@@ -34,7 +34,7 @@ async function main() {
       const elements = [dialog, ...dialog.querySelectorAll('header,.pos-keypad-values,button,footer,.pos-keypad-feedback')];
       return { dialog: rect(dialog), outside: elements.map(element => ({ text: element.textContent.slice(0, 40), box: rect(element) })).filter(({ box }) => box.top < 0 || box.left < 0 || box.right > innerWidth || box.bottom > innerHeight),
         scroll: [...dialog.querySelectorAll('*'), dialog].filter(element => element.clientHeight && (element.scrollHeight > element.clientHeight + 1 || element.scrollWidth > element.clientWidth + 1)).map(element => element.className || element.tagName),
-        small: [...dialog.querySelectorAll('button')].map(rect).filter(box => box.height < 48 || box.width < 48) };
+        small: [...dialog.querySelectorAll('button')].map(rect).filter(box => box.height < 52 || box.width < 52) };
     });
     assert.deepEqual(result.outside, [], name + ' outside viewport'); assert.deepEqual(result.scroll, [], name + ' scrolling'); assert.deepEqual(result.small, [], name + ' touch target');
     layouts.push({ name, ...result }); await page.screenshot({ path: path.join(OUT, name + '.png') });

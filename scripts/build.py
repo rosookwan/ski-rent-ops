@@ -49,7 +49,7 @@ def build():
     fragment += '<script>\n' + dispatch_view + '\n</script>\n'
     fragment += '<style>\n' + (APP / 'vehicle-board.css').read_text() + '\n' + vehicle_hover + '\n</style>\n'
     fragment += '<script>\n' + vehicle_view + '\n</script>\n'
-    for name in ['pos-shell.css', 'pos-orders.css', 'pos-fulfillment.css', 'pos-keypad.css']:
+    for name in ['pos-shell.css', 'pos-orders.css', 'pos-fulfillment.css', 'pos-keypad.css', 'pos-management.css']:
         if (APP / name).exists():
             fragment += '<style>\n' + (APP / name).read_text() + '\n</style>\n'
     for name in MODULES:

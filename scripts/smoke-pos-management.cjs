@@ -27,7 +27,7 @@ const { chooseTime } = require('./time-picker-helper.cjs');
     }, modal);
     assert.ok(result.body.scroll <= result.body.client + 1, label + ' body scroll: ' + JSON.stringify(result));
     assert.ok(result.footer.bottom <= result.height + 1, label + ' footer clipped: ' + JSON.stringify(result));
-    assert.ok(result.controls.every(r => r.left >= -1 && r.right <= result.width + 1 && r.bottom <= result.height + 1 && r.height >= (r.primary ? 56 : 48) && r.font >= 16), label + ' controls clipped/small: ' + JSON.stringify(result));
+    assert.ok(result.controls.every(r => r.left >= -1 && r.right <= result.width + 1 && r.bottom <= result.height + 1 && r.height >= (r.primary ? 56 : 52) && r.font >= 16), label + ' controls clipped/small: ' + JSON.stringify(result));
     return result;
   }
   try {

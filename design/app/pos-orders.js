@@ -174,7 +174,7 @@
       : dueTeams[0] ? ['수납 · ' + dueTeams[0].customer.name + ' 팀', dueTeams[0].id, '미수 ' + won(dueTeams[0].finance.dueWon)]
       : held[0] ? ['이용 중 · ' + held[0].customer.name + ' 팀', held[0].id, short(returnDate(held[0])) + ' 반납 예정']
       : pickupToday[0] ? ['수령 · ' + pickupToday[0].customer.name + ' 팀', pickupToday[0].id, (pickupTime(pickupToday[0]) || '오늘') + ' 수령'] : null;
-    const now = '<div class="pos-now"><strong>지금 처리</strong>' + (urgent ? '<button type="button" class="so-button pos-button primary" data-go="order-detail" data-id="' + e(urgent[1]) + '" style="min-height:48px;font-size:16px">' + e(urgent[0]) + '</button><span>' + e(urgent[2]) + '</span>' : '<span>처리할 급한 업무 없음</span>') + '<span style="flex:1"></span>' + (D.pending ? btn('같은 요청 다시 확인', 'pos-retry', '', 'soft') : btn('최신 기록 확인', 'pos-refresh')) + '</div>';
+    const now = '<div class="pos-now"><strong>지금 처리</strong>' + (urgent ? '<button type="button" class="so-button pos-button primary" data-go="order-detail" data-id="' + e(urgent[1]) + '">' + e(urgent[0]) + '</button><span>' + e(urgent[2]) + '</span>' : '<span>처리할 급한 업무 없음</span>') + '<span class="pos-grow"></span>' + (D.pending ? btn('같은 요청 다시 확인', 'pos-retry', '', 'soft') : btn('최신 기록 확인', 'pos-refresh')) + '</div>';
     const waiting = [sizeTeams.length, dueIssue.length, exchanges.length, heldQty, dueTeams.length, ticketNeed, tasksToday.length, repair.length, closed ? 0 : 1].filter(Boolean).length;
     return P.page('오늘 할 일', '', now + P.cards([{ cards }], { steps: true }),
       '<span>' + e('미지급 ' + unissuedToday + '개 · 미반납 ' + heldQty + '개 · 발권 ' + ticketNeed + '매 · 미수 ' + won(dueWon) + ' · 차량 업무 ' + tasksToday.length + '건') + '</span><div class="so-actions">' + btn('새 접수', 'pos-new', '', 'soft') + '<button type="button" class="so-button pos-button primary" data-go="closing">마감</button></div>',
@@ -196,7 +196,7 @@
       + '<div class="pos-detail-actions pos-shortcuts">' + btn('일행·장비 추가', 'pos-add', o.id) + btn('사이즈 요청' + (sizePending(o) ? ' ' + sizePending(o) + '명' : ''), 'pos-preinput', o.id) + btn('기간·수거 변경', 'pos-change', o.id) + btn('수납·환불', 'pos-money', o.id) + btn('문제 해결·정정', 'pos-problems', o.id) + (phone ? '<a class="so-button pos-button" href="tel:' + e(phone) + '">' + S.icon('phone') + '전화</a>' : '<button type="button" class="so-button pos-button" disabled>전화 · 연락처 없음</button>') + '</div></aside>';
     const tabs = [['items', '품목', lines.length], ['money', '수납·환불', null], ['history', '이력', null]];
     const tabBar = '<div class="pos-toolbar-group">' + tabs.map(([id, label, count]) => P.chip(label, 'pos-detail-tab', id, state.detailTab === id, count)).join('') + '</div>'
-      + '<span class="pos-toolbar-spacer"></span>' + [['청구', won(f.chargedWon), ''], ['수납', won(f.netPaidWon || 0), 'green'], ['미수', won(f.dueWon), f.dueWon ? 'red' : '']].map(([label, value, tone]) => '<span class="pos-sum"><span>' + e(label) + '</span><strong' + (tone ? ' style="color:var(--tone-' + tone + ')"' : '') + '>' + e(value) + '</strong></span>').join('');
+      + '<span class="pos-toolbar-spacer"></span>' + [['청구', won(f.chargedWon), ''], ['수납', won(f.netPaidWon || 0), 'green'], ['미수', won(f.dueWon), f.dueWon ? 'red' : '']].map(([label, value, tone]) => '<span class="pos-sum"><span>' + e(label) + '</span><strong' + (tone ? ' data-tone="' + tone + '"' : '') + '>' + e(value) + '</strong></span>').join('');
     let content;
     if (state.detailTab === 'money') {
       const rowsHtml = [['청구 금액', won(f.chargedWon), ''], ['수납', won(f.netPaidWon || 0), 'green'], ['고객 환불', won(f.refundWon || 0), ''], ['보증금 보관', won(f.depositHeldWon || 0), 'blue'], ['초과 수납', won(f.creditWon || 0), ''], ['미수', won(f.dueWon), f.dueWon ? 'red' : 'green']]
@@ -219,7 +219,7 @@
     const next = o.exchangeOpenQuantity ? btn('교환 진행 확인', 'pos-problems', o.id, 'primary') : o.totals.customerQuantity ? btn('모두 받음', 'pos-return-all', o.id, 'primary') : o.totals.vehicleQuantity ? btn('차량에서 받은 물품 입고', 'pos-receive', o.id, 'primary') : o.totals.unissuedQuantity ? btn('준비·지급하기', 'pos-issue', o.id, 'primary') : btn('남은 정산 확인', 'pos-money', o.id, 'primary');
     return P.page('접수 상세', '', '<div class="pos-detail">' + side + '<div class="pos-detail-main">' + content + '</div></div>',
       '<div>' + (o.totals.customerQuantity ? btn('일부만 받음', 'pos-return-some', o.id) : go('목록으로', 'intake')) + '</div><div class="so-actions">' + (o.totals.unissuedQuantity && o.totals.customerQuantity ? btn('남은 장비 지급', 'pos-issue', o.id) : '') + next + '</div>',
-      { toolbar: '<button type="button" class="so-button pos-button" data-action="back">' + S.icon('chevron-left') + '목록</button>' + tabBar + '<span style="flex:1"></span>' + (o.source ? P.toolbarLabel('이관 접수 · 수납 내역 별도 확인') : '') + P.toolbarLabel(o.batches.length + '개 접수 내역'),
+      { toolbar: '<button type="button" class="so-button pos-button" data-action="back">' + S.icon('chevron-left') + '목록</button>' + tabBar + '<span class="pos-toolbar-spacer"></span>' + (o.source ? P.toolbarLabel('이관 접수 · 수납 내역 별도 확인') : '') + P.toolbarLabel(o.batches.length + '개 접수 내역'),
         wait: o.totals.unissuedQuantity ? '지급 ' + unissuedText(o) : o.totals.customerQuantity ? '반납 ' + customerText(o) : o.totals.vehicleQuantity ? '입고 ' + vehicleText(o) : f.dueWon ? '수납 ' + won(f.dueWon) : '없음',
         sums: [['고객 보유', o.totals.customerQuantity + '개', o.totals.customerQuantity ? 'orange' : ''], ['차량 보관', o.totals.vehicleQuantity + '개', o.totals.vehicleQuantity ? 'purple' : ''], ['미수', won(f.dueWon), f.dueWon ? 'red' : '']] });
   }
@@ -250,7 +250,7 @@
     }
     const steps = [['고객', d.orderId ? '기존 팀' : (d.customer.name || '미입력')], ['품목', d.lines.length ? d.lines.length + '행' : '미선택'], ['일정·장소', d.start.slice(5) + (d.end !== d.start ? '~' + d.end.slice(5) : '')]];
     const toolbar = '<button type="button" class="so-button pos-button" data-action="pos-draft-back">' + S.icon('chevron-left') + (d.step ? '이전' : '닫기') + '</button>'
-      + '<div class="pos-toolbar-group">' + steps.map(([label, value], i) => P.chip((i + 1) + ' ' + label + ' · ' + value, 'pos-draft-step', String(i), d.step === i)).join('') + '</div><span style="flex:1"></span>' + P.toolbarLabel(name + (o ? ' · 일행·장비 추가' : ' · 새 접수'));
+      + '<div class="pos-toolbar-group">' + steps.map(([label, value], i) => P.chip((i + 1) + ' ' + label + ' · ' + value, 'pos-draft-step', String(i), d.step === i)).join('') + '</div><span class="pos-toolbar-spacer"></span>' + P.toolbarLabel(name + (o ? ' · 일행·장비 추가' : ' · 새 접수'));
     return P.page(o ? '일행·장비 추가' : '새 접수', '', body,
       '<span>' + e(['대표자·이용일', '일행·품목', '이번 내역 확인'][d.step] + ' · ' + (d.step + 1) + '/3') + '</span><div class="so-actions">' + (d.step === 2 ? btn('수령·반납 일정', 'pos-draft-plan', 'pickup') : '') + (d.step < 2 ? btn('다음', 'pos-draft-next', '', 'primary') : btn(o ? '추가 확정' : '접수 확정', 'pos-draft-save', '', 'primary')) + '</div>',
       { toolbar, wait: (d.step + 1) + '/3', sums: [['이번 청구', won(d.lines.reduce((n, l) => n + amount(l), 0))]] });

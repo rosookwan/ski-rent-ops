@@ -1,0 +1,16 @@
+/* Management screens (moved out of pos-management.js in UI v4 so every POS style lives in a stylesheet). */
+#ski-ops[data-pos="true"] .pm-filters{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;align-items:end}
+#ski-ops[data-pos="true"] .pm-filters .so-field{display:flex;flex-direction:column}
+#ski-ops[data-pos="true"] .pm-filters>span{padding-bottom:12px;font-size:16px}
+#ski-ops[data-pos="true"] .pm-note{max-width:100%;white-space:nowrap;text-overflow:ellipsis;overflow:hidden}
+#ski-ops[data-pos="true"] .pos-toolbar-select{box-sizing:border-box;height:var(--pos-touch);min-width:132px;padding:0 36px 0 14px;border:1px solid var(--so-control);border-radius:12px;background:#fff url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 width=%2716%27 height=%2716%27 viewBox=%270 0 24 24%27 fill=%27none%27 stroke=%27%236d6d6d%27 stroke-width=%272.5%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27%3E%3Cpath d=%27m6 9 6 6 6-6%27/%3E%3C/svg%3E") no-repeat right 12px center;font:inherit;font-size:16px;font-weight:600;color:var(--so-ink);appearance:none;-webkit-appearance:none}
+#ski-ops[data-pos="true"] .pos-settings{display:grid;grid-template-columns:220px minmax(0,1fr);gap:12px;flex:1;min-height:0}
+#ski-ops[data-pos="true"] .pos-settings-tabs{display:flex;flex-direction:column;gap:6px;min-height:0;overflow-y:auto}
+#ski-ops[data-pos="true"] .pos-settings-tab{display:flex;align-items:center;justify-content:space-between;gap:8px;box-sizing:border-box;min-height:var(--pos-touch);padding:0 14px;border:1px solid var(--so-line);border-radius:12px;background:#fff;font:inherit;font-size:17px;font-weight:600;color:var(--so-ink);text-align:left;cursor:pointer}
+#ski-ops[data-pos="true"] .pos-settings-tab b{font-size:var(--pos-fs-min);font-weight:700;color:var(--so-muted)}
+#ski-ops[data-pos="true"] .pos-settings-tab[aria-pressed="true"]{background:var(--so-soft);border-color:var(--so-accent);color:var(--so-soft-ink)}
+#ski-ops[data-pos="true"] .pos-settings-tab[aria-pressed="true"] b{color:var(--so-soft-ink)}
+#ski-ops[data-pos="true"] .pos-settings-main{display:flex;flex-direction:column;min-height:0;min-width:0}
+#ski-ops[data-pos="true"] .pos-screen-size{font-size:var(--pos-fs-min);color:var(--so-muted);font-variant-numeric:tabular-nums}
+@media(max-height:680px){#ski-ops[data-pos="true"] .pos-settings-tab{font-size:16px}#ski-ops[data-pos="true"] .pos-settings-tabs{gap:4px}}
+@media(max-width:1100px){#ski-ops[data-pos="true"] .pos-settings{grid-template-columns:184px minmax(0,1fr)}}
