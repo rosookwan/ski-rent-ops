@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-21T04:54:09.156Z",
+  "generatedAt": "2026-09-21T05:01:05.353Z",
   "mode": "static memory demonstration; screenshots are not evidence of physical hardware",
   "checks": [
     {
@@ -214,22 +214,14 @@
         "minFont": 16,
         "minTarget": 52,
         "smallText": [],
-        "clippedText": [
-          {
-            "sel": "span.pos-card-lines>span",
-            "sample": "연락처 확인 → 방문별 조회 → 같은 고객 연결",
-            "need": 283,
-            "has": 253,
-            "count": 2
-          }
-        ],
+        "clippedText": [],
         "halfCut": [],
         "shortTargets": [],
         "scrolling": []
       },
       "ruleTotals": {
         "smallText": 0,
-        "clippedText": 2,
+        "clippedText": 0,
         "halfCut": 0,
         "shortTargets": 0,
         "scrolling": 0
@@ -497,22 +489,14 @@
         "minFont": 16,
         "minTarget": 52,
         "smallText": [],
-        "clippedText": [
-          {
-            "sel": "span.pos-card-lines>span",
-            "sample": "연락처 확인 → 방문별 조회 → 같은 고객 연결",
-            "need": 283,
-            "has": 253,
-            "count": 2
-          }
-        ],
+        "clippedText": [],
         "halfCut": [],
         "shortTargets": [],
         "scrolling": []
       },
       "ruleTotals": {
         "smallText": 0,
-        "clippedText": 2,
+        "clippedText": 0,
         "halfCut": 0,
         "shortTargets": 0,
         "scrolling": 0
@@ -780,22 +764,14 @@
         "minFont": 16,
         "minTarget": 52,
         "smallText": [],
-        "clippedText": [
-          {
-            "sel": "span.pos-card-lines>span",
-            "sample": "연락처 확인 → 방문별 조회 → 같은 고객 연결",
-            "need": 283,
-            "has": 264,
-            "count": 2
-          }
-        ],
+        "clippedText": [],
         "halfCut": [],
         "shortTargets": [],
         "scrolling": []
       },
       "ruleTotals": {
         "smallText": 0,
-        "clippedText": 2,
+        "clippedText": 0,
         "halfCut": 0,
         "shortTargets": 0,
         "scrolling": 0
@@ -1064,44 +1040,16 @@
         "minTarget": 52,
         "smallText": [],
         "clippedText": [],
-        "halfCut": [
-          {
-            "sel": "div.pos-page-body article.pos-card",
-            "sample": "인쇄물QR · 안내고객 안내 주소와 QR 안내판카운터·차량에서 고객에게 ",
-            "count": 1
-          },
-          {
-            "sel": "div.pos-page-body article.pos-card",
-            "sample": "오늘 마감 전마감 이력마감 기록 0일날짜별 마감표 · 현금 차이 · 미처",
-            "count": 1
-          },
-          {
-            "sel": "div.pos-cards article.pos-card",
-            "sample": "인쇄물QR · 안내고객 안내 주소와 QR 안내판카운터·차량에서 고객에게 ",
-            "count": 1
-          },
-          {
-            "sel": "div.pos-cards article.pos-card",
-            "sample": "오늘 마감 전마감 이력마감 기록 0일날짜별 마감표 · 현금 차이 · 미처",
-            "count": 1
-          }
-        ],
+        "halfCut": [],
         "shortTargets": [],
-        "scrolling": [
-          {
-            "sel": "div.pos-cards",
-            "need": 630,
-            "has": 492,
-            "allowed": false
-          }
-        ]
+        "scrolling": []
       },
       "ruleTotals": {
         "smallText": 0,
         "clippedText": 0,
-        "halfCut": 4,
+        "halfCut": 0,
         "shortTargets": 0,
-        "scrolling": 1
+        "scrolling": 0
       }
     },
     {

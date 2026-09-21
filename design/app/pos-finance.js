@@ -87,11 +87,11 @@
   function closingHistory() {
     const closings = D.snapshot.closings.slice().sort((a, b) => b.date.localeCompare(a.date) || b.at.localeCompare(a.at)), today = D.today;
     const openToday = !closings.some(c => c.date === today && !c.reopenings.length);
-    const pending = openToday ? [P.card({ tone: 'red', badge: ['마감 대기', 'red'], name: dayLabel(today), meta: '오늘 · 마감 전', lines: [['오늘 수납 ' + won(D.snapshot.finance.paymentWon || 0) + ' · 현금 증감 ' + won(D.snapshot.finance.cashMovementWon || 0), ''], ['미처리 인계 ' + (D.snapshot.finance.handoverDefaults || []).length + '팀', (D.snapshot.finance.handoverDefaults || []).length ? 'orange' : '']], actions: b('마감 확정', 'pos-closing-start', '', 'soft') })] : [];
-    const done = closings.map(c => P.card({ tone: c.reopenings.length ? 'orange' : 'green', badge: c.reopenings.length ? ['재개됨', 'orange'] : ['마감 완료', 'green'], name: dayLabel(c.date), meta: '처리자 ' + c.actor.id + ' · ' + c.at.slice(11, 16) + ' 확정 · 인계 ' + c.snapshot.handover.length + '팀',
-      lines: [['예상 현금 ' + won(c.expectedCashWon) + ' · 실제 ' + won(c.countedCashWon), ''], [c.differenceWon ? '차이 ' + won(c.differenceWon) + ' · ' + (c.differenceReason || '') : '현금 일치', c.differenceWon ? 'red' : 'green']],
-      actions: b('마감표 확인', 'pos-closing-view', c.id) + (c.date === today && !c.reopenings.length ? b('관리자 마감 재개', 'pos-closing-reopen', c.id) : '') }));
-    return P.page('마감 이력', '', P.cards([{ title: '마감 대기', sub: pending.length + '일', cards: pending }, { title: '마감 완료', sub: closings.length + '일', cards: done }], { empty: '마감 기록 없음' }),
+    const handover = (D.snapshot.finance.handoverDefaults || []).length;
+    const pending = openToday ? [P.orderCard({ tone: 'red', badge: ['마감 대기', 'red'], name: dayLabel(today), metaParts: ['오늘', '마감 전'], itemFit: 'parts', itemParts: ['오늘 수납 ' + won(D.snapshot.finance.paymentWon || 0), '현금 증감 ' + won(D.snapshot.finance.cashMovementWon || 0)], money: ['미처리 인계 ' + handover + '팀', handover ? 'orange' : 'grey'], actions: b('마감 확정', 'pos-closing-start', '', 'primary') })] : [];
+    const done = closings.map(c => P.orderCard({ id: c.id, tone: c.reopenings.length ? 'orange' : 'green', badge: c.reopenings.length ? ['재개됨', 'orange'] : ['마감 완료', 'green'], name: dayLabel(c.date), metaParts: [c.at.slice(11, 16) + ' 확정', '처리자 ' + c.actor.id, '인계 ' + c.snapshot.handover.length + '팀'],
+      itemFit: 'parts', itemParts: ['실제 ' + won(c.countedCashWon), '예상 ' + won(c.expectedCashWon)], state: c.differenceWon ? ['차이 ' + won(c.differenceWon), 'red'] : ['현금 일치', 'green'], money: [c.differenceWon ? (c.differenceReason || '차이 사유 없음') : '현금 일치', c.differenceWon ? 'red' : 'green'], actions: b('마감표 확인', 'pos-closing-view', c.id) }));
+    return P.page('마감 이력', '', P.cards([{ title: '마감 대기', sub: pending.length + '일', cards: pending }, { title: '마감 완료', sub: closings.length + '일', cards: done }], { fixed: true, signature: 'closings', empty: '마감 기록 없음' }),
       '<span>' + e('마감 대기 ' + pending.length + '일 · 마감 기록 ' + closings.length + '일') + '</span><div class="so-actions">' + go('정산·마감', 'closing') + '</div>',
       { toolbar: P.toolbarLabel('날짜별 마감 기록 · 사장 확인용'), wait: pending.length ? '마감 ' + pending.length + '일' : '없음', sums: [['마감 기록', closings.length + '일'], ['이번 미수', won(D.snapshot.orders.reduce((n, o) => n + o.finance.dueWon, 0)), 'red']] });
   }

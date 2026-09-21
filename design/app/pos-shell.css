@@ -211,6 +211,7 @@
 #ski-ops[data-pos="true"] .pos-now>span{flex:1 1 0;min-width:0;font-size:var(--pos-fs-body);color:var(--so-muted);white-space:nowrap;overflow:hidden}
 #ski-ops[data-pos="true"] .pos-now .pos-button{flex-shrink:0}
 #ski-ops[data-pos="true"] .pos-tiles{flex:1;min-height:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));grid-template-rows:repeat(2,minmax(0,1fr));gap:12px;padding-top:4px}
+#ski-ops[data-pos="true"] .pos-tiles.is-row{grid-template-rows:minmax(0,220px)}
 #ski-ops[data-pos="true"] .pos-tile{position:relative;display:flex;flex-direction:column;justify-content:space-between;box-sizing:border-box;min-width:0;min-height:0;margin:0;padding:14px 16px 12px;border:0;border-radius:16px;background:#fff;box-shadow:inset 0 0 0 1px var(--so-line);color:inherit;font:inherit;text-align:left;cursor:pointer}
 #ski-ops[data-pos="true"] .pos-tile:focus-visible{outline:3px solid var(--so-accent);outline-offset:2px}
 #ski-ops[data-pos="true"] .pos-tile[data-tone="red"]{box-shadow:inset 0 0 0 2px var(--tone-red)}
@@ -226,6 +227,8 @@
 #ski-ops[data-pos="true"] .pos-tile-figures b{font-size:34px;font-weight:700;letter-spacing:-.03em;line-height:38px;font-variant-numeric:tabular-nums;white-space:nowrap}
 #ski-ops[data-pos="true"] .pos-tile-figures b.is-when{font-size:26px}
 #ski-ops[data-pos="true"] .pos-tile-line{display:block;min-width:0;min-height:22px;overflow:hidden;font-size:var(--pos-fs-min);line-height:22px;color:var(--so-muted);white-space:nowrap}
+#ski-ops[data-pos="true"] .pos-tile-text{flex:1;display:flex;flex-direction:column;gap:4px;min-width:0;padding-top:10px}
+#ski-ops[data-pos="true"] .pos-tile-text .pos-tile-line{font-size:var(--pos-fs-body);line-height:26px}
 #ski-ops[data-pos="true"] .pos-tile-last{display:flex;align-items:center;gap:10px;min-width:0}
 #ski-ops[data-pos="true"] .pos-tile-last .pos-tile-line{flex:1 1 0}
 #ski-ops[data-pos="true"] .pos-tile-open{flex:0 0 auto;font-size:var(--pos-fs-body);font-weight:700;line-height:22px;color:var(--so-accent-dark)}

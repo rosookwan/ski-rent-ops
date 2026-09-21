@@ -118,7 +118,7 @@
     const metaParts = (c.metaParts || []).filter(Boolean), itemParts = (c.itemParts || []).filter(Boolean);
     const inner = '<span class="pos-card-head"><span class="pos-card-name">' + e(c.name) + '</span>' + (c.phone ? '<span class="pos-card-phone">' + e(c.phone) + '</span>' : '') + badgeHtml + '</span>'
       + '<span class="pos-card-meta" data-fit="parts" data-parts="' + partsAttr(metaParts) + '">' + e(metaParts.join(' · ')) + '</span>'
-      + '<span class="pos-card-itemline"><span class="pos-card-itemtext" data-fit="items" data-parts="' + partsAttr(itemParts) + '">' + e(itemParts.join(' · ')) + '</span>'
+      + '<span class="pos-card-itemline"><span class="pos-card-itemtext" data-fit="' + (c.itemFit || 'items') + '" data-parts="' + partsAttr(itemParts) + '">' + e(itemParts.join(' · ')) + '</span>'
       + (c.state?.[0] ? '<span class="pos-state" data-tone="' + e(c.state[1] || 'grey') + '">' + e(c.state[0]) + '</span>' : '') + '</span>';
     const open = c.go ? '<button type="button" class="pos-card-open" data-go="' + e(c.go.page) + '" data-id="' + e(c.go.id ?? '') + '">' + inner + '</button>' : '<div class="pos-card-open">' + inner + '</div>';
     return '<article class="pos-card is-fixed"' + (tone ? ' data-tone="' + e(tone) + '"' : '') + (c.id ? ' data-card-id="' + e(c.id) + '"' : '') + '>' + legend + open
@@ -127,11 +127,11 @@
   // Home tile: the whole tile is one touch target, "열기" is only a hint. Lines may carry shorter alternatives ([long, shorter, shortest]).
   function tile(c) {
     const tone = c.tone || '', strong = ['red', 'orange', 'green'].includes(tone);
-    const line = row => { const alts = [].concat(row?.[0] || []); return '<span class="pos-tile-line" data-tone="' + e(row?.[1] || '') + '" data-fit="alts" data-alts="' + partsAttr(alts) + '">' + e(alts[0] || '') + '</span>'; };
-    return '<button type="button" class="pos-tile" data-go="' + e(c.route) + '"' + (tone ? ' data-tone="' + e(tone) + '"' : '') + '>' + (strong && c.badge ? '<span class="pos-card-legend">' + e(c.badge[0]) + '</span>' : '')
+    const line = row => { const alts = [].concat(row?.[0] || []); return '<span class="pos-tile-line" data-tone="' + e(row?.[1] || '') + '" ' + (alts.length > 1 ? 'data-fit="alts" data-alts="' + partsAttr(alts) + '"' : 'data-fit="auto"') + '>' + e(alts[0] || '') + '</span>'; };
+    return '<button type="button" class="pos-tile" ' + (c.action ? 'data-action="' + e(c.action) + '" data-id="' + e(c.id ?? '') + '"' : 'data-go="' + e(c.route) + '"') + (tone ? ' data-tone="' + e(tone) + '"' : '') + '>' + (strong && c.badge ? '<span class="pos-card-legend">' + e(c.badge[0]) + '</span>' : '')
       + '<span class="pos-tile-head"><strong>' + e(c.name) + '</strong>' + (!strong && c.badge ? badge(c.badge[0], c.badge[1] || 'grey') : '') + '</span>'
-      + '<span class="pos-tile-figures">' + c.figures.map(f => '<span><small>' + e(f.label) + '</small><b' + (f.when ? ' class="is-when"' : '') + ' data-tone="' + e(f.tone || '') + '">' + e(f.value) + '</b></span>').join('') + '</span>'
-      + line(c.lines?.[0]) + '<span class="pos-tile-last">' + line(c.lines?.[1]) + '<span class="pos-tile-open">열기 ›</span></span></button>';
+      + (c.figures ? '<span class="pos-tile-figures">' + c.figures.map(f => '<span><small>' + e(f.label) + '</small><b' + (f.when ? ' class="is-when"' : '') + ' data-tone="' + e(f.tone || '') + '">' + e(f.value) + '</b></span>').join('') + '</span>' : '')
+      + (c.figures ? line(c.lines?.[0]) + '<span class="pos-tile-last">' + line(c.lines?.[1]) : '<span class="pos-tile-text">' + line(c.lines?.[0]) + line(c.lines?.[1]) + '</span><span class="pos-tile-last"><span class="pos-tile-line"></span>') + '<span class="pos-tile-open">' + e(c.open || '열기') + ' ›</span></span></button>';
   }
   // One-line list row (52px): the whole row is the touch target, the label at the end only names what a tap does.
   function lineRow(c) {

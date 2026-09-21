@@ -59,6 +59,12 @@
       ],
       "metrics": "*",
       "viewports": "*"
+    },
+    {
+      "since": "M6 (2026-09-21)",
+      "keys": "*",
+      "metrics": "*",
+      "viewports": "*"
     }
   ]
 }
