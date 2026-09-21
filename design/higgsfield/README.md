@@ -28,6 +28,7 @@
 | 모델 | `gpt_image_2_5` (variant `flare`) · 한글 글자 렌더링과 참조 이미지 편집이 되는 모델 |
 | 품질·해상도 | quality `high`, resolution `2k` |
 | 비율 | `27:16` (1.6875) · 1024×600 POS 표시 영역(1.7067)에 가장 가까운 지원 비율 |
+| 비율(데스크톱) | `16:9` · 관리 콘솔처럼 MacBook 브라우저에서만 보는 화면. 기준 1440×810. 출력 2688×1520 |
 | 비율(휴대폰) | `9:16` · 세로 화면. 기준 360×640(작은 휴대폰에서 주소창이 보일 때). 출력 1520×2688 |
 | 비용 | 장당 3 크레딧 (`get_cost` 사전 확인값, 2026-09-20) |
 | 일관성 | 첫 화면(앵커)을 먼저 만들고, 나머지는 앵커 결과의 job id를 `image_references`로 넘겨 같은 셸·색·글자 크기를 유지한다. |
@@ -51,3 +52,4 @@
 | `pos-rest-v1/` | 나머지 화면 33종: 포스 화면 9 · 팝업 13 · 관리 8 · 기사 태블릿 3 | [docs/40-higgsfield-pos-rest-screens.md](../../docs/40-higgsfield-pos-rest-screens.md) | 같은 템플릿(앵커 P01) + 기준 화면 4종(P02R 카드 목록 · M01 관리 · P20 팝업 · D01 기사) · [보기](pos-rest-v1/index.html) |
 | `driver-phone-v1/` | 기사 휴대폰 화면 4종(차량 운행 · 배달 처리 · 차량 보관 · 못 받음·방문 결과) · 세로 9:16 · 기준 360×640 | [docs/41-higgsfield-driver-phone-screens.md](../../docs/41-higgsfield-driver-phone-screens.md) | 4장 · 12 크레딧 · 재생성 0 · 실제 크기 검사 포함 · [보기](driver-phone-v1/index.html) |
 | `pos-settings-v1/` | 매장 설정(구역별 수령 장소 · 스키장 템플릿 · 할인) 3종 + 새 접수 3단계(구역 버튼 · 반납 타임) 1종 + 팝업 2종(수령 장소 선택 · 접수 확정의 할인·수납) | [docs/44-higgsfield-settings-payment-screens.md](../../docs/44-higgsfield-settings-payment-screens.md) | 9장 · 27 크레딧 · 재생성 0(S07R · S08R은 답변 반영 새 판) · 나눠서 결제는 품목 고르기 방식(S08R) · 실제 크기 검사 포함(2026-09-21) · [보기](pos-settings-v1/index.html) |
+| `admin-console-v1/` | 시스템 관리 콘솔(관리자 히든 화면) 8종: 로그인 · 현황 · 라이선스 · 계정 · 스키장 템플릿 · 사용 내역 · 팝업 2(계정 생성 · 삭제 확인) · 가로 16:9 · MacBook 브라우저 기준 1440×810 | [docs/45-higgsfield-admin-console-screens.md](../../docs/45-higgsfield-admin-console-screens.md) | 8장 · 24 크레딧 · 재생성 0 · 시안까지만(구현 전) · 2026-09-21 · [보기](admin-console-v1/index.html) |

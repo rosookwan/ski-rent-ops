@@ -1,0 +1,182 @@
+{
+  "project": "ski-rent-ops · 스키노트 시스템 관리 콘솔",
+  "library": "design/higgsfield/admin-console-v1",
+  "createdAt": "2026-09-21",
+  "purpose": "서비스 운영자만 쓰는 숨은 관리자 화면 시안: 로그인 · 현황 · 라이선스 · 계정 · 스키장 템플릿 · 사용 내역 · 계정 생성 · 삭제 확인. MacBook 브라우저 기준(설계 프레임 1440×810 · 16:9). 포스 · 휴대폰 크기는 고려하지 않는다.",
+  "generation": {
+    "model": "gpt_image_2_5",
+    "quality": "high",
+    "resolution": "2k",
+    "aspect_ratio": "16:9",
+    "creditsPerImage": 3,
+    "variant": "flare",
+    "order": "wave 1 = A02(셸 기준 화면) + A01(로그인, 셸 없음) → wave 2 = A03~A06(A02를 참조) → wave 3 = 팝업 A07 · A08(A04를 참조)"
+  },
+  "references": {
+    "note": "job_id가 null이면 이 묶음에서 먼저 만든 화면이다. 제출할 때 results의 job id로 채운다.",
+    "filled": {
+      "A02": "3fba9cf0-294e-4166-bf56-faa8dbb8f264",
+      "A04": "4c6cabc2-8ed9-43fc-b1ae-c1a92ade07a9"
+    }
+  },
+  "screens": [
+    {
+      "code": "A01",
+      "title": "관리자 로그인(숨은 진입 화면)",
+      "wave": 1,
+      "file": "a01-admin-login.png",
+      "aspect_ratio": "16:9",
+      "model": "gpt_image_2_5",
+      "params": {
+        "quality": "high",
+        "resolution": "2k",
+        "variant": "flare"
+      },
+      "references": [],
+      "note": "메뉴에 없는 주소 · 로고 5번 누르기 · 단축키로만 열리는 화면. 아이디와 비밀번호만 묻는다.",
+      "prompt": "High-fidelity UI design mockup of one screen of the SYSTEM ADMIN CONSOLE of 스키노트, a web service used by Korean ski rental shops. This console is only for the service operator and is opened in a desktop browser on a MacBook. The screen is shown flat and straight-on and fills the whole canvas edge to edge: no laptop, no browser chrome, no hands, no perspective. Design frame 1440×810 px (desktop, mouse and keyboard), so it can be denser than a touch screen but must stay calm and easy to scan.\nVisual system: page background #F4F4F2, white cards and tables with 12px radius and a 1px hairline #E3E3E3, near-black text #1A1A1A, gray text #5D5D5D, brand orange #FE4E10 only for the ONE primary button of a screen and for the active menu marker, destructive actions in red #B42318, status always as a small pill with a text label (green #247A3D 사용 중, amber #B45309 만료 임박, red #B42318 정지 or 잠김 or 실패, gray 만료). Pretendard-like Korean sans-serif, simple 2px Lucide-like line icons. Desktop sizes: base text 15px, table text 15px with 48px rows, column headers 13px bold gray, page title 22px bold, key numbers 32px bold, buttons and inputs 40px tall with 15px bold labels. Never use an ellipsis or clipped text; every table column is wide enough for its text.\nAll UI text is Korean and must be rendered crisp and spelled EXACTLY as written below. No English UI labels, no lorem ipsum, no watermark, no annotations, no extra screens.\nScreen: the hidden admin sign-in page. There is NO sidebar and NO header on this screen. The whole background is dark slate #1F2329 with a very subtle darker diagonal line pattern.\nCentered: one white card 440px wide with 16px radius and 40px padding. Top of the card: the purple (#5F33E1) 22px bold wordmark 스키노트 with a small red pill \"시스템 관리\" next to it. Under it the 26px bold title \"관리자 로그인\" and one 15px gray line \"서비스 운영자만 들어올 수 있습니다\". Then two labelled inputs 48px tall with 15px bold labels above them: \"아이디\" (filled with \"admin\") and \"비밀번호\" (filled with eight dots, an eye icon at the right end). Then a full-width solid orange button 48px tall \"로그인\". Under the button a light-gray note box with a small shield icon and two 14px lines: \"5회 틀리면 10분 동안 잠깁니다\" and \"모든 접속은 사용 내역에 기록됩니다\".\nUnder the card, centered, one 14px gray link on the dark background: \"매장 화면으로 돌아가기\". Nothing else on the screen."
+    },
+    {
+      "code": "A02",
+      "title": "현황(대시보드 · 셸 기준 화면)",
+      "wave": 1,
+      "file": "a02-admin-overview.png",
+      "aspect_ratio": "16:9",
+      "model": "gpt_image_2_5",
+      "params": {
+        "quality": "high",
+        "resolution": "2k",
+        "variant": "flare"
+      },
+      "references": [],
+      "note": "사이드바와 헤더의 기준 화면. 라이선스 · 접속 · 오류를 한눈에.",
+      "prompt": "High-fidelity UI design mockup of one screen of the SYSTEM ADMIN CONSOLE of 스키노트, a web service used by Korean ski rental shops. This console is only for the service operator and is opened in a desktop browser on a MacBook. The screen is shown flat and straight-on and fills the whole canvas edge to edge: no laptop, no browser chrome, no hands, no perspective. Design frame 1440×810 px (desktop, mouse and keyboard), so it can be denser than a touch screen but must stay calm and easy to scan.\nVisual system: page background #F4F4F2, white cards and tables with 12px radius and a 1px hairline #E3E3E3, near-black text #1A1A1A, gray text #5D5D5D, brand orange #FE4E10 only for the ONE primary button of a screen and for the active menu marker, destructive actions in red #B42318, status always as a small pill with a text label (green #247A3D 사용 중, amber #B45309 만료 임박, red #B42318 정지 or 잠김 or 실패, gray 만료). Pretendard-like Korean sans-serif, simple 2px Lucide-like line icons. Desktop sizes: base text 15px, table text 15px with 48px rows, column headers 13px bold gray, page title 22px bold, key numbers 32px bold, buttons and inputs 40px tall with 15px bold labels. Never use an ellipsis or clipped text; every table column is wide enough for its text.\nAll UI text is Korean and must be rendered crisp and spelled EXACTLY as written below. No English UI labels, no lorem ipsum, no watermark, no annotations, no extra screens.\nShell: a dark left sidebar 240px wide (#1F2329) and a white header 64px tall. Sidebar top: the white 18px bold wordmark 스키노트 followed by a small red pill \"시스템 관리\". Under it exactly SIX menu rows 44px tall, each a 20px line icon and a 15px label, in this order from the top: 현황 (gauge icon), 라이선스 (key icon), 계정 (users icon), 스키장 템플릿 (mountain icon), 사용 내역 (list icon), 시스템 설정 (gear icon). The active row is the FIRST one from the top, \"현황\": white bold text on a slightly lighter dark background with a 3px orange bar at its left edge; the other rows are light gray text. Sidebar bottom: a small block with 15px white \"admin\" over 13px gray \"시스템 관리자\" and a dark outlined button \"로그아웃\". Header: the 22px bold page title \"현황\" at the left; at the right a 40px search field with a magnifier icon and the placeholder \"매장 · 계정 찾기\" and 13px gray text \"마지막 확인 09:12\". The content area has 24px padding.\nContent, top: a row of FOUR equal white cards 104px tall, each with a 14px gray label, a 32px bold number and a 13px gray caption: \"사용 중 매장\" \"12곳\" \"전체 14곳\"; \"만료 임박\" with an amber number \"2곳\" \"30일 안에 만료\"; \"오늘 접속 계정\" \"31명\" \"어제 28명\"; \"오류\" with a red number \"3건\" \"최근 24시간\".\nContent, middle: two white cards side by side with a 16px gap. LEFT 58%: title 17px bold \"만료 임박 라이선스\" with a gray link \"전체 보기\" at the right, then a table with the column headers 매장 · 만료일 · 남은 기간 · 상태 and three rows: \"설천 스키하우스\" \"2026-10-05\" \"14일\" amber pill \"만료 임박\"; \"만선 렌탈샵\" \"2026-10-18\" \"27일\" amber pill \"만료 임박\"; \"지산 보드샵\" \"2026-09-19\" \"만료됨\" gray pill \"만료\". Each row ends with a small white outlined button \"연장\". RIGHT 42%: title 17px bold \"최근 사용 내역\" with a gray link \"전체 보기\", then five single-line rows, each a 13px gray time, a 15px text and a small pill: \"09:10\" \"우리 스키샵 · counter01 로그인\" green \"성공\"; \"09:04\" \"만선 렌탈샵 · 설정 변경(할인)\" green \"성공\"; \"08:57\" \"설천 스키하우스 · driver02 로그인\" red \"실패\"; \"08:41\" \"우리 스키샵 · 마감 확정\" green \"성공\"; \"08:30\" \"시스템 · 야간 백업\" green \"성공\".\nContent, bottom: one white card 64px tall with four items in a row separated by hairlines, each a green dot, a 15px bold label and a 13px gray value: \"서버\" \"정상\"; \"데이터베이스\" \"정상\"; \"백업\" \"오늘 03:00 완료\"; \"버전\" \"1.4.2\"."
+    },
+    {
+      "code": "A03",
+      "title": "라이선스 관리",
+      "wave": 2,
+      "file": "a03-admin-licenses.png",
+      "aspect_ratio": "16:9",
+      "model": "gpt_image_2_5",
+      "params": {
+        "quality": "high",
+        "resolution": "2k",
+        "variant": "flare"
+      },
+      "references": [
+        {
+          "code": "A02",
+          "job_id": "3fba9cf0-294e-4166-bf56-faa8dbb8f264"
+        }
+      ],
+      "note": "매장별 라이선스를 조회 · 발급 · 연장 · 정지 · 삭제한다. 오른쪽에 고른 매장의 상세.",
+      "prompt": "High-fidelity UI design mockup of one screen of the SYSTEM ADMIN CONSOLE of 스키노트, a web service used by Korean ski rental shops. This console is only for the service operator and is opened in a desktop browser on a MacBook. The screen is shown flat and straight-on and fills the whole canvas edge to edge: no laptop, no browser chrome, no hands, no perspective. Design frame 1440×810 px (desktop, mouse and keyboard), so it can be denser than a touch screen but must stay calm and easy to scan.\nVisual system: page background #F4F4F2, white cards and tables with 12px radius and a 1px hairline #E3E3E3, near-black text #1A1A1A, gray text #5D5D5D, brand orange #FE4E10 only for the ONE primary button of a screen and for the active menu marker, destructive actions in red #B42318, status always as a small pill with a text label (green #247A3D 사용 중, amber #B45309 만료 임박, red #B42318 정지 or 잠김 or 실패, gray 만료). Pretendard-like Korean sans-serif, simple 2px Lucide-like line icons. Desktop sizes: base text 15px, table text 15px with 48px rows, column headers 13px bold gray, page title 22px bold, key numbers 32px bold, buttons and inputs 40px tall with 15px bold labels. Never use an ellipsis or clipped text; every table column is wide enough for its text.\nAll UI text is Korean and must be rendered crisp and spelled EXACTLY as written below. No English UI labels, no lorem ipsum, no watermark, no annotations, no extra screens.\nShell: a dark left sidebar 240px wide (#1F2329) and a white header 64px tall. Sidebar top: the white 18px bold wordmark 스키노트 followed by a small red pill \"시스템 관리\". Under it exactly SIX menu rows 44px tall, each a 20px line icon and a 15px label, in this order from the top: 현황 (gauge icon), 라이선스 (key icon), 계정 (users icon), 스키장 템플릿 (mountain icon), 사용 내역 (list icon), 시스템 설정 (gear icon). The active row is the SECOND one from the top, \"라이선스\": white bold text on a slightly lighter dark background with a 3px orange bar at its left edge; the other rows are light gray text. Sidebar bottom: a small block with 15px white \"admin\" over 13px gray \"시스템 관리자\" and a dark outlined button \"로그아웃\". Header: the 22px bold page title \"라이선스\" at the left; at the right a 40px search field with a magnifier icon and the placeholder \"매장 · 계정 찾기\" and 13px gray text \"마지막 확인 09:12\". The content area has 24px padding.\nThe reference image is the 현황 screen of this console; keep its sidebar, header, colors, typography, card and table style exactly.\nContent, top toolbar row 40px: a search field 280px \"매장 이름 · 라이선스 번호\"; four filter chips (the selected chip has a near-black fill and white text): \"전체 14\" (selected), \"사용 중 11\", \"만료 임박 2\", \"정지 1\"; at the right end the solid orange primary button with a plus icon \"라이선스 발급\".\nContent, below: two columns with a 16px gap. LEFT 68%: a white table card with the column headers 매장 · 라이선스 번호 · 요금제 · 단말 · 만료일 · 상태 and seven rows 48px tall; the second row is selected (light-orange background with a 3px orange bar at its left): \"우리 스키샵\" \"SN-2026-0012\" \"기본\" \"포스 2 · 차량 2\" \"2027-03-31\" green \"사용 중\"; \"설천 스키하우스\" \"SN-2026-0007\" \"기본\" \"포스 1 · 차량 1\" \"2026-10-05\" amber \"만료 임박\"; \"만선 렌탈샵\" \"SN-2026-0009\" \"확장\" \"포스 3 · 차량 2\" \"2026-10-18\" amber \"만료 임박\"; \"곤지암 스키월드\" \"SN-2026-0003\" \"기본\" \"포스 1 · 차량 0\" \"2027-01-15\" green \"사용 중\"; \"지산 보드샵\" \"SN-2025-0021\" \"기본\" \"포스 1 · 차량 1\" \"2026-09-19\" gray \"만료\"; \"무주 패밀리렌탈\" \"SN-2026-0010\" \"확장\" \"포스 2 · 차량 3\" \"2027-02-28\" green \"사용 중\"; \"덕유산 장비대여\" \"SN-2026-0011\" \"기본\" \"포스 1 · 차량 1\" \"2026-12-31\" red \"정지\". Under the table one line: left 13px gray \"전체 14곳 · 1–7\"; right a compact pager \"‹\" \"1 / 2쪽\" \"›\".\nRIGHT 32%: a white detail card titled 17px bold \"설천 스키하우스\" with the amber pill \"만료 임박\"; label and value rows 15px (labels gray): \"라이선스 번호\" \"SN-2026-0007\"; \"요금제\" \"기본\"; \"기간\" \"2025-10-06 ~ 2026-10-05\"; \"단말\" \"포스 1 · 차량 1\"; \"계정\" \"4개 (관리자 1 · 카운터 2 · 기사 1)\"; \"마지막 접속\" \"오늘 08:57\". Under the rows four buttons 40px tall stacked in two rows of two: white outlined \"기간 연장\", white outlined \"단말 수 변경\", white outlined \"정지\", and a red outlined button \"삭제\"."
+    },
+    {
+      "code": "A04",
+      "title": "계정 관리",
+      "wave": 2,
+      "file": "a04-admin-accounts.png",
+      "aspect_ratio": "16:9",
+      "model": "gpt_image_2_5",
+      "params": {
+        "quality": "high",
+        "resolution": "2k",
+        "variant": "flare"
+      },
+      "references": [
+        {
+          "code": "A02",
+          "job_id": "3fba9cf0-294e-4166-bf56-faa8dbb8f264"
+        }
+      ],
+      "note": "계정을 조회 · 생성 · 비밀번호 초기화 · 정지 · 삭제한다.",
+      "prompt": "High-fidelity UI design mockup of one screen of the SYSTEM ADMIN CONSOLE of 스키노트, a web service used by Korean ski rental shops. This console is only for the service operator and is opened in a desktop browser on a MacBook. The screen is shown flat and straight-on and fills the whole canvas edge to edge: no laptop, no browser chrome, no hands, no perspective. Design frame 1440×810 px (desktop, mouse and keyboard), so it can be denser than a touch screen but must stay calm and easy to scan.\nVisual system: page background #F4F4F2, white cards and tables with 12px radius and a 1px hairline #E3E3E3, near-black text #1A1A1A, gray text #5D5D5D, brand orange #FE4E10 only for the ONE primary button of a screen and for the active menu marker, destructive actions in red #B42318, status always as a small pill with a text label (green #247A3D 사용 중, amber #B45309 만료 임박, red #B42318 정지 or 잠김 or 실패, gray 만료). Pretendard-like Korean sans-serif, simple 2px Lucide-like line icons. Desktop sizes: base text 15px, table text 15px with 48px rows, column headers 13px bold gray, page title 22px bold, key numbers 32px bold, buttons and inputs 40px tall with 15px bold labels. Never use an ellipsis or clipped text; every table column is wide enough for its text.\nAll UI text is Korean and must be rendered crisp and spelled EXACTLY as written below. No English UI labels, no lorem ipsum, no watermark, no annotations, no extra screens.\nShell: a dark left sidebar 240px wide (#1F2329) and a white header 64px tall. Sidebar top: the white 18px bold wordmark 스키노트 followed by a small red pill \"시스템 관리\". Under it exactly SIX menu rows 44px tall, each a 20px line icon and a 15px label, in this order from the top: 현황 (gauge icon), 라이선스 (key icon), 계정 (users icon), 스키장 템플릿 (mountain icon), 사용 내역 (list icon), 시스템 설정 (gear icon). The active row is the THIRD one from the top, \"계정\": white bold text on a slightly lighter dark background with a 3px orange bar at its left edge; the other rows are light gray text. Sidebar bottom: a small block with 15px white \"admin\" over 13px gray \"시스템 관리자\" and a dark outlined button \"로그아웃\". Header: the 22px bold page title \"계정\" at the left; at the right a 40px search field with a magnifier icon and the placeholder \"매장 · 계정 찾기\" and 13px gray text \"마지막 확인 09:12\". The content area has 24px padding.\nThe reference image is the 현황 screen of this console; keep its sidebar, header, colors, typography, card and table style exactly.\nContent, top toolbar row 40px: a search field 260px \"아이디 · 이름\"; a dropdown 200px showing \"매장 전체\"; five filter chips (the selected chip has a near-black fill and white text): \"전체 38\" (selected), \"매장 관리자 14\", \"카운터 16\", \"기사 7\", \"시스템 관리자 1\"; at the right end the solid orange primary button with a plus icon \"계정 생성\".\nContent, below: one white table card using the full width with the column headers 아이디 · 이름 · 매장 · 역할 · 상태 · 마지막 접속 · 관리 and eight rows 48px tall: \"admin\" \"운영자\" \"—\" \"시스템 관리자\" green \"사용 중\" \"오늘 09:12\"; \"woori-admin\" \"김사장\" \"우리 스키샵\" \"매장 관리자\" green \"사용 중\" \"오늘 08:41\"; \"counter01\" \"이수진\" \"우리 스키샵\" \"카운터\" green \"사용 중\" \"오늘 09:10\"; \"counter02\" \"박민호\" \"우리 스키샵\" \"카운터\" gray \"정지\" \"2026-08-30\"; \"driver01\" \"최기사\" \"우리 스키샵\" \"기사\" green \"사용 중\" \"오늘 07:55\"; \"seolcheon-admin\" \"정대표\" \"설천 스키하우스\" \"매장 관리자\" green \"사용 중\" \"어제 21:14\"; \"driver02\" \"한기사\" \"설천 스키하우스\" \"기사\" red \"잠김\" \"오늘 08:57\"; \"manseon-admin\" \"오사장\" \"만선 렌탈샵\" \"매장 관리자\" green \"사용 중\" \"오늘 09:04\". In the 관리 column every row has three small white outlined buttons 32px tall: \"비밀번호 초기화\", \"정지\" and a red outlined \"삭제\" (the first row, admin, shows only \"비밀번호 초기화\"). Under the table one line: left 13px gray \"전체 38개 · 1–8\"; right a compact pager \"‹\" \"1 / 5쪽\" \"›\"."
+    },
+    {
+      "code": "A05",
+      "title": "스키장 템플릿 관리",
+      "wave": 2,
+      "file": "a05-admin-templates.png",
+      "aspect_ratio": "16:9",
+      "model": "gpt_image_2_5",
+      "params": {
+        "quality": "high",
+        "resolution": "2k",
+        "variant": "flare"
+      },
+      "references": [
+        {
+          "code": "A02",
+          "job_id": "3fba9cf0-294e-4166-bf56-faa8dbb8f264"
+        }
+      ],
+      "note": "스키장별 처음 값(구역 · 수령 장소 · 반납 타임 · 리프트권 권종)을 등록 · 수정 · 삭제한다.",
+      "prompt": "High-fidelity UI design mockup of one screen of the SYSTEM ADMIN CONSOLE of 스키노트, a web service used by Korean ski rental shops. This console is only for the service operator and is opened in a desktop browser on a MacBook. The screen is shown flat and straight-on and fills the whole canvas edge to edge: no laptop, no browser chrome, no hands, no perspective. Design frame 1440×810 px (desktop, mouse and keyboard), so it can be denser than a touch screen but must stay calm and easy to scan.\nVisual system: page background #F4F4F2, white cards and tables with 12px radius and a 1px hairline #E3E3E3, near-black text #1A1A1A, gray text #5D5D5D, brand orange #FE4E10 only for the ONE primary button of a screen and for the active menu marker, destructive actions in red #B42318, status always as a small pill with a text label (green #247A3D 사용 중, amber #B45309 만료 임박, red #B42318 정지 or 잠김 or 실패, gray 만료). Pretendard-like Korean sans-serif, simple 2px Lucide-like line icons. Desktop sizes: base text 15px, table text 15px with 48px rows, column headers 13px bold gray, page title 22px bold, key numbers 32px bold, buttons and inputs 40px tall with 15px bold labels. Never use an ellipsis or clipped text; every table column is wide enough for its text.\nAll UI text is Korean and must be rendered crisp and spelled EXACTLY as written below. No English UI labels, no lorem ipsum, no watermark, no annotations, no extra screens.\nShell: a dark left sidebar 240px wide (#1F2329) and a white header 64px tall. Sidebar top: the white 18px bold wordmark 스키노트 followed by a small red pill \"시스템 관리\". Under it exactly SIX menu rows 44px tall, each a 20px line icon and a 15px label, in this order from the top: 현황 (gauge icon), 라이선스 (key icon), 계정 (users icon), 스키장 템플릿 (mountain icon), 사용 내역 (list icon), 시스템 설정 (gear icon). The active row is the FOURTH one from the top, \"스키장 템플릿\": white bold text on a slightly lighter dark background with a 3px orange bar at its left edge; the other rows are light gray text. Sidebar bottom: a small block with 15px white \"admin\" over 13px gray \"시스템 관리자\" and a dark outlined button \"로그아웃\". Header: the 22px bold page title \"스키장 템플릿\" at the left; at the right a 40px search field with a magnifier icon and the placeholder \"매장 · 계정 찾기\" and 13px gray text \"마지막 확인 09:12\". The content area has 24px padding.\nThe reference image is the 현황 screen of this console; keep its sidebar, header, colors, typography and card style exactly.\nContent: two columns with a 16px gap. LEFT 30%: a white card titled 17px bold \"템플릿\" with the solid orange primary button \"새 템플릿\" at the right of the title; under it a list of rows 64px tall, each with a 16px bold name and a 13px gray line; the first row is selected (light-orange background with a 3px orange bar at its left): \"무주덕유산리조트\" \"구역 3 · 장소 12 · 적용 매장 7곳\"; \"지산포레스트리조트\" \"구역 2 · 장소 4 · 적용 매장 3곳\"; \"곤지암리조트\" \"구역 2 · 장소 3 · 적용 매장 2곳\"; \"하이원리조트\" \"구역 3 · 장소 9 · 적용 매장 0곳\".\nRIGHT 70%: a white editor card. Top line: a 40px input labelled \"템플릿 이름\" filled with \"무주덕유산리조트\" and at the right 13px gray \"마지막 수정 2026-09-21 · admin\". Under it three tabs: \"구역 · 수령 장소\" (selected, orange underline), \"반납 타임\", \"리프트권 권종\". Tab content: three columns, one per area, each a light-gray panel (#F4F4F2, 12px radius) with a 16px bold area name, a small gray count and place chips stacked under it (white chips 36px tall with a small x icon), ending with a dashed chip \"+ 장소 추가\": column \"만선\" \"5곳\": \"만선 티롤 앞\", \"만선 광장\", \"만선 매표소 앞\", \"만선 주차장 입구\", \"만선 셔틀 정류장\"; column \"설천\" \"4곳\": \"설천 주차장\", \"설천 매표소 앞\", \"설천 곤도라 앞\", \"설천 셔틀 정류장\"; column \"기타\" \"3곳\": \"리조트 웰컴센터\", \"가족호텔 로비\", \"국민호텔 로비\". At the right of the columns a dashed outlined tall button \"+ 구역 추가\".\nEditor bottom: a light-blue note bar with an info icon \"저장하면 새로 채우는 매장부터 쓰입니다 · 이미 쓰는 매장의 값은 바뀌지 않습니다\"; then a button row: at the left a red outlined button \"템플릿 삭제\"; at the right white outlined \"되돌리기\" and the solid orange primary button \"저장\"."
+    },
+    {
+      "code": "A06",
+      "title": "사용 내역(로그) 조회",
+      "wave": 2,
+      "file": "a06-admin-logs.png",
+      "aspect_ratio": "16:9",
+      "model": "gpt_image_2_5",
+      "params": {
+        "quality": "high",
+        "resolution": "2k",
+        "variant": "flare"
+      },
+      "references": [
+        {
+          "code": "A02",
+          "job_id": "3fba9cf0-294e-4166-bf56-faa8dbb8f264"
+        }
+      ],
+      "note": "누가 언제 무엇을 했는지 찾는다. 기간 · 매장 · 계정 · 종류로 거르고 내려받는다.",
+      "prompt": "High-fidelity UI design mockup of one screen of the SYSTEM ADMIN CONSOLE of 스키노트, a web service used by Korean ski rental shops. This console is only for the service operator and is opened in a desktop browser on a MacBook. The screen is shown flat and straight-on and fills the whole canvas edge to edge: no laptop, no browser chrome, no hands, no perspective. Design frame 1440×810 px (desktop, mouse and keyboard), so it can be denser than a touch screen but must stay calm and easy to scan.\nVisual system: page background #F4F4F2, white cards and tables with 12px radius and a 1px hairline #E3E3E3, near-black text #1A1A1A, gray text #5D5D5D, brand orange #FE4E10 only for the ONE primary button of a screen and for the active menu marker, destructive actions in red #B42318, status always as a small pill with a text label (green #247A3D 사용 중, amber #B45309 만료 임박, red #B42318 정지 or 잠김 or 실패, gray 만료). Pretendard-like Korean sans-serif, simple 2px Lucide-like line icons. Desktop sizes: base text 15px, table text 15px with 48px rows, column headers 13px bold gray, page title 22px bold, key numbers 32px bold, buttons and inputs 40px tall with 15px bold labels. Never use an ellipsis or clipped text; every table column is wide enough for its text.\nAll UI text is Korean and must be rendered crisp and spelled EXACTLY as written below. No English UI labels, no lorem ipsum, no watermark, no annotations, no extra screens.\nShell: a dark left sidebar 240px wide (#1F2329) and a white header 64px tall. Sidebar top: the white 18px bold wordmark 스키노트 followed by a small red pill \"시스템 관리\". Under it exactly SIX menu rows 44px tall, each a 20px line icon and a 15px label, in this order from the top: 현황 (gauge icon), 라이선스 (key icon), 계정 (users icon), 스키장 템플릿 (mountain icon), 사용 내역 (list icon), 시스템 설정 (gear icon). The active row is the FIFTH one from the top, \"사용 내역\": white bold text on a slightly lighter dark background with a 3px orange bar at its left edge; the other rows are light gray text. Sidebar bottom: a small block with 15px white \"admin\" over 13px gray \"시스템 관리자\" and a dark outlined button \"로그아웃\". Header: the 22px bold page title \"사용 내역\" at the left; at the right a 40px search field with a magnifier icon and the placeholder \"매장 · 계정 찾기\" and 13px gray text \"마지막 확인 09:12\". The content area has 24px padding.\nThe reference image is the 현황 screen of this console; keep its sidebar, header, colors, typography, card and table style exactly.\nContent, top filter row 40px: four period chips (the selected chip has a near-black fill and white text): \"오늘\" (selected), \"7일\", \"30일\", \"직접 선택\"; a dropdown 180px \"매장 전체\"; a dropdown 160px \"계정 전체\"; a search field 220px \"내용 찾기\"; at the right end a white outlined button with a download icon \"CSV 내려받기\". Second row of kind chips 36px tall: \"전체 412\" (selected), \"로그인 96\", \"접수 141\", \"수납 88\", \"설정 변경 23\", \"삭제 4\", \"오류 3\".\nContent, below: two columns with a 16px gap. LEFT 70%: a white table card with the column headers 시각 · 매장 · 계정 · 종류 · 내용 · 결과 and eight rows 48px tall; the third row is selected (light-orange background with a 3px orange bar at its left): \"09:10:42\" \"우리 스키샵\" \"counter01\" \"로그인\" \"포스 로그인\" green \"성공\"; \"09:08:15\" \"우리 스키샵\" \"counter01\" \"접수\" \"새 접수 260921-014\" green \"성공\"; \"09:04:03\" \"만선 렌탈샵\" \"manseon-admin\" \"설정 변경\" \"할인 · 스키 5,000원 추가\" green \"성공\"; \"08:57:31\" \"설천 스키하우스\" \"driver02\" \"로그인\" \"비밀번호 5회 오류 · 잠김\" red \"실패\"; \"08:52:10\" \"우리 스키샵\" \"counter01\" \"수납\" \"카드 118,000원\" green \"성공\"; \"08:41:26\" \"우리 스키샵\" \"woori-admin\" \"삭제\" \"수령 장소 1곳 삭제\" green \"성공\"; \"08:33:02\" \"시스템\" \"—\" \"오류\" \"문자 발송 실패 1건\" red \"실패\"; \"03:00:00\" \"시스템\" \"—\" \"백업\" \"야간 백업 완료\" green \"성공\". Under the table: left 13px gray \"412건 · 1–8\"; right a compact pager \"‹\" \"1 / 52쪽\" \"›\".\nRIGHT 30%: a white detail card titled 17px bold \"설정 변경\" with the green pill \"성공\"; label and value rows 15px: \"시각\" \"2026-09-21 09:04:03\"; \"매장\" \"만선 렌탈샵\"; \"계정\" \"manseon-admin · 매장 관리자\"; \"기기\" \"MacBook · Chrome\"; \"주소\" \"211.34.xx.xx\". Under them two small panels with 13px gray titles \"바꾸기 전\" and \"바꾼 뒤\": the first shows \"장비당 할인 2개\", the second shows \"장비당 할인 3개 · 스키 5,000원 추가\" with the added part in green."
+    },
+    {
+      "code": "A07",
+      "title": "팝업 · 계정 생성",
+      "wave": 3,
+      "file": "a07-popup-account-create.png",
+      "aspect_ratio": "16:9",
+      "model": "gpt_image_2_5",
+      "params": {
+        "quality": "high",
+        "resolution": "2k",
+        "variant": "flare"
+      },
+      "references": [
+        {
+          "code": "A04",
+          "job_id": "4c6cabc2-8ed9-43fc-b1ae-c1a92ade07a9"
+        }
+      ],
+      "note": "매장과 역할을 고르고 아이디와 임시 비밀번호를 만든다.",
+      "prompt": "High-fidelity UI design mockup of one screen of the SYSTEM ADMIN CONSOLE of 스키노트, a web service used by Korean ski rental shops. This console is only for the service operator and is opened in a desktop browser on a MacBook. The screen is shown flat and straight-on and fills the whole canvas edge to edge: no laptop, no browser chrome, no hands, no perspective. Design frame 1440×810 px (desktop, mouse and keyboard), so it can be denser than a touch screen but must stay calm and easy to scan.\nVisual system: page background #F4F4F2, white cards and tables with 12px radius and a 1px hairline #E3E3E3, near-black text #1A1A1A, gray text #5D5D5D, brand orange #FE4E10 only for the ONE primary button of a screen and for the active menu marker, destructive actions in red #B42318, status always as a small pill with a text label (green #247A3D 사용 중, amber #B45309 만료 임박, red #B42318 정지 or 잠김 or 실패, gray 만료). Pretendard-like Korean sans-serif, simple 2px Lucide-like line icons. Desktop sizes: base text 15px, table text 15px with 48px rows, column headers 13px bold gray, page title 22px bold, key numbers 32px bold, buttons and inputs 40px tall with 15px bold labels. Never use an ellipsis or clipped text; every table column is wide enough for its text.\nAll UI text is Korean and must be rendered crisp and spelled EXACTLY as written below. No English UI labels, no lorem ipsum, no watermark, no annotations, no extra screens.\nPopup: a centered white modal 560px wide with 16px radius and a soft shadow, over the parent screen, which is the 계정 screen of the reference image, reproduced as it is (dark sidebar, header, toolbar, table) and dimmed by a 45% black overlay (still recognizable, clearly inactive). Inside the modal: a 20px bold title at the top left, a 36px square close button with an X icon at the top right, then the body, then a bottom button row aligned right with 40px tall buttons.\nPopup title \"계정 생성\". Body: a dropdown 40px labelled \"매장\" showing \"우리 스키샵\"; a label \"역할\" with three option buttons 40px tall in one row (the selected one has a near-black fill and white text): \"매장 관리자\", \"카운터\" (selected), \"기사\"; two inputs side by side labelled \"이름\" (filled \"김지원\") and \"아이디\" (filled \"counter03\") with a green 13px line under the second one \"쓸 수 있는 아이디입니다\"; a row labelled \"임시 비밀번호\" with a read-only field showing \"Sk7-w4Qp-92\" in a monospaced font, a white outlined button \"다시 만들기\" and a white outlined button \"복사\"; a switch row, switched on: \"첫 로그인 때 비밀번호를 바꾸게 하기\".\nUnder the body a light-gray note: \"이 매장의 계정은 4개입니다 · 라이선스 한도 6개\". Bottom button row: white outlined \"취소\" and the solid orange primary button \"계정 생성\"."
+    },
+    {
+      "code": "A08",
+      "title": "팝업 · 삭제 확인",
+      "wave": 3,
+      "file": "a08-popup-delete-confirm.png",
+      "aspect_ratio": "16:9",
+      "model": "gpt_image_2_5",
+      "params": {
+        "quality": "high",
+        "resolution": "2k",
+        "variant": "flare"
+      },
+      "references": [
+        {
+          "code": "A04",
+          "job_id": "4c6cabc2-8ed9-43fc-b1ae-c1a92ade07a9"
+        }
+      ],
+      "note": "되돌릴 수 없는 일은 무엇이 지워지고 무엇이 남는지 보여 주고, 아이디를 직접 쳐야 지울 수 있다.",
+      "prompt": "High-fidelity UI design mockup of one screen of the SYSTEM ADMIN CONSOLE of 스키노트, a web service used by Korean ski rental shops. This console is only for the service operator and is opened in a desktop browser on a MacBook. The screen is shown flat and straight-on and fills the whole canvas edge to edge: no laptop, no browser chrome, no hands, no perspective. Design frame 1440×810 px (desktop, mouse and keyboard), so it can be denser than a touch screen but must stay calm and easy to scan.\nVisual system: page background #F4F4F2, white cards and tables with 12px radius and a 1px hairline #E3E3E3, near-black text #1A1A1A, gray text #5D5D5D, brand orange #FE4E10 only for the ONE primary button of a screen and for the active menu marker, destructive actions in red #B42318, status always as a small pill with a text label (green #247A3D 사용 중, amber #B45309 만료 임박, red #B42318 정지 or 잠김 or 실패, gray 만료). Pretendard-like Korean sans-serif, simple 2px Lucide-like line icons. Desktop sizes: base text 15px, table text 15px with 48px rows, column headers 13px bold gray, page title 22px bold, key numbers 32px bold, buttons and inputs 40px tall with 15px bold labels. Never use an ellipsis or clipped text; every table column is wide enough for its text.\nAll UI text is Korean and must be rendered crisp and spelled EXACTLY as written below. No English UI labels, no lorem ipsum, no watermark, no annotations, no extra screens.\nPopup: a centered white modal 560px wide with 16px radius and a soft shadow, over the parent screen, which is the 계정 screen of the reference image, reproduced as it is (dark sidebar, header, toolbar, table) and dimmed by a 45% black overlay (still recognizable, clearly inactive). Inside the modal: a 20px bold title at the top left, a 36px square close button with an X icon at the top right, then the body, then a bottom button row aligned right with 40px tall buttons.\nPopup title \"계정 삭제\" with a red warning triangle icon in front of it. Body: a 15px line \"counter02 · 박민호 · 우리 스키샵 · 카운터\"; a light-red panel (#FFF0EF, 12px radius) with two short lists, each with a 13px bold heading: \"지워지는 것\" with the rows \"로그인 정보\" and \"기기 연결\"; \"남는 것\" with the rows \"이 계정이 만든 접수 · 수납 기록\" and \"사용 내역의 이름은 삭제된 계정으로 표시\". Under the panel a label \"확인을 위해 아이디를 입력하세요\" and a 40px input filled with \"counter02\" with a small green check icon at its right end.\nBottom button row: white outlined \"취소\", white outlined \"삭제 대신 정지\" and a solid red (#B42318) button with white bold text \"삭제\". There is no orange button in this popup."
+    }
+  ]
+}
