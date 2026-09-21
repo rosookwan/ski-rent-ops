@@ -194,6 +194,8 @@ npm run build && npm run pos:screens:driver
 
 ## 7. 시안과 다르게 가는 곳
 
+**2026-09-21 마무리 정정:** 아래 표는 변경 내역이며, 차이 전체를 업무상 필수로 승인한 표가 아니다. 사용자 지적에 따라 A4의 시안 일치는 미완료로 남긴다. 업무 사유·미구현 기능·임의로 바뀐 모양은 [docs/51](51-pos-ui-design-differences.md)에 구분했다. 규칙 0건을 시안 일치 근거로 쓰지 않는다.
+
 | 시안 | 실제 구현 | 이유 |
 |---|---|---|
 | P20 · P22의 고정 품목 행과 간단한 하단 | A1 확인 창의 공용 −/+ · 미수 띠. `규격·준비`·`발권 기록`·`수량 설정` 입구 유지, 많은 품목은 높이별 쪽 나눔 | 실제 준비·발권·품목별 전량 선택을 보존하고 16px 글자·52px 버튼·552px 창 한도를 지킨다(`docs/47`) |
@@ -287,6 +289,7 @@ npm run build && npm run pos:screens:driver
 | 2026-09-21 | 후속 A2 | 사용자 요청에 따라 P24·P25·P26 기간·수거 변경·교환·문제 해결 창을 선택 버튼·달력·실제 규격·여섯 선택지로 정리. Pretendard·공용 크기·확정 문구·기존 지급/회수/정정 절차 유지. 지급/반납/변경 24개, 업무 검사 6종·단위 180·반납 25·알림 18·PWA 6·check·빌드 통과. **규칙 195곳 0건**, 번들 1,136,213바이트. 다섯 크기 20장·시안 비교 세 장과 오류 안내 검증은 `docs/48`·`docs/pos-ui-a2`. `feat/pos-ui-v4` 구현 완료, **main·Pages 반영 확인 대기** |
 | 2026-09-21 | 후속 A3 | P27·P28·P14·P31·P32 발권·마감 3단계·사이즈 현황/요청·업무 알림 정리. Pretendard·공용 크기·확정 문구와 발권/지급·제출/적용·링크 준비/발송 구분 유지. 업무 검사 6종(사전입력 10개)·단위 180·반납 25·알림 18·PWA 6·check·빌드 통과. **규칙 244곳 0건**, 번들 1,153,766바이트. 다섯 크기 45장·오류 3장·비교 5장과 추가 업무 확인은 `docs/49`·`docs/pos-ui-a3`. `feat/pos-ui-v4` 구현 완료, **main·Pages 반영 확인 대기** |
 | 2026-09-21 | 후속 A4 | M02 품목 타일 → 실물 목록, M04 거래처·P04 배치 기준의 고객 좌우 상세 정리. Pretendard·공용 크기·기존 선택/확정 문구와 실물/약정/실제 돈·현재 연락처/과거 접수 구분 유지. 업무 검사 6종·단위 180·반납 25·알림 18·PWA 6·check·빌드 통과. **규칙 291곳 0건**, 번들 1,163,255바이트. 다섯 크기 45장·다음 쪽 2장·비교 3장과 추가 업무 확인은 `docs/50`·`docs/pos-ui-a4`. `feat/pos-ui-v4` 구현 완료, **main·Pages 반영 확인 대기** |
+| 2026-09-21 | A4 상태 정정·마무리 | 사용자가 시안과의 큰 차이를 지적한 뒤 추가 작업 중단·사유 문서화를 요청. 화면 코드는 검증 완료한 `aa1dae6` 상태로 유지하고 미완성 재수정은 제거. **업무 검사 통과, 시안 일치 미완료**로 정정. A1~A4의 업무상 차이 사유·미구현 범위·A4 모양 불일치는 `docs/51`. 이번 변경은 문서만이며 전체 업무 검사를 새로 실행한 기록이 아님. A5 미착수, main·Pages 반영 없음 |
 
 ## 12. 결정 기록
 
@@ -341,9 +344,9 @@ npm run build && npm run pos:screens:driver
 | P30 | 날짜로 보기 | `pos-orders.js 창 :262`, `pos-dispatch.js 창 :53` | M5 |
 | P32 | 업무 알림 | `pos-notifications.js open()` | M5 → 후속 A3 (`docs/49`) |
 | M01 · M03 · M05 · M06 · M07 | 관리 허브 · 거래처/고객 목록 · 매장 설정 · 인쇄물 | `pos-management.js hub() · partners() · customers() · settings() · guide()` | M6 · M9 |
-| M02 | 재고·정비 `inventory` · 실물 목록 `inventory-assets` | `pos-management.js inventory() · inventoryAssets()` | M6 → 후속 A4 (`docs/50`) |
-| M04 | 거래처 상세 `partner-detail` | `pos-management.js partnerDetail()` | M6 → 후속 A4 (`docs/50`) |
-| P04 좌우 배치 기준 | 고객 상세 `customer-profile` (전용 시안 없음) | `pos-management.js customerDetail()` | M6 → 후속 A4 (`docs/50`) |
+| M02 | 재고·정비 `inventory` · 실물 목록 `inventory-assets` | `pos-management.js inventory() · inventoryAssets()` | M6 → 후속 A4. 업무 검사 통과·시안 일치 미완료 (`docs/50`·`docs/51`) |
+| M04 | 거래처 상세 `partner-detail` | `pos-management.js partnerDetail()` | M6 → 후속 A4. 업무 검사 통과·시안 일치 미완료 (`docs/50`·`docs/51`) |
+| P04 좌우 배치 기준 | 고객 상세 `customer-profile` (전용 시안 없음) | `pos-management.js customerDetail()` | M6 → 후속 A4. 업무 검사 통과·전용 시안 없음 (`docs/50`·`docs/51`) |
 | M08 | 마감 이력 `closing-history` | `pos-finance.js closingHistory :82` | M6 |
 | D01~D03 | 기사 태블릿 | `pos-dispatch.js render :43 · taskPage :58 · vehicleStock :108` | M7 |
 | D11~D14 | 기사 휴대폰 | 위와 같음 + 새 `@media (max-width: 599px)` | M7 |
