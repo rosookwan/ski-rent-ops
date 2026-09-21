@@ -18,7 +18,8 @@
   }
   function open() {
     const list = rows().filter(r => filter !== 'unread' || unread(r));
-    P.modal('업무 알림', '<div class="so-actions">' + P.button('미확인', 'pos-notice-filter', 'unread') + P.button('전체 기록', 'pos-notice-filter', 'all') + '</div>' + P.pager(list, 'notices', row => P.row(row.title, (unread(row) ? '미확인' : row.acknowledgedAt ? '확인함' : '처리됨') + ' · ' + row.summary.split('\n')[0], P.button('내용 보기', 'pos-notice-detail', row.id)), innerHeight < 700 ? 2 : 3) + U.errorBox(), P.button('닫기', 'close') + P.button('이 기기 소리 ' + (sound ? '끄기' : '켜기'), 'pos-notice-sound') + P.button('최신 알림', 'pos-notice-refresh'));
+    const filters = [['unread', '미확인 ' + rows().filter(unread).length], ['all', '전체 기록']].map(([id, name]) => '<button type="button" class="so-button pos-button pos-option" data-action="pos-notice-filter" data-id="' + id + '" aria-pressed="' + (filter === id) + '">' + name + '</button>').join('');
+    P.modal('업무 알림', '<section class="pos-a3-form"><div class="so-actions">' + filters + '</div>' + P.pager(list, 'notices', row => P.row(row.title, (unread(row) ? '미확인' : row.acknowledgedAt ? '확인함' : '처리됨') + ' · ' + row.summary.split('\n')[0], P.button('내용 보기', 'pos-notice-detail', row.id)), innerHeight < 700 ? 2 : 3) + '</section>' + U.errorBox(), P.button('닫기', 'close') + P.button('이 기기 소리 ' + (sound ? '끄기' : '켜기'), 'pos-notice-sound') + P.button('최신 알림', 'pos-notice-refresh'), '미확인 ' + rows().filter(unread).length + '건');
   }
   function detail(id) {
     selected = id; const row = rows().find(r => r.id === id); if (!row) return open();

@@ -11,13 +11,13 @@
   const printStatus = job => ({ queued: '미리보기 준비', dispatched: '브라우저 인쇄 요청', unknown: '실제 출력 결과 확인 필요', confirmed: '직원 출력 확인', failed: '출력 실패', cancelled: '출력 취소' }[job.status] || job.status);
   const batchLabel = (current, id) => current.batches.find(batch => batch.id === id)?.label || id;
   function formsPanel(current) {
-    return (current.people.some(person => person.preinput?.orderDifferences?.length) ? '<p class="pos-info">입력 확인 당시 품목 차이가 있었습니다. 고객 상세에서 요청 장비·의류·헬멧을 확인하세요.</p>' : '')
-      + '<div class="so-actions">' + button('이번 일행 입력 요청', 'pos-preinput-new', '', 'primary') + '</div>'
-      + P.pager(linkedForms(current).slice().reverse(), 'preinput-forms', form => {
+    const eligiblePeople = current.people.filter(person => current.lines.some(line => line.personId === person.id && line.category !== 'liftTicket' && line.cancelledQuantity < line.quantity));
+    const applied = eligiblePeople.filter(person => person.preinput).length;
+    return '<p class="pos-a3-note" data-fit="auto">' + e(current.customer.name + ' · ' + (eligiblePeople.length ? '규격 적용 ' + applied + '/' + eligiblePeople.length + '명' : '대표자 접수 · 준비에서 실물 규격 확인') + (current.people.some(person => person.preinput?.orderDifferences?.length) ? ' · 요청 품목 차이 확인 필요' : '')) + '</p>'
+      + P.cards([{ title: '입력 요청 내역', cards: linkedForms(current).slice().reverse().map(form => {
         const applied = (current.preinputApplications || []).filter(row => row.formId === form.id).at(-1), pending = !!latest(form) && applied?.submissionVersion !== latest(form).version;
-        return P.row(form.id + ' · ' + (form.orderBatchIds || []).map(id => batchLabel(current, id)).join(' / '), '제출 ' + form.submittedPeople + '/' + form.expectedPeople + '명 · ' + (pending ? '매장 확인 필요' : applied ? '규격 적용됨' : '입력 대기') + ' · ' + (form.linkStatus === 'active' ? '유효한 링크' : '링크 만료·닫힘'),
-          button('입력 내용', 'pos-preinput-review', form.id) + button('입력 링크', 'pos-preinput-link', form.id));
-      }, pageSize());
+        return P.lineRow({ name: (form.orderBatchIds || []).map(id => batchLabel(current, id)).join(' / ') || form.id, noteParts: ['제출 ' + form.submittedPeople + '/' + form.expectedPeople + '명', pending ? '매장 확인 필요' : applied ? '규격 적용됨' : '입력 대기', form.linkStatus === 'active' ? '유효한 링크' : '링크 만료·닫힘'], action: 'pos-preinput-review', id: form.id, label: '입력 내용' });
+      }) }], { lines: true, signature: 'preinput-forms-' + current.id, empty: '아직 준비한 입력 링크가 없습니다' });
   }
   function printPanel(current) {
     return '<div class="so-actions">' + button('A4 준비표 만들기', 'pos-preinput-print-new', 'a4', 'primary') + button('팀 스티커 만들기', 'pos-preinput-print-new', 'sticker') + '</div>'
@@ -34,25 +34,39 @@
   }
   function render() {
     const current = order(); if (!current) return P.page('접수를 선택해 주세요', '', O.go('접수 목록', 'intake'));
-    return P.page('사전입력·준비표', current.customer.name + ' · ' + (current.receiptNo || current.id) + ' · 새 일행의 입력부터 준비표까지 같은 접수에서 이어집니다.',
-      '<div class="so-actions">' + [['forms', '일행 사전입력'], ['prints', '준비표·스티커'], ['sources', '기존 기록 연결']].map(([id, label]) => button(label, 'pos-preinput-tab', id, state.tab === id ? 'primary' : '')).join('') + '</div>'
-      + (state.tab === 'forms' ? formsPanel(current) : state.tab === 'prints' ? printPanel(current) : sourcePanel(current)) + errorBox(),
-      O.go('고객 상세로', 'order-detail', current.id) + button('최신 제출 확인', 'pos-refresh'));
+    const tabs = '<div class="so-actions">' + O.go('팀별 현황', 'size-status') + [['forms', '일행 사전입력'], ['prints', '준비표·스티커'], ['sources', '기존 기록 연결']].map(([id, label]) => button(label, 'pos-preinput-tab', id, state.tab === id ? 'primary' : '')).join('') + '</div>';
+    return P.page('사이즈 입력 현황', '', (state.tab === 'forms' ? formsPanel(current) : state.tab === 'prints' ? printPanel(current) : sourcePanel(current)) + errorBox(),
+      O.go('고객 상세로', 'order-detail', current.id) + '<div class="so-actions">' + (state.tab === 'forms' ? button('이번 일행 입력 요청', 'pos-preinput-new', '', 'primary') : '') + button('최신 제출 확인', 'pos-refresh') + '</div>', { toolbar: tabs });
   }
+
   function eligible(current, batchId) { return current.people.filter(person => current.lines.some(line => line.batchId === batchId && line.personId === person.id && line.category !== 'liftTicket' && !line.cancelledQuantity)); }
   function startRequest() {
     const current = order(), batchId = current.batches.at(-1).id;
     state.draft = { batchId, personIds: eligible(current, batchId).filter(person => !person.preinput).map(person => person.id) }; requestModal();
   }
   function requestModal() {
-    const current = order(), draft = state.draft, people = eligible(current, draft.batchId);
-    const select = '<label class="so-field">입력 요청할 접수 차수<select aria-label="입력 요청할 접수 차수" data-change="pos-preinput-batch">' + current.batches.map(batch => '<option value="' + e(batch.id) + '"' + (batch.id === draft.batchId ? ' selected' : '') + '>' + e(batch.label || batch.id) + '</option>').join('') + '</select></label>';
-    P.modal('이번에 입력할 일행 선택', select + '<p class="pos-label">새로 추가한 일행을 기본 선택합니다. 이미 아는 규격은 다시 묻지 않습니다.</p>'
-      + P.pager(people, 'preinput-request-people', person => P.row(person.preinput?.name || person.name, person.id + ' · ' + (person.preinput ? '규격 입력 있음 · 필요하면 다시 선택' : '규격 입력 대기'),
-        button(draft.personIds.includes(person.id) ? '선택됨' : '선택', 'pos-preinput-person', person.id, draft.personIds.includes(person.id) ? 'primary' : '')), pageSize())
-      + (!people.length ? '<p class="pos-label">팀 공용 장비만 있는 접수입니다. 일행을 추가하면 개인별 입력을 요청할 수 있습니다. 준비표는 바로 만들 수 있습니다.</p>' : '') + errorBox(),
-      button('취소', 'close') + button(draft.personIds.length + '명 입력 링크 준비', 'pos-preinput-create', '', 'primary'));
+    const current = order(), draft = state.draft, people = eligible(current, draft.batchId), chosen = people.filter(person => draft.personIds.includes(person.id));
+    const formIds = linkedForms(current).map(form => form.id), deliveries = (D.snapshot.deliveries || []).filter(row => formIds.includes(row.formId));
+    const sent = deliveries.filter(row => ['sent', 'delivered'].includes(row.status)).length;
+    const row = (name, value, action = '') => '<div><dt>' + name + '</dt><dd data-fit="words" title="' + e(value) + '">' + e(value) + '</dd>' + action + '</div>';
+    P.modal(current.customer.name + ' · 사이즈 요청 ' + chosen.length + '명', '<section class="pos-a3-form"><dl class="pos-a3-ledger">'
+      + row('대상 일행', chosen.map(person => person.preinput?.name || person.name).join(' · ') || (people.length ? '선택 없음' : '대표자 접수 · 개인별 대상 없음'), button('대상 선택', 'pos-preinput-people'))
+      + row('접수 차수', batchLabel(current, draft.batchId), button('차수 선택', 'pos-preinput-batches'))
+      + row('받는 번호', current.customer.phone || '연락처 미입력') + row('발송 기록', sent ? '발송 기록 ' + sent + '건' : '자동 발송 안 함 · 링크만 준비') + '</dl>'
+      + '<div class="pos-a3-note"><strong>안내 문구</strong><p>[' + e(P.storeName()) + '] ' + e(current.customer.name) + ' 님, 일행 사이즈를 미리 입력해 주세요.</p></div></section>' + errorBox(),
+      button('취소', 'close') + button(draft.personIds.length + '명 입력 링크 준비', 'pos-preinput-create', '', 'primary'), (current.receiptNo || current.id) + ' · 이미 아는 규격은 다시 묻지 않습니다');
+    S.$('#so-dialog .pos-modal-sub').dataset.fit = 'auto'; P.fitPage(S.$('#so-dialog'));
+    S.$('[data-action="pos-preinput-create"]').disabled = !draft.personIds.length;
   }
+  function requestPeople() {
+    const draft = state.draft, people = eligible(order(), draft.batchId);
+    P.modal('이번에 입력할 일행 선택', '<section class="pos-a3-form">' + P.pager(people, 'preinput-request-people', person => P.row(person.preinput?.name || person.name, person.preinput ? '규격 입력 있음 · 필요하면 다시 선택' : '규격 입력 대기', button(draft.personIds.includes(person.id) ? '선택됨' : '선택', 'pos-preinput-person', person.id, draft.personIds.includes(person.id) ? 'primary' : '')), pageSize())
+      + (!people.length ? '<p class="pos-label">대표자 접수는 준비에서 실물 규격을 확인합니다. 준비표는 바로 만들 수 있습니다.</p>' : '') + '</section>', button('선택 적용', 'pos-preinput-request-back', '', 'primary'));
+  }
+  S.action('pos-preinput-people', requestPeople);
+  S.action('pos-preinput-request-back', requestModal);
+  S.action('pos-preinput-batches', () => P.modal('입력 요청할 접수 차수', '<section class="pos-a3-form">' + P.pager(order().batches, 'preinput-batches', batch => P.lineRow({ name: batch.label || batch.id, noteParts: [eligible(order(), batch.id).length + '명'], action: 'pos-preinput-pick-batch', id: batch.id, label: '선택', selected: batch.id === state.draft.batchId }), 4) + '</section>', button('돌아가기', 'pos-preinput-request-back')));
+  S.action('pos-preinput-pick-batch', id => { state.draft.batchId = id; state.draft.personIds = eligible(order(), id).filter(person => !person.preinput).map(person => person.id); requestModal(); });
   async function createForm() {
     const current = order(), draft = state.draft; if (!draft.personIds.length) throw new Error('입력을 요청할 일행을 선택해 주세요.');
     const id = D.id('form'), token = C.randomId(''), accessHash = await window.SkiWorkflowService.hashToken(token), expiresAt = new Date(Date.parse(D.snapshot.at) + 7 * 86400000).toISOString();
@@ -79,7 +93,7 @@
     P.modal(form.id + ' · 입력 확인', '<p class="pos-label">제출 ' + form.submittedPeople + '/' + form.expectedPeople + '명 · 아직 입력하지 않은 일행은 계속 남습니다.</p>'
       + P.pager(people, 'preinput-review-' + id, person => P.row(person.name, (person.equipment === 'ski' ? '스키' : person.equipment === 'board' ? '보드' : '장비 없음·확인') + ' · 키 ' + (person.heightCm ?? '현장 확인') + ' · 발 ' + (person.footMm ?? '현장 확인') + ' · 의류 ' + (person.clothing ? person.clothingSize || '현장 확인' : '없음') + ' · 헬멧 ' + (person.helmet ? '필요' : '없음'),
         submitted && bound ? button('규격 수정', 'pos-preinput-edit-person', id + '|' + person.id) : ''), pageSize()) + errorBox(),
-      button('닫기', 'close') + (submitted ? button(bound ? '확인하고 접수에 적용' : '기존 일행과 연결', bound ? 'pos-preinput-apply' : 'pos-preinput-bind', id, 'primary') : button('입력 링크', 'pos-preinput-link', id)));
+      button('닫기', 'close') + (submitted ? button('입력 링크', 'pos-preinput-link', id) : '') + (submitted ? button(bound ? '확인하고 접수에 적용' : '기존 일행과 연결', bound ? 'pos-preinput-apply' : 'pos-preinput-bind', id, 'primary') : button('입력 링크', 'pos-preinput-link', id)));
   }
   async function apply(id, people) {
     const form = formOf(id); const result = await D.execute('docs.formApply', { orderId: order().id, formId: id, submissionVersion: latest(form).version, ...(people ? { people } : {}) });
@@ -139,7 +153,7 @@
   S.action('pos-preinput', id => { state.tab = 'forms'; S.go('order-preinput', { id }); });
   S.action('pos-preinput-tab', tab => { state.tab = tab; S.render(); }); S.action('pos-preinput-new', startRequest);
   S.change('pos-preinput-batch', id => { state.draft.batchId = id; state.draft.personIds = eligible(order(), id).filter(person => !person.preinput).map(person => person.id); requestModal(); });
-  S.action('pos-preinput-person', id => { const ids = state.draft.personIds; state.draft.personIds = ids.includes(id) ? ids.filter(value => value !== id) : [...ids, id]; requestModal(); });
+  S.action('pos-preinput-person', id => { const ids = state.draft.personIds; state.draft.personIds = ids.includes(id) ? ids.filter(value => value !== id) : [...ids, id]; requestPeople(); });
   S.action('pos-preinput-create', safe(createForm)); S.action('pos-preinput-link', linkModal); S.action('pos-preinput-renew', safe(renew));
   S.action('pos-preinput-copy', safe(async id => { const link = linkOf(id); try { await navigator.clipboard.writeText(link); S.toast('입력 링크를 복사했습니다.'); } catch { const area = S.$('[data-preinput-link]'); area?.focus(); area?.select(); S.toast('링크를 선택했습니다. 복사해 주세요.'); } }));
   S.action('pos-preinput-review', reviewModal); S.action('pos-preinput-apply', safe(id => apply(id)));
@@ -161,7 +175,7 @@
   S.action('pos-preinput-local-guest', safe(localGuest)); S.action('pos-preinput-guest-step', delta => { captureGuest(); state.guest.index = Math.max(0, Math.min(state.guest.rows.length - 1, state.guest.index + Number(delta))); S.render(); });
   S.action('pos-preinput-guest-submit', safe(async () => { captureGuest(); const guest = state.guest; const result = await S.workflow.guest(guest.id).submit(C.newCommand('intake.submit', guest.submissionVersion, { id: guest.id, people: guest.rows, status: 'submitted' })); guest.submissionVersion = result.submissionVersion; guest.done = true; await D.refresh(); S.render(); }));
   S.action('pos-preinput-guest-back', () => { S.go('order-preinput', { id: state.guest.orderId }); });
-  S.register('order-preinput', { title: '사전입력·준비표', parent: 'preparation', pos: true, render });
+  S.register('order-preinput', { title: '사이즈 입력 현황', parent: 'preparation', pos: true, render });
   S.register('order-print-preview', { title: '준비표 미리보기', parent: 'preparation', pos: true, render: printPreview });
   S.register('order-preinput-guest', { title: '일행 사전입력 체험', public: true, pos: true, render: guestRender });
   S.posPreinput = { state, render, printPreview, requestModal };

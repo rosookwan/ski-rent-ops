@@ -104,31 +104,58 @@
     const row = closingDraft.handover[closingDraft.index];
     if (row && read('handoverReason') !== undefined) Object.assign(row, { reason: read('handoverReason'), assignee: read('assignee'), nextDate: read('nextDate') || null, note: read('handoverNote') });
   }
-  function renderClosing() {
-    const d = closingDraft, report = D.snapshot.finance; let body;
-    if (d.step === 0) body = '<div class="pos-confirm-summary"><strong>오늘 현금 증감 ' + won(report.cashMovementWon) + '</strong><span>시작 현금과 실제 금고 잔액 확인</span></div><div class="pos-form-grid">' + input('시작 현금', 'openingCashWon', d.openingCashWon, 'number', 'min="0" inputmode="numeric"') + input('실제 금고 현금', 'countedCashWon', d.countedCashWon, 'number', 'min="0" inputmode="numeric"') + input('차이가 있는 경우 사유', 'differenceReason', d.differenceReason) + '</div>';
+  function closingDifference() {
+    if (!closingDraft) return;
+    const d = closingDraft, expected = Number(d.openingCashWon) + D.snapshot.finance.cashMovementWon;
+    const amount = S.$('[data-closing-expected]'), difference = S.$('[data-closing-difference]');
+    if (amount) amount.textContent = won(expected);
+    if (difference) { const value = d.countedCashWon === '' ? null : Number(d.countedCashWon) - expected; difference.textContent = value === null ? '실사 전' : won(Math.abs(value)) + (value < 0 ? ' 부족' : value > 0 ? ' 초과' : ' 일치'); difference.dataset.tone = value ? 'red' : 'green'; }
+  }
+  function showClosing() {
+    const d = closingDraft; if (!d) return; const report = D.snapshot.finance;
+    const steps = '<div class="pos-a3-steps">' + ['현금 대조', '미처리 이월', '확정'].map((name, index) => '<span' + (d.step === index ? ' aria-current="step"' : '') + '>' + (index + 1) + ' ' + name + '</span>').join('') + '</div>';
+    let body;
+    if (d.step === 0) body = '<dl class="pos-a3-ledger"><div><dt>예상 현금</dt><dd class="is-amount" data-closing-expected></dd>' + b('시작 현금', 'pos-closing-opening') + '</div></dl>'
+      + '<input type="hidden" data-pos-input="openingCashWon" value="' + e(d.openingCashWon) + '">'
+      + '<div class="pos-a3-inline">' + input('실제 금고 현금', 'countedCashWon', d.countedCashWon, 'number', 'min="0" inputmode="numeric"') + '</div>'
+      + '<dl class="pos-a3-ledger"><div><dt>차이</dt><dd class="is-amount" data-closing-difference></dd>' + b('현금 재확인', 'pos-closing-recount') + '</div></dl>'
+      + '<div class="pos-a3-inline">' + input('차이 사유', 'differenceReason', d.differenceReason) + '</div>';
     else if (d.step === 1) {
       const row = d.handover[d.index];
-      body = '<div class="pos-confirm-summary"><strong>' + e(row.customer.name) + ' 팀 · ' + (d.index + 1) + '/' + d.handover.length + '팀</strong><span>미수 ' + won(row.dueWon) + ' · 기존 인계 정보 유지</span></div><div class="pos-form-grid">' + select('다음에 할 일', 'handoverReason', [['', '사유 선택'], ...reasons], row.reason || '') + input('담당자', 'assignee', row.assignee || '') + input('다음 확인일', 'nextDate', row.nextDate || D.today, 'date') + input('메모 (기타 사유는 필수)', 'handoverNote', row.note || '') + '</div>';
-    } else body = '<div class="pos-confirm-summary"><strong>' + D.today + ' 하루 마감</strong><span>예상 현금 ' + won(d.openingCashWon + report.cashMovementWon) + ' · 실제 현금 ' + won(d.countedCashWon) + '</span><span>차이 ' + won(d.countedCashWon - d.openingCashWon - report.cashMovementWon) + '</span><span>미수·미반납 ' + d.handover.length + '팀 인계</span><span>마감표 보존 · 반납·정비 진행 상태는 별도</span></div>';
-    return P.page('마감 확정 · ' + (d.step + 1) + '/3', ['현금 대조', '미처리 업무 인계', '마감 확인'][d.step], body + errorBox(), '<div class="so-actions">' + b('이전', 'pos-closing-back') + b('거래처 미정산 확인', 'pos-closing-partners') + '</div>' + b(d.step < 2 ? '다음' : '오늘 마감 확정', d.step < 2 ? 'pos-closing-next' : 'pos-closing-save', '', 'primary'), { wait: (d.step + 1) + '/3', sums: [['오늘 수납', won(report.paymentWon || 0)], ['현금 증감', won(report.cashMovementWon || 0)]] });
+      body = '<div class="pos-option-row"><span>다음에 할 일</span>' + b(reasons.find(([id]) => id === row.reason)?.[1] || '사유 선택', 'pos-closing-reason') + '<input type="hidden" data-pos-input="handoverReason" value="' + e(row.reason || '') + '"></div>'
+        + '<div class="pos-a3-inline">' + input('담당자', 'assignee', row.assignee || '') + input('다음 확인일', 'nextDate', row.nextDate || D.today, 'date') + input('메모 (기타 필수)', 'handoverNote', row.note || '') + '</div>';
+    } else body = '<dl class="pos-a3-ledger">' + [['예상 현금', won(Number(d.openingCashWon) + report.cashMovementWon)], ['실제 현금', won(d.countedCashWon)], ['차이', won(d.countedCashWon - d.openingCashWon - report.cashMovementWon)], ['미처리 이월', d.handover.length + '팀']].map(([name, value]) => '<div><dt>' + name + '</dt><dd class="is-amount">' + e(value) + '</dd></div>').join('') + '</dl><p class="pos-a3-note">마감표 보존 · 반납·정비 진행 상태는 별도</p>';
+    P.modal(Number(D.today.slice(5, 7)) + '월 ' + Number(D.today.slice(8, 10)) + '일 마감 확정 · 미처리 ' + d.handover.length + '팀', '<section class="pos-a3-form pos-a3-closing">' + steps + body + '</section>' + errorBox(),
+      '<div class="pos-fulfillment-extra">' + b('취소', 'pos-closing-cancel') + b('이전', 'pos-closing-back') + b('거래처 미정산 확인', 'pos-closing-partners') + '</div>' + b(d.step < 2 ? '다음' : '오늘 마감 확정', d.step < 2 ? 'pos-closing-next' : 'pos-closing-save', '', 'primary'), (d.step + 1) + ' / 3 단계 · ' + (d.step === 1 ? d.handover[d.index].customer.name + ' · ' + (d.index + 1) + '/' + d.handover.length + '팀 · 미수 ' + won(d.handover[d.index].dueWon) : ['현금 대조', '', '마감 확인'][d.step]));
+    S.$('#so-dialog .pos-modal-sub').dataset.fit = 'auto'; P.fitPage(S.$('#so-dialog')); closingDifference();
   }
-  S.action('pos-closing-start', () => { const f = D.snapshot.finance; closingDraft = { step: 0, index: 0, revision: D.snapshot.revision, openingCashWon: f.openingCashWon || 0, countedCashWon: '', differenceReason: '', handover: structuredClone(f.handoverDefaults || []) }; S.go('closing-wizard'); });
+  function renderClosing() { queueMicrotask(showClosing); return closing(); }
+  S.root.addEventListener('input', event => { if (event.target.closest('.pos-a3-closing')) { captureClosing(); closingDifference(); } });
+  S.root.addEventListener('ski:close-dialogs', () => { closingDraft = null; });
+  S.action('pos-closing-cancel', () => { closingDraft = null; S.go('closing'); });
+  S.action('pos-closing-resume', showClosing);
+  S.action('pos-closing-recount', () => S.$('[data-pos-input="countedCashWon"]')?.focus());
+  S.action('pos-closing-opening', () => { captureClosing(); P.modal('시작 현금 확인', input('시작 현금', 'closingOpening', closingDraft.openingCashWon, 'number', 'min="0" inputmode="numeric"') + errorBox(), b('돌아가기', 'pos-closing-resume') + b('선택 적용', 'pos-closing-opening-save', '', 'primary')); });
+  S.action('pos-closing-opening-save', () => { try { const value = Number(read('closingOpening')); window.SkiWorkflowCommon.integer(value, 0, Number.MAX_SAFE_INTEGER); closingDraft.openingCashWon = value; showClosing(); } catch (err) { error(err); } });
+  S.action('pos-closing-reason', () => { captureClosing(); P.modal('다음에 할 일', '<div class="pos-a3-options">' + reasons.map(([id, name]) => b(name, 'pos-closing-pick-reason', id)).join('') + '</div>', b('돌아가기', 'pos-closing-resume')); });
+  S.action('pos-closing-pick-reason', value => { closingDraft.handover[closingDraft.index].reason = value; showClosing(); });
+  S.action('pos-closing-start', () => { const f = D.snapshot.finance; closingDraft = { step: 0, index: 0, revision: D.snapshot.revision, openingCashWon: f.openingCashWon || 0, countedCashWon: '', differenceReason: '', handover: structuredClone(f.handoverDefaults || []) }; showClosing(); });
   S.action('pos-closing-next', () => {
     captureClosing(); const d = closingDraft;
     try {
       if (d.step === 0) { window.SkiWorkflowCommon.integer(d.countedCashWon, 0, Number.MAX_SAFE_INTEGER); if (d.countedCashWon - d.openingCashWon - D.snapshot.finance.cashMovementWon && !d.differenceReason.trim()) throw new Error('현금 차이의 사유를 입력해 주세요.'); d.step = d.handover.length ? 1 : 2; }
       else { const row = d.handover[d.index]; if (!row.reason || !row.assignee || row.reason === 'other' && !row.note) throw new Error('새 인계 사유와 담당자를 확인해 주세요.'); if (++d.index >= d.handover.length) d.step = 2; }
-      S.render();
+      showClosing();
     } catch (err) { error(err); }
   });
-  S.action('pos-closing-back', () => { captureClosing(); const d = closingDraft; if (d.step === 2) { d.step = d.handover.length ? 1 : 0; d.index = Math.max(0, d.handover.length - 1); } else if (d.step === 1 && d.index) d.index--; else if (d.step === 1) d.step = 0; else { S.go('closing'); return; } S.render(); });
+  S.action('pos-closing-back', () => { captureClosing(); const d = closingDraft; if (d.step === 2) { d.step = d.handover.length ? 1 : 0; d.index = Math.max(0, d.handover.length - 1); } else if (d.step === 1 && d.index) d.index--; else if (d.step === 1) d.step = 0; else { S.go('closing'); return; } showClosing(); });
   S.action('pos-closing-save', async () => { try { const d = closingDraft; if (d.revision !== D.snapshot.revision) throw new Error('업무가 변경되어 마감 내용을 다시 확인해야 합니다.'); await D.execute('closing.close', { id: D.id('close'), date: D.today, openingCashWon: d.openingCashWon, countedCashWon: d.countedCashWon, differenceReason: d.differenceReason, handover: d.handover.map(({ orderId, reason, assignee, nextDate, note }) => ({ orderId, reason, assignee, nextDate, note })) }); closingDraft = null; S.go('closing'); S.toast('마감표와 미처리 인계 내역 보존 완료'); } catch (err) { error(err); } });
   S.action('pos-closing-history', () => S.go('closing-history'));
   S.action('pos-closing-view', id => { const c = D.snapshot.closings.find(c => c.id === id); P.modal('보존된 마감표 · ' + c.date, '<div class="pos-confirm-summary"><strong>처리자 ' + e(c.actor.id) + '</strong><span>예상 ' + won(c.expectedCashWon) + ' · 실제 ' + won(c.countedCashWon) + ' · 차이 ' + won(c.differenceWon) + '</span><span>' + e(c.differenceReason || '현금 일치') + '</span><span>인계 ' + c.snapshot.handover.length + '팀 · 확정시각 ' + e(c.at) + '</span></div>', b('닫기', 'close') + b('마감 당시 거래처', 'pos-closing-partners', c.id) + (c.date === D.today && !c.reopenings.length ? b('관리자 마감 재개', 'pos-closing-reopen', id) : '')); });
   S.action('pos-closing-partners', closingId => {
+    if (closingDraft) captureClosing();
     const saved = closingId ? D.snapshot.closings.find(row => row.id === closingId) : null, balances = saved ? saved.snapshot.partnerBalances || [] : D.snapshot.finance.partnerBalances || [];
-    P.modal(saved ? saved.date + ' · 마감 당시 거래처' : '거래처 미정산·실물 의무', '<p class="pos-label">' + (saved ? '마감 확정 당시 보존 내역' : '현재 원장의 약정 잔액과 실물 의무') + ' · 미배분 금액은 약정에서 자동 차감하지 않음</p>' + P.pager(balances, 'closing-partners', row => P.row(row.name + ' · 받을 ' + won(row.receivableWon) + ' / 줄 ' + won(row.payableWon), '미배분 지급 ' + won(row.unallocatedPaymentWon) + ' · 받음 ' + won(row.unallocatedReceiptWon) + ' · 빌린 미반환 ' + row.borrowedPendingQuantity + '개 / 빌려준 미회수 ' + row.lentPendingQuantity + '개' + (row.agreementUnconfirmed ? ' · 약정 확인 필요' : ''), go(saved ? '현재 장부' : '장부 열기', 'partner-detail', row.id)), 2), b('닫기', 'close'));
+    P.modal(saved ? saved.date + ' · 마감 당시 거래처' : '거래처 미정산·실물 의무', '<p class="pos-label">' + (saved ? '마감 확정 당시 보존 내역' : '현재 원장의 약정 잔액과 실물 의무') + ' · 미배분 금액은 약정에서 자동 차감하지 않음</p>' + P.pager(balances, 'closing-partners', row => P.row(row.name + ' · 받을 ' + won(row.receivableWon) + ' / 줄 ' + won(row.payableWon), '미배분 지급 ' + won(row.unallocatedPaymentWon) + ' · 받음 ' + won(row.unallocatedReceiptWon) + ' · 빌린 미반환 ' + row.borrowedPendingQuantity + '개 / 빌려준 미회수 ' + row.lentPendingQuantity + '개' + (row.agreementUnconfirmed ? ' · 약정 확인 필요' : ''), go(saved ? '현재 장부' : '장부 열기', 'partner-detail', row.id)), 2), b(closingDraft && !saved ? '마감으로' : '닫기', closingDraft && !saved ? 'pos-closing-resume' : 'close'));
   });
   S.action('pos-closing-reopen', id => P.modal('관리자 마감 재개', input('재개 사유', 'reopenReason', '') + errorBox(), b('취소', 'close') + b('권한 확인·재개', 'pos-closing-reopen-save', id, 'primary')));
   S.action('pos-closing-reopen-save', async id => { try { await D.execute('closing.reopen', { id, reason: read('reopenReason') }); S.close(); S.render(); } catch (err) { error(err); } });

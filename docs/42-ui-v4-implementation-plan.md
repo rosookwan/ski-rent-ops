@@ -200,6 +200,11 @@ npm run build && npm run pos:screens:driver
 | P24 반납 일정의 매장 직접·차량 수거 전환 | A2는 `수거 약속 변경`: 날짜·장소·반납 타임·담당 차량 선택, 기간 연장은 별도 | 기존 `ops.schedule`은 차량 수거용이다. 직접 반납 전환을 UI만 바꿔 지원하는 것처럼 표시하지 않는다(`docs/48`) |
 | P25 고정 사이즈 버튼·한 번에 교환 확정 | 실제 등록 규격·직접 입력, 현재 실물·구성품 확인, 교환 방법·사유는 하단. 요청 뒤 기존 지급·회수 절차 | 사이즈를 임의로 만들지 않고 실물별 이동·정정 약속을 유지한다. 규격 오류 시 요약 영역에 경고를 표시해 겹침을 막는다(`docs/48`) |
 | P26 대상 품목과 다음 단계 | 여섯 선택지·품목별 쪽 나눔. 금액 정정·접수 취소는 접수 전체 절차, 수량 정정은 원래 기록 | 선택만으로 쓰지 않는다. 반납 완료 품목의 정정과 전체 처리 이력도 유지한다(`docs/48`) |
+| P27 예비권·추가 발권을 한 창에서 선택 | 발권·배정된 권은 읽기 전용, 추가 발권은 공용 −/+. 실제 권 조건·예비권은 별도 입구 | 예비권은 실제 권을 고르는 기존 절차다. 발권·배정과 고객 지급을 구분하고 접수 전체 미수 범위를 표시한다(`docs/49`) |
+| P28 현금 차이 처리 버튼 | 정산 화면 위의 3단계 창, 차이 사유 직접 입력과 팀별 인계 | 기존 필수 사유·담당자·다음 확인일·오래된 자료 거부를 보존한다. `다음`·`이전`·`오늘 마감 확정` 문구 유지(`docs/49`) |
+| P14 팀별 현황과 사이즈 집계 | 내일까지 준비할 미지급 품목의 팀 카드와 적용한 고객 규격 집계. 대표자 접수는 준비표로 연결 | 실제 일행·접수 적용 상태만 사용한다. 제출과 적용을 구분하고 대표자 접수에 개인별 입력을 강요하지 않는다(`docs/49`) |
+| P31 사이즈 재요청·문자 | 대상·차수·번호·발송 기록·안내 문구, 기존 `N명 입력 링크 준비` | 실제 문자 발송은 추가하지 않는다. 대상·차수 선택은 별도 창에서 하며 입력 원본·적용·출력 절차를 보존한다(`docs/49`) |
+| P32 업무 알림 두 행 | 미확인/전체 선택 상태·수량, 높이에 따른 기존 2/3행 쪽 나눔 | 실제 알림 기록을 사용하고 열람과 확인 처리를 구분한다(`docs/49`) |
 | 카드 아래 폭 전체 버튼(P05 · P06 · P08) | 금액과 버튼을 한 줄에 | 실제 글자 크기로는 카드가 203px가 되어 1024×600에서 아랫줄이 55px 잘린다(`docs/38` 7-4) |
 | 묶음 제목 2개 + 카드 4장 | 낮은 화면에서는 제목 한 줄 | 426px가 필요한데 목록 영역은 392px |
 | 정산·마감 48px 행 + 44px `수납` 버튼 | 52px 행 전체가 누르는 곳(7건을 한 번에 보이려면 왼쪽 제목 줄을 뺀다) | 누르는 곳 52px 기준 |
@@ -277,6 +282,7 @@ npm run build && npm run pos:screens:driver
 | 2026-09-21 | 반영 | 사용자 확인("메인페이지까지 반영")을 받아 `feat/pos-ui-v4`를 `main`에 올리고 Pages에 배포. 예전 화면 정리(번들 1,110,342바이트 · 가드 2,000,000)와 관리자 콘솔 시안(`docs/45`)까지 포함. 남은 일은 `docs/46`에 인계 |
 | 2026-09-21 | 후속 A1 | 사용자 확인 뒤 P20·P22 지급·반납·차량 입고를 공용 −/+ 확인 창으로 정리. Pretendard·공용 글자 크기·확정 문구 유지. 수납 복귀·부분 반납·준비 취소·품목별 전량 선택 포함 지급/반납 19개, 업무 검사 6종·단위 180·반납 25·알림 18·PWA 6·check·빌드 통과. **규칙 170곳 0건**, 번들 1,117,385바이트. 비교 그림·촬영·검사 근거 `docs/47`·`docs/pos-ui-a1`. `feat/pos-ui-v4` 구현 완료, **main·Pages 반영 확인 대기** |
 | 2026-09-21 | 후속 A2 | 사용자 요청에 따라 P24·P25·P26 기간·수거 변경·교환·문제 해결 창을 선택 버튼·달력·실제 규격·여섯 선택지로 정리. Pretendard·공용 크기·확정 문구·기존 지급/회수/정정 절차 유지. 지급/반납/변경 24개, 업무 검사 6종·단위 180·반납 25·알림 18·PWA 6·check·빌드 통과. **규칙 195곳 0건**, 번들 1,136,213바이트. 다섯 크기 20장·시안 비교 세 장과 오류 안내 검증은 `docs/48`·`docs/pos-ui-a2`. `feat/pos-ui-v4` 구현 완료, **main·Pages 반영 확인 대기** |
+| 2026-09-21 | 후속 A3 | P27·P28·P14·P31·P32 발권·마감 3단계·사이즈 현황/요청·업무 알림 정리. Pretendard·공용 크기·확정 문구와 발권/지급·제출/적용·링크 준비/발송 구분 유지. 업무 검사 6종(사전입력 10개)·단위 180·반납 25·알림 18·PWA 6·check·빌드 통과. **규칙 244곳 0건**, 번들 1,153,766바이트. 다섯 크기 45장·오류 3장·비교 5장과 추가 업무 확인은 `docs/49`·`docs/pos-ui-a3`. `feat/pos-ui-v4` 구현 완료, **main·Pages 반영 확인 대기** |
 
 ## 12. 결정 기록
 
@@ -316,18 +322,20 @@ npm run build && npm run pos:screens:driver
 | P02R · P05 · P08 · P06 | `intake` · `preparation` · `rentals` · `returns` | `pos-orders.js listing() :124 · cardOf() :95` | M2 |
 | P09 | 리프트권 `tickets` | `pos-tickets.js ticketsPage :59` | M2 |
 | P10 | 차량 운행 `dispatch` | `pos-dispatch.js render :33 · taskCard :18` | M2 |
-| P07 · P28 · P29 | 정산·마감 `closing` · 마감 확정 `closing-wizard` · 현금 입출금 | `pos-finance.js closing :62 · renderClosing :100 · 창 :128` | M3 · M5 |
+| P07 · P29 | 정산·마감 `closing` · 현금 입출금 | `pos-finance.js closing()` · `pos-cash` | M3 · M5 |
+| P28 | 정산 화면 위 마감 확정 3단계 · 호환 경로 `closing-wizard` | `pos-finance.js showClosing() · captureClosing() · renderClosing()` | M5 → 후속 A3 (`docs/49`) |
 | P11 · P03 · P13 · P12 · P17 · P33 | 새 접수·일행·장비 추가 `order-intake` | `pos-orders.js intake() :238` | M4 |
 | P04 · P15 | 접수 상세 `order-detail` | `pos-orders.js detail() :189` | M4 |
-| P14 · P31 | 사이즈 입력 현황 `order-preinput` | `pos-preinput.js render :35 · 창 :50~97` | M4 · M5 |
+| P14 | 팀별 사이즈 현황 `size-status` · 접수별 입력·출력 `order-preinput` | `pos-size-status.js render() · card()` · `pos-preinput.js render() · formsPanel()` | M4 → 후속 A3 (`docs/49`) |
+| P31 | 사이즈 요청·대상·차수 선택 창 | `pos-preinput.js requestModal() · requestPeople()` | M5 → 후속 A3 (`docs/49`) |
 | P20 · P22 | 지급 · 반납 · 차량 입고 확인 창, 품목별 수량 상세 `order-issue` · `order-fulfillment` | `pos-fulfillment-view.js show() · row()` · `pos-fulfillment.js open() · confirm() · fulfillment()` | M5 → 후속 A1 (`docs/47`) |
 | P21 | 수납 | `pos-finance.js 창 :20 · :33` | M5 |
 | P24 | 기간·수거 변경 창 · `order-changes` | `pos-adjustment-forms.js extension() · appointment()` · `pos-fulfillment.js changes()` | M5 → 후속 A2 (`docs/48`) |
 | P25 | 교환 사이즈 창 · `order-exchange` | `pos-adjustment-forms.js exchange()` · `pos-fulfillment.js exchangeStart() · exchangeRow()` | M5 → 후속 A2 (`docs/48`) |
 | P26 | 문제 해결 선택 창 · `order-problems` · `order-assets` | `pos-problem-picker.js` · `pos-fulfillment.js problemRecords() · problems() · assetsPage()` | M5 → 후속 A2 (`docs/48`) |
-| P27 | 발권 | `pos-fulfillment.js 창 :411`, `pos-tickets.js` | M5 |
+| P27 | 발권·권 조건 확인 창 | `pos-ticket-form.js open() · render()` · `pos-fulfillment.js pos-ticket-issue` | M5 → 후속 A3 (`docs/49`) |
 | P30 | 날짜로 보기 | `pos-orders.js 창 :262`, `pos-dispatch.js 창 :53` | M5 |
-| P32 | 업무 알림 | `pos-notifications.js open :19` | M5 |
+| P32 | 업무 알림 | `pos-notifications.js open()` | M5 → 후속 A3 (`docs/49`) |
 | M01~M07 | 관리 8화면 | `pos-management.js hub :22 ~ guide :179` | M6 |
 | M08 | 마감 이력 `closing-history` | `pos-finance.js closingHistory :82` | M6 |
 | D01~D03 | 기사 태블릿 | `pos-dispatch.js render :43 · taskPage :58 · vehicleStock :108` | M7 |

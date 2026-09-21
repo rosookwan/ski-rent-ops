@@ -143,7 +143,7 @@
     const groups = grouped(filtered, dateKind).map(g => ({ title: g.title, sub: g.sub, cards: g.orders.map(o => cardOf(o, kind)) }));
     const emptyTitle = { intake: '예약 없음', preparation: '준비할 팀 없음', rentals: '이용 중인 팀 없음', returns: '반납할 팀 없음' }[kind];
     const body = P.cards(groups, { fixed: true, signature: [kind, state.query, state.period, state.date, state.sort].join('|'), empty: state.query ? '검색 결과 없음' : emptyTitle, emptyNote: state.query ? '"' + state.query + '"' : '', emptyAction: state.query || state.period !== 'all' || state.date ? btn('전체 보기', 'pos-period', 'all', 'primary') : '' });
-    return P.page(titles[kind], '', body, '<span>' + e(foot) + '</span><div class="so-actions">' + (D.pending ? btn('같은 요청 다시 확인', 'pos-retry', '', 'soft') : btn('최신 기록 확인', 'pos-refresh')) + btn('새 접수', 'pos-new', '', 'primary') + '</div>', options);
+    return P.page(titles[kind], '', body, '<span>' + e(foot) + '</span><div class="so-actions">' + (kind === 'preparation' ? btn('사이즈 입력 현황', 'pos-size-status') : '') + (D.pending ? btn('같은 요청 다시 확인', 'pos-retry', '', 'soft') : btn('최신 기록 확인', 'pos-refresh')) + btn('새 접수', 'pos-new', '', 'primary') + '</div>', options);
   }
   function home() {
     const orders = D.snapshot.orders, today = D.today, tomorrow = nextDate(today);

@@ -1,0 +1,48 @@
+{
+  "checks": [
+    "Operating staff prepares fixed-person link without contacting configured SMS provider",
+    "Real /guest partial submission applies only completed person and preserves original price and issue state",
+    "Later partial completion keeps the earlier submission and application histories",
+    "Size overview distinguishes submitted forms from applied customer sizes and viewing the summary writes nothing",
+    "Next-day form requests only newly added person; existing person sizing is reused",
+    "Public API rejects adding an unrequested order person without changing the form",
+    "A4 original snapshot opens browser preview and records unknown physical outcome without invoking printer provider",
+    "Additional-batch sticker includes integrated receipt and use date",
+    "SQLite restart preserves person applications, immutable forms and print originals",
+    "Static demo uses local guest flow and sends no network mutations or misleading cross-device link"
+  ],
+  "errors": [],
+  "layouts": [
+    {
+      "name": "01-first-request-1024x600",
+      "outside": [],
+      "scroll": []
+    },
+    {
+      "name": "03-partial-review-1024x600",
+      "outside": [],
+      "scroll": []
+    },
+    {
+      "name": "03-applied-size-summary-1024x600",
+      "outside": [],
+      "scroll": []
+    },
+    {
+      "name": "04-late-request-1024x600",
+      "outside": [],
+      "scroll": []
+    },
+    {
+      "name": "05-a4-preview-1024x600",
+      "outside": [],
+      "scroll": []
+    }
+  ],
+  "smsProviderCalls": 0,
+  "printerProviderCalls": 0,
+  "surfaces": [
+    "operating /pos + /guest, SQLite",
+    "static demo, memory only"
+  ]
+}

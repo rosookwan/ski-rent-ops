@@ -400,15 +400,7 @@
     const order = currentOrder(state.operation?.orderId), line = order.lines.find(line => line.id === id), allocated = D.snapshot.allocations.filter(a => a.reservationId === order.id && a.status === 'active' && !a.fulfilledAt && (line.reservationBindings || []).some(binding => binding.lineId === a.lineId)).length;
     const left = line.unissuedQuantity - allocated;
     if (left <= 0) { error('이 품목은 이미 발권·배정했습니다. 지급할 수량을 선택하세요.'); return; }
-    request('실제로 발권한 리프트권 기록', '<div class="pos-form-grid">'
-      + O.select('실제 발권 권종', 'ticket-sku', D.snapshot.catalog.filter(sku => sku.kind === 'liftTicket' && !sku.requiresTypeConfirmation).map(sku => [sku.id, sku.label]), line.sku)
-      + O.input('실제 발권 수량', 'ticket-quantity', left, 'number', 'min="1" max="' + left + '"')
-      + O.input('권의 유효 시작', 'ticket-from', line.start + 'T09:00', 'datetime-local') + O.input('권의 유효 종료', 'ticket-to', line.start + 'T18:00', 'datetime-local')
-      + O.input('발권처 관리번호', 'ticket-vendor', '', 'text', 'maxlength="100" placeholder="실제 발권처"')
-      + O.select('반환 후 재사용 조건', 'ticket-transfer', [['false', '재사용 불가'], ['true', '유효시간 안에 양도 가능']], 'false') + '</div><p class="pos-label">실제 발권을 마친 권의 조건만 기록합니다. 판매 접수만으로 발권 완료되지 않습니다.</p>', 'ops.ticketIssue',
-      () => { const sku = O.read('ticket-sku'); return { orderId: order.id, lineId: line.id, quantity: Number(O.read('ticket-quantity')), sku,
-        ticket: { validFrom: O.read('ticket-from') + ':00+09:00', validTo: O.read('ticket-to') + ':00+09:00', acceptedTypes: [sku], transferable: O.read('ticket-transfer') === 'true', vendorId: O.read('ticket-vendor') } }; },
-      () => { refreshPrepared(order.id); S.toast('실제 발권·배정을 기록했습니다. 고객에게 지급할 권을 선택하세요.'); }, '실제 발권·배정 기록');
+    S.posTicketForm.open(order, line, allocated, formServices(), () => { refreshPrepared(order.id); S.toast('실제 발권·배정을 기록했습니다. 고객에게 지급할 권을 선택하세요.'); });
   });
   S.root.addEventListener('change', event => {
     const name = event.target.dataset.posInput;
