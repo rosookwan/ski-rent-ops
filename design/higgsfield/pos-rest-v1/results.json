@@ -1,0 +1,532 @@
+{
+  "project": "ski-rent-ops · 스키노트 POS",
+  "library": "design/higgsfield/pos-rest-v1",
+  "workspace": {
+    "id": "a3cca891-ff82-4041-9d9a-0584cef69319",
+    "type": "private",
+    "name": null,
+    "note": "개인 워크스페이스 그대로(별도 선택 없음)."
+  },
+  "generation": {
+    "model": "gpt_image_2_5",
+    "variant": "flare",
+    "quality": "high",
+    "resolution": "2k",
+    "aspect_ratio": "27:16",
+    "output": "2592×1536",
+    "creditsPerImage": 3
+  },
+  "anchors": {
+    "shell": {
+      "code": "P01",
+      "bundle": "pos-main-v1",
+      "job_id": "8d6e31bf-6f35-4a6b-bb11-65a3f1ab8ebc"
+    },
+    "cardList": "P02R",
+    "management": "M01",
+    "popup": "P20",
+    "driver": "D01",
+    "note": "기준 화면을 먼저 만들어 직접 검수한 뒤, 그 job id를 나머지 화면의 image_references로 넘겼다."
+  },
+  "review": {
+    "criteria": "pos-main-v1과 같다(docs/38 6-3): 레일·헤더 완전, 온전한 카드·행, 업무 용어 문구 일치, 말줄임표 0, 주황(기사는 보라) 주 버튼 한 종류. 샘플 데이터 오탈자는 기록만 한다.",
+    "sizeNote": "그림은 크기를 보증하지 않는다. 글자 크기와 실제 들어가는지는 구현할 때 fit-check 방식으로 잰다(docs/38 7절)."
+  },
+  "final": [
+    {
+      "code": "P02R",
+      "title": "1 접수·예약 (카드 목록 · 확정 배치)",
+      "group": "포스 화면",
+      "file": "p02r-intake-cards.png",
+      "job_id": "c3a5f3bd-6b54-4e0d-a37c-1f2fcb6522fe",
+      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J2y32mXmk1jhAd5qmEsy69365Q/hf_20260921_011059_c3a5f3bd-6b54-4e0d-a37c-1f2fcb6522fe.png",
+      "references": [
+        "P01",
+        "P02"
+      ],
+      "verdict": "통과",
+      "review": "확정 배치대로 나옴: 제목 한 줄, 온전한 카드 4장, 금액과 버튼이 한 줄, 품목 많은 카드는 '외 4종'으로 끝남. 헤더(매장명·알림 종·나가기)와 레일 9개 완전. 목록 화면의 기준으로 사용.",
+      "regenerations": 0
+    },
+    {
+      "code": "M01",
+      "title": "관리 허브",
+      "group": "관리",
+      "file": "m01-management-hub.png",
+      "job_id": "ebc4a6ca-2d86-473f-a84a-74a08261a65f",
+      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J2y32mXmk1jhAd5qmEsy69365Q/hf_20260921_011059_ebc4a6ca-2d86-473f-a84a-74a08261a65f.png",
+      "references": [
+        "P01"
+      ],
+      "verdict": "통과",
+      "review": "관리 레일 7개(포스로 · 재고·정비 · 거래처 장부 · 고객 관리 · 매장 설정 · 인쇄물 · 마감 이력) 순서 정확, 강조 없음. 타일 6개 문구 일치, 마감 이력만 빨간 테두리. 관리 화면의 기준으로 사용.",
+      "regenerations": 0
+    },
+    {
+      "code": "P20",
+      "title": "팝업 · 지급 확정",
+      "group": "팝업",
+      "file": "p20-popup-issue.png",
+      "job_id": "de333b51-84be-4955-a684-3fee0e3eddd5",
+      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J2y32mXmk1jhAd5qmEsy69365Q/hf_20260921_011059_de333b51-84be-4955-a684-3fee0e3eddd5.png",
+      "references": [
+        "P05",
+        "P01"
+      ],
+      "verdict": "통과",
+      "review": "부모 화면(2 준비·지급)이 어둡게 깔리고 팝업에 제목·부제·닫기, 품목 3줄의 −/+ 수량, 미수 줄과 수납 버튼, 주황 확정 버튼 하나. 팝업의 기준으로 사용.",
+      "regenerations": 0
+    },
+    {
+      "code": "D01",
+      "title": "기사 태블릿 · 차량 운행",
+      "group": "기사 태블릿",
+      "file": "d01-driver-dispatch.png",
+      "job_id": "27c00e31-e89a-4c9c-b8f1-a7628c8da874",
+      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J2y32mXmk1jhAd5qmEsy69365Q/hf_20260921_011059_27c00e31-e89a-4c9c-b8f1-a7628c8da874.png",
+      "references": [
+        "P01"
+      ],
+      "verdict": "통과",
+      "review": "레일 없음, 보라색 강조, 카드가 아닌 행 4줄과 쪽수, 행마다 보라 '업무 처리'. 하단에 주 버튼 없음. 기사 화면의 기준으로 사용.",
+      "regenerations": 0
+    },
+    {
+      "code": "P11",
+      "title": "새 접수 · 1 고객",
+      "group": "포스 화면",
+      "file": "p11-intake-customer.png",
+      "job_id": "d2b5a7eb-74c0-4dc7-971c-d56f2665f611",
+      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J2y32mXmk1jhAd5qmEsy69365Q/hf_20260921_011059_d2b5a7eb-74c0-4dc7-971c-d56f2665f611.png",
+      "references": [
+        "P01"
+      ],
+      "verdict": "통과",
+      "review": "끝 4자리 표시와 숫자판(지우기·찾기), 찾은 고객 2명 중 선택 표시, 새 고객 등록, 하단 '다음 · 품목'. 레일·헤더 완전.",
+      "regenerations": 0
+    },
+    {
+      "code": "P12",
+      "title": "새 접수 · 3 일정·장소",
+      "group": "포스 화면",
+      "file": "p12-intake-schedule.png",
+      "job_id": "a4c65fbc-af99-4d4c-87bb-70f58ba680b5",
+      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J2y32mXmk1jhAd5qmEsy69365Q/hf_20260921_011059_a4c65fbc-af99-4d4c-87bb-70f58ba680b5.png",
+      "references": [
+        "P01"
+      ],
+      "verdict": "통과",
+      "review": "수령일·수령 시간·수령 장소·반납 시간을 큰 선택 버튼으로, 오른쪽 접수 요약과 합계 105,000원, 하단 '접수 확정 · 105,000원'.",
+      "regenerations": 0
+    },
+    {
+      "code": "P13",
+      "title": "새 접수 · 일행마다 다르게 입력",
+      "group": "포스 화면",
+      "file": "p13-intake-per-person.png",
+      "job_id": "8282048c-621c-44dd-9b40-830a325fb1bc",
+      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J2y32mXmk1jhAd5qmEsy69365Q/hf_20260921_011059_8282048c-621c-44dd-9b40-830a325fb1bc.png",
+      "references": [
+        "P01"
+      ],
+      "verdict": "통과",
+      "review": "왼쪽 일행 목록 5줄과 쪽수(1 / 6쪽), 오른쪽 품목 버튼 6개, '앞사람과 같게'·'남은 27명 모두 같게', 하단 '다음 일행 · 4 최유나'.",
+      "regenerations": 0
+    },
+    {
+      "code": "P09",
+      "title": "리프트권",
+      "group": "포스 화면",
+      "file": "p09-tickets.png",
+      "job_id": "994055c5-d0b4-4df6-bde2-67c663bfa7bb",
+      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J2y32mXmk1jhAd5qmEsy69365Q/hf_20260921_011824_994055c5-d0b4-4df6-bde2-67c663bfa7bb.png",
+      "references": [
+        "P01",
+        "P02R"
+      ],
+      "verdict": "통과",
+      "review": "활성은 일곱째 리프트권. 제목 한 줄(발권 필요 · 사용 중 4팀), 온전한 카드 4장, 주황은 발권 카드 버튼에만, 하단에 예비권 25매. 헤더·레일 완전.",
+      "regenerations": 0
+    },
+    {
+      "code": "P10",
+      "title": "차량 운행 (포스)",
+      "group": "포스 화면",
+      "file": "p10-dispatch.png",
+      "job_id": "c8606a0f-7a2c-4a72-b75e-38297ab0c518",
+      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J2y32mXmk1jhAd5qmEsy69365Q/hf_20260921_012000_c8606a0f-7a2c-4a72-b75e-38297ab0c518.png",
+      "references": [
+        "P01",
+        "P02R"
+      ],
+      "verdict": "통과(메모)",
+      "review": "활성은 여덟째 차량 운행. 차량 선택 3칸, 카드 4장(시간 · 팀, 장소 · 차량, 물품과 상태, 남은 물품 + 업무 처리), 주황은 하단 배달할 팀 찾기 하나. 메모: 발권처 환불 카드는 배지 대신 보라 테두리로 그려짐.",
+      "regenerations": 0
+    },
+    {
+      "code": "P14",
+      "title": "사이즈 입력 현황",
+      "group": "포스 화면",
+      "file": "p14-size-status.png",
+      "job_id": "bafdc2aa-6230-4016-a491-141685223a72",
+      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J2y32mXmk1jhAd5qmEsy69365Q/hf_20260921_011824_bafdc2aa-6230-4016-a491-141685223a72.png",
+      "references": [
+        "P01",
+        "P02R"
+      ],
+      "verdict": "통과",
+      "review": "팀별 입력 현황 카드 4장: 미입력은 주황 테두리와 재요청 버튼, 입력 완료는 초록, 발송 전은 입력폼 보내기. 하단에 사이즈 집계 · 준비표 인쇄 2팀.",
+      "regenerations": 0
+    },
+    {
+      "code": "P15",
+      "title": "접수 상세 · 수납·환불",
+      "group": "포스 화면",
+      "file": "p15-order-money.png",
+      "job_id": "59d9660c-4075-4466-853d-1ba76e17de2b",
+      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J2y32mXmk1jhAd5qmEsy69365Q/hf_20260921_011824_59d9660c-4075-4466-853d-1ba76e17de2b.png",
+      "references": [
+        "P01",
+        "P04"
+      ],
+      "verdict": "통과",
+      "review": "접수 상세의 수납·환불 탭: 왼쪽 요약과 버튼 6개는 그대로, 오른쪽에 대여 요금 · 수납 · 환불 · 보증금 · 미수 다섯 줄, 하단 주황 수납 105,000원.",
+      "regenerations": 0
+    },
+    {
+      "code": "P17",
+      "title": "일행·장비 추가 · 1 대상",
+      "group": "포스 화면",
+      "file": "p17-add-party.png",
+      "job_id": "78f00657-7edf-4b8b-b06e-de4a2b90fd7a",
+      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J2y32mXmk1jhAd5qmEsy69365Q/hf_20260921_011824_78f00657-7edf-4b8b-b06e-de4a2b90fd7a.png",
+      "references": [
+        "P01"
+      ],
+      "verdict": "통과",
+      "review": "대표자는 고정 표시(김민수 팀 · 이용 중), 추가 대상 · 수령일 선택 버튼, 새 일행 수 −/+, 오른쪽 현재 접수와 미수, 하단 다음 · 품목.",
+      "regenerations": 0
+    },
+    {
+      "code": "M02",
+      "title": "관리 · 재고·정비",
+      "group": "관리",
+      "file": "m02-inventory.png",
+      "job_id": "c61cbf7e-b78a-46c2-8dbd-55d41f8d93ec",
+      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J2y32mXmk1jhAd5qmEsy69365Q/hf_20260921_011824_c61cbf7e-b78a-46c2-8dbd-55d41f8d93ec.png",
+      "references": [
+        "P01",
+        "M01"
+      ],
+      "verdict": "통과(메모)",
+      "review": "관리 레일 7개, 활성은 둘째 재고·정비. 품목 타일 6개에 대여 가능 숫자와 상태 변경 버튼, 부츠만 주황 테두리(정비 중 2). 메모: 헬멧 타일의 배지 한 곳이 정상 대신 헹상으로 찍힘(다른 다섯 곳은 정상).",
+      "regenerations": 0
+    },
+    {
+      "code": "M03",
+      "title": "관리 · 거래처 장부",
+      "group": "관리",
+      "file": "m03-partners.png",
+      "job_id": "22da4ab4-eef1-4af7-b04f-18e580acd26c",
+      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J2y32mXmk1jhAd5qmEsy69365Q/hf_20260921_011824_22da4ab4-eef1-4af7-b04f-18e580acd26c.png",
+      "references": [
+        "P01",
+        "M01"
+      ],
+      "verdict": "통과(메모)",
+      "review": "거래처 카드 3장(미수 빨강 · 미지급 주황 · 정산 완료), 주황은 하단 거래 추가 하나. 메모: 헤더 알약이 정산 대기 대신 정산 대거로 찍힘, 카드가 2열이 아니라 3열 한 줄로 그려짐(구현은 2열).",
+      "regenerations": 0
+    },
+    {
+      "code": "M04",
+      "title": "관리 · 거래처 상세",
+      "group": "관리",
+      "file": "m04-partner-detail.png",
+      "job_id": "5ebfd35e-fd4a-4db4-9959-fa157336ca45",
+      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J2y32mXmk1jhAd5qmEsy69365Q/hf_20260921_011824_5ebfd35e-fd4a-4db4-9959-fa157336ca45.png",
+      "references": [
+        "P01",
+        "P04"
+      ],
+      "verdict": "통과",
+      "review": "접수 상세와 같은 좌우 배치: 왼쪽 거래처 요약과 버튼 6개, 오른쪽 품목 카드(대여 5 · 반환 3 · 미반환 2)와 금액 세 줄, 하단 주황 수납 100,000원.",
+      "regenerations": 0
+    },
+    {
+      "code": "M05",
+      "title": "관리 · 고객 관리",
+      "group": "관리",
+      "file": "m05-customers.png",
+      "job_id": "c977f5e2-b9b2-44a6-85eb-715ac78c27af",
+      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J2y32mXmk1jhAd5qmEsy69365Q/hf_20260921_012000_c977f5e2-b9b2-44a6-85eb-715ac78c27af.png",
+      "references": [
+        "P01",
+        "M01"
+      ],
+      "verdict": "통과",
+      "review": "고객 카드 4장: 미수 2명은 빨간 테두리, 연락처 미등록은 주황 테두리와 연락처로 확인 버튼. 하단에 주황 없음(동명이인 확인 · 명단 인쇄).",
+      "regenerations": 0
+    },
+    {
+      "code": "M06",
+      "title": "관리 · 매장 설정",
+      "group": "관리",
+      "file": "m06-settings.png",
+      "job_id": "710e2713-b97f-4682-bbe2-a8ee881b1410",
+      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J2y32mXmk1jhAd5qmEsy69365Q/hf_20260921_012001_710e2713-b97f-4682-bbe2-a8ee881b1410.png",
+      "references": [
+        "P01",
+        "M01"
+      ],
+      "verdict": "통과",
+      "review": "왼쪽 항목 7개(장비 요금 선택), 오른쪽 요금 5줄과 수정 버튼, 아래 쪽수 1 / 2쪽, 하단 주황 품목 추가.",
+      "regenerations": 0
+    },
+    {
+      "code": "M07",
+      "title": "관리 · 인쇄물",
+      "group": "관리",
+      "file": "m07-prints.png",
+      "job_id": "282be4fd-0029-4ce8-9f1a-6f05af41c2bf",
+      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J2y32mXmk1jhAd5qmEsy69365Q/hf_20260921_012001_282be4fd-0029-4ce8-9f1a-6f05af41c2bf.png",
+      "references": [
+        "P01",
+        "M01"
+      ],
+      "verdict": "통과",
+      "review": "준비표 · 스티커 · QR 안내문 탭, 왼쪽 시간대별 준비표 3줄과 인쇄 버튼, 오른쪽 A4 미리보기, 하단 주황 모두 인쇄 6장.",
+      "regenerations": 0
+    },
+    {
+      "code": "M08",
+      "title": "관리 · 마감 이력",
+      "group": "관리",
+      "file": "m08-closing-history.png",
+      "job_id": "08f03216-2646-439b-8013-1c463884d4ba",
+      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J2y32mXmk1jhAd5qmEsy69365Q/hf_20260921_012001_08f03216-2646-439b-8013-1c463884d4ba.png",
+      "references": [
+        "P01",
+        "M01"
+      ],
+      "verdict": "통과",
+      "review": "날짜별 마감 카드 4장: 오늘만 빨간 테두리와 주황 마감 확정, 나머지는 마감표 인쇄. 현금 차이 −20,000원은 빨강. 하단에 마감 재개 · 정산·마감.",
+      "regenerations": 0
+    },
+    {
+      "code": "D02",
+      "title": "기사 태블릿 · 배달·수거 처리",
+      "group": "기사 태블릿",
+      "file": "d02-driver-task.png",
+      "job_id": "ad282bec-bb3c-4302-98be-b795ffae040c",
+      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J2y32mXmk1jhAd5qmEsy69365Q/hf_20260921_012001_ad282bec-bb3c-4302-98be-b795ffae040c.png",
+      "references": [
+        "D01",
+        "P01"
+      ],
+      "verdict": "통과",
+      "review": "기사 화면. 팀 정보 줄과 전화, 품목 2줄의 큰 −/+ 수량, 미수 안내 띠, 하단 업무 목록 · 출발 문자 · 못 받음·고객 부재와 큰 보라 실제 전달 확정 3개.",
+      "regenerations": 0
+    },
+    {
+      "code": "D03",
+      "title": "기사 태블릿 · 차량 보관",
+      "group": "기사 태블릿",
+      "file": "d03-driver-stock.png",
+      "job_id": "577f76b0-1eca-4709-9f5e-18ab05437d74",
+      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J2y32mXmk1jhAd5qmEsy69365Q/hf_20260921_012002_577f76b0-1eca-4709-9f5e-18ab05437d74.png",
+      "references": [
+        "D01",
+        "P01"
+      ],
+      "verdict": "통과",
+      "review": "기사 화면. 큰 숫자 4칸(장비 · 의류 · 헬멧 · 리프트권), 품목 4줄과 상태 배지, 하단 업무 목록과 큰 보라 매장 입고 8개.",
+      "regenerations": 0
+    },
+    {
+      "code": "P21",
+      "title": "팝업 · 수납",
+      "group": "팝업",
+      "file": "p21-popup-payment.png",
+      "job_id": "c3f4e8c8-e3f4-4b61-b382-29d21019d014",
+      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J2y32mXmk1jhAd5qmEsy69365Q/hf_20260921_012001_c3f4e8c8-e3f4-4b61-b382-29d21019d014.png",
+      "references": [
+        "P04",
+        "P20"
+      ],
+      "verdict": "통과",
+      "review": "접수 상세 위 팝업. 왼쪽 미수 · 수납 방법(현금 선택) · 받은 금액 · 빠른 금액 3개, 오른쪽 숫자판, 하단 취소와 주황 수납 확정 · 105,000원.",
+      "regenerations": 0
+    },
+    {
+      "code": "P22",
+      "title": "팝업 · 반납 확인",
+      "group": "팝업",
+      "file": "p22-popup-return.png",
+      "job_id": "880df46b-4f98-4971-b387-99f614a76234",
+      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J2y32mXmk1jhAd5qmEsy69365Q/hf_20260921_012001_880df46b-4f98-4971-b387-99f614a76234.png",
+      "references": [
+        "P06",
+        "P20"
+      ],
+      "verdict": "통과",
+      "review": "4 반납·회수 위 팝업. 품목 3줄의 −/+ 수량, 미수 · 반납 시 수납 줄, 하단 취소 · 일부만 받음과 주황 모두 반납 확정.",
+      "regenerations": 0
+    },
+    {
+      "code": "P24",
+      "title": "팝업 · 반납 일정 변경",
+      "group": "팝업",
+      "file": "p24-popup-reschedule.png",
+      "job_id": "f909b7f3-f45c-434b-9a20-426054f8f3f5",
+      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J2y32mXmk1jhAd5qmEsy69365Q/hf_20260921_012441_f909b7f3-f45c-434b-9a20-426054f8f3f5.png",
+      "references": [
+        "P08",
+        "P20"
+      ],
+      "verdict": "통과",
+      "review": "3 이용 중·변경 위 팝업. 반납일 · 반납 장소 · 반납 시간을 선택 버튼으로, 아래에 변경 후 반납과 추가 금액, 주황 반납 일정 변경 · 9/18 22:00.",
+      "regenerations": 0
+    },
+    {
+      "code": "P25",
+      "title": "팝업 · 교환",
+      "group": "팝업",
+      "file": "p25-popup-exchange.png",
+      "job_id": "e7e4e3c0-17c4-42ed-969c-a140d4622f55",
+      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J2y32mXmk1jhAd5qmEsy69365Q/hf_20260921_012440_e7e4e3c0-17c4-42ed-969c-a140d4622f55.png",
+      "references": [
+        "P08",
+        "P20"
+      ],
+      "verdict": "통과(메모)",
+      "review": "교환 사이즈 8칸(현재 265는 회색으로 눌리지 않게, 270 선택), 교환 내용과 추가 금액 없음, 주황 교환 확정 270mm. 메모: 어둡게 깔린 배경 화면의 글자 일부가 뭉개짐(팝업 내용과 무관).",
+      "regenerations": 0
+    },
+    {
+      "code": "P26",
+      "title": "팝업 · 문제 해결·정정",
+      "group": "팝업",
+      "file": "p26-popup-problem.png",
+      "job_id": "e77be661-34f5-49f1-be54-9952aa243fd1",
+      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J2y32mXmk1jhAd5qmEsy69365Q/hf_20260921_012440_e77be661-34f5-49f1-be54-9952aa243fd1.png",
+      "references": [
+        "P04",
+        "P20"
+      ],
+      "verdict": "통과",
+      "review": "처리 선택 6칸(파손 선택)과 대상 품목 3칸, 추가 청구는 다음 단계에서 입력, 주황 다음 · 파손 내용. 타이핑 없음.",
+      "regenerations": 0
+    },
+    {
+      "code": "P27",
+      "title": "팝업 · 발권",
+      "group": "팝업",
+      "file": "p27-popup-ticket.png",
+      "job_id": "e4cb5284-cdc2-47d8-9c70-ec197155b9af",
+      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J2y32mXmk1jhAd5qmEsy69365Q/hf_20260921_012441_e4cb5284-cdc2-47d8-9c70-ec197155b9af.png",
+      "references": [
+        "P09",
+        "P20"
+      ],
+      "verdict": "통과(메모)",
+      "review": "예비권 배정 2 + 추가 발권 1의 −/+ 수량, 접수 매수 3매와 청구 120,000원, 주황 발권 3매. 메모: 어둡게 깔린 배경의 묶음 제목이 뭉개짐(팝업 내용과 무관).",
+      "regenerations": 0
+    },
+    {
+      "code": "P28",
+      "title": "팝업 · 마감 확정",
+      "group": "팝업",
+      "file": "p28-popup-closing.png",
+      "job_id": "49b4a5c5-e426-44d2-8dc7-2d8dcbc3977f",
+      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J2y32mXmk1jhAd5qmEsy69365Q/hf_20260921_012440_49b4a5c5-e426-44d2-8dc7-2d8dcbc3977f.png",
+      "references": [
+        "P07",
+        "P20"
+      ],
+      "verdict": "통과",
+      "review": "3단계 표시(1 현금 대조 선택), 예상 현금 · 실사 현금(숫자판) · 차이 20,000원 빨강, 현금 차이 처리 선택, 주황 다음 · 미처리 이월.",
+      "regenerations": 0
+    },
+    {
+      "code": "P29",
+      "title": "팝업 · 현금 입출금",
+      "group": "팝업",
+      "file": "p29-popup-cash.png",
+      "job_id": "7af68bd6-bc70-40b1-b0b0-99bd071a974f",
+      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J2y32mXmk1jhAd5qmEsy69365Q/hf_20260921_012759_7af68bd6-bc70-40b1-b0b0-99bd071a974f.png",
+      "references": [
+        "P07",
+        "P21"
+      ],
+      "verdict": "통과",
+      "review": "수납 팝업과 같은 좌우 배치. 입금|출금(출금 선택), 사유 3칸, 금액 15,000원과 출금 후 예상 현금, 오른쪽 숫자판, 주황 출금 기록 · 15,000원.",
+      "regenerations": 0
+    },
+    {
+      "code": "P30",
+      "title": "팝업 · 달력",
+      "group": "팝업",
+      "file": "p30-popup-calendar.png",
+      "job_id": "4c3eecde-9667-47ca-a232-9c568a343f08",
+      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J2y32mXmk1jhAd5qmEsy69365Q/hf_20260921_012800_4c3eecde-9667-47ca-a232-9c568a343f08.png",
+      "references": [
+        "P02R",
+        "P20"
+      ],
+      "verdict": "통과(메모)",
+      "review": "2026년 9월 달력이 요일까지 맞게 그려짐(1일 화요일, 30일). 오늘(17)은 주황 테두리, 고른 날(18)은 주황 채움, 예약 있는 날에 팀 수. 하단 취소 · 오늘 · 주황 9월 18일 보기. 메모: 날짜 칸 안의 팀 수 글자가 작다(구현은 16px).",
+      "regenerations": 0
+    },
+    {
+      "code": "P31",
+      "title": "팝업 · 사이즈 입력 재요청",
+      "group": "팝업",
+      "file": "p31-popup-size-request.png",
+      "job_id": "2e9ba97a-f155-46e2-a1f7-5b1d85191236",
+      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J2y32mXmk1jhAd5qmEsy69365Q/hf_20260921_012800_2e9ba97a-f155-46e2-a1f7-5b1d85191236.png",
+      "references": [
+        "P14",
+        "P20"
+      ],
+      "verdict": "통과",
+      "review": "미입력자 · 받는 번호 · 발송 기록, 보낼 문자 내용을 그대로 보여 주고 주황 경고 띠, 하단 취소 · 현장 측정 2명 · 주황 재요청 2명.",
+      "regenerations": 0
+    },
+    {
+      "code": "P32",
+      "title": "팝업 · 업무 알림",
+      "group": "팝업",
+      "file": "p32-popup-alerts.png",
+      "job_id": "63495fc0-c86e-45ab-b3d1-95e17901d568",
+      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J2y32mXmk1jhAd5qmEsy69365Q/hf_20260921_012759_63495fc0-c86e-45ab-b3d1-95e17901d568.png",
+      "references": [
+        "P01",
+        "P20"
+      ],
+      "verdict": "통과",
+      "review": "오늘 할 일 위 팝업. 미확인 2 / 전체 기록, 알림 2줄과 내용 보기, 쪽수, 하단 닫기 · 이 기기 소리 켜기 · 최신 알림. 요청대로 주황 버튼 없음.",
+      "regenerations": 0
+    },
+    {
+      "code": "P33",
+      "title": "팝업 · 접수 완료",
+      "group": "팝업",
+      "file": "p33-popup-intake-done.png",
+      "job_id": "0ae3ab14-88c1-4b3c-a3ef-dcf9dfc1fc33",
+      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J2y32mXmk1jhAd5qmEsy69365Q/hf_20260921_012759_0ae3ab14-88c1-4b3c-a3ef-dcf9dfc1fc33.png",
+      "references": [
+        "P12",
+        "P20"
+      ],
+      "verdict": "통과(메모)",
+      "review": "초록 체크와 접수 완료 · 260917-031, 대여 품목 · 일정 · 합계 · 사이즈 입력 요청(미발송), 같은 폭 버튼 3개 중 접수 목록만 주황. 메모: 배경 화면의 장소 글자 한 곳이 뭉개짐.",
+      "regenerations": 0
+    }
+  ],
+  "discarded": [],
+  "credits": {
+    "perImage": 3,
+    "images": 33,
+    "total": 99
+  }
+}
