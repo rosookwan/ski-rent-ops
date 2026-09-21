@@ -1,0 +1,63 @@
+<!doctype html><html lang="ko"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>pos-settings-v1 실제 크기 검사</title>
+<style>
+@font-face{font-family:Pretendard;src:url(../../../vendor/PretendardVariable.woff2) format("woff2");font-weight:100 900}
+*{box-sizing:border-box}html,body{margin:0;height:100%;font-family:Pretendard,system-ui,sans-serif;color:#1a1a1a;background:#f4f4f2;font-size:16px;letter-spacing:-.02em}
+.frame{position:relative;width:100vw;height:100vh;overflow:hidden;display:grid;grid-template-columns:112px 1fr}
+@media(max-width:999px){.frame{grid-template-columns:96px 1fr}}
+.rail{background:#fff;box-shadow:inset -1px 0 0 #e3e3e3}.work{display:grid;grid-template-rows:60px 60px minmax(0,1fr) 72px;min-width:0}
+.bar{background:#fff;box-shadow:inset 0 -1px 0 #e3e3e3;display:flex;align-items:center;padding:0 16px;font-weight:700;font-size:22px}
+.foot{background:#fff;box-shadow:inset 0 1px 0 #e3e3e3;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:0 16px;font-size:18px;font-weight:600}
+.body{padding:8px 16px;display:grid;grid-template-columns:1.6fr 1fr;gap:12px;min-height:0}
+.panel{background:#fff;border-radius:16px;box-shadow:inset 0 0 0 1px #e3e3e3;padding:8px 16px;display:flex;flex-direction:column;justify-content:space-between;min-width:0;min-height:0}
+.row{display:flex;align-items:center;gap:10px;min-width:0}.row>span{flex:0 0 78px;font-weight:700;font-size:16px;white-space:nowrap}.row>div{flex:1 1 0;display:flex;gap:8px;min-width:0}
+button{font:inherit;letter-spacing:inherit;min-height:52px;border:0;border-radius:12px;background:#fff;box-shadow:inset 0 0 0 1px #cfcfcf;font-size:16px;font-weight:700;padding:0 6px;white-space:nowrap;min-width:0;cursor:pointer}
+.opt{flex:1 1 0}.opt.two{display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:20px}.opt.two small{font-size:16px;font-weight:600}.on{background:#1f2329;color:#fff;box-shadow:none}
+.primary{background:#fe4e10;color:#fff;box-shadow:none;min-height:56px;font-size:18px;padding:0 22px}.sec{min-height:52px;padding:0 16px}
+.sum dl{margin:0;display:flex;flex-direction:column;gap:6px}.sum dl div{display:flex;gap:10px;line-height:24px}.sum dt{flex:0 0 70px;color:#5d5d5d;font-weight:600}.sum dd{margin:0;font-weight:700;white-space:nowrap;overflow:hidden;flex:1 1 0;min-width:0}
+.line{display:flex;justify-content:space-between;align-items:baseline;color:#5d5d5d;font-weight:600;white-space:nowrap}.line b{color:#1a1a1a;font-size:18px}.total b{font-size:32px;line-height:40px}
+.dim{position:absolute;inset:0;background:rgba(26,26,26,.4);display:none;align-items:center;justify-content:center}
+.dlg{background:#fff;border-radius:14px;width:min(var(--w,760px),calc(100% - 48px));max-height:calc(100% - 48px);display:grid;grid-template-rows:auto minmax(0,1fr);box-shadow:0 24px 60px rgba(0,0,0,.25)}
+.dlg header{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;min-height:64px;padding:20px 24px 4px}.dlg h2{margin:0;font-size:24px;line-height:1.25}.dlg header button{width:52px;padding:0;background:#f4f4f2;box-shadow:none}
+.dlg .in{padding:8px 24px 24px;display:flex;flex-direction:column;gap:10px;min-height:0}.sub{margin:-4px 0 0;color:#5d5d5d;line-height:24px;white-space:nowrap;overflow:hidden}
+.cards{display:grid;grid-template-columns:1fr 1fr;gap:12px}.card{background:#f4f4f2;border-radius:14px;padding:12px 14px;display:flex;flex-direction:column;gap:6px;min-width:0}
+.card .head{display:flex;justify-content:space-between;align-items:baseline;font-weight:700;font-size:20px;white-space:nowrap}.card .head b{font-size:22px}.lab{color:#5d5d5d;font-weight:600;line-height:20px}
+.btns{display:flex;gap:6px;min-width:0}.minus{color:#b42318;font-weight:700}.take{display:flex;justify-content:space-between;align-items:baseline;box-shadow:inset 0 1px 0 #e3e3e3;padding-top:6px;color:#5d5d5d;font-weight:600}.take b{color:#1a1a1a;font-size:28px;line-height:34px}
+.dfoot{display:flex;justify-content:flex-end;gap:8px;padding-top:6px}.chips{display:flex;gap:8px}.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.grid button{min-height:64px;font-size:20px}
+.note{color:#5d5d5d;line-height:22px}
+body[data-show="s06"] #d6,body[data-show="s07"] #d7{display:flex}
+</style>
+<body>
+<div class="frame"><div class="rail"></div><div class="work">
+  <div class="bar">스키노트 · 우리 스키샵 · 새 접수</div>
+  <div class="bar" style="font-size:16px;gap:8px"><button class="sec">‹ 이전</button><button class="sec">1 고객 · 김민수 팀</button><button class="sec">2 품목 · 7개</button><button class="sec on" style="background:#fe4e10">3 일정·장소</button></div>
+  <div class="body" id="s05">
+    <section class="panel" id="options">
+      <div class="row"><span>수령일</span><div><button class="opt on">오늘 9/21</button><button class="opt">내일 9/22</button><button class="opt">달력</button></div></div>
+      <div class="row"><span>이용 일수</span><div><button class="opt">1일</button><button class="opt on">2일</button><button class="opt">3일</button><button class="opt">직접</button></div></div>
+      <div class="row"><span>수령 시간</span><div><button class="opt">지금</button><button class="opt on">09:00</button><button class="opt">12:00</button><button class="opt">17:00</button><button class="opt">직접</button></div></div>
+      <div class="row"><span>수령 장소</span><div><button class="opt">매장 수령</button><button class="opt two on"><small>만선</small><b>주차장 입구</b></button><button class="opt">설천 ›</button><button class="opt">기타 ›</button></div></div>
+      <div class="row"><span>반납 시간</span><div><button class="opt two"><small>오전타임 후</small><b>12:00</b></button><button class="opt two on"><small>오후타임 후</small><b>16:30</b></button><button class="opt two"><small>야간타임 후</small><b>22:00</b></button><button class="opt two"><small>익일 오전</small><b>09:00</b></button><button class="opt">직접</button></div></div>
+    </section>
+    <section class="panel sum"><strong style="font-size:22px;line-height:30px">접수 요약</strong>
+      <dl><div><dt>대표자</dt><dd>김민수 · 010-0000-5678</dd></div><div><dt>대여 품목</dt><dd>스키 3 · 의류 2 · 3시간권 2</dd></div><div><dt>이용</dt><dd>9/21~9/22 · 2일</dd></div><div><dt>수령</dt><dd>9/21 09:00 · 만선 주차장 입구</dd></div><div><dt>반납</dt><dd>9/22 16:30 · 차량 수거</dd></div></dl>
+      <div><div class="line"><span>장비 대여</span><b>160,000원</b></div><div class="line"><span>리프트권</span><b>70,000원</b></div><div class="line total" style="box-shadow:inset 0 1px 0 #e3e3e3;padding-top:6px;margin-top:6px"><span>합계</span><b>230,000원</b></div></div>
+    </section>
+  </div>
+  <div class="foot"><span>김민수 팀 · 품목 7개</span><span style="display:flex;gap:8px"><button class="sec">취소</button><button class="primary">접수 확정 · 230,000원</button></span></div>
+</div>
+<div class="dim" id="d6"><div class="dlg" id="dlg6"><header><h2>수령 장소 · 만선</h2><button>✕</button></header><div class="in"><p class="sub">차량이 배달하고 수거하는 장소</p>
+  <div class="chips"><button class="opt on">만선 5</button><button class="opt">설천 4</button><button class="opt">기타 3</button></div>
+  <div class="grid"><button class="on">티롤 앞</button><button>만선 광장</button><button>매표소 앞</button><button>주차장 입구</button><button>설천 셔틀 정류장</button><button>곤도라 승강장 앞</button><button>스키 하우스 정문</button><button>웰컴센터 1층 입구</button><button>카니발 상가 앞</button></div>
+  <div class="line"><span>만선 12곳 · 1–9</span><span style="display:flex;gap:6px;align-items:center"><button style="width:52px">‹</button> 1 / 2쪽 <button style="width:52px">›</button></span></div>
+  <div class="dfoot"><button class="sec">취소</button><button class="sec">매장 수령으로</button><button class="primary">이 장소로 선택</button></div></div></div></div>
+<div class="dim" id="d7"><div class="dlg" id="dlg7" style="--w:880px"><header><h2>아주 긴 이름의 단체 접수 대표자 팀 · 접수 확정</h2><button>✕</button></header><div class="in"><p class="sub">9/21 수령 · 2일 · 품목 7개 · 할인과 결제 수단을 고르세요</p>
+  <div class="cards">
+    <div class="card"><div class="head"><span>장비 대여</span><b>1,160,000원</b></div><span class="lab">할인</span><div class="btns"><button class="opt">없음</button><button class="opt on" style="flex:1.7 1 0">장비당 할인</button><button class="opt">10%</button><button class="opt">20%</button><button class="opt">30%</button></div><div class="line"><span>스키 3 · 의류 2 · 2일</span><span class="minus">−30,000원</span></div><span class="lab">결제 수단</span><div class="btns"><button class="opt on">카드</button><button class="opt">현금</button><button class="opt">계좌이체</button></div><div class="take"><span>받을 금액</span><b>1,130,000원</b></div></div>
+    <div class="card"><div class="head"><span>리프트권</span><b>70,000원</b></div><span class="lab">할인</span><div class="btns"><button class="opt">없음</button><button class="opt">20%</button><button class="opt on">25%</button><button class="opt">27%</button></div><div class="line"><span>3시간권 2매</span><span class="minus">−17,500원</span></div><span class="lab">결제 수단</span><div class="btns"><button class="opt">카드</button><button class="opt on">현금</button><button class="opt">계좌이체</button></div><div class="take"><span>받을 금액</span><b>52,500원</b></div></div>
+  </div>
+  <div class="line total"><span id="split">할인 47,500원 · 카드 1,130,000원 · 현금 52,500원</span><span>합계 <b>1,182,500원</b></span></div>
+  <div class="dfoot"><button class="sec">취소</button><button class="sec">나중에 수납</button><button class="primary">수납하고 접수 확정 · 1,182,500원</button></div></div></div></div>
+</div>
+<script>document.body.dataset.show=location.hash.slice(1)||'s05';</script>
+</body></html>
