@@ -1,5 +1,5 @@
 /* POS shell v4 (docs/42): sizes live in the --pos-* variables below. 112px rail with 16px labels (96px under 1000px wide), 60px header, 60px toolbar, 72px footer, nothing under 16px, touch targets 52px or taller. Legacy and public screens keep their own layout. */
-#ski-ops[data-pos="true"]{--so-accent:#fe4e10;--so-accent-dark:#ef3408;--so-soft:#fff4ed;--so-soft-line:#ffd9c6;--so-soft-ink:#c93e0c;--so-ink:#1a1a1a;--so-muted:#6d6d6d;--so-muted-2:#5d5d5d;--so-line:#e7e7e7;--so-control:#d1d1d1;--so-bg:#f8f8f8;--tone-red:#b42318;--tone-orange:#b45309;--tone-green:#247a3d;--tone-blue:#0074d9;--tone-purple:#5f33e1;--tone-grey:#5d5d5d;--pos-fs-min:16px;--pos-fs-body:18px;--pos-fs-title:22px;--pos-touch:52px;--pos-touch-primary:56px;--pos-rail:112px;--pos-header:60px;--pos-toolbar:60px;--pos-footer:72px;font-size:16px;line-height:1.4;color:var(--so-ink);background:var(--so-bg)}
+#ski-ops[data-pos="true"]{--so-accent:#fe4e10;--so-accent-dark:#ef3408;--so-soft:#fff4ed;--so-soft-line:#ffd9c6;--so-soft-ink:#c93e0c;--so-ink:#1a1a1a;--so-muted:#6d6d6d;--so-muted-2:#5d5d5d;--so-line:#e7e7e7;--so-control:#d1d1d1;--so-bg:#f8f8f8;--tone-red:#b42318;--tone-orange:#b45309;--tone-green:#247a3d;--tone-blue:#0074d9;--tone-purple:#5f33e1;--tone-grey:#5d5d5d;--pos-fs-min:16px;--pos-fs-body:18px;--pos-fs-title:22px;--pos-touch:52px;--pos-touch-primary:56px;--pos-rail:112px;--pos-header:60px;--pos-toolbar:60px;--pos-footer:72px;--pos-card-h:171px;--pos-card-gap:12px;--pos-group-head:34px;font-size:16px;line-height:1.4;color:var(--so-ink);background:var(--so-bg)}
 #ski-ops[data-pos="true"] .so-workspace,
 #ski-ops[data-pos="true"].so-menu-open .so-workspace{display:grid;grid-template-columns:var(--pos-rail) minmax(0,1fr);grid-template-rows:minmax(0,1fr);height:100%;min-height:0}
 #ski-ops[data-pos="true"] .so-sidebar,
@@ -74,7 +74,7 @@
 #ski-ops[data-pos="true"] .pos-page-body{display:flex;flex-direction:column;gap:12px;box-sizing:border-box;min-width:0;min-height:0;padding:12px 16px}
 #ski-ops[data-pos="true"] .pos-page-footer{display:flex;align-items:center;justify-content:space-between;gap:12px;box-sizing:border-box;min-width:0;height:var(--pos-footer);min-height:var(--pos-footer);padding:0 16px;border:0;background:#fff;box-shadow:inset 0 1px 0 var(--so-line)}
 #ski-ops[data-pos="true"] .pos-page-footer>span,
-#ski-ops[data-pos="true"] .pos-page-footer>div:first-child>span{min-width:0;font-size:16px;font-weight:600;color:#3d3d3d;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#ski-ops[data-pos="true"] .pos-page-footer>div:first-child>span{flex:1 1 0;min-width:0;font-size:var(--pos-fs-body);font-weight:600;color:#3d3d3d;white-space:nowrap;overflow:hidden}
 #ski-ops[data-pos="true"] .pos-page-footer>div{display:flex;align-items:center;gap:8px;min-width:0}
 #ski-ops[data-pos="true"] .pos-page-footer .so-actions{display:flex;align-items:center;gap:8px;flex-wrap:nowrap;flex-shrink:0}
 /* Buttons */
@@ -161,6 +161,51 @@
 #ski-ops[data-pos="true"] .pos-card-actions{display:flex;gap:8px;margin-top:6px}
 #ski-ops[data-pos="true"] .pos-card-actions .pos-button{flex:1;min-width:0;min-height:var(--pos-touch);padding:8px 10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 #ski-ops[data-pos="true"] .pos-card-actions .pos-button.primary{min-height:var(--pos-touch);font-size:var(--pos-fs-body)}
+/* UI v4 fixed card (docs/42 2-4): four single-line rows, 171px tall, money and the one action share the last row. Text is fitted by pos-shell.js, never cut with an ellipsis. */
+#ski-ops[data-pos="true"] .pos-page-body.is-cards{padding:8px 16px 0}
+#ski-ops[data-pos="true"] .pos-cards[data-pos-cards]{overflow:hidden;padding:0}
+#ski-ops[data-pos="true"] .pos-cards[data-pos-cards] .pos-group+.pos-group{margin-top:0}
+#ski-ops[data-pos="true"] .pos-cards[data-pos-cards] .pos-group-head{box-sizing:border-box;height:var(--pos-group-head);margin:0;align-items:baseline;gap:10px;font-size:var(--pos-fs-title);line-height:30px;white-space:nowrap;overflow:hidden}
+#ski-ops[data-pos="true"] .pos-cards[data-pos-cards] .pos-group-head small{font-size:var(--pos-fs-body)}
+#ski-ops[data-pos="true"] .pos-cards[data-pos-cards] .pos-card-grid{grid-template-columns:repeat(var(--pos-cols,2),minmax(0,1fr));gap:var(--pos-card-gap);margin-bottom:var(--pos-card-gap)}
+#ski-ops[data-pos="true"] .pos-card.is-fixed,
+#ski-ops[data-pos="true"] .pos-card.is-fixed[data-tone]{height:var(--pos-card-h);padding:14px;gap:0;justify-content:space-between;border-radius:16px}
+#ski-ops[data-pos="true"] .pos-card.is-fixed[data-tone="green"]{background:#fff}
+#ski-ops[data-pos="true"] .pos-card.is-fixed .pos-card-legend{top:-12px;left:auto;right:16px;padding:1px 10px;border-radius:6px;color:#fff;line-height:22px}
+#ski-ops[data-pos="true"] .pos-card.is-fixed[data-tone="red"] .pos-card-legend{background:var(--tone-red);color:#fff}
+#ski-ops[data-pos="true"] .pos-card.is-fixed[data-tone="orange"] .pos-card-legend{background:var(--tone-orange);color:#fff}
+#ski-ops[data-pos="true"] .pos-card.is-fixed[data-tone="green"] .pos-card-legend{background:var(--tone-green);color:#fff}
+#ski-ops[data-pos="true"] .pos-card.is-fixed .pos-card-open{gap:3px}
+#ski-ops[data-pos="true"] .pos-card.is-fixed .pos-card-head{height:27px;gap:10px;align-items:baseline}
+#ski-ops[data-pos="true"] .pos-card.is-fixed .pos-card-name{flex:0 1 auto;min-width:0;font-size:var(--pos-fs-title);line-height:27px;text-overflow:clip}
+#ski-ops[data-pos="true"] .pos-card.is-fixed .pos-card-phone{flex:0 0 auto;font-size:var(--pos-fs-body);line-height:27px}
+#ski-ops[data-pos="true"] .pos-card.is-fixed .pos-card-meta{height:21px;line-height:21px;text-overflow:clip}
+#ski-ops[data-pos="true"] .pos-card-itemline{display:flex;align-items:center;gap:10px;height:26px;min-width:0}
+#ski-ops[data-pos="true"] .pos-card-itemtext{flex:1 1 0;min-width:0;overflow:hidden;white-space:nowrap;font-size:var(--pos-fs-body);font-weight:700;letter-spacing:-.02em;line-height:26px}
+#ski-ops[data-pos="true"] .pos-state{flex:0 0 auto;padding:2px 10px;border-radius:999px;background:var(--tone-grey);color:#fff;font-size:var(--pos-fs-min);font-weight:700;line-height:20px;white-space:nowrap}
+#ski-ops[data-pos="true"] .pos-state[data-tone="red"]{background:var(--tone-red)}
+#ski-ops[data-pos="true"] .pos-state[data-tone="orange"]{background:var(--tone-orange)}
+#ski-ops[data-pos="true"] .pos-state[data-tone="green"]{background:var(--tone-green)}
+#ski-ops[data-pos="true"] .pos-state[data-tone="blue"]{background:var(--tone-blue)}
+#ski-ops[data-pos="true"] .pos-state[data-tone="purple"]{background:var(--tone-purple)}
+#ski-ops[data-pos="true"] .pos-card-bottom{display:flex;align-items:center;gap:12px;height:var(--pos-touch);min-width:0}
+#ski-ops[data-pos="true"] .pos-card-bottom .pos-card-money{display:block;flex:1 1 0;min-width:0;overflow:hidden;white-space:nowrap;font-size:var(--pos-fs-body);font-weight:700;color:var(--so-ink)}
+#ski-ops[data-pos="true"] .pos-card-bottom .pos-card-money[data-tone="red"]{color:var(--tone-red)}
+#ski-ops[data-pos="true"] .pos-card-bottom .pos-card-money[data-tone="blue"]{color:var(--tone-blue)}
+#ski-ops[data-pos="true"] .pos-card-bottom .pos-card-money[data-tone="green"]{color:var(--tone-green)}
+#ski-ops[data-pos="true"] .pos-card-bottom .pos-card-money[data-tone="orange"]{color:var(--tone-orange)}
+#ski-ops[data-pos="true"] .pos-card-bottom .pos-card-money[data-tone="grey"]{color:var(--so-muted);font-weight:600}
+#ski-ops[data-pos="true"] .pos-card-bottom .pos-card-actions{flex:0 0 56%;margin:0;min-width:0}
+#ski-ops[data-pos="true"] .pos-card-bottom .pos-card-actions .pos-button{width:100%;padding:0 8px;font-size:var(--pos-fs-body);font-weight:700;text-overflow:clip}
+#ski-ops[data-pos="true"] .pos-card.is-widemoney .pos-card-actions{flex-basis:46%}
+#ski-ops[data-pos="true"] .pos-card.is-widebutton .pos-card-actions{flex-basis:66%}
+#ski-ops[data-pos="true"] .pos-card.is-longname .pos-card-head{height:52px;align-items:flex-start}
+#ski-ops[data-pos="true"] .pos-card.is-longname .pos-card-name{white-space:normal;line-height:26px;max-height:52px;overflow-wrap:anywhere}
+#ski-ops[data-pos="true"] .pos-card.is-longname .pos-card-meta{display:none}
+/* Footer pager for v4 card lists */
+#ski-ops[data-pos="true"] .pos-cards-pager{display:flex;align-items:center;gap:8px;flex-shrink:0;font-size:var(--pos-fs-body);font-weight:600;color:#3d3d3d;white-space:nowrap;font-variant-numeric:tabular-nums}
+#ski-ops[data-pos="true"] .pos-cards-pager[hidden]{display:none}
+#ski-ops[data-pos="true"] .pos-cards-pager .pos-button{min-width:var(--pos-touch-primary);min-height:var(--pos-touch-primary);padding:0;font-size:24px;line-height:1}
 #ski-ops[data-pos="true"] .pos-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;box-sizing:border-box;min-height:220px;padding:32px;border-radius:14px;background:#fff;box-shadow:inset 0 0 0 1px var(--so-line);text-align:center}
 #ski-ops[data-pos="true"] .pos-empty strong{font-size:22px;font-weight:700;letter-spacing:-.03em}
 #ski-ops[data-pos="true"] .pos-empty span{font-size:17px;color:var(--so-muted)}

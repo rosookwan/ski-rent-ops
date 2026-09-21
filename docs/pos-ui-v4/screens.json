@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-21T03:41:05.386Z",
+  "generatedAt": "2026-09-21T03:55:27.662Z",
   "mode": "static memory demonstration; screenshots are not evidence of physical hardware",
   "checks": [
     {
@@ -78,44 +78,16 @@
         "minTarget": 52,
         "smallText": [],
         "clippedText": [],
-        "halfCut": [
-          {
-            "sel": "div.pos-page-body article.pos-card",
-            "sample": "지급 완료최은정 팀010-0000-0024R-024 · 9/21 이용 ·",
-            "count": 1
-          },
-          {
-            "sel": "div.pos-page-body article.pos-card",
-            "sample": "정하늘 팀010-0000-0026리프트권만R-026 · 9/21 이용 ·",
-            "count": 1
-          },
-          {
-            "sel": "div.pos-cards article.pos-card",
-            "sample": "지급 완료최은정 팀010-0000-0024R-024 · 9/21 이용 ·",
-            "count": 1
-          },
-          {
-            "sel": "div.pos-cards article.pos-card",
-            "sample": "정하늘 팀010-0000-0026리프트권만R-026 · 9/21 이용 ·",
-            "count": 1
-          }
-        ],
+        "halfCut": [],
         "shortTargets": [],
-        "scrolling": [
-          {
-            "sel": "div.pos-cards",
-            "need": 881,
-            "has": 384,
-            "allowed": false
-          }
-        ]
+        "scrolling": []
       },
       "ruleTotals": {
         "smallText": 0,
         "clippedText": 0,
-        "halfCut": 4,
+        "halfCut": 0,
         "shortTargets": 0,
-        "scrolling": 1
+        "scrolling": 0
       }
     },
     {
@@ -131,34 +103,16 @@
         "minTarget": 52,
         "smallText": [],
         "clippedText": [],
-        "halfCut": [
-          {
-            "sel": "div.pos-page-body article.pos-card",
-            "sample": "지급 전박준호 팀010-0000-0022R-022 · 9/21 이용 · ",
-            "count": 1
-          },
-          {
-            "sel": "div.pos-cards article.pos-card",
-            "sample": "지급 전박준호 팀010-0000-0022R-022 · 9/21 이용 · ",
-            "count": 1
-          }
-        ],
+        "halfCut": [],
         "shortTargets": [],
-        "scrolling": [
-          {
-            "sel": "div.pos-cards",
-            "need": 576,
-            "has": 384,
-            "allowed": false
-          }
-        ]
+        "scrolling": []
       },
       "ruleTotals": {
         "smallText": 0,
         "clippedText": 0,
-        "halfCut": 2,
+        "halfCut": 0,
         "shortTargets": 0,
-        "scrolling": 1
+        "scrolling": 0
       }
     },
     {
@@ -174,34 +128,16 @@
         "minTarget": 52,
         "smallText": [],
         "clippedText": [],
-        "halfCut": [
-          {
-            "sel": "div.pos-page-body article.pos-card",
-            "sample": "이수진 팀010-0000-0023이용 중R-023 · 9/21 이용 · ",
-            "count": 1
-          },
-          {
-            "sel": "div.pos-cards article.pos-card",
-            "sample": "이수진 팀010-0000-0023이용 중R-023 · 9/21 이용 · ",
-            "count": 1
-          }
-        ],
+        "halfCut": [],
         "shortTargets": [],
-        "scrolling": [
-          {
-            "sel": "div.pos-cards",
-            "need": 599,
-            "has": 384,
-            "allowed": false
-          }
-        ]
+        "scrolling": []
       },
       "ruleTotals": {
         "smallText": 0,
         "clippedText": 0,
-        "halfCut": 2,
+        "halfCut": 0,
         "shortTargets": 0,
-        "scrolling": 1
+        "scrolling": 0
       }
     },
     {
@@ -217,44 +153,16 @@
         "minTarget": 52,
         "smallText": [],
         "clippedText": [],
-        "halfCut": [
-          {
-            "sel": "div.pos-page-body article.pos-card",
-            "sample": "일부만 받음김민수 팀010-0000-0025R-025 · 9/21~9/2",
-            "count": 1
-          },
-          {
-            "sel": "div.pos-page-body article.pos-card",
-            "sample": "대여 중김영희 팀010-0000-0021R-021 · 9/21 이용 · ",
-            "count": 1
-          },
-          {
-            "sel": "div.pos-cards article.pos-card",
-            "sample": "일부만 받음김민수 팀010-0000-0025R-025 · 9/21~9/2",
-            "count": 1
-          },
-          {
-            "sel": "div.pos-cards article.pos-card",
-            "sample": "대여 중김영희 팀010-0000-0021R-021 · 9/21 이용 · ",
-            "count": 1
-          }
-        ],
+        "halfCut": [],
         "shortTargets": [],
-        "scrolling": [
-          {
-            "sel": "div.pos-cards",
-            "need": 894,
-            "has": 384,
-            "allowed": false
-          }
-        ]
+        "scrolling": []
       },
       "ruleTotals": {
         "smallText": 0,
         "clippedText": 0,
-        "halfCut": 4,
+        "halfCut": 0,
         "shortTargets": 0,
-        "scrolling": 1
+        "scrolling": 0
       }
     },
     {
@@ -323,34 +231,16 @@
         "minTarget": 52,
         "smallText": [],
         "clippedText": [],
-        "halfCut": [
-          {
-            "sel": "div.pos-page-body article.pos-card",
-            "sample": "발권 필요정하늘 팀010-0000-0026R-026 · 09/21 이용 ",
-            "count": 1
-          },
-          {
-            "sel": "div.pos-cards article.pos-card",
-            "sample": "발권 필요정하늘 팀010-0000-0026R-026 · 09/21 이용 ",
-            "count": 1
-          }
-        ],
+        "halfCut": [],
         "shortTargets": [],
-        "scrolling": [
-          {
-            "sel": "div.pos-cards",
-            "need": 825,
-            "has": 384,
-            "allowed": false
-          }
-        ]
+        "scrolling": []
       },
       "ruleTotals": {
         "smallText": 0,
         "clippedText": 0,
-        "halfCut": 2,
+        "halfCut": 0,
         "shortTargets": 0,
-        "scrolling": 1
+        "scrolling": 0
       }
     },
     {
@@ -366,44 +256,16 @@
         "minTarget": 52,
         "smallText": [],
         "clippedText": [],
-        "halfCut": [
-          {
-            "sel": "div.pos-page-body article.pos-card",
-            "sample": "13:00 · 리프트권 2매 환불발권처 환불리조트 매표소 · 1호 차량4",
-            "count": 1
-          },
-          {
-            "sel": "div.pos-page-body article.pos-card",
-            "sample": "16:30 · 김영희 팀010-0000-0021수거만선 티롤 앞 · 1호",
-            "count": 1
-          },
-          {
-            "sel": "div.pos-cards article.pos-card",
-            "sample": "13:00 · 리프트권 2매 환불발권처 환불리조트 매표소 · 1호 차량4",
-            "count": 1
-          },
-          {
-            "sel": "div.pos-cards article.pos-card",
-            "sample": "16:30 · 김영희 팀010-0000-0021수거만선 티롤 앞 · 1호",
-            "count": 1
-          }
-        ],
+        "halfCut": [],
         "shortTargets": [],
-        "scrolling": [
-          {
-            "sel": "div.pos-cards",
-            "need": 986,
-            "has": 384,
-            "allowed": false
-          }
-        ]
+        "scrolling": []
       },
       "ruleTotals": {
         "smallText": 0,
         "clippedText": 0,
-        "halfCut": 4,
+        "halfCut": 0,
         "shortTargets": 0,
-        "scrolling": 1
+        "scrolling": 0
       }
     },
     {
@@ -565,29 +427,16 @@
         "minTarget": 52,
         "smallText": [],
         "clippedText": [],
-        "halfCut": [
-          {
-            "sel": "div.pos-cards article.pos-card",
-            "sample": "지급 완료최은정 팀010-0000-0024R-024 · 9/21 이용 ·",
-            "count": 1
-          }
-        ],
+        "halfCut": [],
         "shortTargets": [],
-        "scrolling": [
-          {
-            "sel": "div.pos-cards",
-            "need": 881,
-            "has": 552,
-            "allowed": false
-          }
-        ]
+        "scrolling": []
       },
       "ruleTotals": {
         "smallText": 0,
         "clippedText": 0,
-        "halfCut": 1,
+        "halfCut": 0,
         "shortTargets": 0,
-        "scrolling": 1
+        "scrolling": 0
       }
     },
     {
@@ -603,34 +452,16 @@
         "minTarget": 52,
         "smallText": [],
         "clippedText": [],
-        "halfCut": [
-          {
-            "sel": "div.pos-page-body article.pos-card",
-            "sample": "지급 전박준호 팀010-0000-0022R-022 · 9/21 이용 · ",
-            "count": 1
-          },
-          {
-            "sel": "div.pos-cards article.pos-card",
-            "sample": "지급 전박준호 팀010-0000-0022R-022 · 9/21 이용 · ",
-            "count": 1
-          }
-        ],
+        "halfCut": [],
         "shortTargets": [],
-        "scrolling": [
-          {
-            "sel": "div.pos-cards",
-            "need": 576,
-            "has": 552,
-            "allowed": false
-          }
-        ]
+        "scrolling": []
       },
       "ruleTotals": {
         "smallText": 0,
         "clippedText": 0,
-        "halfCut": 2,
+        "halfCut": 0,
         "shortTargets": 0,
-        "scrolling": 1
+        "scrolling": 0
       }
     },
     {
@@ -646,34 +477,16 @@
         "minTarget": 52,
         "smallText": [],
         "clippedText": [],
-        "halfCut": [
-          {
-            "sel": "div.pos-page-body article.pos-card",
-            "sample": "이수진 팀010-0000-0023이용 중R-023 · 9/21 이용 · ",
-            "count": 1
-          },
-          {
-            "sel": "div.pos-cards article.pos-card",
-            "sample": "이수진 팀010-0000-0023이용 중R-023 · 9/21 이용 · ",
-            "count": 1
-          }
-        ],
+        "halfCut": [],
         "shortTargets": [],
-        "scrolling": [
-          {
-            "sel": "div.pos-cards",
-            "need": 599,
-            "has": 552,
-            "allowed": false
-          }
-        ]
+        "scrolling": []
       },
       "ruleTotals": {
         "smallText": 0,
         "clippedText": 0,
-        "halfCut": 2,
+        "halfCut": 0,
         "shortTargets": 0,
-        "scrolling": 1
+        "scrolling": 0
       }
     },
     {
@@ -689,44 +502,16 @@
         "minTarget": 52,
         "smallText": [],
         "clippedText": [],
-        "halfCut": [
-          {
-            "sel": "div.pos-page-body article.pos-card",
-            "sample": "일부만 받음김민수 팀010-0000-0025R-025 · 9/21~9/2",
-            "count": 1
-          },
-          {
-            "sel": "div.pos-page-body article.pos-card",
-            "sample": "대여 중김영희 팀010-0000-0021R-021 · 9/21 이용 · ",
-            "count": 1
-          },
-          {
-            "sel": "div.pos-cards article.pos-card",
-            "sample": "일부만 받음김민수 팀010-0000-0025R-025 · 9/21~9/2",
-            "count": 1
-          },
-          {
-            "sel": "div.pos-cards article.pos-card",
-            "sample": "대여 중김영희 팀010-0000-0021R-021 · 9/21 이용 · ",
-            "count": 1
-          }
-        ],
+        "halfCut": [],
         "shortTargets": [],
-        "scrolling": [
-          {
-            "sel": "div.pos-cards",
-            "need": 894,
-            "has": 552,
-            "allowed": false
-          }
-        ]
+        "scrolling": []
       },
       "ruleTotals": {
         "smallText": 0,
         "clippedText": 0,
-        "halfCut": 4,
+        "halfCut": 0,
         "shortTargets": 0,
-        "scrolling": 1
+        "scrolling": 0
       }
     },
     {
@@ -797,21 +582,14 @@
         "clippedText": [],
         "halfCut": [],
         "shortTargets": [],
-        "scrolling": [
-          {
-            "sel": "div.pos-cards",
-            "need": 825,
-            "has": 552,
-            "allowed": false
-          }
-        ]
+        "scrolling": []
       },
       "ruleTotals": {
         "smallText": 0,
         "clippedText": 0,
         "halfCut": 0,
         "shortTargets": 0,
-        "scrolling": 1
+        "scrolling": 0
       }
     },
     {
@@ -827,29 +605,16 @@
         "minTarget": 52,
         "smallText": [],
         "clippedText": [],
-        "halfCut": [
-          {
-            "sel": "div.pos-page-body article.pos-card",
-            "sample": "16:40 · 박준호 팀010-0000-0022배달설천 주차장 · 1호 ",
-            "count": 2
-          }
-        ],
+        "halfCut": [],
         "shortTargets": [],
-        "scrolling": [
-          {
-            "sel": "div.pos-cards",
-            "need": 986,
-            "has": 552,
-            "allowed": false
-          }
-        ]
+        "scrolling": []
       },
       "ruleTotals": {
         "smallText": 0,
         "clippedText": 0,
-        "halfCut": 2,
+        "halfCut": 0,
         "shortTargets": 0,
-        "scrolling": 1
+        "scrolling": 0
       }
     },
     {
@@ -993,21 +758,14 @@
         "clippedText": [],
         "halfCut": [],
         "shortTargets": [],
-        "scrolling": [
-          {
-            "sel": "div.pos-cards",
-            "need": 852,
-            "has": 552,
-            "allowed": false
-          }
-        ]
+        "scrolling": []
       },
       "ruleTotals": {
         "smallText": 0,
         "clippedText": 0,
         "halfCut": 0,
         "shortTargets": 0,
-        "scrolling": 1
+        "scrolling": 0
       }
     },
     {
@@ -1023,34 +781,16 @@
         "minTarget": 52,
         "smallText": [],
         "clippedText": [],
-        "halfCut": [
-          {
-            "sel": "div.pos-page-body article.pos-card",
-            "sample": "지급 전박준호 팀010-0000-0022R-022 · 9/21 이용 · ",
-            "count": 1
-          },
-          {
-            "sel": "div.pos-cards article.pos-card",
-            "sample": "지급 전박준호 팀010-0000-0022R-022 · 9/21 이용 · ",
-            "count": 1
-          }
-        ],
+        "halfCut": [],
         "shortTargets": [],
-        "scrolling": [
-          {
-            "sel": "div.pos-cards",
-            "need": 576,
-            "has": 552,
-            "allowed": false
-          }
-        ]
+        "scrolling": []
       },
       "ruleTotals": {
         "smallText": 0,
         "clippedText": 0,
-        "halfCut": 2,
+        "halfCut": 0,
         "shortTargets": 0,
-        "scrolling": 1
+        "scrolling": 0
       }
     },
     {
@@ -1065,43 +805,17 @@
         "minFont": 16,
         "minTarget": 52,
         "smallText": [],
-        "clippedText": [
-          {
-            "sel": "span.pos-card-meta",
-            "sample": "R-025 · 9/21~9/22 이용 · 9/21 16:30 반납 · 만",
-            "need": 385,
-            "has": 367,
-            "count": 1
-          }
-        ],
-        "halfCut": [
-          {
-            "sel": "div.pos-page-body article.pos-card",
-            "sample": "이수진 팀010-0000-0023이용 중R-023 · 9/21 이용 · ",
-            "count": 1
-          },
-          {
-            "sel": "div.pos-cards article.pos-card",
-            "sample": "이수진 팀010-0000-0023이용 중R-023 · 9/21 이용 · ",
-            "count": 1
-          }
-        ],
+        "clippedText": [],
+        "halfCut": [],
         "shortTargets": [],
-        "scrolling": [
-          {
-            "sel": "div.pos-cards",
-            "need": 599,
-            "has": 552,
-            "allowed": false
-          }
-        ]
+        "scrolling": []
       },
       "ruleTotals": {
         "smallText": 0,
-        "clippedText": 1,
-        "halfCut": 2,
+        "clippedText": 0,
+        "halfCut": 0,
         "shortTargets": 0,
-        "scrolling": 1
+        "scrolling": 0
       }
     },
     {
@@ -1116,53 +830,17 @@
         "minFont": 16,
         "minTarget": 52,
         "smallText": [],
-        "clippedText": [
-          {
-            "sel": "span.pos-card-meta",
-            "sample": "R-025 · 9/21~9/22 이용 · 9/21 16:30 반납 · 만",
-            "need": 385,
-            "has": 367,
-            "count": 1
-          }
-        ],
-        "halfCut": [
-          {
-            "sel": "div.pos-page-body article.pos-card",
-            "sample": "일부만 받음김민수 팀010-0000-0025R-025 · 9/21~9/2",
-            "count": 1
-          },
-          {
-            "sel": "div.pos-page-body article.pos-card",
-            "sample": "대여 중김영희 팀010-0000-0021R-021 · 9/21 이용 · ",
-            "count": 1
-          },
-          {
-            "sel": "div.pos-cards article.pos-card",
-            "sample": "일부만 받음김민수 팀010-0000-0025R-025 · 9/21~9/2",
-            "count": 1
-          },
-          {
-            "sel": "div.pos-cards article.pos-card",
-            "sample": "대여 중김영희 팀010-0000-0021R-021 · 9/21 이용 · ",
-            "count": 1
-          }
-        ],
+        "clippedText": [],
+        "halfCut": [],
         "shortTargets": [],
-        "scrolling": [
-          {
-            "sel": "div.pos-cards",
-            "need": 894,
-            "has": 552,
-            "allowed": false
-          }
-        ]
+        "scrolling": []
       },
       "ruleTotals": {
         "smallText": 0,
-        "clippedText": 1,
-        "halfCut": 4,
+        "clippedText": 0,
+        "halfCut": 0,
         "shortTargets": 0,
-        "scrolling": 1
+        "scrolling": 0
       }
     },
     {
@@ -1221,34 +899,16 @@
         "minTarget": 52,
         "smallText": [],
         "clippedText": [],
-        "halfCut": [
-          {
-            "sel": "div.pos-page-body article.pos-card",
-            "sample": "김민수 팀010-0000-0025사용 중R-025 · 09/21 이용 ·",
-            "count": 1
-          },
-          {
-            "sel": "div.pos-cards article.pos-card",
-            "sample": "김민수 팀010-0000-0025사용 중R-025 · 09/21 이용 ·",
-            "count": 1
-          }
-        ],
+        "halfCut": [],
         "shortTargets": [],
-        "scrolling": [
-          {
-            "sel": "div.pos-cards",
-            "need": 576,
-            "has": 552,
-            "allowed": false
-          }
-        ]
+        "scrolling": []
       },
       "ruleTotals": {
         "smallText": 0,
         "clippedText": 0,
-        "halfCut": 2,
+        "halfCut": 0,
         "shortTargets": 0,
-        "scrolling": 1
+        "scrolling": 0
       }
     },
     {
@@ -1264,29 +924,16 @@
         "minTarget": 52,
         "smallText": [],
         "clippedText": [],
-        "halfCut": [
-          {
-            "sel": "div.pos-page-body article.pos-card",
-            "sample": "17:00 · 이수진 팀010-0000-0023수거만선 광장 · 1호 차",
-            "count": 1
-          }
-        ],
+        "halfCut": [],
         "shortTargets": [],
-        "scrolling": [
-          {
-            "sel": "div.pos-cards",
-            "need": 797,
-            "has": 552,
-            "allowed": false
-          }
-        ]
+        "scrolling": []
       },
       "ruleTotals": {
         "smallText": 0,
         "clippedText": 0,
-        "halfCut": 1,
+        "halfCut": 0,
         "shortTargets": 0,
-        "scrolling": 1
+        "scrolling": 0
       }
     },
     {
@@ -1438,44 +1085,16 @@
         "minTarget": 52,
         "smallText": [],
         "clippedText": [],
-        "halfCut": [
-          {
-            "sel": "div.pos-page-body article.pos-card",
-            "sample": "지급 완료최은정 팀010-0000-0024R-024 · 9/21 이용 ·",
-            "count": 1
-          },
-          {
-            "sel": "div.pos-page-body article.pos-card",
-            "sample": "정하늘 팀010-0000-0026리프트권만R-026 · 9/21 이용 ·",
-            "count": 1
-          },
-          {
-            "sel": "div.pos-cards article.pos-card",
-            "sample": "지급 완료최은정 팀010-0000-0024R-024 · 9/21 이용 ·",
-            "count": 1
-          },
-          {
-            "sel": "div.pos-cards article.pos-card",
-            "sample": "정하늘 팀010-0000-0026리프트권만R-026 · 9/21 이용 ·",
-            "count": 1
-          }
-        ],
+        "halfCut": [],
         "shortTargets": [],
-        "scrolling": [
-          {
-            "sel": "div.pos-cards",
-            "need": 881,
-            "has": 432,
-            "allowed": false
-          }
-        ]
+        "scrolling": []
       },
       "ruleTotals": {
         "smallText": 0,
         "clippedText": 0,
-        "halfCut": 4,
+        "halfCut": 0,
         "shortTargets": 0,
-        "scrolling": 1
+        "scrolling": 0
       }
     },
     {
@@ -1491,34 +1110,16 @@
         "minTarget": 52,
         "smallText": [],
         "clippedText": [],
-        "halfCut": [
-          {
-            "sel": "div.pos-page-body article.pos-card",
-            "sample": "지급 전박준호 팀010-0000-0022R-022 · 9/21 이용 · ",
-            "count": 1
-          },
-          {
-            "sel": "div.pos-cards article.pos-card",
-            "sample": "지급 전박준호 팀010-0000-0022R-022 · 9/21 이용 · ",
-            "count": 1
-          }
-        ],
+        "halfCut": [],
         "shortTargets": [],
-        "scrolling": [
-          {
-            "sel": "div.pos-cards",
-            "need": 576,
-            "has": 432,
-            "allowed": false
-          }
-        ]
+        "scrolling": []
       },
       "ruleTotals": {
         "smallText": 0,
         "clippedText": 0,
-        "halfCut": 2,
+        "halfCut": 0,
         "shortTargets": 0,
-        "scrolling": 1
+        "scrolling": 0
       }
     },
     {
@@ -1533,43 +1134,17 @@
         "minFont": 16,
         "minTarget": 52,
         "smallText": [],
-        "clippedText": [
-          {
-            "sel": "span.pos-card-meta",
-            "sample": "R-025 · 9/21~9/22 이용 · 9/21 16:30 반납 · 만",
-            "need": 385,
-            "has": 351,
-            "count": 1
-          }
-        ],
-        "halfCut": [
-          {
-            "sel": "div.pos-page-body article.pos-card",
-            "sample": "이수진 팀010-0000-0023이용 중R-023 · 9/21 이용 · ",
-            "count": 1
-          },
-          {
-            "sel": "div.pos-cards article.pos-card",
-            "sample": "이수진 팀010-0000-0023이용 중R-023 · 9/21 이용 · ",
-            "count": 1
-          }
-        ],
+        "clippedText": [],
+        "halfCut": [],
         "shortTargets": [],
-        "scrolling": [
-          {
-            "sel": "div.pos-cards",
-            "need": 599,
-            "has": 432,
-            "allowed": false
-          }
-        ]
+        "scrolling": []
       },
       "ruleTotals": {
         "smallText": 0,
-        "clippedText": 1,
-        "halfCut": 2,
+        "clippedText": 0,
+        "halfCut": 0,
         "shortTargets": 0,
-        "scrolling": 1
+        "scrolling": 0
       }
     },
     {
@@ -1584,53 +1159,17 @@
         "minFont": 16,
         "minTarget": 52,
         "smallText": [],
-        "clippedText": [
-          {
-            "sel": "span.pos-card-meta",
-            "sample": "R-025 · 9/21~9/22 이용 · 9/21 16:30 반납 · 만",
-            "need": 385,
-            "has": 351,
-            "count": 1
-          }
-        ],
-        "halfCut": [
-          {
-            "sel": "div.pos-page-body article.pos-card",
-            "sample": "일부만 받음김민수 팀010-0000-0025R-025 · 9/21~9/2",
-            "count": 1
-          },
-          {
-            "sel": "div.pos-page-body article.pos-card",
-            "sample": "대여 중김영희 팀010-0000-0021R-021 · 9/21 이용 · ",
-            "count": 1
-          },
-          {
-            "sel": "div.pos-cards article.pos-card",
-            "sample": "일부만 받음김민수 팀010-0000-0025R-025 · 9/21~9/2",
-            "count": 1
-          },
-          {
-            "sel": "div.pos-cards article.pos-card",
-            "sample": "대여 중김영희 팀010-0000-0021R-021 · 9/21 이용 · ",
-            "count": 1
-          }
-        ],
+        "clippedText": [],
+        "halfCut": [],
         "shortTargets": [],
-        "scrolling": [
-          {
-            "sel": "div.pos-cards",
-            "need": 894,
-            "has": 432,
-            "allowed": false
-          }
-        ]
+        "scrolling": []
       },
       "ruleTotals": {
         "smallText": 0,
-        "clippedText": 1,
-        "halfCut": 4,
+        "clippedText": 0,
+        "halfCut": 0,
         "shortTargets": 0,
-        "scrolling": 1
+        "scrolling": 0
       }
     },
     {
@@ -1699,34 +1238,16 @@
         "minTarget": 52,
         "smallText": [],
         "clippedText": [],
-        "halfCut": [
-          {
-            "sel": "div.pos-page-body article.pos-card",
-            "sample": "발권 필요정하늘 팀010-0000-0026R-026 · 09/21 이용 ",
-            "count": 1
-          },
-          {
-            "sel": "div.pos-cards article.pos-card",
-            "sample": "발권 필요정하늘 팀010-0000-0026R-026 · 09/21 이용 ",
-            "count": 1
-          }
-        ],
+        "halfCut": [],
         "shortTargets": [],
-        "scrolling": [
-          {
-            "sel": "div.pos-cards",
-            "need": 825,
-            "has": 432,
-            "allowed": false
-          }
-        ]
+        "scrolling": []
       },
       "ruleTotals": {
         "smallText": 0,
         "clippedText": 0,
-        "halfCut": 2,
+        "halfCut": 0,
         "shortTargets": 0,
-        "scrolling": 1
+        "scrolling": 0
       }
     },
     {
@@ -1742,44 +1263,16 @@
         "minTarget": 52,
         "smallText": [],
         "clippedText": [],
-        "halfCut": [
-          {
-            "sel": "div.pos-page-body article.pos-card",
-            "sample": "13:00 · 리프트권 2매 환불발권처 환불리조트 매표소 · 1호 차량4",
-            "count": 1
-          },
-          {
-            "sel": "div.pos-page-body article.pos-card",
-            "sample": "16:30 · 김영희 팀010-0000-0021수거만선 티롤 앞 · 1호",
-            "count": 1
-          },
-          {
-            "sel": "div.pos-cards article.pos-card",
-            "sample": "13:00 · 리프트권 2매 환불발권처 환불리조트 매표소 · 1호 차량4",
-            "count": 1
-          },
-          {
-            "sel": "div.pos-cards article.pos-card",
-            "sample": "16:30 · 김영희 팀010-0000-0021수거만선 티롤 앞 · 1호",
-            "count": 1
-          }
-        ],
+        "halfCut": [],
         "shortTargets": [],
-        "scrolling": [
-          {
-            "sel": "div.pos-cards",
-            "need": 986,
-            "has": 432,
-            "allowed": false
-          }
-        ]
+        "scrolling": []
       },
       "ruleTotals": {
         "smallText": 0,
         "clippedText": 0,
-        "halfCut": 4,
+        "halfCut": 0,
         "shortTargets": 0,
-        "scrolling": 1
+        "scrolling": 0
       }
     },
     {
@@ -2065,53 +1558,17 @@
         "minFont": 16,
         "minTarget": 52,
         "smallText": [],
-        "clippedText": [
-          {
-            "sel": "span.pos-card-name",
-            "sample": "아주 긴 이름의 단체 접수 대표자 · 여러 일행 방문 확인 1 팀",
-            "need": 429,
-            "has": 268,
-            "count": 2
-          }
-        ],
-        "halfCut": [
-          {
-            "sel": "div.pos-page-body article.pos-card",
-            "sample": "지급 전아주 긴 이름의 단체 접수 대표자 · 여러 일행 방문 확인 1 팀",
-            "count": 1
-          },
-          {
-            "sel": "div.pos-page-body article.pos-card",
-            "sample": "지급 전아주 긴 이름의 단체 접수 대표자 · 여러 일행 방문 확인 2 팀",
-            "count": 1
-          },
-          {
-            "sel": "div.pos-cards article.pos-card",
-            "sample": "지급 전아주 긴 이름의 단체 접수 대표자 · 여러 일행 방문 확인 1 팀",
-            "count": 1
-          },
-          {
-            "sel": "div.pos-cards article.pos-card",
-            "sample": "지급 전아주 긴 이름의 단체 접수 대표자 · 여러 일행 방문 확인 2 팀",
-            "count": 1
-          }
-        ],
+        "clippedText": [],
+        "halfCut": [],
         "shortTargets": [],
-        "scrolling": [
-          {
-            "sel": "div.pos-cards",
-            "need": 25701,
-            "has": 384,
-            "allowed": false
-          }
-        ]
+        "scrolling": []
       },
       "ruleTotals": {
         "smallText": 0,
-        "clippedText": 2,
-        "halfCut": 4,
+        "clippedText": 0,
+        "halfCut": 0,
         "shortTargets": 0,
-        "scrolling": 1
+        "scrolling": 0
       }
     },
     {

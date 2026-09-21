@@ -60,9 +60,12 @@
   const meaningful = html => !!html && html.replace(/<span class="pos-toolbar-label">[\s\S]*?<\/span>/g, '').trim() !== '';
   function page(title, description, body, footer = '', options = {}) {
     header(options);
+    // Card lists page by height (UI v4): the pager sits in the footer, just before the buttons.
+    if (footer && body.includes('data-pos-cards=')) { const at = footer.lastIndexOf('<div class="so-actions">'), slot = '<nav class="pos-cards-pager" aria-label="목록 쪽" hidden></nav>'; footer = at < 0 ? footer + slot : footer.slice(0, at) + slot + footer.slice(at); }
+    afterRender();
     return '<section class="pos-page" aria-label="' + e(title) + '"><header class="pos-page-heading"><h1>' + e(title) + '</h1>'
       + (meaningful(options.toolbar) ? '<div class="pos-toolbar">' + options.toolbar + '</div>' : '') + (description ? '<p>' + e(description) + '</p>' : '')
-      + '</header><div class="pos-page-body">' + body + '</div>' + (footer ? '<footer class="pos-page-footer">' + footer + '</footer>' : '') + '</section>';
+      + '</header><div class="pos-page-body' + (body.includes('data-pos-cards=') ? ' is-cards' : '') + '">' + body + '</div>' + (footer ? '<footer class="pos-page-footer">' + footer + '</footer>' : '') + '</section>';
   }
   function row(title, description, actions = '') {
     return '<article class="pos-row"><div class="pos-row-copy"><strong>' + e(title) + '</strong>'
@@ -89,13 +92,133 @@
     const open = c.go ? '<button type="button" class="pos-card-open" data-go="' + e(c.go.page) + '" data-id="' + e(c.go.id ?? '') + '">' + inner + '</button>' : '<div class="pos-card-open">' + inner + '</div>';
     return '<article class="pos-card"' + (tone ? ' data-tone="' + e(tone) + '"' : '') + (c.id ? ' data-card-id="' + e(c.id) + '"' : '') + '>' + legend + open + (c.actions ? '<div class="pos-card-actions">' + c.actions + '</div>' : '') + '</article>';
   }
-  // Grouped card grid. This is the only scrolling region of a list screen; header, toolbar and footer stay fixed.
+  // Grouped card grid. Legacy mode scrolls inside this region; v4 lists pass { fixed: true } and page by height instead (no scrolling).
   function cards(groups, options = {}) {
     const filled = groups.filter(g => g.cards && g.cards.length);
+    if (options.fixed && filled.length) {
+      // UI v4 list: same-height cards, laid out after insertion by layoutCards(). The first rows are rendered right away as a fallback.
+      const key = pageKey('cards'), signature = filled.map(g => g.title + ':' + g.cards.length).join('|') + '|' + (options.signature || '');
+      if (cardSets.get(key)?.signature !== signature) pages.set(key, 0);
+      cardSets.set(key, { groups: filled, signature });
+      return '<div class="pos-cards" data-pos-scroll data-pos-cards="' + e(key) + '"><section class="pos-group"><div class="pos-card-grid">' + filled.flatMap(g => g.cards).slice(0, 4).join('') + '</div></section></div>';
+    }
     if (!filled.length) return '<div class="pos-cards" data-pos-scroll><div class="pos-empty"><strong>' + e(options.empty || '항목 없음') + '</strong>' + (options.emptyNote ? '<span>' + e(options.emptyNote) + '</span>' : '') + (options.emptyAction || '') + '</div></div>';
     return '<div class="pos-cards" data-pos-scroll>' + filled.map(g => '<section class="pos-group">' + (g.title ? '<div class="pos-group-head">' + e(g.title) + (g.sub ? '<small>' + e(g.sub) + '</small>' : '') + '</div>' : '')
       + '<div class="pos-card-grid' + (options.steps ? ' is-steps' : '') + '">' + g.cards.join('') + '</div></section>').join('') + '</div>';
   }
+  // ---- UI v4 (docs/42 2-3 · 2-4): fixed four-row card, text that is fitted instead of clipped, paging by height ----
+  // Rows are single lines. When a row is too narrow, whole low-priority parts are dropped (never an ellipsis):
+  // parts arrive in priority order, item lines end with "외 N종".
+  const partsAttr = list => e(JSON.stringify(list.filter(Boolean)));
+  function orderCard(c) {
+    const tone = c.tone || '', strong = ['red', 'orange', 'green'].includes(tone);
+    const legend = strong && c.badge ? '<span class="pos-card-legend">' + e(c.badge[0]) + '</span>' : '';
+    const badgeHtml = !legend && c.badge ? badge(c.badge[0], c.badge[1] || 'grey') : '';
+    const metaParts = (c.metaParts || []).filter(Boolean), itemParts = (c.itemParts || []).filter(Boolean);
+    const inner = '<span class="pos-card-head"><span class="pos-card-name">' + e(c.name) + '</span>' + (c.phone ? '<span class="pos-card-phone">' + e(c.phone) + '</span>' : '') + badgeHtml + '</span>'
+      + '<span class="pos-card-meta" data-fit="parts" data-parts="' + partsAttr(metaParts) + '">' + e(metaParts.join(' · ')) + '</span>'
+      + '<span class="pos-card-itemline"><span class="pos-card-itemtext" data-fit="items" data-parts="' + partsAttr(itemParts) + '">' + e(itemParts.join(' · ')) + '</span>'
+      + (c.state?.[0] ? '<span class="pos-state" data-tone="' + e(c.state[1] || 'grey') + '">' + e(c.state[0]) + '</span>' : '') + '</span>';
+    const open = c.go ? '<button type="button" class="pos-card-open" data-go="' + e(c.go.page) + '" data-id="' + e(c.go.id ?? '') + '">' + inner + '</button>' : '<div class="pos-card-open">' + inner + '</div>';
+    return '<article class="pos-card is-fixed"' + (tone ? ' data-tone="' + e(tone) + '"' : '') + (c.id ? ' data-card-id="' + e(c.id) + '"' : '') + '>' + legend + open
+      + '<div class="pos-card-bottom"><span class="pos-card-money" data-tone="' + e(c.money?.[1] || 'ink') + '">' + e(c.money?.[0] || '') + '</span>' + (c.actions ? '<div class="pos-card-actions">' + c.actions + '</div>' : '') + '</div></article>';
+  }
+  function fitParts(el) {
+    let parts; try { parts = JSON.parse(el.dataset.parts || '[]'); } catch { return; }
+    const items = el.dataset.fit === 'items';
+    for (let k = parts.length; k >= 1; k--) {
+      el.textContent = parts.slice(0, k).join(' · ') + (items && k < parts.length ? ' 외 ' + (parts.length - k) + '종' : '');
+      if (el.scrollWidth <= el.clientWidth + 1) return;
+    }
+    if (items && parts.length > 1) el.textContent = '품목 ' + parts.length + '종';
+  }
+  function fitCard(card) {
+    const name = card.querySelector('.pos-card-name'), phone = card.querySelector('.pos-card-phone'), over = el => el && el.scrollWidth > el.clientWidth + 1;
+    card.classList.remove('is-longname', 'is-widemoney', 'is-widebutton'); if (phone) phone.hidden = false;
+    if (over(name) && phone) phone.hidden = true;
+    if (over(name)) card.classList.add('is-longname'); // the name takes two lines and the meta row gives way
+    if (over(card.querySelector('.pos-card-money'))) card.classList.add('is-widemoney');
+    if (over(card.querySelector('.pos-card-actions .pos-button'))) card.classList.add('is-widebutton');
+    card.querySelectorAll('[data-fit]').forEach(fitParts);
+  }
+  function fitPage(scope) {
+    const pageEl = scope || S.$('.pos-page'); if (!pageEl) return;
+    const summary = pageEl.querySelector('.pos-page-footer > span:first-child');
+    if (summary && !summary.dataset.fit) { summary.dataset.fit = 'parts'; summary.dataset.parts = JSON.stringify(summary.textContent.split(' · ')); }
+    pageEl.querySelectorAll('.pos-page-footer [data-fit], .pos-group-head [data-fit]').forEach(fitParts);
+    // Search hints are fitted the same way: whole words drop from the end instead of being cut by the field.
+    pageEl.querySelectorAll('.pos-search input[placeholder]').forEach(input => {
+      const full = input.dataset.hint || (input.dataset.hint = input.placeholder), parts = full.split(' · ');
+      const context = fitPage.canvas || (fitPage.canvas = document.createElement('canvas').getContext('2d')); context.font = getComputedStyle(input).font;
+      for (let k = parts.length; k >= 1; k--) { input.placeholder = parts.slice(0, k).join(' · '); if (context.measureText(input.placeholder).width <= input.clientWidth - 2) return; }
+      input.placeholder = '검색';
+    });
+    pageEl.querySelectorAll('.pos-card.is-fixed').forEach(fitCard);
+  }
+  const cardSets = new Map();
+  function joinTitles(titles) {
+    if (titles.length < 2) return titles[0] || '';
+    const split = titles.map(t => { const k = t.lastIndexOf(' '); return k > 0 ? [t.slice(0, k), t.slice(k + 1)] : [t, '']; }), tail = split[0][1];
+    const same = tail && split.every(part => part[1] === tail), heads = same ? split.map(part => part[0]) : titles;
+    return (heads.length > 2 ? heads[0] + ' ~ ' + heads.at(-1) : heads.join(' · ')) + (same ? ' ' + tail : '');
+  }
+  function joinSubs(subs) {
+    const parsed = subs.map(sub => /^(\d+)(\D+)$/.exec(sub || ''));
+    return parsed.every(Boolean) && parsed.every(m => m[2] === parsed[0][2]) ? parsed.reduce((n, m) => n + Number(m[1]), 0) + parsed[0][2] : subs.filter(Boolean).join(' · ');
+  }
+  // Whole cards only. Each page is filled group by group; when group headings would cost a row of cards
+  // (low counters), the page gets one combined heading instead (docs/38 7-6).
+  function paginate(flat, cols, height, cardHeight, headHeight, gap) {
+    const result = []; let i = 0;
+    const rowsIn = room => Math.floor((room - headHeight + gap) / (cardHeight + gap));
+    while (i < flat.length) {
+      const sections = []; let used = 0, j = i;
+      while (j < flat.length) {
+        const gi = flat[j].gi; let end = j; while (end < flat.length && flat[end].gi === gi) end++;
+        const rows = rowsIn(height - used); if (rows < 1) break;
+        const take = Math.min(end - j, rows * cols);
+        sections.push({ gi, from: j, to: j + take }); used += headHeight + Math.ceil(take / cols) * (cardHeight + gap); j += take;
+        if (j < end) break;
+      }
+      const combined = Math.min(Math.max(1, rowsIn(height)) * cols, flat.length - i);
+      if (combined > j - i) { result.push({ sections: [{ gi: -1, from: i, to: i + combined }] }); i += combined; }
+      else { result.push({ sections }); i = j; }
+    }
+    return result.length ? result : [{ sections: [] }];
+  }
+  function layoutCards(container, focusDelta) {
+    const set = cardSets.get(container.dataset.posCards); if (!set) return;
+    const flat = set.groups.flatMap((g, gi) => g.cards.map(html => ({ html, gi })));
+    const css = getComputedStyle(container), num = name => parseFloat(css.getPropertyValue(name)) || 0;
+    const gap = num('--pos-card-gap') || 12, cardHeight = num('--pos-card-h') || 171, headHeight = num('--pos-group-head') || 34;
+    const cols = Math.max(1, Math.min(3, Math.floor((container.clientWidth + gap) / (360 + gap))));
+    const list = paginate(flat, cols, container.clientHeight, cardHeight, headHeight, gap);
+    const index = Math.min(getPage('cards'), list.length - 1); limits.set(pageKey('cards'), list.length - 1); pages.set(pageKey('cards'), index);
+    container.style.setProperty('--pos-cols', cols);
+    container.innerHTML = list[index].sections.map(section => {
+      const groupIds = [...new Set(flat.slice(section.from, section.to).map(item => item.gi))], groups = groupIds.map(gi => set.groups[gi]);
+      const title = joinTitles(groups.map(g => g.title).filter(Boolean)), sub = joinSubs(groups.map(g => g.sub));
+      return '<section class="pos-group">' + (title ? '<div class="pos-group-head"><span>' + e(title) + '</span>' + (sub ? '<small>' + e(sub) + '</small>' : '') + '</div>' : '')
+        + '<div class="pos-card-grid">' + flat.slice(section.from, section.to).map(item => item.html).join('') + '</div></section>';
+    }).join('');
+    S.icons?.();
+    const nav = S.$('.pos-cards-pager');
+    if (nav) {
+      nav.hidden = list.length < 2;
+      const move = (label, name, delta, off) => '<button type="button" class="so-button pos-button" data-action="pos-cards-page" data-id="' + delta + '" aria-label="' + name + '"' + (off ? ' disabled' : '') + '>' + label + '</button>';
+      nav.innerHTML = move('‹', '이전 쪽', -1, index === 0) + '<span aria-live="polite">' + (index + 1) + ' / ' + list.length + '쪽</span>' + move('›', '다음 쪽', 1, index === list.length - 1);
+      if (focusDelta) (nav.querySelector('[data-id="' + focusDelta + '"]:not(:disabled)') || nav.querySelector('button:not(:disabled)'))?.focus({ preventScroll: true });
+    }
+    fitPage();
+  }
+  let renderQueued = false;
+  function afterRender() {
+    if (renderQueued) return; renderQueued = true;
+    queueMicrotask(() => { renderQueued = false; const container = S.$('.pos-cards[data-pos-cards]'); if (container) layoutCards(container); else fitPage(); });
+  }
+  let resizeTimer = 0;
+  window.addEventListener('resize', () => { clearTimeout(resizeTimer); resizeTimer = setTimeout(afterRender, 120); });
+  document.fonts?.ready?.then(afterRender);
   function getPage(key) { return pages.get(pageKey(key)) || 0; }
   function setPage(key, index, options = {}) {
     const fullKey = pageKey(key), max = limits.get(fullKey) ?? 0;
@@ -136,7 +259,11 @@
     const button = [...S.root.querySelectorAll('[data-action="pos-page-change"]')].find(el => el.dataset.posKey === key && el.dataset.id === delta && !el.disabled);
     (button || S.$('.pos-pager button:not(:disabled)'))?.focus({ preventScroll: true });
   });
-  S.pos = Object.freeze({ navigation, page, button, row, pager, getPage, setPage, modal, prepareModal, card, cards, badge, search, chip, chipGo, toolbarLabel, group, terms, storeName, menus,
+  S.action('pos-cards-page', delta => {
+    const container = S.$('.pos-cards[data-pos-cards]'); if (!container) return;
+    setPage('cards', getPage('cards') + Number(delta), { render: false }); layoutCards(container, delta);
+  });
+  S.pos = Object.freeze({ navigation, page, button, row, pager, getPage, setPage, modal, prepareModal, card, orderCard, cards, fitPage, badge, search, chip, chipGo, toolbarLabel, group, terms, storeName, menus,
     field: (label, value = '', type = 'text', attrs = '') => S.field(e(label), value, type, attrs),
     label: value => '<span class="pos-label">' + e(value) + '</span>'
   });

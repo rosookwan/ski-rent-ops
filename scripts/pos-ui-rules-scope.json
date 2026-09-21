@@ -9,6 +9,20 @@
         "shortTargets"
       ],
       "viewports": "*"
+    },
+    {
+      "since": "M2 (2026-09-21)",
+      "keys": [
+        "intake",
+        "preparation",
+        "rentals",
+        "returns",
+        "tickets",
+        "dispatch",
+        "tomorrow-100"
+      ],
+      "metrics": "*",
+      "viewports": "*"
     }
   ]
 }

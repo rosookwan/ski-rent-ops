@@ -91,21 +91,26 @@
     if (kind === 'intake') return o.people.length >= 10 ? ['단체', 'purple'] : ['예약 확정', 'green'];
     return ['지급 전', 'red'];
   }
+  // One state chip per card: the most urgent line state wins, the rest is on the detail screen (docs/42 M2).
+  // On the return-side screens the chip answers "where is it now"; on the intake side "what is still to hand out".
+  const stateRanks = { out: ['지급 전', '일부 지급', '발권 예정', '차량 수거 예정', '대여 중', '차량 보관', '지급 완료', '반납 완료', '취소'], back: ['차량 수거 예정', '대여 중', '차량 보관', '지급 전', '일부 지급', '발권 예정', '지급 완료', '반납 완료', '취소'] };
   function cardOf(o, kind) {
     const [badgeText, tone] = badgeOf(o, kind), pending = sizePending(o), due = o.finance.dueWon, deposit = o.finance.depositHeldWon;
     const dueNow = activeLines(o).some(l => l.unissuedQuantity && (l.pickupPlan?.date || l.start) <= D.today);
-    const meta = (o.receiptNo || o.id) + ' · ' + useRange(o) + ' 이용 · ' + (kind === 'returns' || kind === 'rentals' ? short(returnDate(o)) + ' ' + (returnTime(o) || '') + ' 반납 · ' + returnPlace(o) : short(pickupDate(o)) + ' ' + (pickupTime(o) || '') + ' 수령 · ' + placeOf(o));
-    const money = [];
-    if (kind === 'intake') money.push(['예약 금액 ' + won(o.finance.chargedWon), 'ink']);
-    if (due) money.push(['미수 ' + won(due), 'red']);
-    if (deposit) money.push(['보증금 ' + won(deposit), 'blue']);
-    if (!due && kind !== 'intake' && o.finance.chargedWon) money.push(['수납 완료', 'green']);
+    const returning = kind === 'returns' || kind === 'rentals';
+    // Row 2 in priority order: time, place, use dates, receipt number. Whole parts drop off when the card is narrow.
+    const metaParts = returning ? [(short(returnDate(o)) + ' ' + (returnTime(o) || '')).trim() + ' 반납', returnPlace(o), useRange(o) + ' 이용', o.receiptNo || o.id]
+      : [(short(pickupDate(o)) + ' ' + (pickupTime(o) || '')).trim() + ' 수령', placeOf(o), useRange(o) + ' 이용', o.receiptNo || o.id];
+    const states = activeLines(o).map(l => ({ l, state: lineState(l) })), open = states.filter(x => !x.state[2]);
+    const itemParts = (open.length ? open : states).map(x => itemText(x.l));
+    const stateRank = stateRanks[returning ? 'back' : 'out'], state = (open.length ? open : states).map(x => x.state).sort((a, b) => stateRank.indexOf(a[0]) - stateRank.indexOf(b[0]))[0];
+    const money = due ? ['미수 ' + won(due), 'red'] : kind === 'intake' ? ['예약 금액 ' + won(o.finance.chargedWon), 'ink'] : deposit ? ['보증금 ' + won(deposit), 'blue'] : o.finance.chargedWon ? ['수납 완료', 'green'] : null;
     let action;
-    if (kind === 'returns') action = o.totals.customerQuantity ? btn('모두 받음', 'pos-return-all', o.id, 'soft') : o.totals.vehicleQuantity ? btn('차량 입고 확인 ' + vehicleText(o), 'pos-receive', o.id, 'soft') : btn('반납 완료', 'pos-noop', o.id, 'done');
-    else if (kind === 'rentals') action = o.exchangeOpenQuantity ? btn('교환 진행 확인', 'pos-problems', o.id, 'soft') : btn('기간·수거 변경', 'pos-change', o.id);
-    else if (kind === 'preparation') action = pending ? btn('사이즈 요청 ' + pending + '명', 'pos-preinput', o.id, 'soft') : o.totals.unissuedQuantity && dueNow ? btn((liftOnly(o) ? '발권 ' : '지급 ') + unissuedText(o), 'pos-issue', o.id, 'soft') : o.totals.unissuedQuantity ? go('접수 상세', 'order-detail', o.id) : due ? btn('수납 ' + won(due), 'pos-money', o.id, 'soft') : btn('지급 완료', 'pos-noop', o.id, 'done');
-    else action = o.totals.unissuedQuantity && dueNow ? btn((liftOnly(o) ? '발권 ' : '지급 ') + unissuedText(o), 'pos-issue', o.id, 'soft') : go('접수 상세', 'order-detail', o.id);
-    return P.card({ id: o.id, tone: ['red', 'orange', 'green'].includes(tone) ? tone : '', badge: [badgeText, tone], name: o.customer.name + ' 팀', phone: o.customer.phone || '', meta, items: items(o), money, actions: action, go: { page: 'order-detail', id: o.id } });
+    if (kind === 'returns') action = o.totals.customerQuantity ? btn('모두 받음', 'pos-return-all', o.id, 'primary') : o.totals.vehicleQuantity ? btn('차량 입고 확인 ' + vehicleText(o), 'pos-receive', o.id, 'primary') : btn('반납 완료', 'pos-noop', o.id, 'done');
+    else if (kind === 'rentals') action = o.exchangeOpenQuantity ? btn('교환 진행 확인', 'pos-problems', o.id, 'primary') : btn('기간·수거 변경', 'pos-change', o.id);
+    else if (kind === 'preparation') action = pending ? btn('사이즈 요청 ' + pending + '명', 'pos-preinput', o.id) : o.totals.unissuedQuantity && dueNow ? btn((liftOnly(o) ? '발권 ' : '지급 ') + unissuedText(o), 'pos-issue', o.id, 'primary') : o.totals.unissuedQuantity ? go('접수 상세', 'order-detail', o.id) : due ? btn('수납 ' + won(due), 'pos-money', o.id, 'primary') : btn('지급 완료', 'pos-noop', o.id, 'done');
+    else action = o.totals.unissuedQuantity && dueNow ? btn((liftOnly(o) ? '발권 ' : '지급 ') + unissuedText(o), 'pos-issue', o.id, 'primary') : go('접수 상세', 'order-detail', o.id);
+    return P.orderCard({ id: o.id, tone: ['red', 'orange', 'green'].includes(tone) ? tone : '', badge: [badgeText, tone], name: o.customer.name + ' 팀', phone: o.customer.phone || '', metaParts, itemParts, state, money, actions: action, go: { page: 'order-detail', id: o.id } });
   }
   function toolbar(kind) {
     const dateKind = ['returns', 'rentals'].includes(kind) ? 'return' : 'pickup';
@@ -131,13 +136,13 @@
     const exchanges = filtered.filter(o => o.exchangeOpenQuantity).length;
     const options = { toolbar: toolbar(kind) };
     let foot;
-    if (kind === 'intake') { options.wait = pendingPeople ? '사이즈 ' + pendingPeople + '명' : '없음'; options.sums = [['예약 수량', sets + '세트'], ['사이즈 미입력', pendingPeople + '명', pendingPeople ? 'orange' : ''], ['예약 금액', won(total)]]; foot = '수령 ' + filtered.length + '팀 · 예약 ' + sets + '세트 · 사이즈 미입력 ' + pendingPeople + '명 · 예약 금액 ' + won(total); }
+    if (kind === 'intake') { options.wait = pendingPeople ? '사이즈 ' + pendingPeople + '명' : '없음'; options.sums = [['예약 수량', sets + '세트'], ['사이즈 미입력', pendingPeople + '명', pendingPeople ? 'orange' : ''], ['예약 금액', won(total)]]; foot = '수령 ' + filtered.length + '팀 · 예약 금액 ' + won(total) + ' · 예약 ' + sets + '세트 · 사이즈 미입력 ' + pendingPeople + '명'; }
     else if (kind === 'preparation') { options.wait = unissued ? '지급 ' + unissued + '개' : dueTeams ? '수납 ' + dueTeams + '팀' : '없음'; options.sums = [['미지급', unissued + '개', unissued ? 'red' : ''], ['미수 팀', dueTeams + '팀', dueTeams ? 'red' : ''], ['미수 금액', won(due), due ? 'red' : '']]; foot = '수령 ' + filtered.length + '팀 · 미지급 ' + unissued + '개 · 미수 ' + won(due) + '(' + dueTeams + '팀) · 사이즈 미입력 ' + pendingPeople + '명'; }
     else if (kind === 'rentals') { options.wait = exchanges ? '요청 ' + exchanges + '팀' : '없음'; options.sums = [['고객 보유', held + '개', held ? 'orange' : ''], ['교환 대기', exchanges + '건', exchanges ? 'orange' : ''], ['미수', won(due), due ? 'red' : '']]; foot = '반납 ' + filtered.length + '팀 · 고객 보유 ' + held + '개 · 교환 대기 ' + exchanges + '건 · 미수 ' + won(due); }
     else { options.wait = held ? '반납 ' + held + '개' : inVehicle ? '입고 ' + inVehicle + '개' : '없음'; options.sums = [['미반납', held + '개', held ? 'red' : ''], ['차량 보관', inVehicle + '개', inVehicle ? 'purple' : ''], ['미수', won(due), due ? 'red' : '']]; foot = '반납 ' + filtered.length + '팀 · 미반납 ' + held + '개 · 차량 보관 ' + inVehicle + '개 · 미수 ' + won(due); }
     const groups = grouped(filtered, dateKind).map(g => ({ title: g.title, sub: g.sub, cards: g.orders.map(o => cardOf(o, kind)) }));
     const emptyTitle = { intake: '예약 없음', preparation: '준비할 팀 없음', rentals: '이용 중인 팀 없음', returns: '반납할 팀 없음' }[kind];
-    const body = P.cards(groups, { empty: state.query ? '검색 결과 없음' : emptyTitle, emptyNote: state.query ? '"' + state.query + '"' : '', emptyAction: state.query || state.period !== 'all' || state.date ? btn('전체 보기', 'pos-period', 'all', 'primary') : '' });
+    const body = P.cards(groups, { fixed: true, signature: [kind, state.query, state.period, state.date, state.sort].join('|'), empty: state.query ? '검색 결과 없음' : emptyTitle, emptyNote: state.query ? '"' + state.query + '"' : '', emptyAction: state.query || state.period !== 'all' || state.date ? btn('전체 보기', 'pos-period', 'all', 'primary') : '' });
     return P.page(titles[kind], '', body, '<span>' + e(foot) + '</span><div class="so-actions">' + (D.pending ? btn('같은 요청 다시 확인', 'pos-retry', '', 'soft') : btn('최신 기록 확인', 'pos-refresh')) + btn('새 접수', 'pos-new', '', 'primary') + '</div>', options);
   }
   function home() {

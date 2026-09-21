@@ -51,10 +51,12 @@
   }
   function ticketCard(row) {
     const { order, line, need, stage } = row, badge = { issue: ['발권 필요', 'red'], hand: ['지급 대기', 'orange'], using: ['사용 중', 'blue'], stored: ['보관 · 회수 대기', 'purple'], done: ['지급 완료', 'green'] }[stage];
-    const action = stage === 'issue' ? button('발권 ' + need + '매', 'pos-ticket-open-issue', order.id, 'soft') : stage === 'hand' ? button('지급 ' + line.unissuedQuantity + '매', 'pos-ticket-open-issue', order.id, 'soft') : stage === 'using' ? button('회수 ' + line.customerQuantity + '매', 'pos-ticket-open-return', order.id) : stage === 'stored' ? button('보관 권 확인', 'pos-ticket-stock', order.id) : O.go('접수 상세', 'order-detail', order.id);
-    return P.card({ tone: ['red', 'orange', 'green'].includes(badge[1]) ? badge[1] : '', badge, name: order.customer.name + ' 팀', phone: order.customer.phone || '', meta: (order.receiptNo || order.id) + ' · ' + line.start.slice(5).replace('-', '/') + ' 이용 · ' + title({ sku: line.sku }),
-      items: [[O.itemText(line), O.lineState(line)[0], O.lineState(line)[1]], ['발권·배정 ' + row.allocated + '매 · 지급 ' + line.issuedQuantity + '매 · 보관 ' + row.stored + '매', '', 'grey']],
-      money: order.finance.dueWon ? [['미수 ' + S.money(order.finance.dueWon), 'red']] : [], actions: action, go: { page: 'order-detail', id: order.id } });
+    const action = stage === 'issue' ? button('발권 ' + need + '매', 'pos-ticket-open-issue', order.id, 'primary') : stage === 'hand' ? button('지급 ' + line.unissuedQuantity + '매', 'pos-ticket-open-issue', order.id, 'primary') : stage === 'using' ? button('회수 ' + line.customerQuantity + '매', 'pos-ticket-open-return', order.id) : stage === 'stored' ? button('보관 권 확인', 'pos-ticket-stock', order.id) : O.go('접수 상세', 'order-detail', order.id);
+    const state = O.lineState(line);
+    return P.orderCard({ tone: ['red', 'orange', 'green'].includes(badge[1]) ? badge[1] : '', badge, name: order.customer.name + ' 팀', phone: order.customer.phone || '',
+      metaParts: [line.start.slice(5).replace('-', '/') + ' 이용', title({ sku: line.sku }), order.receiptNo || order.id, '발권·배정 ' + row.allocated + '매 · 지급 ' + line.issuedQuantity + '매 · 보관 ' + row.stored + '매'],
+      itemParts: [O.itemText(line)], state: [state[0], state[1]], money: order.finance.dueWon ? ['미수 ' + S.money(order.finance.dueWon), 'red'] : order.finance.chargedWon ? ['수납 완료', 'green'] : null,
+      actions: action, go: { page: 'order-detail', id: order.id } });
   }
   function ticketsPage() {
     const rows = ticketRows(), stock = D.snapshot.assets.filter(a => a.ticket && ['shop', 'vehicle'].includes(a.location.kind)).length;
@@ -63,7 +65,7 @@
     const groups = [['issue', '발권 필요'], ['hand', '지급 대기'], ['using', '사용 중'], ['stored', '보관 · 회수 대기'], ['done', '지급 완료']].map(([stage, name]) => ({ title: name, sub: shown.filter(r => r.stage === stage).length + '건', cards: shown.filter(r => r.stage === stage).map(ticketCard) }));
     const toolbar = P.search('pos-tickets-search', listQuery, '이름 · 접수번호 · 권종') + P.toolbarLabel('발권일')
       + P.group(P.chip('전체', 'pos-tickets-filter', 'all', listFilter === 'all', rows.length) + P.chip('발권 필요', 'pos-tickets-filter', 'issue', listFilter === 'issue', count('issue')) + P.chip('지급 대기', 'pos-tickets-filter', 'hand', listFilter === 'hand', count('hand')) + P.chip('사용 중', 'pos-tickets-filter', 'using', listFilter === 'using', count('using')));
-    return P.page('리프트권', '', P.cards(groups, { empty: listQuery ? '검색 결과 없음' : '리프트권 접수 없음' }),
+    return P.page('리프트권', '', P.cards(groups, { fixed: true, signature: listFilter + '|' + listQuery, empty: listQuery ? '검색 결과 없음' : '리프트권 접수 없음' }),
       '<span>' + e('발권 필요 ' + need + '매 · 지급 대기 ' + hand + '매 · 보관 권 ' + stock + '매') + '</span><div class="so-actions">' + button('보관 권 ' + stock + '매', 'pos-ticket-stock') + (D.pending ? button('같은 요청 다시 확인', 'pos-retry', '', 'soft') : button('최신 기록 확인', 'pos-refresh')) + '</div>',
       { toolbar, wait: need ? '발권 ' + need + '매' : hand ? '지급 ' + hand + '매' : '없음', sums: [['발권 필요', need + '매', need ? 'red' : ''], ['지급 대기', hand + '매', hand ? 'orange' : ''], ['보관 권', stock + '매', stock ? 'purple' : '']] });
   }
