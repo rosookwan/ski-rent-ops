@@ -7,20 +7,291 @@
     "name": null,
     "note": "프로젝트 전용 워크스페이스 없음. 2026-09-20 사용자 결정으로 개인 워크스페이스에서 생성. 이 job id 목록이 프로젝트 소속의 기준이다."
   },
-  "generation": { "model": "gpt_image_2_5", "variant": "flare", "quality": "high", "resolution": "2k", "aspect_ratio": "27:16", "output": "2592×1536", "creditsPerImage": 3 },
+  "generation": {
+    "model": "gpt_image_2_5",
+    "variant": "flare",
+    "quality": "high",
+    "resolution": "2k",
+    "aspect_ratio": "27:16",
+    "output": "2592×1536",
+    "creditsPerImage": 3,
+    "anchor": {
+      "code": "P01",
+      "variant": "d",
+      "job_id": "8d6e31bf-6f35-4a6b-bb11-65a3f1ab8ebc",
+      "note": "2라운드 8장과 재생성 2장은 이 job id를 image_references로 넘겨 만들었다."
+    }
+  },
   "download": {
-    "status": "blocked",
-    "reason": "이 세션의 네트워크 정책이 d8j0ntlcm91z4.cloudfront.net(결과 CDN)을 차단(CONNECT 403)해 PNG를 저장소에 내려받지 못했다. URL과 job id만 등록한다. 세션 환경의 허용 도메인에 위 호스트를 추가하면 내려받아 PNG를 함께 보관할 수 있다."
+    "status": "ok",
+    "note": "2026-09-21 로컬 세션에서 결과 CDN에 접근해 최종 9장을 이 폴더에 PNG(2592×1536 원본 그대로)로 보관했다. 2026-09-20 클라우드 세션은 CDN이 차단돼 URL만 등록했었다. 탈락한 후보와 1차 시도는 저장소에 넣지 않고 job id·URL만 남긴다."
+  },
+  "review": {
+    "criteria": [
+      "레일 9개 라벨이 모두 보이는가",
+      "타일·카드·행이 온전한가(반쯤 잘린 것 0)",
+      "지정한 한글 문구 그대로인가(메뉴·버튼·상태 같은 업무 용어 기준)",
+      "말줄임표 0",
+      "최소 글자 16px 상당",
+      "주황 주 버튼 한 종류"
+    ],
+    "policy": "2026-09-21 사용자 지시: 고객 이름·전화번호·금액·매장명 같은 샘플 데이터의 오탈자·누락은 기록만 하고 재생성하지 않는다. 재생성은 구조 문제일 때만 한다.",
+    "measurement": "원본(2592px = 1024px 프레임의 2.531배)에서 글자 줄의 잉크 높이를 픽셀로 재고, 같은 배율로 그린 실제 한글(16px 굵게 = 36px, 18px = 40px, 22px = 50px)과 비교했다. 숫자만 있는 줄은 숫자 높이(글자 크기의 0.72배)로 환산했다. 오차 ±0.5px.",
+    "commonNote": "전 화면 공통: 이름(22px)·품목(18px)·금액·핵심 숫자는 기준 이상. 레일 라벨은 14~15px 상당, 칩·범례·전화번호·하단 보조 버튼은 13~15px 상당으로 16px 기준에 1~3px 못 미친다. 글자 크기 문단을 넣고도 같은 수준이라 재생성하지 않았다. 구현할 때 CSS로 16px 이상을 고정한다(시안의 레일 112px·카드 폭에는 16px 라벨이 들어갈 여유가 있다)."
   },
   "rounds": [
     {
       "round": 1,
       "purpose": "앵커(P01 오늘 할 일) 후보 2장",
       "submittedAt": "2026-09-20T23:22Z",
+      "prompt": "requests.json P01 rev1",
       "jobs": [
-        { "code": "P01", "variant": "a", "job_id": "0825a73c-f0ab-4035-8bc7-06667de280fa", "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J2y32mXmk1jhAd5qmEsy69365Q/hf_20260920_232215_0825a73c-f0ab-4035-8bc7-06667de280fa.png", "status": "completed", "credits": 3, "review": "사용자 확인 대기" },
-        { "code": "P01", "variant": "b", "job_id": "c3d25061-b53f-4893-91ad-a0c079305cd4", "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J2y32mXmk1jhAd5qmEsy69365Q/hf_20260920_232215_c3d25061-b53f-4893-91ad-a0c079305cd4.png", "status": "completed", "credits": 3, "review": "사용자 확인 대기" }
+        {
+          "code": "P01",
+          "variant": "a",
+          "job_id": "0825a73c-f0ab-4035-8bc7-06667de280fa",
+          "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J2y32mXmk1jhAd5qmEsy69365Q/hf_20260920_232215_0825a73c-f0ab-4035-8bc7-06667de280fa.png",
+          "status": "completed",
+          "credits": 3,
+          "verdict": "미달",
+          "review": "레일 9개·6타일·문구는 맞지만 작은 글자가 작다: 레일 라벨 약 13px, 배지 약 13px, 회색 라벨 약 14px 상당. 레일 폭 약 99px. 샘플 이름 김영희가 김영회로 찍힘."
+        },
+        {
+          "code": "P01",
+          "variant": "b",
+          "job_id": "c3d25061-b53f-4893-91ad-a0c079305cd4",
+          "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J2y32mXmk1jhAd5qmEsy69365Q/hf_20260920_232215_c3d25061-b53f-4893-91ad-a0c079305cd4.png",
+          "status": "completed",
+          "credits": 3,
+          "verdict": "미달",
+          "review": "레일이 아이콘 왼쪽·라벨 오른쪽 가로 배치(활성 항목만 세로)로 요청과 다르고 폭 약 132px. 타일 2 범례에 흰 얼룩이 있고 제목과 겹침. 작은 글자도 A와 같은 수준. 샘플 문구 2곳 오타(박준호 틸, 김영회)."
+        }
+      ]
+    },
+    {
+      "round": "1b",
+      "purpose": "앵커 재생성 2장. 1라운드에서 나온 문제만 P01 프롬프트 끝에 덧붙임",
+      "submittedAt": "2026-09-20T23:40Z",
+      "prompt": "requests.json P01 rev2",
+      "jobs": [
+        {
+          "code": "P01",
+          "variant": "c",
+          "job_id": "19936d88-262f-4254-9028-6a5a6058ae2b",
+          "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J2y32mXmk1jhAd5qmEsy69365Q/hf_20260920_234012_19936d88-262f-4254-9028-6a5a6058ae2b.png",
+          "status": "completed",
+          "credits": 3,
+          "verdict": "탈락",
+          "review": "문구·레일·6타일 모두 맞고 회색 라벨은 약 16px 상당으로 커졌지만 레일 라벨 약 13px, 배지 약 15px 상당으로 D보다 작다."
+        },
+        {
+          "code": "P01",
+          "variant": "d",
+          "job_id": "8d6e31bf-6f35-4a6b-bb11-65a3f1ab8ebc",
+          "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J2y32mXmk1jhAd5qmEsy69365Q/hf_20260920_234012_8d6e31bf-6f35-4a6b-bb11-65a3f1ab8ebc.png",
+          "status": "completed",
+          "credits": 3,
+          "verdict": "앵커로 선택",
+          "review": "레일 112px에 9개 라벨(아이콘 위·라벨 아래), 6타일 온전, 문구 전부 일치, 말줄임표 0, 주황 버튼 한 종류. 회색 라벨 약 17px·배지 약 17px·본문 약 17px 상당. 메모: 레일 라벨 약 14.5px 상당, 타일 4 아래에 1px 희미한 선."
+        }
+      ]
+    },
+    {
+      "round": 2,
+      "purpose": "앵커 D를 참조 이미지로 넣어 8장 한 번에 생성",
+      "submittedAt": "2026-09-20T23:47Z",
+      "prompt": "requests.json 각 화면 rev2(글자 크기 확인 문단 덧붙임)",
+      "reference": "8d6e31bf-6f35-4a6b-bb11-65a3f1ab8ebc",
+      "jobs": [
+        {
+          "code": "P02",
+          "job_id": "2d623ca4-56c6-4e29-89e5-cd595a8567fc",
+          "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J2y32mXmk1jhAd5qmEsy69365Q/hf_20260920_234726_2d623ca4-56c6-4e29-89e5-cd595a8567fc.png",
+          "status": "completed",
+          "credits": 3,
+          "verdict": "통과(메모)",
+          "review": "온전한 카드 4장(2×2), 쪽수 1 / 2쪽, 주황은 새 접수 하나. 메모: 헤더에 매장명이 빠짐, 칩·범례 약 13~14px 상당, 하단 '최신 기록 확인' 글자 약 14px 상당."
+        },
+        {
+          "code": "P02A",
+          "job_id": "c4d2ef8f-c5fd-40f7-be3f-78b21797a7cb",
+          "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J2y32mXmk1jhAd5qmEsy69365Q/hf_20260920_234726_c4d2ef8f-c5fd-40f7-be3f-78b21797a7cb.png",
+          "status": "completed",
+          "credits": 3,
+          "verdict": "통과(메모)",
+          "review": "5행과 오른쪽 상세 패널이 한 화면에 온전히 들어감, 선택 행 표시 분명. 메모: '1 / 1쪽'과 파란 칩이 약 12.5px 상당으로 가장 작다."
+        },
+        {
+          "code": "P03",
+          "job_id": "445bec0f-9886-44fe-a4d1-026da637667b",
+          "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J2y32mXmk1jhAd5qmEsy69365Q/hf_20260920_234726_445bec0f-9886-44fe-a4d1-026da637667b.png",
+          "status": "completed",
+          "credits": 3,
+          "verdict": "통과",
+          "review": "품목 버튼 3×3, 선택 수량 배지, −/+ 스테퍼, 이용 일수, 합계 105,000원까지 문구 일치. 메모: 안내문과 '일행마다 다르게 입력' 약 14px 상당."
+        },
+        {
+          "code": "P04",
+          "job_id": "45e0ead2-a15d-4694-872a-c69ba6355f38",
+          "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J2y32mXmk1jhAd5qmEsy69365Q/hf_20260920_234726_45e0ead2-a15d-4694-872a-c69ba6355f38.png",
+          "status": "completed",
+          "credits": 3,
+          "verdict": "미달 → 재생성",
+          "review": "내용 영역은 맞지만 레일이 틀림: '1 접수·예약'이 사라지고 없는 메뉴 '4 이용·변경'이 생김. 활성 '2 준비·지급'이 둘째 칸에 놓임."
+        },
+        {
+          "code": "P05",
+          "job_id": "e7c65fc2-4475-4f1b-b805-29dd853c0ec0",
+          "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J2y32mXmk1jhAd5qmEsy69365Q/hf_20260920_234726_e7c65fc2-4475-4f1b-b805-29dd853c0ec0.png",
+          "status": "completed",
+          "credits": 3,
+          "verdict": "미달 → 재생성",
+          "review": "내용 영역은 맞지만 레일에서 '1 접수·예약'이 빠져 8개뿐. 활성 '2 준비·지급'이 둘째 칸에 놓임."
+        },
+        {
+          "code": "P06",
+          "job_id": "98eab95c-d419-4f7e-953e-9108c8164840",
+          "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J2y32mXmk1jhAd5qmEsy69365Q/hf_20260920_234726_98eab95c-d419-4f7e-953e-9108c8164840.png",
+          "status": "completed",
+          "credits": 3,
+          "verdict": "통과(메모)",
+          "review": "반납 타임 2묶음, 카드 3장 온전, 카드 버튼으로 '차량 입고 확인'과 '모두 받음' 구분, 하단에 주황 없음. 메모: 첫 줄 카드 폭이 아랫줄 카드보다 좁다, 전화번호 약 13px·하단 버튼 약 14.5px 상당."
+        },
+        {
+          "code": "P07",
+          "job_id": "2246226f-da6f-4c88-928c-3c6d9bfa1418",
+          "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J2y32mXmk1jhAd5qmEsy69365Q/hf_20260920_234726_2246226f-da6f-4c88-928c-3c6d9bfa1418.png",
+          "status": "completed",
+          "credits": 3,
+          "verdict": "통과(메모)",
+          "review": "수납 대기 7행이 스크롤 없이 모두 보이고 오른쪽 '오늘 마감 준비' 숫자 4개와 확인 3줄, 주황은 마감 확정 하나. 메모: 행 메모·'수납' 버튼 약 14px, '거래처 미정산 확인' 버튼 글자 약 14px 상당."
+        },
+        {
+          "code": "P08",
+          "job_id": "ddcf2620-1720-4054-ae9a-517083392c5d",
+          "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J2y32mXmk1jhAd5qmEsy69365Q/hf_20260920_234726_ddcf2620-1720-4054-ae9a-517083392c5d.png",
+          "status": "completed",
+          "credits": 3,
+          "verdict": "통과(메모)",
+          "review": "카드 3장 온전, 주황은 교환 대기 카드의 '교환 진행 확인'에만. 메모: 헤더 오른쪽 알림 종과 나가기 버튼이 빠짐(내용 판단에는 영향이 없어 재생성하지 않음), 칩·전화번호 약 13px 상당."
+        }
+      ]
+    },
+    {
+      "round": "2b",
+      "purpose": "레일이 틀린 P04·P05만 재생성(화면당 1회째). 발견한 문제(레일 9개 순서와 활성 위치)만 프롬프트 끝에 덧붙임",
+      "submittedAt": "2026-09-20T23:54Z",
+      "prompt": "requests.json P04·P05 rev3",
+      "reference": "8d6e31bf-6f35-4a6b-bb11-65a3f1ab8ebc",
+      "jobs": [
+        {
+          "code": "P04",
+          "job_id": "1cc53988-9bfe-4a98-be82-ab1dc3f55b81",
+          "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J2y32mXmk1jhAd5qmEsy69365Q/hf_20260920_235433_1cc53988-9bfe-4a98-be82-ab1dc3f55b81.png",
+          "status": "completed",
+          "credits": 3,
+          "verdict": "통과",
+          "review": "레일 9개 순서 정상(활성은 위에서 셋째 '2 준비·지급'). 왼쪽 요약+버튼 6개, 오른쪽 품목 행 카드 3개가 잘림 없이 들어감, 주황은 '지급 5개' 하나. 메모: 회색 라벨·안내 줄 약 15px 상당."
+        },
+        {
+          "code": "P05",
+          "job_id": "854409ed-dbfb-4dae-aca6-d2b6275c716b",
+          "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J2y32mXmk1jhAd5qmEsy69365Q/hf_20260920_235433_854409ed-dbfb-4dae-aca6-d2b6275c716b.png",
+          "status": "completed",
+          "credits": 3,
+          "verdict": "통과(메모)",
+          "review": "레일 9개 순서 정상. 묶음 제목 2개와 카드 4장 온전, 카드마다 버튼 하나(지급 5개만 주황, 발권은 보라 테두리), 하단에 주황 없음. 메모: 칩 약 14px·전화번호 약 14px 상당."
+        }
       ]
     }
-  ]
+  ],
+  "final": [
+    {
+      "code": "P01",
+      "title": "오늘 할 일 (홈)",
+      "file": "p01-home.png",
+      "job_id": "8d6e31bf-6f35-4a6b-bb11-65a3f1ab8ebc",
+      "verdict": "통과(메모)",
+      "regenerations": 1
+    },
+    {
+      "code": "P02",
+      "title": "1 접수·예약 (카드 목록)",
+      "file": "p02-intake-cards.png",
+      "job_id": "2d623ca4-56c6-4e29-89e5-cd595a8567fc",
+      "verdict": "통과(메모)",
+      "regenerations": 0
+    },
+    {
+      "code": "P02A",
+      "title": "1 접수·예약 (행 목록 + 상세 패널, 비교안)",
+      "file": "p02a-intake-rows.png",
+      "job_id": "c4d2ef8f-c5fd-40f7-be3f-78b21797a7cb",
+      "verdict": "통과(메모)",
+      "regenerations": 0
+    },
+    {
+      "code": "P03",
+      "title": "새 접수 · 2 품목",
+      "file": "p03-intake-items.png",
+      "job_id": "445bec0f-9886-44fe-a4d1-026da637667b",
+      "verdict": "통과",
+      "regenerations": 0
+    },
+    {
+      "code": "P04",
+      "title": "접수 상세",
+      "file": "p04-order-detail.png",
+      "job_id": "1cc53988-9bfe-4a98-be82-ab1dc3f55b81",
+      "verdict": "통과",
+      "regenerations": 1
+    },
+    {
+      "code": "P05",
+      "title": "2 준비·지급",
+      "file": "p05-preparation.png",
+      "job_id": "854409ed-dbfb-4dae-aca6-d2b6275c716b",
+      "verdict": "통과(메모)",
+      "regenerations": 1
+    },
+    {
+      "code": "P06",
+      "title": "4 반납·회수",
+      "file": "p06-returns.png",
+      "job_id": "98eab95c-d419-4f7e-953e-9108c8164840",
+      "verdict": "통과(메모)",
+      "regenerations": 0
+    },
+    {
+      "code": "P07",
+      "title": "5 정산·마감",
+      "file": "p07-closing.png",
+      "job_id": "2246226f-da6f-4c88-928c-3c6d9bfa1418",
+      "verdict": "통과(메모)",
+      "regenerations": 0
+    },
+    {
+      "code": "P08",
+      "title": "3 이용 중·변경",
+      "file": "p08-in-use.png",
+      "job_id": "ddcf2620-1720-4054-ae9a-517083392c5d",
+      "verdict": "통과(메모)",
+      "regenerations": 0
+    }
+  ],
+  "credits": {
+    "perImage": 3,
+    "images": 14,
+    "total": 42,
+    "breakdown": {
+      "1 (앵커 후보 2장, 2026-09-20)": 6,
+      "1b (앵커 재생성 2장)": 6,
+      "2 (8장)": 24,
+      "2b (P04·P05 재생성)": 6
+    },
+    "balance": {
+      "2026-09-21 작업 전": 1653,
+      "2026-09-21 작업 후": 1617
+    }
+  }
 }
