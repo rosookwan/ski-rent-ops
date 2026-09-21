@@ -1,0 +1,766 @@
+{
+  "checks": [
+    {
+      "key": "extension",
+      "file": "extension-1024x600.png",
+      "rules": {
+        "smallText": 0,
+        "clippedText": 0,
+        "halfCut": 0,
+        "shortTargets": 0,
+        "scrolling": 0
+      },
+      "geometry": {
+        "width": 1024,
+        "height": 600,
+        "dialog": {
+          "x": 152,
+          "y": 88.21875,
+          "width": 720,
+          "height": 423.5625,
+          "top": 88.21875,
+          "right": 872,
+          "bottom": 511.78125,
+          "left": 152
+        },
+        "bodies": [
+          {
+            "className": "pos-page-body",
+            "clientHeight": 436,
+            "scrollHeight": 436
+          },
+          {
+            "className": "pos-modal-body",
+            "clientHeight": 276,
+            "scrollHeight": 276
+          }
+        ],
+        "title": "박준호 팀 · 기간 연장"
+      }
+    },
+    {
+      "key": "schedule",
+      "file": "schedule-1024x600.png",
+      "rules": {
+        "smallText": 0,
+        "clippedText": 0,
+        "halfCut": 0,
+        "shortTargets": 0,
+        "scrolling": 0
+      },
+      "geometry": {
+        "width": 1024,
+        "height": 600,
+        "dialog": {
+          "x": 152,
+          "y": 57.40625,
+          "width": 720,
+          "height": 485.1875,
+          "top": 57.40625,
+          "right": 872,
+          "bottom": 542.59375,
+          "left": 152
+        },
+        "bodies": [
+          {
+            "className": "pos-page-body",
+            "clientHeight": 436,
+            "scrollHeight": 436
+          },
+          {
+            "className": "pos-modal-body",
+            "clientHeight": 337,
+            "scrollHeight": 337
+          }
+        ],
+        "title": "박준호 팀 · 수거 약속 변경"
+      }
+    },
+    {
+      "key": "problem",
+      "file": "problem-1024x600.png",
+      "rules": {
+        "smallText": 0,
+        "clippedText": 0,
+        "halfCut": 0,
+        "shortTargets": 0,
+        "scrolling": 0
+      },
+      "geometry": {
+        "width": 1024,
+        "height": 600,
+        "dialog": {
+          "x": 152,
+          "y": 55.609375,
+          "width": 720,
+          "height": 488.765625,
+          "top": 55.609375,
+          "right": 872,
+          "bottom": 544.375,
+          "left": 152
+        },
+        "bodies": [
+          {
+            "className": "pos-page-body is-cards",
+            "clientHeight": 408,
+            "scrollHeight": 408
+          },
+          {
+            "className": "pos-modal-body",
+            "clientHeight": 341,
+            "scrollHeight": 341
+          }
+        ],
+        "title": "박준호 팀 · 문제 해결·정정"
+      }
+    },
+    {
+      "key": "exchange",
+      "file": "exchange-1024x600.png",
+      "rules": {
+        "smallText": 0,
+        "clippedText": 0,
+        "halfCut": 0,
+        "shortTargets": 0,
+        "scrolling": 0
+      },
+      "geometry": {
+        "width": 1024,
+        "height": 600,
+        "dialog": {
+          "x": 152,
+          "y": 30.8125,
+          "width": 720,
+          "height": 538.375,
+          "top": 30.8125,
+          "right": 872,
+          "bottom": 569.1875,
+          "left": 152
+        },
+        "bodies": [
+          {
+            "className": "pos-page-body",
+            "clientHeight": 436,
+            "scrollHeight": 436
+          },
+          {
+            "className": "pos-modal-body",
+            "clientHeight": 390,
+            "scrollHeight": 390
+          }
+        ],
+        "title": "박준호 팀 · 교환 1개"
+      }
+    },
+    {
+      "key": "extension",
+      "file": "extension-1024x768.png",
+      "rules": {
+        "smallText": 0,
+        "clippedText": 0,
+        "halfCut": 0,
+        "shortTargets": 0,
+        "scrolling": 0
+      },
+      "geometry": {
+        "width": 1024,
+        "height": 768,
+        "dialog": {
+          "x": 152,
+          "y": 172.21875,
+          "width": 720,
+          "height": 423.5625,
+          "top": 172.21875,
+          "right": 872,
+          "bottom": 595.78125,
+          "left": 152
+        },
+        "bodies": [
+          {
+            "className": "pos-page-body",
+            "clientHeight": 604,
+            "scrollHeight": 604
+          },
+          {
+            "className": "pos-modal-body",
+            "clientHeight": 276,
+            "scrollHeight": 276
+          }
+        ],
+        "title": "박준호 팀 · 기간 연장"
+      }
+    },
+    {
+      "key": "schedule",
+      "file": "schedule-1024x768.png",
+      "rules": {
+        "smallText": 0,
+        "clippedText": 0,
+        "halfCut": 0,
+        "shortTargets": 0,
+        "scrolling": 0
+      },
+      "geometry": {
+        "width": 1024,
+        "height": 768,
+        "dialog": {
+          "x": 152,
+          "y": 141.40625,
+          "width": 720,
+          "height": 485.1875,
+          "top": 141.40625,
+          "right": 872,
+          "bottom": 626.59375,
+          "left": 152
+        },
+        "bodies": [
+          {
+            "className": "pos-page-body",
+            "clientHeight": 604,
+            "scrollHeight": 604
+          },
+          {
+            "className": "pos-modal-body",
+            "clientHeight": 337,
+            "scrollHeight": 337
+          }
+        ],
+        "title": "박준호 팀 · 수거 약속 변경"
+      }
+    },
+    {
+      "key": "problem",
+      "file": "problem-1024x768.png",
+      "rules": {
+        "smallText": 0,
+        "clippedText": 0,
+        "halfCut": 0,
+        "shortTargets": 0,
+        "scrolling": 0
+      },
+      "geometry": {
+        "width": 1024,
+        "height": 768,
+        "dialog": {
+          "x": 152,
+          "y": 139.609375,
+          "width": 720,
+          "height": 488.765625,
+          "top": 139.609375,
+          "right": 872,
+          "bottom": 628.375,
+          "left": 152
+        },
+        "bodies": [
+          {
+            "className": "pos-page-body is-cards",
+            "clientHeight": 576,
+            "scrollHeight": 576
+          },
+          {
+            "className": "pos-modal-body",
+            "clientHeight": 341,
+            "scrollHeight": 341
+          }
+        ],
+        "title": "박준호 팀 · 문제 해결·정정"
+      }
+    },
+    {
+      "key": "exchange",
+      "file": "exchange-1024x768.png",
+      "rules": {
+        "smallText": 0,
+        "clippedText": 0,
+        "halfCut": 0,
+        "shortTargets": 0,
+        "scrolling": 0
+      },
+      "geometry": {
+        "width": 1024,
+        "height": 768,
+        "dialog": {
+          "x": 152,
+          "y": 114.8125,
+          "width": 720,
+          "height": 538.375,
+          "top": 114.8125,
+          "right": 872,
+          "bottom": 653.1875,
+          "left": 152
+        },
+        "bodies": [
+          {
+            "className": "pos-page-body",
+            "clientHeight": 604,
+            "scrollHeight": 604
+          },
+          {
+            "className": "pos-modal-body",
+            "clientHeight": 390,
+            "scrollHeight": 390
+          }
+        ],
+        "title": "박준호 팀 · 교환 1개"
+      }
+    },
+    {
+      "key": "extension",
+      "file": "extension-1366x768.png",
+      "rules": {
+        "smallText": 0,
+        "clippedText": 0,
+        "halfCut": 0,
+        "shortTargets": 0,
+        "scrolling": 0
+      },
+      "geometry": {
+        "width": 1366,
+        "height": 768,
+        "dialog": {
+          "x": 323,
+          "y": 172.21875,
+          "width": 720,
+          "height": 423.5625,
+          "top": 172.21875,
+          "right": 1043,
+          "bottom": 595.78125,
+          "left": 323
+        },
+        "bodies": [
+          {
+            "className": "pos-page-body",
+            "clientHeight": 604,
+            "scrollHeight": 604
+          },
+          {
+            "className": "pos-modal-body",
+            "clientHeight": 276,
+            "scrollHeight": 276
+          }
+        ],
+        "title": "박준호 팀 · 기간 연장"
+      }
+    },
+    {
+      "key": "schedule",
+      "file": "schedule-1366x768.png",
+      "rules": {
+        "smallText": 0,
+        "clippedText": 0,
+        "halfCut": 0,
+        "shortTargets": 0,
+        "scrolling": 0
+      },
+      "geometry": {
+        "width": 1366,
+        "height": 768,
+        "dialog": {
+          "x": 323,
+          "y": 141.40625,
+          "width": 720,
+          "height": 485.1875,
+          "top": 141.40625,
+          "right": 1043,
+          "bottom": 626.59375,
+          "left": 323
+        },
+        "bodies": [
+          {
+            "className": "pos-page-body",
+            "clientHeight": 604,
+            "scrollHeight": 604
+          },
+          {
+            "className": "pos-modal-body",
+            "clientHeight": 337,
+            "scrollHeight": 337
+          }
+        ],
+        "title": "박준호 팀 · 수거 약속 변경"
+      }
+    },
+    {
+      "key": "problem",
+      "file": "problem-1366x768.png",
+      "rules": {
+        "smallText": 0,
+        "clippedText": 0,
+        "halfCut": 0,
+        "shortTargets": 0,
+        "scrolling": 0
+      },
+      "geometry": {
+        "width": 1366,
+        "height": 768,
+        "dialog": {
+          "x": 323,
+          "y": 139.609375,
+          "width": 720,
+          "height": 488.765625,
+          "top": 139.609375,
+          "right": 1043,
+          "bottom": 628.375,
+          "left": 323
+        },
+        "bodies": [
+          {
+            "className": "pos-page-body is-cards",
+            "clientHeight": 576,
+            "scrollHeight": 576
+          },
+          {
+            "className": "pos-modal-body",
+            "clientHeight": 341,
+            "scrollHeight": 341
+          }
+        ],
+        "title": "박준호 팀 · 문제 해결·정정"
+      }
+    },
+    {
+      "key": "exchange",
+      "file": "exchange-1366x768.png",
+      "rules": {
+        "smallText": 0,
+        "clippedText": 0,
+        "halfCut": 0,
+        "shortTargets": 0,
+        "scrolling": 0
+      },
+      "geometry": {
+        "width": 1366,
+        "height": 768,
+        "dialog": {
+          "x": 323,
+          "y": 114.8125,
+          "width": 720,
+          "height": 538.375,
+          "top": 114.8125,
+          "right": 1043,
+          "bottom": 653.1875,
+          "left": 323
+        },
+        "bodies": [
+          {
+            "className": "pos-page-body",
+            "clientHeight": 604,
+            "scrollHeight": 604
+          },
+          {
+            "className": "pos-modal-body",
+            "clientHeight": 390,
+            "scrollHeight": 390
+          }
+        ],
+        "title": "박준호 팀 · 교환 1개"
+      }
+    },
+    {
+      "key": "extension",
+      "file": "extension-907x648.png",
+      "rules": {
+        "smallText": 0,
+        "clippedText": 0,
+        "halfCut": 0,
+        "shortTargets": 0,
+        "scrolling": 0
+      },
+      "geometry": {
+        "width": 907,
+        "height": 648,
+        "dialog": {
+          "x": 93.5,
+          "y": 112.21875,
+          "width": 720,
+          "height": 423.5625,
+          "top": 112.21875,
+          "right": 813.5,
+          "bottom": 535.78125,
+          "left": 93.5
+        },
+        "bodies": [
+          {
+            "className": "pos-page-body",
+            "clientHeight": 484,
+            "scrollHeight": 484
+          },
+          {
+            "className": "pos-modal-body",
+            "clientHeight": 276,
+            "scrollHeight": 276
+          }
+        ],
+        "title": "박준호 팀 · 기간 연장"
+      }
+    },
+    {
+      "key": "schedule",
+      "file": "schedule-907x648.png",
+      "rules": {
+        "smallText": 0,
+        "clippedText": 0,
+        "halfCut": 0,
+        "shortTargets": 0,
+        "scrolling": 0
+      },
+      "geometry": {
+        "width": 907,
+        "height": 648,
+        "dialog": {
+          "x": 93.5,
+          "y": 81.40625,
+          "width": 720,
+          "height": 485.1875,
+          "top": 81.40625,
+          "right": 813.5,
+          "bottom": 566.59375,
+          "left": 93.5
+        },
+        "bodies": [
+          {
+            "className": "pos-page-body",
+            "clientHeight": 484,
+            "scrollHeight": 484
+          },
+          {
+            "className": "pos-modal-body",
+            "clientHeight": 337,
+            "scrollHeight": 337
+          }
+        ],
+        "title": "박준호 팀 · 수거 약속 변경"
+      }
+    },
+    {
+      "key": "problem",
+      "file": "problem-907x648.png",
+      "rules": {
+        "smallText": 0,
+        "clippedText": 0,
+        "halfCut": 0,
+        "shortTargets": 0,
+        "scrolling": 0
+      },
+      "geometry": {
+        "width": 907,
+        "height": 648,
+        "dialog": {
+          "x": 93.5,
+          "y": 79.609375,
+          "width": 720,
+          "height": 488.765625,
+          "top": 79.609375,
+          "right": 813.5,
+          "bottom": 568.375,
+          "left": 93.5
+        },
+        "bodies": [
+          {
+            "className": "pos-page-body is-cards",
+            "clientHeight": 456,
+            "scrollHeight": 456
+          },
+          {
+            "className": "pos-modal-body",
+            "clientHeight": 341,
+            "scrollHeight": 341
+          }
+        ],
+        "title": "박준호 팀 · 문제 해결·정정"
+      }
+    },
+    {
+      "key": "exchange",
+      "file": "exchange-907x648.png",
+      "rules": {
+        "smallText": 0,
+        "clippedText": 0,
+        "halfCut": 0,
+        "shortTargets": 0,
+        "scrolling": 0
+      },
+      "geometry": {
+        "width": 907,
+        "height": 648,
+        "dialog": {
+          "x": 93.5,
+          "y": 54.8125,
+          "width": 720,
+          "height": 538.375,
+          "top": 54.8125,
+          "right": 813.5,
+          "bottom": 593.1875,
+          "left": 93.5
+        },
+        "bodies": [
+          {
+            "className": "pos-page-body",
+            "clientHeight": 484,
+            "scrollHeight": 484
+          },
+          {
+            "className": "pos-modal-body",
+            "clientHeight": 390,
+            "scrollHeight": 390
+          }
+        ],
+        "title": "박준호 팀 · 교환 1개"
+      }
+    },
+    {
+      "key": "extension",
+      "file": "extension-875x600.png",
+      "rules": {
+        "smallText": 0,
+        "clippedText": 0,
+        "halfCut": 0,
+        "shortTargets": 0,
+        "scrolling": 0
+      },
+      "geometry": {
+        "width": 875,
+        "height": 600,
+        "dialog": {
+          "x": 77.5,
+          "y": 88.21875,
+          "width": 720,
+          "height": 423.5625,
+          "top": 88.21875,
+          "right": 797.5,
+          "bottom": 511.78125,
+          "left": 77.5
+        },
+        "bodies": [
+          {
+            "className": "pos-page-body",
+            "clientHeight": 436,
+            "scrollHeight": 436
+          },
+          {
+            "className": "pos-modal-body",
+            "clientHeight": 276,
+            "scrollHeight": 276
+          }
+        ],
+        "title": "박준호 팀 · 기간 연장"
+      }
+    },
+    {
+      "key": "schedule",
+      "file": "schedule-875x600.png",
+      "rules": {
+        "smallText": 0,
+        "clippedText": 0,
+        "halfCut": 0,
+        "shortTargets": 0,
+        "scrolling": 0
+      },
+      "geometry": {
+        "width": 875,
+        "height": 600,
+        "dialog": {
+          "x": 77.5,
+          "y": 57.40625,
+          "width": 720,
+          "height": 485.1875,
+          "top": 57.40625,
+          "right": 797.5,
+          "bottom": 542.59375,
+          "left": 77.5
+        },
+        "bodies": [
+          {
+            "className": "pos-page-body",
+            "clientHeight": 436,
+            "scrollHeight": 436
+          },
+          {
+            "className": "pos-modal-body",
+            "clientHeight": 337,
+            "scrollHeight": 337
+          }
+        ],
+        "title": "박준호 팀 · 수거 약속 변경"
+      }
+    },
+    {
+      "key": "problem",
+      "file": "problem-875x600.png",
+      "rules": {
+        "smallText": 0,
+        "clippedText": 0,
+        "halfCut": 0,
+        "shortTargets": 0,
+        "scrolling": 0
+      },
+      "geometry": {
+        "width": 875,
+        "height": 600,
+        "dialog": {
+          "x": 77.5,
+          "y": 55.609375,
+          "width": 720,
+          "height": 488.765625,
+          "top": 55.609375,
+          "right": 797.5,
+          "bottom": 544.375,
+          "left": 77.5
+        },
+        "bodies": [
+          {
+            "className": "pos-page-body is-cards",
+            "clientHeight": 408,
+            "scrollHeight": 408
+          },
+          {
+            "className": "pos-modal-body",
+            "clientHeight": 341,
+            "scrollHeight": 341
+          }
+        ],
+        "title": "박준호 팀 · 문제 해결·정정"
+      }
+    },
+    {
+      "key": "exchange",
+      "file": "exchange-875x600.png",
+      "rules": {
+        "smallText": 0,
+        "clippedText": 0,
+        "halfCut": 0,
+        "shortTargets": 0,
+        "scrolling": 0
+      },
+      "geometry": {
+        "width": 875,
+        "height": 600,
+        "dialog": {
+          "x": 77.5,
+          "y": 30.8125,
+          "width": 720,
+          "height": 538.375,
+          "top": 30.8125,
+          "right": 797.5,
+          "bottom": 569.1875,
+          "left": 77.5
+        },
+        "bodies": [
+          {
+            "className": "pos-page-body",
+            "clientHeight": 436,
+            "scrollHeight": 436
+          },
+          {
+            "className": "pos-modal-body",
+            "clientHeight": 390,
+            "scrollHeight": 390
+          }
+        ],
+        "title": "박준호 팀 · 교환 1개"
+      }
+    }
+  ],
+  "errors": [],
+  "writes": []
+}

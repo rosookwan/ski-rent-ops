@@ -6,7 +6,7 @@ from html import escape
 
 ROOT = Path(__file__).resolve().parents[1]
 APP = ROOT / 'design/app'
-MODULES = ['data.js', 'core.js', 'operations.js', 'return-runtime.js', 'guide.js', 'returns.js', 'login.js', 'notifications.js', 'workflow-runtime.js', 'workflow-ui.js', 'workflow-preparation.js', 'app-mode.js', 'pos-shell.js', 'pos-runtime.js', 'pos-orders.js', 'pos-finance.js', 'pos-fulfillment-view.js', 'pos-fulfillment.js', 'pos-tickets.js', 'pos-management.js', 'pos-dispatch.js', 'pos-connection.js', 'pos-preinput.js', 'pos-notifications.js', 'pos-keypad.js']
+MODULES = ['data.js', 'core.js', 'operations.js', 'return-runtime.js', 'guide.js', 'returns.js', 'login.js', 'notifications.js', 'workflow-runtime.js', 'workflow-ui.js', 'workflow-preparation.js', 'app-mode.js', 'pos-shell.js', 'pos-runtime.js', 'pos-orders.js', 'pos-finance.js', 'pos-fulfillment-view.js', 'pos-adjustment-forms.js', 'pos-problem-picker.js', 'pos-fulfillment.js', 'pos-tickets.js', 'pos-management.js', 'pos-dispatch.js', 'pos-connection.js', 'pos-preinput.js', 'pos-notifications.js', 'pos-keypad.js']
 RETURN_MODULES = ['domain.js', 'service.js', 'client.js', 'demo.js']
 WORKFLOW_MODULES = ['common.js', 'reservations.js', 'inventory.js', 'dispatch.js', 'intake.js', 'documents.js', 'exchanges.js', 'early-returns.js', 'orders.js', 'migration.js', 'finance.js', 'management.js', 'order-operations.js', 'order-documents.js', 'ticket-operations.js', 'domain.js', 'service.js', 'client.js', 'demo.js']
 PWA_FILES = {
@@ -36,7 +36,7 @@ def build():
     for name in WORKFLOW_MODULES:
         fragment += '<script>\n' + (ROOT / 'src/workflows' / name).read_text() + '\n</script>\n'
     fragment += '<style>\n' + (APP / 'workflows.css').read_text() + '\n' + (APP / 'app-mode.css').read_text() + '\n</style>\n'
-    for name in ['pos-shell.css', 'pos-orders.css', 'pos-fulfillment.css', 'pos-keypad.css', 'pos-management.css']:
+    for name in ['pos-shell.css', 'pos-orders.css', 'pos-fulfillment.css', 'pos-adjustments.css', 'pos-keypad.css', 'pos-management.css']:
         if (APP / name).exists():
             fragment += '<style>\n' + (APP / name).read_text() + '\n</style>\n'
     for name in MODULES:

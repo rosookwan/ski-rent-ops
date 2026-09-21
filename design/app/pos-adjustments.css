@@ -1,0 +1,26 @@
+#ski-ops[data-pos="true"] #so-dialog:has(.pos-a2-form){width:min(720px,calc(100% - 48px))}
+#ski-ops[data-pos="true"] #so-dialog:has(.pos-a2-form) .so-dialog-heading{padding:16px 24px 0}
+#ski-ops[data-pos="true"] #so-dialog:has(.pos-a2-form) #so-dialog-body{padding:0 24px 16px;gap:8px}
+#ski-ops[data-pos="true"] #so-dialog:has(.pos-a2-form) .pos-modal-body{gap:8px}
+#ski-ops[data-pos="true"] #so-dialog:has(.pos-a2-form) .pos-modal-sub{margin:0}
+#ski-ops[data-pos="true"] #so-dialog:has(.pos-a2-form) .pos-modal-footer{min-height:56px;padding:0}
+#ski-ops[data-pos="true"] .pos-a2-form{display:flex;flex-direction:column;flex-shrink:0;gap:12px;min-width:0;min-height:0}
+#ski-ops[data-pos="true"] .pos-modal-body:has(.pos-error:not([hidden])) .pos-a2-exchange .pos-a2-summary{display:none}
+#ski-ops[data-pos="true"] .pos-a2-options{display:flex;align-items:center;gap:8px;flex:1;min-width:0}
+#ski-ops[data-pos="true"] .pos-a2-options>.pos-button{flex:1;min-width:0;padding:0 12px}
+#ski-ops[data-pos="true"] .pos-a2-options .pos-option span,#ski-ops[data-pos="true"] .pos-a2-choice-grid .pos-option span{display:block;white-space:nowrap;overflow:hidden;min-width:0}
+#ski-ops[data-pos="true"] .pos-a2-summary{display:flex;flex-direction:column;gap:8px;margin:0;padding:12px 16px;background:var(--so-bg);border-radius:10px}
+#ski-ops[data-pos="true"] .pos-a2-summary>div{display:flex;align-items:center;gap:12px;min-width:0}
+#ski-ops[data-pos="true"] .pos-a2-summary dt{flex:0 0 90px;color:var(--so-muted);font-size:var(--pos-fs-min)}
+#ski-ops[data-pos="true"] .pos-a2-summary dd{min-width:0;margin:0;font-weight:700;font-size:var(--pos-fs-body);white-space:nowrap;overflow:hidden}
+#ski-ops[data-pos="true"] .pos-a2-tools{display:flex;align-items:center;gap:12px;color:var(--so-muted)}
+#ski-ops[data-pos="true"] .pos-a2-size-head{display:flex;align-items:center;gap:12px}
+#ski-ops[data-pos="true"] .pos-a2-size-head>span{color:var(--so-muted)}
+#ski-ops[data-pos="true"] .pos-a2-size-head>.pos-button{margin-left:auto}
+#ski-ops[data-pos="true"] .pos-a2-size-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+#ski-ops[data-pos="true"] .pos-a2-size-grid>.pos-button{min-width:0;min-height:64px;padding:0 8px}
+#ski-ops[data-pos="true"] .pos-a2-size-grid>.pos-option{font-size:var(--pos-fs-title);font-weight:700}
+#ski-ops[data-pos="true"] .pos-a2-choice-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;min-width:0}
+#ski-ops[data-pos="true"] .pos-a2-choice-grid>.pos-button{min-width:0;padding:0 12px}
+#ski-ops[data-pos="true"] .pos-a2-problem>strong{font-size:var(--pos-fs-body)}
+#ski-ops[data-pos="true"] .pos-a2-problem-note{padding:12px 16px;background:var(--so-bg);border-radius:10px;font-size:var(--pos-fs-min);color:var(--so-muted)}

@@ -1,0 +1,186 @@
+{
+  "checks": [
+    "direct issue and full direct return use actual custody; full return takes two clicks and no typing",
+    "next-day additions stay unissued and partial return affects only the chosen repeated-SKU line",
+    "one order collected in two vehicles is received together without moving unrelated vehicle assets",
+    "a changed revision rejects stale confirmation with all current data unchanged",
+    "a returned asset reused by a later line is returned only for that later issue",
+    "500 order lines paginate without losing quantity selections or scrolling at 600 and 768 pixels",
+    "payment from the issue window preserves selected quantities and cancel returns without writing",
+    "reducing a full return changes the confirmation to partial and leaves the other asset with the customer",
+    "physical size preparation is saved and the same bound asset is issued",
+    "quantity detail retains per-line full selection and preparation without a second confirmation overlay",
+    "cancelling an unissued prepared item leads to preparation release before cancelling only that item",
+    "dispatch uses selected quantities and vehicle 2; cancellation unloads before cancelling the unissued line",
+    "period extension and collection rescheduling change only the chosen line",
+    "lost stock is excluded from normal return and found confirmation restores it to inspection",
+    "shop exchange records preparation, new delivery and old receipt before the replacement returns normally",
+    "actual ticket issuance is separately recorded then the bound ticket is delivered",
+    "a partial receipt correction allows the same selected quantity to be restored through its earlier collection",
+    "exchange-specific correction reverses old receipt then new delivery and permits cancelling the restored request",
+    "partial return extends only the one remaining customer asset with its own period and extra charge",
+    "A2 calendar recalculates extension and nested edits preserve the original revision",
+    "A2 next-morning selection applies the day offset once and saves only the chosen collection line",
+    "A2 paged problem selection records loss only after the existing asset confirmation",
+    "A2 quantity correction includes a fully returned line and keeps whole-order money and cancellation routes",
+    "A2 registered sizes and component confirmation lead to a vehicle request without moving any equipment"
+  ],
+  "layouts": [
+    {
+      "name": "issue-600",
+      "width": 1024,
+      "height": 600,
+      "outside": [],
+      "scroll": []
+    },
+    {
+      "name": "return-confirm-600",
+      "width": 1024,
+      "height": 600,
+      "outside": [],
+      "scroll": []
+    },
+    {
+      "name": "multi-vehicle-confirm-600",
+      "width": 1024,
+      "height": 600,
+      "outside": [],
+      "scroll": []
+    },
+    {
+      "name": "stale-error-600",
+      "width": 1024,
+      "height": 600,
+      "outside": [],
+      "scroll": []
+    },
+    {
+      "name": "500-lines-page-2-600",
+      "width": 1024,
+      "height": 600,
+      "outside": [],
+      "scroll": []
+    },
+    {
+      "name": "500-lines-768",
+      "width": 1024,
+      "height": 768,
+      "outside": [],
+      "scroll": []
+    },
+    {
+      "name": "issue-after-payment-600",
+      "width": 1024,
+      "height": 600,
+      "outside": [],
+      "scroll": []
+    },
+    {
+      "name": "preparation-confirm-600",
+      "width": 1024,
+      "height": 600,
+      "outside": [],
+      "scroll": []
+    },
+    {
+      "name": "dispatch-confirm-600",
+      "width": 1024,
+      "height": 600,
+      "outside": [],
+      "scroll": []
+    },
+    {
+      "name": "extension-600",
+      "width": 1024,
+      "height": 600,
+      "outside": [],
+      "scroll": []
+    },
+    {
+      "name": "schedule-600",
+      "width": 1024,
+      "height": 600,
+      "outside": [],
+      "scroll": []
+    },
+    {
+      "name": "lost-confirm-600",
+      "width": 1024,
+      "height": 600,
+      "outside": [],
+      "scroll": []
+    },
+    {
+      "name": "exchange-request-600",
+      "width": 1024,
+      "height": 600,
+      "outside": [],
+      "scroll": []
+    },
+    {
+      "name": "exchange-flow-600",
+      "width": 1024,
+      "height": 600,
+      "outside": [],
+      "scroll": []
+    },
+    {
+      "name": "ticket-issue-600",
+      "width": 1024,
+      "height": 600,
+      "outside": [],
+      "scroll": []
+    },
+    {
+      "name": "partial-correction-600",
+      "width": 1024,
+      "height": 600,
+      "outside": [],
+      "scroll": []
+    },
+    {
+      "name": "partial-extension-600",
+      "width": 1024,
+      "height": 600,
+      "outside": [],
+      "scroll": []
+    },
+    {
+      "name": "a2-extension-calendar-600",
+      "width": 1024,
+      "height": 600,
+      "outside": [],
+      "scroll": []
+    },
+    {
+      "name": "a2-extension-stale-600",
+      "width": 1024,
+      "height": 600,
+      "outside": [],
+      "scroll": []
+    },
+    {
+      "name": "a2-problem-page-2-600",
+      "width": 1024,
+      "height": 600,
+      "outside": [],
+      "scroll": []
+    },
+    {
+      "name": "a2-exchange-missing-size-600",
+      "width": 1024,
+      "height": 600,
+      "outside": [],
+      "scroll": []
+    },
+    {
+      "name": "a2-exchange-visit-600",
+      "width": 1024,
+      "height": 600,
+      "outside": [],
+      "scroll": []
+    }
+  ],
+  "errors": [],
+  "writes": []
+}

@@ -140,10 +140,10 @@
     } catch (reason) { error(reason); }
     finally { operation.busy = false; controls.forEach(el => { el.disabled = false; }); }
   }
-  function request(title, body, type, payload, done, confirmLabel = '확인하고 저장') {
+  function request(title, body, type, payload, done, confirmLabel = '확인하고 저장', sub = '') {
     const resume = state.operation?.modal && !!S.$('#so-dialog[open] .pos-fulfillment-picker');
     state.request = { revision: D.snapshot.revision, type, payload, done, busy: false };
-    P.modal(title, body + errorBox(), button('취소', resume ? 'pos-fulfillment-request-cancel' : 'close') + button(confirmLabel, 'pos-fulfillment-save', '', 'primary'));
+    P.modal(title, body + errorBox(), button('취소', resume ? 'pos-fulfillment-request-cancel' : 'close') + button(confirmLabel, 'pos-fulfillment-save', '', 'primary'), sub);
   }
   S.action('pos-fulfillment-request-cancel', () => { state.request = null; renderOperation(); });
   S.action('pos-fulfillment-save', async () => {
@@ -171,27 +171,18 @@
     return line.customerAssetIds.length ? line.customerAssetIds.map(id => (line.assetTerms || []).find(term => term.assetId === id)?.end || line.end) : Array(line.unissuedQuantity).fill(line.end);
   }
   function extensionAmount(line, end) { return extensionTerms(line).reduce((sum, previous) => sum + Math.max(0, (Date.parse(end) - Date.parse(previous)) / 86400000) * line.price.unitWon, 0); }
+  const formServices = () => ({ request, state, error, errorBox, get vehicleNames() { return vehicleOptions(); }, vehicleName });
   S.action('pos-extend-line', id => {
-    const order = currentOrder(), line = order.lines.find(line => line.id === id), terms = extensionTerms(line), lastEnd = terms.slice().sort().at(-1) || line.end, end = window.SkiWorkflowCommon.nextDate(lastEnd);
-    request(line.customerQuantity ? '남은 ' + line.customerQuantity + '개만 이용 연장' : '이 미지급 품목의 이용 기간 연장', '<div class="pos-info"><strong>' + e(label(line)) + ' · ' + terms.length + '개</strong><p>현재 이용 종료 ' + e([...new Set(terms)].join(' / ')) + ' → 아래 선택일까지</p></div><div class="pos-form-grid">'
-      + O.input('새 이용 종료일', 'fulfillment-end', end, 'date', 'min="' + end + '" data-change="pos-extension-date"')
-      + O.input('이번 추가 청구액 (원)', 'fulfillment-amount', extensionAmount(line, end), 'number', 'min="0" inputmode="numeric"') + '</div>'
-      + reasonSelect(['고객 요청 기간 연장', '접수 시 이용 기간 누락']) + '<p class="pos-label">반납한 실물의 기간은 유지합니다. 남은 이용분의 추가 일수만 별도로 청구합니다.</p>', 'ops.extend',
-      () => ({ orderId: order.id, lineIds: [line.id], end: O.read('fulfillment-end'), amountWon: Number(O.read('fulfillment-amount')), reason: readReason() }));
-    state.request.line = line;
-  });
-  S.change('pos-extension-date', value => {
-    const line = state.request?.line, input = S.$('[data-pos-input="fulfillment-amount"]');
-    if (line && input) input.value = extensionAmount(line, value);
+    const order = currentOrder(), line = order.lines.find(line => line.id === id);
+    S.posAdjustmentForms.extension(order, line, extensionTerms(line), end => extensionAmount(line, end), formServices());
   });
   S.action('pos-schedule-line', id => {
     const order = currentOrder(), line = order.lines.find(line => line.id === id), plan = line.returnPlan;
     const task = orderTasks(order).find(task => active(task) && task.kind === 'collection' && task.assetIds.some(id => line.customerAssetIds.includes(id)));
-    request('수거 날짜·장소·차량 변경', '<div class="pos-info"><strong>' + e(label(line)) + ' · 고객 보유 ' + line.customerQuantity + '개</strong><p>선택한 품목의 남은 수거 약속만 바꿉니다.</p></div><div class="pos-form-grid">'
-      + O.input('수거일', 'fulfillment-date', task?.date || plan.date, 'date') + O.input('수거 시각', 'fulfillment-time', task?.time || plan.time || '18:00', 'time')
-      + O.input('수거 장소', 'fulfillment-place', task?.place || (plan.method === 'vehicle' ? plan.place : S.operations.store().place))
-      + O.select('담당 차량', 'fulfillment-vehicle', [['', '차량 선택'], ...vehicleOptions()], task?.vehicleId || plan.vehicleId || '') + '</div>', 'ops.schedule',
-      () => ({ orderId: order.id, lineItems: [{ lineId: id, assetIds: line.customerAssetIds }], date: O.read('fulfillment-date'), time: O.read('fulfillment-time'), place: O.read('fulfillment-place'), vehicleId: O.read('fulfillment-vehicle') }));
+    S.posAdjustmentForms.appointment({ order, line, title: '수거 약속 변경', command: 'ops.schedule',
+      values: { date: task?.date || plan.date, time: task?.time || plan.time || '18:00', place: task?.place || (plan.method === 'vehicle' ? plan.place : S.operations.store().place), vehicleId: task?.vehicleId || plan.vehicleId || '' },
+      fields: { date: 'fulfillment-date', time: 'fulfillment-time', place: 'fulfillment-place', vehicleId: 'fulfillment-vehicle' },
+      payload: d => ({ orderId: order.id, lineItems: [{ lineId: id, assetIds: line.customerAssetIds }], date: d.date, time: d.time, place: d.place, vehicleId: d.vehicleId }) }, formServices());
   });
   const movementNames = { load: '차량 적재', deliver: '고객 지급', collect: '차량 수거', receive: '매장 입고', directReturn: '직접 반납', opening: '이관 보관 확인', stock: '재고 입고', ticketIssue: '발권', refund: '발권처 환불' };
   const locationName = location => !location ? '기록' : location.kind === 'vehicle' ? vehicleName(location.id) : { customer: '고객', shop: '매장', vendor: '발권처' }[location.kind] || location.kind;
@@ -237,7 +228,10 @@
       + P.pager(rows, 'problem-' + state.problemTab, renderRow, innerHeight < 700 ? 2 : 4) + errorBox(), '<div>' + O.go('고객 상세로', 'order-detail', order.id) + '</div>'
       + (state.historyAssetIds ? button('접수 전체 이력 보기', 'pos-history-all') : '<span>금액 정정은 고객 상세의 수납·환불에서 처리합니다.</span>'));
   }
-  S.action('pos-problems', id => { state.problemTab = 'history'; state.historyAssetIds = null; S.go('order-problems', { id }); });
+  function problemRecords(id, tab = 'history', line) { state.problemTab = tab; state.historyAssetIds = line ? [...line.customerAssetIds, ...line.vehicleAssetIds, ...line.unknownAssetIds, ...line.shopAssetIds] : null; S.go('order-problems', { id }); }
+  S.action('pos-problems', id => S.posProblemPicker.open(currentOrder(id), {
+    records: problemRecords, assets: (lineId, condition) => { state.assetLineId = lineId; state.assetCondition = condition; S.go('order-assets', { id }); }, lineAssets,
+  }));
   S.action('pos-problem-tab', tab => { state.problemTab = tab; S.render(); });
   S.action('pos-history-all', () => { state.historyAssetIds = null; S.render(); });
   S.action('pos-movement-dependencies', id => {
@@ -299,12 +293,12 @@
         asset.id + ' · ' + (asset.condition === 'lost' ? '마지막 확인 ' : '') + locationName(asset.location),
         button(asset.condition === 'lost' ? '실물 발견·매장 확인' : '상태·분실 기록', asset.condition === 'lost' ? 'pos-found-asset' : 'pos-condition-asset', asset.id)), innerHeight < 700 ? 3 : 4), O.go('문제 해결로', 'order-problems', order.id));
   }
-  S.action('pos-asset-problem', id => { state.assetLineId = id; S.go('order-assets', { id: currentOrder().id }); });
+  S.action('pos-asset-problem', id => { state.assetLineId = id; state.assetCondition = null; S.go('order-assets', { id: currentOrder().id }); });
   S.action('pos-condition-asset', id => {
     const asset = D.snapshot.assets.find(asset => asset.id === id);
     request('현재 물품의 상태 기록', '<div class="pos-info"><strong>' + e(id) + '</strong><p>' + e(locationName(asset.location) + ' · ' + (asset.size || '규격 미기록')) + '</p></div><div class="pos-form-grid">'
-      + O.select('확인한 상태', 'fulfillment-condition', [['inspection', '점검 필요'], ['cleaning', '세척 필요'], ['repair', '파손·수리 필요'], ['lost', '실물 분실']], 'inspection')
-      + reasonSelect(['실물 점검 중 이상 확인', '반납 물품 오염', '고객 파손 신고', '고객 분실 신고', '수거 물품 부족 확인']) + '</div><p class="pos-label">보관 위치는 유지됩니다. 분실은 정상 반납으로 처리하지 않으며, 발견 시 별도로 확인합니다.</p>',
+      + O.select('확인한 상태', 'fulfillment-condition', [['inspection', '점검 필요'], ['cleaning', '세척 필요'], ['repair', '파손·수리 필요'], ['lost', '실물 분실']], state.assetCondition || 'inspection')
+      + reasonSelect(['실물 점검 중 이상 확인', '반납 물품 오염', '고객 파손 신고', '고객 분실 신고', '수거 물품 부족 확인'], { repair: '고객 파손 신고', lost: '고객 분실 신고' }[state.assetCondition]) + '</div><p class="pos-label">보관 위치는 유지됩니다. 분실은 정상 반납으로 처리하지 않으며, 발견 시 별도로 확인합니다.</p>',
       'management.asset', () => ({ assetIds: [id], condition: O.read('fulfillment-condition'), reason: readReason() }));
   });
   S.action('pos-found-asset', id => request('분실품 실물을 매장에서 확인했나요?', '<div class="pos-info"><strong>' + e(id) + '</strong><p>발견한 실물을 매장 점검 대기로 기록합니다. 정상 재고 복귀는 점검 후 처리합니다.</p></div>'
@@ -319,13 +313,7 @@
     const assets = lineAssets(order, line).filter(asset => asset.location.kind === 'customer' && asset.condition !== 'lost' && !asset.exchangeReservationId);
     if (!assets.length) { error('현재 고객이 보유한 교환 가능 장비를 먼저 확인해 주세요.'); return; }
     state.exchange = { orderId: order.id, lineId, assets, revision: D.snapshot.revision };
-    P.modal('교환할 실물·규격 확인', '<div class="pos-form-grid">'
-      + O.select('현재 고객 장비', 'exchange-base', assets.map(asset => [asset.id, (asset.size || '규격 미기록') + ' · ' + asset.id]), assets[0].id)
-      + O.select('교환 품목', 'exchange-kind', exchangeKinds(line.sku), line.sku)
-      + O.input('현재 규격', 'exchange-old-size', assets[0].size || '', 'text', 'maxlength="24"') + O.input('새 규격', 'exchange-new-size', '', 'text', 'maxlength="24"')
-      + O.select('교환 사유', 'exchange-reason', [['size', '사이즈 변경'], ['damage', '파손 교체']], 'size')
-      + O.select('교환 방법', 'exchange-method', [['shop', '매장에서 교환'], ['vehicle', '차량으로 교환']], 'shop') + '</div><p class="pos-label">부츠·폴대는 현재 대여 세트에 포함된 실물을 확인한 뒤 선택하세요.</p>' + errorBox(),
-      button('취소', 'close') + button('교환 내용 확인', 'pos-exchange-request-review', '', 'primary'));
+    S.posAdjustmentForms.exchange(state.exchange, exchangeKinds(line.sku), formServices());
   }
   S.action('pos-exchange-start', exchangeStart);
   S.action('pos-exchange-request-review', () => {
@@ -342,11 +330,10 @@
       draft.payload = payload;
       const after = result => { state.exchangeId = result.exchangeId; S.go('order-exchange', { id: order.id }); };
       if (payload.method === 'vehicle') {
-        request('교환 방문 약속', '<div class="pos-info"><strong>' + e(oldSize + ' → ' + newSize) + '</strong><p>새 장비 전달과 기존 장비 수거를 각각 기록합니다.</p></div><div class="pos-form-grid">'
-          + O.input('방문일', 'exchange-date', D.today, 'date') + O.input('방문 시각', 'exchange-time', '18:00', 'time')
-          + O.input('방문 장소', 'exchange-place', line.returnPlan.method === 'vehicle' ? line.returnPlan.place : S.operations.store().place)
-          + O.select('담당 차량', 'exchange-vehicle', [['', '차량 선택'], ...vehicleOptions()], line.returnPlan.vehicleId || '') + '</div>', 'exchange.request',
-          () => ({ ...payload, visit: { method: 'vehicle', date: O.read('exchange-date'), time: O.read('exchange-time'), place: O.read('exchange-place'), vehicleId: O.read('exchange-vehicle') } }), after, '교환 방문 요청 생성');
+        S.posAdjustmentForms.appointment({ order, line, title: '교환 방문 약속', command: 'exchange.request', done: after, confirmLabel: '교환 방문 요청 생성',
+          values: { date: D.today, time: '18:00', place: line.returnPlan.method === 'vehicle' ? line.returnPlan.place : S.operations.store().place, vehicleId: line.returnPlan.vehicleId || '' },
+          fields: { date: 'exchange-date', time: 'exchange-time', place: 'exchange-place', vehicleId: 'exchange-vehicle' },
+          payload: d => ({ ...payload, visit: { method: 'vehicle', date: d.date, time: d.time, place: d.place, vehicleId: d.vehicleId } }) }, formServices());
       } else request('매장 교환 요청 확인', '<div class="pos-confirm-summary"><strong>' + e(label(line)) + ' · 1개</strong><span>규격 ' + e(oldSize + ' → ' + newSize) + '</span><span>새 장비 준비 → 지급 · 기존 장비 받음</span></div>', 'exchange.request', payload, after, '매장 교환 요청 생성');
     } catch (reason) { error(reason); }
   });
