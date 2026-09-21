@@ -1,0 +1,140 @@
+{
+  "project": "ski-rent-ops · 스키노트 POS",
+  "library": "design/higgsfield/pos-settings-v1",
+  "workspace": {
+    "id": "a3cca891-ff82-4041-9d9a-0584cef69319",
+    "type": "private",
+    "name": null,
+    "note": "개인 워크스페이스 그대로(별도 선택 없음)."
+  },
+  "generation": {
+    "model": "gpt_image_2_5",
+    "variant": "flare",
+    "quality": "high",
+    "resolution": "2k",
+    "aspect_ratio": "27:16",
+    "output": "2592×1536",
+    "creditsPerImage": 3
+  },
+  "anchors": {
+    "settings": "M06 (pos-rest-v1)",
+    "intake": "P12 (pos-rest-v1)",
+    "popup": "P20 · P21 (pos-rest-v1)",
+    "note": "새 기준 화면 없이, 이미 검수한 화면의 job id를 image_references로 넘겼다."
+  },
+  "review": {
+    "date": "2026-09-21",
+    "method": "미리보기로 구조·문구 확인 + 실제 크기 검사(fit-check/)",
+    "regenerated": 0,
+    "policy": "구조 결함 없음. 한 낱말 오기와 작은 글자는 기록만 하고 다시 뽑지 않음(크레딧 절약)."
+  },
+  "fitCheck": {
+    "page": "fit-check/index.html",
+    "script": "fit-check/measure.cjs",
+    "result": "접수 확정 창 549px · 수령 장소 창 542px — 1024×600의 창 한도 552px 안. 1024×600 · 1024×768에서 잘림 0. 907×648에서는 반납 타임 5칸의 이름표가 4px 넘침 → 폭이 모자라면 앞 3개 + `더 보기`로 바꾼다."
+  },
+  "final": [
+    {
+      "code": "S01",
+      "title": "관리 · 매장 설정 · 수령 장소(구역별)",
+      "file": "s01-settings-places.png",
+      "preview": "s01-settings-places.jpg",
+      "job_id": "30fa1160-83de-460f-ba07-7493c443c4a0",
+      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J2y32mXmk1jhAd5qmEsy69365Q/hf_20260921_054015_30fa1160-83de-460f-ba07-7493c443c4a0.png",
+      "references": [
+        "M06",
+        "M01"
+      ],
+      "verdict": "통과",
+      "review": "구역 칩(만선 5 · 설천 4 · 기타 3 · 구역 추가) 아래에 고른 구역의 장소만 행으로 보인다. 왼쪽 탭 8개(할인 추가), 하단에 `스키장 템플릿` · `장소 추가`. 레일 7개 · 헤더 완전. 샘플 표기: `매장 정보` 옆 숫자 0은 요청에 없던 값(기록만).",
+      "regenerations": 0
+    },
+    {
+      "code": "S02",
+      "title": "팝업 · 스키장 템플릿",
+      "file": "s02-popup-resort-template.png",
+      "preview": "s02-popup-resort-template.jpg",
+      "job_id": "fe3902a9-4ee4-4300-8d51-4c7b9701becc",
+      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J2y32mXmk1jhAd5qmEsy69365Q/hf_20260921_054015_fe3902a9-4ee4-4300-8d51-4c7b9701becc.png",
+      "references": [
+        "M06",
+        "P20"
+      ],
+      "verdict": "통과",
+      "review": "왼쪽에서 스키장을 고르면 오른쪽에 채워지는 값(구역 · 수령 장소 · 반납 타임 · 리프트권 권종)이 보인다. `요금과 할인은 바뀌지 않습니다` · `이미 있는 값은 지우지 않고 없는 항목만 추가합니다` 안내 포함. 어두운 배경(부모 화면)의 레일 오탈자는 배경이라 기록만.",
+      "regenerations": 0
+    },
+    {
+      "code": "S04",
+      "title": "관리 · 매장 설정 · 할인",
+      "file": "s04-settings-discounts.png",
+      "preview": "s04-settings-discounts.jpg",
+      "job_id": "f5d681c6-711d-4077-9d2b-d94c7c9f49af",
+      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J2y32mXmk1jhAd5qmEsy69365Q/hf_20260921_054015_f5d681c6-711d-4077-9d2b-d94c7c9f49af.png",
+      "references": [
+        "M06",
+        "M01"
+      ],
+      "verdict": "통과",
+      "review": "할인 종류 칩 3개(장비당 · 장비 전체 · 리프트권) 아래에 규칙 행. 장비당 할인은 품목마다 금액(스키 −5,000원 등)을 가진다. 안내 줄 `접수 확정 창의 할인 버튼으로 나옵니다 · 리프트권은 따로 계산`.",
+      "regenerations": 0
+    },
+    {
+      "code": "S05",
+      "title": "새 접수 · 3 일정·장소 (구역 · 반납 타임 4개)",
+      "file": "s05-intake-schedule-areas.png",
+      "preview": "s05-intake-schedule-areas.jpg",
+      "job_id": "72984a5c-2110-4942-895a-bc34673af496",
+      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J2y32mXmk1jhAd5qmEsy69365Q/hf_20260921_054015_72984a5c-2110-4942-895a-bc34673af496.png",
+      "references": [
+        "P12",
+        "P01"
+      ],
+      "verdict": "통과(메모)",
+      "review": "수령 장소는 `매장 수령` + 구역 버튼(만선 · 설천 · 기타)만 보이고, 고른 구역 버튼은 두 줄(`만선` / `티롤 앞`)로 바뀐다. 반납 시간은 4개 + `직접`. 요약 아래가 `장비 대여` · `리프트권` · `합계`로 나뉜다. 메모: 첫 줄 `수령일`만 이름표가 버튼 위에 그려짐(나머지는 왼쪽) — 구현은 다섯 줄 모두 왼쪽 이름표. 두 줄 버튼의 작은 글자가 13px쯤으로 그려짐 — 구현은 16px.",
+      "regenerations": 0
+    },
+    {
+      "code": "S06",
+      "title": "팝업 · 수령 장소 선택(구역별)",
+      "file": "s06-popup-place.png",
+      "preview": "s06-popup-place.jpg",
+      "job_id": "733c30ce-3b7a-416a-903b-f59c0143d28d",
+      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J2y32mXmk1jhAd5qmEsy69365Q/hf_20260921_054015_733c30ce-3b7a-416a-903b-f59c0143d28d.png",
+      "references": [
+        "P12",
+        "P20"
+      ],
+      "verdict": "통과",
+      "review": "구역 칩으로 구역을 바꾸고 장소를 3열 큰 버튼(64px)으로 고른다. 빈 칸은 `직접 입력`. 하단 `취소` · `매장 수령으로` · `이 장소로 선택`. 어두운 배경의 깨진 시간 글자는 배경이라 기록만.",
+      "regenerations": 0
+    },
+    {
+      "code": "S07",
+      "title": "팝업 · 접수 확정 · 할인과 수납",
+      "file": "s07-popup-confirm-payment.png",
+      "preview": "s07-popup-confirm-payment.jpg",
+      "job_id": "b0ea38b0-1162-4ed0-8f0e-328fc87c1b71",
+      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J2y32mXmk1jhAd5qmEsy69365Q/hf_20260921_054015_b0ea38b0-1162-4ed0-8f0e-328fc87c1b71.png",
+      "references": [
+        "P12",
+        "P21"
+      ],
+      "verdict": "통과(메모)",
+      "review": "장비 대여와 리프트권을 두 칸으로 나눠 각각 금액 · 할인 버튼 · 할인액 · 결제 수단 · 받을 금액을 보인다. 아래에 합계, 하단 `취소` · `나중에 수납` · `수납하고 접수 확정 · N원`. 메모: 왼쪽 아래 요약의 `받을 47,500원`은 `할인 47,500원`의 오기(한 낱말) — 구현은 `할인`. 주 버튼 글자가 작게 그려짐 — 구현은 18px.",
+      "regenerations": 0
+    }
+  ],
+  "discarded": [],
+  "credits": {
+    "perImage": 3,
+    "images": 6,
+    "total": 18,
+    "balanceBefore": 1441,
+    "balanceAfter": 1423
+  },
+  "storage": {
+    "here": "가벼운 미리보기(.jpg · 폭 1440px)만 둔다. final[].preview가 그 파일이다.",
+    "originals": "원본 PNG(2592×1536)는 브랜치 claude/pos-ui-improvement-q9yqku의 같은 폴더와 힉스필드(각 항목의 url)에 있다."
+  }
+}
