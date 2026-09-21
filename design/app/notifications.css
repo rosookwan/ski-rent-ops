@@ -86,12 +86,9 @@
 #ski-ops.so-vehicle #so-notice-bell .so-notice-count{background:#fff;color:#6033e8;border-color:#6033e8}
 #ski-ops.so-vehicle .so-topbar-right button{background:#744ce9}
 #ski-ops.so-vehicle .so-topbar-right .so-notice-bell{background:#fff;color:#6033e8}
-#ski-ops.so-vehicle #ski-first-look .ski-vehicle-head .ski-segment{margin-right:290px}
-#ski-ops #ski-first-look .ski-priority-button{width:100%;display:flex;justify-content:space-between;text-align:left;border:0;border-bottom:1px solid #fed7b7;border-radius:0;font:inherit;cursor:pointer}
-#ski-ops #ski-first-look .ski-priority-button>strong{font-size:14px;white-space:nowrap;background:#fff;border-radius:12px;padding:12px 15px}
-#ski-ops #ski-first-look .ski-priority-button svg{animation:so-bell-sway 3s ease-in-out infinite;transform-origin:50% 12%}
-@media(max-width:1100px){#ski-ops .so-topbar-right{gap:8px}#ski-ops .so-topbar-right .so-demo-label{display:none}#ski-ops.so-vehicle #ski-first-look .ski-vehicle-head .ski-segment{margin-right:256px}}
+
+@media(max-width:1100px){#ski-ops .so-topbar-right{gap:8px}#ski-ops .so-topbar-right .so-demo-label{display:none}}
 @media(max-height:680px){#ski-ops .so-notice-header{min-height:68px;padding:10px 18px}#ski-ops .so-notice-settings{gap:16px;padding:18px 22px}#ski-ops .so-notice-setting-intro{padding:0}#ski-ops .so-notice-setting-intro h3{font-size:21px;margin-top:10px}#ski-ops .so-notice-setting-intro br{display:none}#ski-ops .so-notice-setting-intro .so-notice-large-icon{display:none}#ski-ops .so-notice-footer{padding:8px 18px 12px}#ski-ops .so-notice-compose{padding:18px 22px;gap:15px}}
 @media(max-height:560px){#ski-ops .so-notice-settings{gap:10px;padding:14px 20px}#ski-ops .so-notice-setting-intro h3{font-size:18px;line-height:1.4;margin:0}#ski-ops .so-notice-setting-intro p{display:none}#ski-ops .so-notice-setting-row{padding:12px 14px}#ski-ops .so-notice-setting{gap:8px}#ski-ops .so-notice-setting input{min-height:32px}#ski-ops .so-notice-compose{padding:14px 20px;gap:10px}#ski-ops .so-notice-compose>p.so-notice-hint{display:none}#ski-ops .so-notice-compose textarea{padding:10px 13px}#ski-ops .so-notice-detail{padding:18px 22px;gap:14px}#ski-ops .so-notice-detail h3{font-size:23px}#ski-ops .so-notice-detail-message{padding:14px 0;line-height:1.65}}
 @media(max-width:760px){#ski-ops #so-notice-dialog{inset:8px;width:calc(100vw - 16px);max-width:none;height:calc(100dvh - 16px);max-height:none;border-radius:20px}#ski-ops .so-notice-row{gap:10px;padding:14px 10px}#ski-ops .so-notice-row-icon{width:32px;height:32px}#ski-ops .so-notice-row-copy>strong{font-size:16px}#ski-ops .so-notice-row>svg{display:none}#ski-ops .so-notice-tabs{margin-inline:14px}#ski-ops .so-notice-detail,#ski-ops .so-notice-compose{padding:20px}}
-@media(prefers-reduced-motion:reduce){#ski-ops #so-notice-bell.has-unread>svg,#ski-ops #ski-first-look .ski-priority-button svg{animation:none}}
+@media(prefers-reduced-motion:reduce){#ski-ops #so-notice-bell.has-unread>svg{animation:none}}

@@ -15,9 +15,7 @@
 #ski-ops .so-responsive-table td:last-child{position:sticky;right:0;background:#fff;box-shadow:-6px 0 12px #00000003}
 #ski-ops .so-responsive-table th:last-child{right:0;z-index:2}
 #ski-ops .so-responsive-table td{white-space:nowrap}
-#ski-ops #ski-first-look .ski-dialog:has([data-action=representative-done]){max-width:520px}
-#ski-ops #ski-first-look .ski-dialog:has([data-action=representative-done]) .ski-fields{margin-top:18px;gap:16px}
-#ski-ops #ski-first-look .ski-dialog:has([data-action=representative-done]) .ski-primary{min-height:56px}
+
 @media(min-width:901px){
   #ski-ops .so-work-columns,#ski-ops .so-work-item{min-width:0;grid-template-columns:80px 108px minmax(0,1fr) 92px 16px;gap:10px;padding:0 14px}
   #ski-ops .so-work-item{height:auto}
@@ -53,14 +51,14 @@
   #ski-ops .so-shortcut{padding:10px 12px;min-height:70px}
   #ski-ops .so-shortcut small{font-size:13px;margin-top:2px}
   #ski-ops .so-home-shortcuts{gap:10px}
-  #ski-ops #ski-first-look .ski-pos-layout{gap:12px}
-  #ski-ops #ski-first-look .ski-pos-catalog,#ski-ops #ski-first-look .ski-pos-customer,#ski-ops #ski-first-look .ski-pos-checkout{padding:12px;gap:10px}
-  #ski-ops #ski-first-look .ski-days{padding:9px 10px;gap:8px}
-  #ski-ops #ski-first-look #ski-product-panel{position:static;inset:auto;overflow:auto;padding-bottom:8px}
-  #ski-ops #ski-first-look .ski-products{flex:none;overflow:visible}
-  #ski-ops #ski-first-look .ski-product{padding:10px}
-  #ski-ops #ski-first-look .ski-total{padding:10px 12px;margin-bottom:8px}
-  #ski-ops #ski-first-look .ski-discount-card{padding:10px}
+  
+  
+  
+  
+  
+  
+  
+  
 }
 @media(min-width:901px) and (max-width:1150px){
   #ski-ops .so-home-grid{grid-template-columns:minmax(0,1fr) 300px}
@@ -71,13 +69,13 @@
   #ski-ops .so-main-detail>.so-stack>.so-panel{overflow:visible}
   #ski-ops .so-main-detail>.so-panel{width:100%}
   #ski-ops .so-main-detail>.so-panel .so-actions{grid-template-columns:repeat(3,1fr)}
-  #ski-ops #ski-first-look .ski-pos-layout{grid-template-columns:minmax(0,1fr) 340px;grid-template-rows:minmax(320px,1.7fr) minmax(240px,1fr);overflow:auto;align-content:stretch}
-  #ski-ops #ski-first-look .ski-pos-catalog{grid-column:1;grid-row:1;min-height:0}
-  #ski-ops #ski-first-look .ski-pos-customer{grid-column:1;grid-row:2;min-height:0}
-  #ski-ops #ski-first-look .ski-pos-checkout{grid-column:2;grid-row:1 / span 2;position:static;min-height:0;max-height:none;align-self:stretch}
-  #ski-ops #ski-first-look .ski-pos-customer .ski-return-section{padding:10px}
-  #ski-ops #ski-first-look .ski-pos-customer .ski-return-options{grid-template-columns:repeat(4,minmax(0,1fr))}
-  #ski-ops #ski-first-look .ski-pos-customer .ski-return-options button{font-size:14px;white-space:normal}
+  
+  
+  
+  
+  
+  
+  
 }
 /* Browser chrome can leave less than 700px of a 768px POS display. */
 @media(min-width:901px) and (max-height:700px){
@@ -102,58 +100,13 @@
   #ski-ops .so-home-grid{overflow:visible}
 }
 
-/* Intake disclosures keep dates and quantities available without crowding products. */
-#ski-ops #ski-first-look .ski-period-compact{margin:0;min-height:44px;flex-shrink:0;padding:4px 10px;background:#f8f8f8;border:0;font-size:14px}
-#ski-ops #ski-first-look .ski-period-compact>span{min-width:0;line-height:1.4}
-#ski-ops #ski-first-look .ski-period-compact strong{font-weight:600;margin-left:6px}
-#ski-ops #ski-first-look .ski-period-compact:hover{background:#f0f0f0}
-#ski-ops #ski-first-look .ski-days{grid-template-columns:105px minmax(0,1fr)}
-#ski-ops #ski-first-look .ski-days-top{gap:4px;justify-content:space-between}
-#ski-ops #ski-first-look .ski-days-top .ski-setting-button{min-height:44px;min-width:36px;padding:4px}
-#ski-ops #ski-first-look .ski-selected-day{display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:44px;flex-shrink:0;padding:4px 10px;background:#fff4ed;border:1px solid #f2c9ae;border-radius:10px;font-size:14px}
-#ski-ops #ski-first-look .ski-selected-day>span:first-child{display:flex;align-items:center;flex-wrap:wrap;gap:4px 10px;min-width:0}
-#ski-ops #ski-first-look .ski-selected-day strong{font-size:15px}
-#ski-ops #ski-first-look .ski-selected-day small{font-size:13px;color:#6d6d6d}
-#ski-ops #ski-first-look .ski-selected-day:hover{background:#ffeadc}
-#ski-ops #ski-first-look .ski-disclosure-hint{color:#6d6d6d}
-#ski-ops #ski-first-look .ski-physical-summary{display:block;padding:0}
-#ski-ops #ski-first-look .ski-physical-summary summary{display:flex;align-items:center;gap:8px;padding:10px 12px;min-height:48px;cursor:pointer;list-style:none}
-#ski-ops #ski-first-look .ski-physical-summary summary::-webkit-details-marker{display:none}
-#ski-ops #ski-first-look .ski-physical-summary summary strong{font-size:15px;white-space:nowrap}
-#ski-ops #ski-first-look .ski-physical-summary summary span{font-size:13px;color:#6d6d6d;margin-left:auto}
-#ski-ops #ski-first-look .ski-physical-summary summary svg{flex-shrink:0;width:16px;height:16px}
-#ski-ops #ski-first-look .ski-physical-summary[open] summary svg{transform:rotate(180deg)}
-#ski-ops #ski-first-look .ski-physical-summary.has-difference{background:#fff7ed;border-color:#f0bd8a}
-#ski-ops #ski-first-look .ski-physical-summary.has-difference summary strong{color:#a14a13}
-#ski-ops #ski-first-look .ski-physical-details{display:grid;gap:8px;padding:0 12px 12px}
-#ski-ops #ski-first-look .ski-physical-summary:not(details){padding-top:12px}
-#ski-ops #ski-first-look .ski-physical-summary:not(details)>strong{display:block;padding:0 12px 8px}
 #ski-ops .so-return-time-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 0;border-bottom:1px solid #eee}
 #ski-ops .so-return-time-row>div:first-child{min-width:0;overflow-wrap:anywhere}
 #ski-ops .so-return-time-row strong{font-size:16px}
 #ski-ops .so-return-time-row p{font-size:14px;color:#6d6d6d;margin-top:4px}
 #ski-ops .so-return-time-row p b{font-variant-numeric:tabular-nums}
 #ski-ops .so-return-time-row .so-actions{flex-wrap:nowrap;flex-shrink:0;gap:6px}
-@media(min-width:901px) and (max-height:820px){
-  #ski-ops #ski-first-look .ski-product{padding:8px 10px}
-  #ski-ops #ski-first-look .ski-product-title{font-size:18px;line-height:1.2;margin-bottom:4px}
-  #ski-ops #ski-first-look .ski-product-price{font-size:14px;line-height:1.4;margin-bottom:6px}
-  #ski-ops #ski-first-look .ski-product.is-picked{background:#fff4ed}
-}
 
-/* Vehicle: remove inherited grid areas so both modes show every information block. */
-#ski-ops #ski-first-look .ski-visit-inner{grid-template-areas:none}
-#ski-ops #ski-first-look .ski-visit-inner *{grid-area:auto}
-#ski-ops #ski-first-look .is-simple .ski-customer{flex-direction:column;align-items:flex-start;justify-content:flex-start;gap:4px;padding:0 0 12px;margin:0 0 10px;border:0;border-bottom:1px solid #ede8ff}
-#ski-ops #ski-first-look .ski-visit-equipment{min-width:0}
-#ski-ops #ski-first-look .ski-equipment{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));margin:6px 0 0}
-#ski-ops #ski-first-look .ski-equipment span{min-width:0;white-space:nowrap}
-#ski-ops #ski-first-look .ski-actions:has([data-action=partial-return]){grid-template-columns:repeat(4,minmax(0,1fr))}
-#ski-ops #ski-first-look .ski-actions:has([data-action=partial-return]) button{font-size:19px;padding:10px 6px}
-#ski-ops #ski-first-look .ski-job-sidebar{min-height:0;display:flex;flex-direction:column;gap:8px}
-#ski-ops #ski-first-look .ski-job-sidebar .ski-job-list{flex:1}
-#ski-ops #ski-first-look .ski-job-pager{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-shrink:0;color:#5f33e1}
-#ski-ops #ski-first-look .ski-job-pager button{height:44px;min-width:64px;background:#fff;border:0;border-radius:12px;color:#5f33e1}
 #ski-ops .so-return-picker{display:grid;gap:10px}
 #ski-ops .so-return-pick{border:1px solid #e7e7e7;border-radius:14px;padding:12px;display:grid;gap:8px}
 #ski-ops .so-return-pick.is-missing{border-color:#5f33e1;background:#f4f0ff}
@@ -163,72 +116,52 @@
 #ski-ops .so-return-stepper output{min-width:32px;text-align:center;font-size:22px;font-weight:700}
 #ski-ops .so-return-stepper>span{margin-right:auto;font-size:15px;color:#6d6d6d}
 #ski-ops .so-return-totals{padding:12px;border-radius:12px;background:#f4f0ff;color:#5f33e1;display:flex;justify-content:space-between;font-size:18px;font-weight:700}
-@media(min-width:761px) and (max-height:850px){
-  #ski-ops #ski-first-look .ski-vehicle-grid:not(.is-simple) .ski-visit-inner{display:grid;grid-template-columns:1fr;gap:10px;padding:14px 18px}
-  #ski-ops #ski-first-look .ski-place{font-size:32px}
-  #ski-ops #ski-first-look .ski-arrival{padding:10px 14px;margin-top:10px}
-  #ski-ops #ski-first-look .ski-priority{min-height:56px;padding:6px 18px;font-size:17px}
-  #ski-ops #ski-first-look .ski-priority button{min-height:44px;padding:8px 14px}
-  #ski-ops #ski-first-look .ski-equipment span{padding:10px 12px;font-size:17px}
-  #ski-ops #ski-first-look .ski-equipment strong{font-size:26px}
-}
 @media(min-width:761px) and (max-height:680px){
   #ski-ops.so-vehicle #so-main{padding:10px}
-  #ski-ops #ski-first-look .ski-content{gap:8px}
-  #ski-ops #ski-first-look .ski-vehicle-head{height:60px;min-height:60px;border-radius:18px;padding:6px 16px}
-  #ski-ops #ski-first-look .ski-vehicle-head>div:first-child{display:flex;align-items:center;gap:14px}
-  #ski-ops #ski-first-look .ski-vehicle-head .ski-eyebrow{font-size:14px;margin:0;max-width:75px}
-  #ski-ops #ski-first-look .ski-vehicle-head h1{font-size:27px;white-space:nowrap}
-  #ski-ops #ski-first-look .ski-vehicle-head .ski-segment{margin-right:210px;min-width:200px;padding:3px;border-radius:15px}
-  #ski-ops #ski-first-look .ski-vehicle-head .ski-segment button{min-height:44px;font-size:17px;padding:6px 12px;border-radius:12px}
+  
+  
+  
+  
+  
+  
+  
   #ski-ops.so-vehicle .so-topbar{top:18px;right:24px;height:44px;min-height:44px}
-  #ski-ops #ski-first-look .ski-filter button,#ski-ops #ski-first-look .ski-sort{min-height:44px;height:44px;font-size:16px;padding:8px 16px}
-  #ski-ops #ski-first-look .ski-vehicle-grid{grid-template-columns:246px minmax(0,1fr);gap:10px}
-  #ski-ops #ski-first-look .ski-vehicle-grid.is-simple{grid-template-columns:1fr}
-  #ski-ops #ski-first-look .ski-vehicle-grid>section{gap:8px}
-  #ski-ops #ski-first-look .ski-job-list{gap:8px}
-  #ski-ops #ski-first-look .ski-job-item{padding:9px 12px;min-height:92px;border-radius:16px}
-  #ski-ops #ski-first-look .ski-job-meta{margin-bottom:4px}
-  #ski-ops #ski-first-look .ski-job-item strong{font-size:20px;margin-bottom:2px}
-  #ski-ops #ski-first-look .ski-job-slot{display:none}
-  #ski-ops #ski-first-look .ski-job-item p{font-size:14px}
-  #ski-ops #ski-first-look .ski-visit{border-radius:18px}
-  #ski-ops #ski-first-look .ski-priority{min-height:48px;padding:2px 14px;font-size:16px}
-  #ski-ops #ski-first-look .ski-priority button{min-height:44px;padding:6px 12px;border-radius:12px;font-size:15px}
-  #ski-ops #ski-first-look .ski-visit-inner,#ski-ops #ski-first-look .ski-vehicle-grid:not(.is-simple) .ski-visit-inner{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px;padding:12px 16px;align-content:center;overflow:auto}
-  #ski-ops #ski-first-look .ski-place-line{align-items:center;flex-wrap:wrap;gap:6px}
-  #ski-ops #ski-first-look .ski-place{font-size:28px}
-  #ski-ops #ski-first-look .ski-location-detail{font-size:14px;line-height:1.35;margin-top:5px}
-  #ski-ops #ski-first-look .ski-arrival{padding:7px 12px;margin-top:8px;border-radius:12px}
-  #ski-ops #ski-first-look .ski-arrival strong{font-size:24px}
-  #ski-ops #ski-first-look .ski-arrival small{font-size:14px;margin-top:2px}
-  #ski-ops #ski-first-look .ski-customer,#ski-ops #ski-first-look .is-simple .ski-customer{display:flex;flex-direction:column;align-items:flex-start;gap:0;margin:0 0 6px;padding:0;border:0}
-  #ski-ops #ski-first-look .ski-customer strong{font-size:21px}
-  #ski-ops #ski-first-look .ski-customer span{font-size:18px}
-  #ski-ops #ski-first-look .ski-customer b{font-size:21px}
-  #ski-ops #ski-first-look .ski-equipment-label{font-size:14px}
-  #ski-ops #ski-first-look .ski-equipment{gap:6px;margin:4px 0 0}
-  #ski-ops #ski-first-look .ski-equipment span{gap:4px;padding:8px 10px;font-size:16px;border-radius:12px}
-  #ski-ops #ski-first-look .ski-equipment strong{font-size:24px}
-  #ski-ops #ski-first-look .ski-actions{padding:8px 14px 10px;gap:8px}
-  #ski-ops #ski-first-look .ski-actions button,#ski-ops #ski-first-look .ski-actions:has([data-action=partial-return]) button{min-height:72px;font-size:18px}
-  #ski-ops #ski-first-look .ski-upcoming{font-size:14px;gap:4px}
-  #ski-ops #ski-first-look .ski-next{padding:8px 12px;gap:2px;border-radius:14px}
-  #ski-ops #ski-first-look .ski-next-place strong{font-size:18px}
-  #ski-ops #ski-first-look .ski-next-meta,#ski-ops #ski-first-look .ski-next-meta b{font-size:16px}
-  #ski-ops #ski-first-look .ski-equipment:has(>span:nth-child(4)){grid-template-columns:repeat(2,minmax(0,1fr))}
-  #ski-ops #ski-first-look .ski-equipment:has(>span:nth-child(4)) span{padding:4px 10px}
-}
-@media(min-width:761px) and (max-height:680px){
-  #ski-ops #ski-first-look .ski-visit-inner,#ski-ops #ski-first-look .ski-vehicle-grid:not(.is-simple) .ski-visit-inner{align-content:safe center;padding-top:8px;padding-bottom:8px}
-  #ski-ops #ski-first-look .ski-upcoming .ski-next{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;min-height:54px;height:54px;padding:6px 12px;gap:8px}
-  #ski-ops #ski-first-look .ski-next-meta{grid-column:2;grid-row:1}
-  #ski-ops #ski-first-look .ski-next-place{grid-column:1;grid-row:1}
-  #ski-ops #ski-first-look .ski-next-meta>span:first-child,#ski-ops #ski-first-look .ski-next-place svg{display:none}
-}
-@media(min-width:761px) and (max-height:560px){
-  #ski-ops #ski-first-look .ski-visit-inner,#ski-ops #ski-first-look .ski-vehicle-grid:not(.is-simple) .ski-visit-inner{padding-top:4px;padding-bottom:4px}
-  #ski-ops #ski-first-look .is-simple .ski-equipment:has(>span:nth-child(4)){grid-template-columns:repeat(4,minmax(0,1fr))}
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
 }
 
 /* Ledger, customers, inventory and settings retain their own table scroll areas. */
@@ -373,14 +306,9 @@
 #ski-ops .so-lift-summary>div:last-child{background:#fff4ed;color:#ef3408}
 #ski-ops .so-lift-summary strong{font-size:26px}
 #ski-ops .so-lift-note{padding:0 16px 12px;font-size:14px;color:#6d6d6d}
-#ski-ops #ski-first-look .ski-split-return{border-top:1px solid #e7e7e7;padding-top:10px;font-size:14px}
-#ski-ops #ski-first-look .ski-split-return summary{min-height:44px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;list-style:none;color:#5d5d5d;font-weight:600}
-#ski-ops #ski-first-look .ski-split-return summary:after{content:'+';font-size:20px}
-#ski-ops #ski-first-look .ski-split-return[open] summary:after{content:'−'}
-#ski-ops #ski-first-look .ski-split-return summary::-webkit-details-marker{display:none}
-#ski-ops #ski-first-look .ski-split-group{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:10px;background:#f8f8f8;border-radius:12px}
+
 #ski-ops.so-vehicle .so-dialog-actions .so-button.primary{background:#5f33e1;border-color:#5f33e1}
-#ski-ops #ski-first-look .ski-datesort>.so-button{color:#5f33e1;border-color:#ddd5ef;background:#fff}
+
 @media(min-width:901px) and (max-width:1150px){
   #ski-ops .so-return-detail{grid-template-columns:1fr;align-content:start;overflow:auto}
   #ski-ops .so-return-detail>.so-stack{overflow:visible}
@@ -393,114 +321,4 @@
   #ski-ops .so-return-stepper input{width:60px}
 }
 #ski-ops .so-return-detail .so-panel-pad>.so-status{align-self:flex-start;width:fit-content}
-#ski-ops #ski-first-look .ski-remaining-note{font-size:14px;color:#a65a18;margin-top:6px}
-#ski-ops #ski-first-look .ski-status-message{margin:0;border-radius:0;padding:16px 20px;flex-shrink:0;font-size:17px}
-@media(min-width:761px) and (max-height:680px){
-  #ski-ops #ski-first-look .ski-equipment span{white-space:normal}
-  #ski-ops #ski-first-look .is-simple .ski-customer{flex-direction:row;align-items:center;justify-content:space-between;gap:8px}
-  #ski-ops #ski-first-look .is-simple .ski-equipment:has(>span:nth-child(4)){grid-template-columns:repeat(4,minmax(0,1fr))}
-}
 
-/* Intake 1b: one product workspace, with full-row summaries and focused settings sheets. */
-#ski-ops #ski-first-look .ski-intake-overview{display:grid;gap:6px;flex-shrink:0}
-#ski-ops #ski-first-look .ski-layout-summary .ski-period-compact{min-height:48px;padding:8px 12px;border-radius:12px}
-#ski-ops #ski-first-look .ski-layout-summary .ski-period-compact strong{font-size:17px;font-weight:700}
-#ski-ops #ski-first-look .ski-fulfillment-summary{display:flex;align-items:center;gap:10px;min-height:64px;padding:9px 12px;border:0;border-radius:12px;background:#f8f8f8}
-#ski-ops #ski-first-look .ski-fulfillment-summary:hover{background:#f0f0f0}
-#ski-ops #ski-first-look .ski-summary-label{font-size:14px;white-space:nowrap;color:#5d5d5d;flex-shrink:0}
-#ski-ops #ski-first-look .ski-fulfillment-copy{display:grid;gap:3px;min-width:0;flex:1;overflow-wrap:anywhere}
-#ski-ops #ski-first-look .ski-fulfillment-copy strong{font-size:17px;line-height:1.3}
-#ski-ops #ski-first-look .ski-fulfillment-copy small{font-size:14px;line-height:1.35;color:#5d5d5d}
-#ski-ops #ski-first-look .ski-return-exceptions{display:inline;color:#a34d1f}
-#ski-ops #ski-first-look .ski-intake-overview .needs-attention{background:#fff4ed;box-shadow:inset 0 0 0 1px #f2b089}
-#ski-ops #ski-first-look .ski-layout-summary .ski-product-title svg{display:none}
-#ski-ops #ski-first-look .ski-layout-summary .ski-product{background:#f8f8f8;box-shadow:none}
-#ski-ops #ski-first-look .ski-layout-summary .ski-product.is-picked{background:#fff4ed;border-color:#fe4e10}
-#ski-ops #ski-first-look .ski-layout-summary .ski-copy-day{width:100%;min-height:44px;padding:8px;margin:0}
-#ski-ops #ski-first-look .ski-overlay[data-intake-sheet]{padding:16px}
-#ski-ops #ski-first-look .ski-overlay[data-intake-sheet] .ski-dialog{display:flex;flex-direction:column;max-width:660px;max-height:calc(100dvh - 32px);padding:0;overflow:hidden}
-#ski-ops #ski-first-look .ski-overlay[data-intake-sheet] .ski-dialog-head{padding:16px 20px;margin:0;flex-shrink:0}
-#ski-ops #ski-first-look .ski-overlay[data-intake-sheet] .ski-dialog-head h2{font-size:22px}
-#ski-ops #ski-first-look .ski-overlay[data-intake-sheet] #ski-dialog-content{display:flex;flex-direction:column;min-height:0}
-#ski-ops #ski-first-look .ski-sheet-scroll{padding:20px;min-height:0;overflow:auto;overscroll-behavior:contain}
-#ski-ops #ski-first-look .ski-sheet-footer{flex-shrink:0;padding:14px 20px;border-top:1px solid #e7e7e7;background:#fff}
-#ski-ops #ski-first-look .ski-sheet-footer .ski-primary{width:100%;margin:0;min-height:52px}
-#ski-ops #ski-first-look .ski-sheet-footer .ski-return-error{margin:0 0 10px}
-#ski-ops #ski-first-look .ski-sheet-scroll .ski-days{display:flex;flex-direction:column;gap:18px;padding:0;background:none}
-#ski-ops #ski-first-look .ski-sheet-scroll .ski-days .ski-segment button{min-height:52px;font-size:18px}
-#ski-ops #ski-first-look .ski-sheet-scroll .ski-period-dates{grid-template-columns:1fr 1fr;gap:16px}
-#ski-ops #ski-first-look .ski-sheet-scroll .ski-period-dates .ski-field{display:flex;flex-direction:column;align-items:stretch;gap:6px;font-size:16px}
-#ski-ops #ski-first-look .ski-sheet-scroll .ski-field input,#ski-ops #ski-first-look .ski-sheet-scroll .ski-field select{min-height:52px;font-size:18px;min-width:0}
-#ski-ops #ski-first-look .ski-fulfillment-fields{display:grid;gap:18px}
-#ski-ops #ski-first-look .ski-sheet-pickup{display:flex;align-items:center;gap:8px;font-weight:600;font-size:17px}
-#ski-ops #ski-first-look .ski-sheet-pickup span{margin-left:auto;font-size:15px;color:#6d6d6d;font-weight:400}
-#ski-ops #ski-first-look .ski-sheet-scroll .ski-return-method,#ski-ops #ski-first-look .ski-sheet-scroll .ski-manual-fields{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-#ski-ops #ski-first-look .ski-sheet-scroll .ski-return-options{grid-template-columns:repeat(2,minmax(0,1fr))}
-#ski-ops #ski-first-look .ski-sheet-scroll .ski-return-options button{min-height:52px;font-size:17px}
-#ski-ops #ski-first-look .ski-sheet-scroll .ski-split-return summary{min-height:48px;cursor:pointer;font-size:17px}
-@media(min-width:901px){
-  #ski-ops #ski-first-look .ski-layout-summary{grid-template-columns:minmax(0,1fr) clamp(300px,30vw,400px);grid-template-rows:minmax(0,1fr);overflow:hidden;align-content:stretch}
-  #ski-ops #ski-first-look .ski-layout-summary .ski-pos-catalog,#ski-ops #ski-first-look .ski-layout-summary .ski-pos-checkout{grid-row:1;grid-column:auto;position:static;min-height:0;max-height:none;align-self:stretch}
-  #ski-ops #ski-first-look .ski-layout-summary .ski-pos-catalog{gap:8px;overflow:hidden}
-  #ski-ops #ski-first-look .ski-layout-summary .ski-product-tabs{padding:0;background:none;gap:8px}
-  #ski-ops #ski-first-look .ski-layout-summary .ski-product-tabs button{flex:0 1 auto;min-width:140px;min-height:44px;height:44px;padding:8px 20px;border:1px solid #d1d1d1;font-size:17px}
-  #ski-ops #ski-first-look .ski-layout-summary .ski-product-tabs button[aria-selected=true]{border-color:#fe4e10}
-  #ski-ops #ski-first-look .ski-layout-summary #ski-product-panel{overflow:hidden;padding:0;gap:8px;position:static}
-  #ski-ops #ski-first-look .ski-layout-summary .ski-products{grid-template-columns:repeat(3,minmax(0,1fr));flex:1;overflow:auto;gap:8px;align-content:start;padding:0 2px 0 0}
-  #ski-ops #ski-first-look .ski-layout-summary .ski-product{padding:10px;min-height:118px;display:flex;flex-direction:column}
-  #ski-ops #ski-first-look .ski-layout-summary .ski-product-title{font-size:20px;line-height:1.2;margin-bottom:4px}
-  #ski-ops #ski-first-look .ski-layout-summary .ski-product-price{font-size:14px;line-height:1.3;margin:0 0 8px}
-  #ski-ops #ski-first-look .ski-layout-summary .ski-stepper{margin-top:auto}
-  #ski-ops #ski-first-look .ski-layout-summary .ski-stepper button{width:48px;height:48px;min-width:48px;min-height:48px}
-  #ski-ops #ski-first-look .ski-layout-summary .ski-day-heading{margin:0}
-  #ski-ops #ski-first-look .ski-layout-summary .ski-day-tabs button{min-height:48px;padding:6px 10px}
-  #ski-ops #ski-first-look .ski-layout-summary .ski-lift-inline{overflow:auto;flex:1}
-}
-@media(min-width:901px) and (max-height:820px){
-  #ski-ops #ski-first-look .ski-layout-summary .ski-product{padding:8px;min-height:108px}
-  #ski-ops #ski-first-look .ski-layout-summary .ski-product-title{font-size:18px}
-  #ski-ops #ski-first-look .ski-layout-summary .ski-product-price{margin-bottom:6px}
-}
-@media(max-width:900px){
-  #ski-ops #ski-first-look .ski-layout-summary{display:flex;flex-direction:column;overflow:auto}
-  #ski-ops #ski-first-look .ski-layout-summary .ski-pos-catalog,#ski-ops #ski-first-look .ski-layout-summary .ski-pos-checkout{min-height:0;flex-shrink:0;position:static;max-height:none}
-  #ski-ops #ski-first-look .ski-layout-summary .ski-products{grid-template-columns:repeat(2,minmax(0,1fr));overflow:visible}
-  #ski-ops #ski-first-look .ski-layout-summary #ski-product-panel{overflow:visible}
-  #ski-ops #ski-first-look .ski-fulfillment-summary{flex-wrap:wrap}
-  #ski-ops #ski-first-look .ski-fulfillment-copy{flex-basis:60%}
-  #ski-ops #ski-first-look .ski-fulfillment-summary .ski-disclosure-hint{margin-left:auto}
-}
-@media(max-width:480px){
-  #ski-ops #ski-first-look .ski-layout-summary .ski-period-compact{flex-wrap:wrap}
-  #ski-ops #ski-first-look .ski-layout-summary .ski-products{grid-template-columns:1fr}
-  #ski-ops #ski-first-look .ski-sheet-scroll .ski-return-method,#ski-ops #ski-first-look .ski-sheet-scroll .ski-manual-fields,#ski-ops #ski-first-look .ski-sheet-scroll .ski-period-dates{grid-template-columns:1fr}
-  #ski-ops #ski-first-look .ski-sheet-scroll{padding:16px}
-}
-#ski-ops #ski-first-look .ski-catalog-toolbar{display:flex;flex-direction:column;gap:8px;flex-shrink:0;min-width:0}
-#ski-ops #ski-first-look .ski-day-tools{min-width:0}
-#ski-ops #ski-first-look .ski-single-day{display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:30px;font-size:16px}
-#ski-ops #ski-first-look .ski-single-day small{font-size:14px;color:#6d6d6d}
-@media(min-width:901px) and (max-height:740px){
-  #ski-ops #ski-first-look .ski-layout-summary .ski-pos-catalog{gap:6px}
-  #ski-ops #ski-first-look .ski-layout-summary .ski-period-compact{min-height:44px;padding:6px 12px}
-  #ski-ops #ski-first-look .ski-layout-summary .ski-fulfillment-summary{min-height:56px;padding:6px 12px}
-  #ski-ops #ski-first-look .ski-layout-summary .ski-fulfillment-copy strong{font-size:16px}
-  #ski-ops #ski-first-look .ski-layout-summary .ski-fulfillment-copy small{font-size:13px}
-  #ski-ops #ski-first-look .ski-catalog-toolbar{flex-direction:row;align-items:stretch;gap:8px}
-  #ski-ops #ski-first-look .ski-catalog-toolbar .ski-product-tabs{gap:6px}
-  #ski-ops #ski-first-look .ski-catalog-toolbar .ski-product-tabs button{min-width:0;padding:8px 12px;font-size:15px;gap:5px}
-  #ski-ops #ski-first-look .ski-day-tools{flex:1}
-  #ski-ops #ski-first-look .ski-selected-day{height:100%;padding:4px 8px;gap:4px}
-  #ski-ops #ski-first-look .ski-selected-day>span:first-child{display:grid;gap:0}
-  #ski-ops #ski-first-look .ski-selected-day small{font-size:12px}
-  #ski-ops #ski-first-look .ski-selected-day .ski-disclosure-label{display:none}
-  #ski-ops #ski-first-look .ski-single-day{height:100%;display:flex;flex-direction:column;justify-content:center;align-items:flex-start;gap:0;font-size:15px}
-  #ski-ops #ski-first-look .ski-single-day small{font-size:12px}
-  #ski-ops #ski-first-look .ski-catalog-toolbar:has(.ski-day-tabs),#ski-ops #ski-first-look .ski-catalog-toolbar:has([data-use-date]){flex-wrap:wrap}
-  #ski-ops #ski-first-look .ski-day-tools:has(.ski-day-tabs),#ski-ops #ski-first-look .ski-day-tools:has([data-use-date]){flex-basis:100%}
-  #ski-ops #ski-first-look .ski-layout-summary .ski-products{gap:6px}
-  #ski-ops #ski-first-look .ski-layout-summary .ski-product{padding:5px 7px;min-height:100px}
-  #ski-ops #ski-first-look .ski-layout-summary .ski-product-title{font-size:18px;margin-bottom:2px}
-  #ski-ops #ski-first-look .ski-layout-summary .ski-product-price{font-size:13px;line-height:1.3;margin-bottom:2px}
-  #ski-ops #ski-first-look .ski-layout-summary .ski-stepper button{width:44px;height:44px;min-width:44px;min-height:44px}
-}

@@ -3,11 +3,10 @@ from pathlib import Path
 import argparse
 import base64
 from html import escape
-from rental_template import compile_rental_template
 
 ROOT = Path(__file__).resolve().parents[1]
 APP = ROOT / 'design/app'
-MODULES = ['data.js', 'core.js', 'operations.js', 'return-runtime.js', 'rentals.js', 'settings.js', 'partners.js', 'closing.js', 'preparation.js', 'guide.js', 'returns.js', 'login.js', 'notifications.js', 'workflow-runtime.js', 'workflow-ui.js', 'workflow-preparation.js', 'rental-board.js', 'dispatch-board.js', 'vehicle-board.js', 'rental-changes.js', 'app-mode.js', 'pos-shell.js', 'pos-runtime.js', 'pos-orders.js', 'pos-finance.js', 'pos-fulfillment.js', 'pos-tickets.js', 'pos-management.js', 'pos-dispatch.js', 'pos-connection.js', 'pos-preinput.js', 'pos-notifications.js', 'pos-keypad.js']
+MODULES = ['data.js', 'core.js', 'operations.js', 'return-runtime.js', 'guide.js', 'returns.js', 'login.js', 'notifications.js', 'workflow-runtime.js', 'workflow-ui.js', 'workflow-preparation.js', 'app-mode.js', 'pos-shell.js', 'pos-runtime.js', 'pos-orders.js', 'pos-finance.js', 'pos-fulfillment.js', 'pos-tickets.js', 'pos-management.js', 'pos-dispatch.js', 'pos-connection.js', 'pos-preinput.js', 'pos-notifications.js', 'pos-keypad.js']
 RETURN_MODULES = ['domain.js', 'service.js', 'client.js', 'demo.js']
 WORKFLOW_MODULES = ['common.js', 'reservations.js', 'inventory.js', 'dispatch.js', 'intake.js', 'documents.js', 'exchanges.js', 'early-returns.js', 'orders.js', 'migration.js', 'finance.js', 'management.js', 'order-operations.js', 'order-documents.js', 'ticket-operations.js', 'domain.js', 'service.js', 'client.js', 'demo.js']
 PWA_FILES = {
@@ -23,15 +22,9 @@ PWA_FILES = {
 }
 
 def build():
-    rental_view, rental_hover = compile_rental_template(APP / 'rental-board.html')
-    dispatch_view, dispatch_hover = compile_rental_template(APP / 'dispatch-board.html', 'dispatch', 'SkiDispatchView')
-    vehicle_view, vehicle_hover = compile_rental_template(APP / 'vehicle-board.html', 'vehicle', 'SkiVehicleView')
-    legacy = (ROOT / 'design/prototypes/first-look.fragment.html').read_text()
-    bridge = "root.addEventListener('ski:set-view',e=>{closeDialog();state.view=e.detail;render();if(e.detail==='shop'&&!state.representativeSeen){state.representativeSeen=true;representative();}});"
-    legacy = legacy.replace('  render();applyDesign();', '  '+bridge+'\n  render();applyDesign();')
-    legacy = '<script>\n' + (APP / 'time-picker.js').read_text() + '\n</script>\n' + legacy
+    legacy = '<script>\n' + (APP / 'time-picker.js').read_text() + '\n</script>\n'  # the old intake prototype lived here; only the shared time picker is left
     fragment = (APP / 'shell.html').read_text().replace('<!-- LEGACY_FRAGMENT -->', legacy)
-    fragment += '\n<style>\n' + (APP / 'styles.css').read_text() + '\n' + (APP / 'polish.css').read_text() + '\n' + (APP / 'responsive.css').read_text() + '\n' + (APP / 'time-picker.css').read_text() + '\n' + (APP / 'operations.css').read_text() + '\n</style>\n'
+    fragment += '\n<style>\n' + (APP / 'styles.css').read_text() + '\n' + (APP / 'polish.css').read_text() + '\n' + (APP / 'responsive.css').read_text() + '\n' + (APP / 'time-picker.css').read_text() + '\n</style>\n'
     for name in RETURN_MODULES:
         fragment += '<script>\n' + (ROOT / 'src/returns' / name).read_text() + '\n</script>\n'
         if name == 'domain.js':
@@ -43,12 +36,6 @@ def build():
     for name in WORKFLOW_MODULES:
         fragment += '<script>\n' + (ROOT / 'src/workflows' / name).read_text() + '\n</script>\n'
     fragment += '<style>\n' + (APP / 'workflows.css').read_text() + '\n' + (APP / 'app-mode.css').read_text() + '\n</style>\n'
-    fragment += '<style>\n' + (APP / 'rental-board.css').read_text() + '\n' + rental_hover + '\n</style>\n'
-    fragment += '<script>\n' + rental_view + '\n</script>\n'
-    fragment += '<style>\n' + (APP / 'dispatch-board.css').read_text() + '\n' + dispatch_hover + '\n</style>\n'
-    fragment += '<script>\n' + dispatch_view + '\n</script>\n'
-    fragment += '<style>\n' + (APP / 'vehicle-board.css').read_text() + '\n' + vehicle_hover + '\n</style>\n'
-    fragment += '<script>\n' + vehicle_view + '\n</script>\n'
     for name in ['pos-shell.css', 'pos-orders.css', 'pos-fulfillment.css', 'pos-keypad.css', 'pos-management.css']:
         if (APP / name).exists():
             fragment += '<style>\n' + (APP / name).read_text() + '\n</style>\n'
@@ -63,7 +50,9 @@ def build():
     mark = base64.b64encode((APP / 'assets/app-mark.svg').read_bytes()).decode()
     fragment = fragment.replace('__SKINOTE_LOGO__', 'data:image/svg+xml;base64,' + mark)
     assert '__SKINOTE_LOGO__' not in fragment
-    assert len(fragment.encode()) < 1_750_000
+    # Guard against accidental bloat, not a platform limit. Raised from 1,750,000 on 2026-09-21 after the unreachable legacy screens were removed (about 1.11 MB now).
+    size = len(fragment.encode())
+    assert size < 2_000_000, f'bundle is {size:,} bytes — over the 2,000,000 guard; remove dead code or raise the guard on purpose'
     out = ROOT / 'dist'
     out.mkdir(exist_ok=True)
     for name in PWA_FILES:

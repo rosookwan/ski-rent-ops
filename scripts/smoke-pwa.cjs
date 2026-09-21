@@ -97,35 +97,34 @@ const path = require('node:path');
     assert.equal(await frame.locator('.so-login-brand strong').textContent(), '스키노트');
     assert.equal(await frame.locator('.so-login-brand img').evaluate(image => image.complete && image.naturalWidth > 0), true);
     await frame.locator('[data-action="login-shop"]').click();
-    const dashboard = await frame.locator('#so-page').innerHTML();
-    await frame.locator('#so-workspace-switch').click();
-    assert.equal(await frame.locator('#ski-ops').getAttribute('data-workspace'), 'management');
-    assert.equal(await frame.locator('#so-page').innerHTML(), dashboard);
-    await frame.locator('#so-navigation [data-go="lift-reservations"]').click();
-    assert.equal(await frame.locator('#ski-ops').getAttribute('data-page'), 'lift-reservations');
-    await frame.locator('#so-workspace-switch').click();
-    assert.equal(await frame.locator('#ski-ops').getAttribute('data-workspace'), 'pos');
+    // The POS rail replaced the old sidebar (UI v3/v4): walk 포스 → 관리 → 매장 설정 → 포스로 inside the installed app.
+    await frame.locator('.pos-rail').waitFor();
+    await frame.locator('.pos-rail [data-go="management"]').click();
+    assert.equal(await frame.locator('#ski-ops').getAttribute('data-page'), 'management');
+    await frame.locator('.pos-rail [data-go="settings"]').click();
+    assert.equal(await frame.locator('#ski-ops').getAttribute('data-page'), 'settings');
     assert.equal(appPage.url(), manifestId);
     assert.equal(await appPage.evaluate(() => matchMedia('(display-mode: standalone)').matches), true);
     checks.push('Installed app launches standalone and keeps POS/management navigation inside the app');
     console.log('PASS ' + checks.at(-1));
 
     await appPage.goBack();
-    await frame.locator('#ski-ops[data-page="lift-reservations"][data-workspace="management"]').waitFor();
+    await frame.locator('#ski-ops[data-page="management"]').waitFor();
     await appPage.goForward();
-    await frame.locator('#ski-ops[data-page="home"][data-workspace="pos"]').waitFor();
+    await frame.locator('#ski-ops[data-page="settings"]').waitFor();
     assert.equal(appPage.url(), manifestId);
     const browserState = await appPage.evaluate(() => history.state);
     assert.deepEqual(Object.keys(browserState).sort(), ['position','skinoteSession']);
     checks.push('Native back/forward restores the screen and workspace without exposing rental data in the URL');
     console.log('PASS ' + checks.at(-1));
 
-    await frame.locator('#so-navigation [data-go="rentals"]').click();
-    await frame.locator('#so-page [data-go="rental"]').first().click();
+    await frame.locator('#ski-ops').evaluate(root => root.ownerDocument.defaultView.SkiOps.go('rentals'));
+    await frame.locator('#so-page [data-go="order-detail"]').first().click();
+    await frame.locator('#ski-ops[data-page="order-detail"]').waitFor();
     await frame.locator('#so-page [data-action="back"]').click();
     await frame.locator('#ski-ops[data-page="rentals"]').waitFor();
     await appPage.goForward();
-    await frame.locator('#ski-ops[data-page="rental"]').waitFor();
+    await frame.locator('#ski-ops[data-page="order-detail"]').waitFor();
     checks.push('In-app back and browser forward share the same navigation history');
     console.log('PASS ' + checks.at(-1));
 

@@ -32,7 +32,7 @@
       const read=key=>S.$('[data-shop-field="'+key+'"]').value;
       const next={name:name(read('name'),'상호'),phone:phone(read('phone')),place:read('place')};
       if(!places.includes(next.place))throw new Error('기본 수거 장소를 선택해 주세요.');
-      window.SkiIntake.setDefaultPlace(shop.place,next.place);
+      window.SkiIntake?.setDefaultPlace(shop.place,next.place);
       shop=next;S.close();S.render();S.toast('매장 정보와 대표 연락처를 반영했습니다.');
     }catch(reason){error(reason.message);}
   });

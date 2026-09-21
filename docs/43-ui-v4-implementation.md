@@ -83,6 +83,24 @@ Pages CI는 업무 규칙과 문법·빌드만 확인하고 화면은 보지 않
 
 1. **공개 체험판(`main` · Pages) 반영은 아직 하지 않았다.** 반영 전에 결과 화면을 보고 확인을 받기로 했다(`docs/42` 10절 2번).
 2. 매장 포스의 실제 표시 영역: `관리 → 매장 설정 → 매장 정보` 아래 `이 화면 크기 W×H`를 읽어 알려 주면 그 크기를 촬영 기준에 넣는다(`docs/42` 10절 6번).
-3. 번들 1,632,358바이트(한도 1,750,000의 93.3% · M9 포함). 남은 여유는 약 118KB다. 나눠서 결제를 넣기 전에 예전 셸 코드를 줄이거나 한도를 다시 정해야 한다.
+3. (해결 · 8절) 번들은 예전 화면 정리 뒤 1,110,342바이트다. 크기 검사는 2,000,000으로 올렸다.
 4. 배치를 그대로 둔 화면(4절)의 모양 맞추기.
-5. `npm run test:navigation`과 `npm run test:pwa`는 이 작업과 무관하게 `main`(`1d1ae7f`)에서도 실패한다(예전 셸의 메뉴 목록·설치 안내를 보는 검사가 v3 포스 셸 이후 갱신되지 않음). v4에서 새로 깨진 검사는 없다. 따로 고칠 일로 남긴다.
+5. (해결 · 8절) `test:navigation` · `test:pwa`가 `main`에서도 실패하던 문제: 예전 메뉴를 누르던 검사였다. `test:navigation`은 예전 화면과 함께 지웠고 `test:pwa`는 포스 레일 기준으로 고쳐 통과한다.
+
+## 8. 예전 화면 코드 정리와 번들 한도 (2026-09-21)
+
+새 포스 화면이 같은 경로를 나중에 등록해 덮어쓰기 때문에(`core.js`의 `register`는 마지막 등록이 이긴다) **어디서도 도달할 수 없던 예전 화면**을 지웠다. 지우기 전에 파일마다 등록 경로 · 내보내는 값 · 포스 쪽 의존을 조사했다.
+
+| 지운 것 | 크기 |
+|---|---:|
+| 예전 화면 9개: `rentals.js` · `settings.js` · `partners.js` · `closing.js` · `preparation.js` · `rental-board.js` · `dispatch-board.js` · `vehicle-board.js` · `rental-changes.js` | 215,712 |
+| 그 화면의 틀과 스타일: `rental-board.html` · `dispatch-board.html` · `vehicle-board.html` · 같은 이름의 CSS 3개 · `operations.css`, 빌드 보조 `scripts/rental_template.py` | 109,481 |
+| 렌더링되지 않던 예전 접수 시안 `design/prototypes/first-look.fragment.html`과 셸의 연결 코드(`core.js` · `build.py` · `check.py`) | 125,618 |
+| 그 시안만 쓰던 선택자(`.ski-*` · `#ski-first-look` · `#so-legacy`) 440개 규칙 — `styles.css` · `polish.css` · `responsive.css` · `workflows.css` · `notifications.css` | 약 47,500 |
+| 예전 화면만 누르던 검사 스크립트 26개와 `package.json`의 실행 항목 18개 | — |
+
+- **번들 1,632,437 → 1,110,342바이트(−522KB · −32%).** 크기 검사(`scripts/build.py`)는 1,750,000 → **2,000,000**으로 올리고, 넘으면 실제 크기를 알려 주게 했다. 이 값은 실수로 불어나는 것을 잡는 장치이지 플랫폼 제한이 아니다.
+- CSS는 선택자 단위로 지우는 스크립트를 썼고, **남아야 할 선택자 집합이 지우기 전후로 같은지**를 파일마다 확인한 뒤에만 저장했다(주석 안의 쉼표를 선택자로 잘못 읽는 문제를 이 확인이 잡아냈다).
+- 남긴 것(아직 쓰임): `login.js`(체험판 첫 화면) · `guide.js`(고객 안내 · QR 안내판) · `workflow-preparation.js` + `workflow-ui.js`(고객 사이즈 입력폼) · `notifications.js` · `returns.js` · `operations.js` · `time-picker.js` · 공용 스타일. 이 안에도 안 쓰는 부분이 약 150KB 남아 있다(예: `workflow-ui.js`의 예전 업무 화면 · 예전 알림함). 서로 얽혀 있어 이번에는 건드리지 않았다.
+- 확인: 업무 검사 6종 · `test:pwa`(포스 레일 기준으로 고침 · 6항목) · 단위 180 · 반납 25 · 알림 18 · `check` 통과, 촬영 60 + 기사 11 + 업무 검사 83 = 규칙 154곳 0건, 로그인 · 고객 안내 · 고객 입력폼 · QR 안내판 창을 직접 열어 확인.
+

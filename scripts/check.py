@@ -7,10 +7,9 @@ for p in js:
     body=p.read_text()
     if p.parent == ROOT/'design/app':
         assert not re.search(r'\b(?:fetch\s*\(|XMLHttpRequest\b|WebSocket\b|localStorage\b|sessionStorage\b|indexedDB\b)',body),p
-legacy = (ROOT/'design/prototypes/first-look.fragment.html').read_text()
-legacy += (ROOT/'design/app/pos-guest.html').read_text()
+legacy = (ROOT/'design/app/pos-guest.html').read_text()
 inline_scripts = re.findall(r'<script\b[^>]*>(.*?)</script>', legacy, flags=re.S)
-assert inline_scripts, 'The intake and vehicle script must be included in syntax checks'
+assert inline_scripts, 'The guest page script must be included in syntax checks'
 for source in inline_scripts:
     subprocess.run(['node','--check'],input=source,text=True,check=True)
 for p in [ROOT/'README.md',*(ROOT/'docs').glob('*.md')]:

@@ -62,7 +62,7 @@ npm test
 
 `npm test`는 반납·알림·업무 도메인, SQLite, HTTP API, 새 화면의 데모 연결을 72개 검사로 검증합니다. `npm run check`는 JavaScript 구문 검사와 정적 빌드를 수행합니다. GitHub Actions에서도 세 기능 검사를 수행한 뒤 Pages에 배포합니다.
 
-현재 화면의 실제 클릭과 가독성은 Chrome에서 매장 1366×768·1024×768, 차량 1024×600, 고객 360px 폭으로 확인했습니다. A4 21명이 실제 브라우저 인쇄에서 20+1명 두 쪽으로 나뉘는지도 확인했습니다. 상세 시나리오는 [1.0 검증 기록](docs/20-workflow-ui-release.md)에 있습니다. `test:legacy-ui`, `test:visual` 및 기존 개별 `test:*:ui` 스크립트는 이전 0.9 화면의 회귀 자료로 유지하며, 새 화면의 통과 근거로 사용하지 않았습니다. `test:workflows`에는 별도 브라우저 번들 검사도 포함되며 Chrome 설치가 필요합니다.
+현재 화면의 실제 클릭과 가독성은 Chrome에서 매장 1366×768·1024×768, 차량 1024×600, 고객 360px 폭으로 확인했습니다. A4 21명이 실제 브라우저 인쇄에서 20+1명 두 쪽으로 나뉘는지도 확인했습니다. 상세 시나리오는 [1.0 검증 기록](docs/20-workflow-ui-release.md)에 있습니다. 이전 0.9 화면(예전 셸)의 코드와 그 회귀 스크립트(`test:legacy-ui`, `test:visual`, 개별 `test:*:ui` 등)는 2026-09-21에 정리했습니다 — 새 포스 화면이 같은 경로를 덮어써서 도달할 수 없던 화면들입니다(`docs/43` 8절). 화면 검사는 `test:pos:*` 6종과 `npm run pos:rules`, 설치형 앱은 `test:pwa`를 씁니다. `test:workflows`에는 별도 브라우저 번들 검사도 포함되며 Chrome 설치가 필요합니다.
 
 `npm run build` 결과는 `dist/index.html`, `dist/ski-workflows.js`, `dist/manifest.webmanifest`, `dist/assets/`의 앱 아이콘입니다. `main`에 푸시하면 GitHub Actions가 검증·빌드 후 Pages를 갱신합니다. Pages 설정의 빌드 소스는 **GitHub Actions**입니다. 정적 체험 화면의 메모리 상태는 같은 페이지에서 매장·차량·고객 화면을 전환할 때 공유되며, 새로고침하면 초기화됩니다. 다른 기기의 고객 링크·실시간 공유에는 별도 API 연결이 필요합니다.
 
