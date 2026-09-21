@@ -9,3 +9,20 @@
 #ski-ops[data-pos="true"] .pos-fulfillment-tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
 #ski-ops[data-pos="true"] .pos-fulfillment-tabs [aria-pressed="true"]{background:var(--so-soft);border-color:#ffc7a9;color:var(--so-accent)}
 #ski-ops[data-pos="true"] .pos-summary-pages{display:flex;align-items:center;justify-content:space-between;gap:8px}
+#ski-ops[data-pos="true"] #so-dialog:has(.pos-fulfillment-picker){width:min(640px,calc(100% - 48px))}
+#ski-ops[data-pos="true"] #so-dialog:has(.pos-fulfillment-picker) .so-dialog-heading{padding:16px 24px 0}
+#ski-ops[data-pos="true"] #so-dialog:has(.pos-fulfillment-picker) #so-dialog-body{padding:0 24px 16px;gap:8px}
+#ski-ops[data-pos="true"] #so-dialog:has(.pos-fulfillment-picker) .pos-modal-body{gap:8px}
+#ski-ops[data-pos="true"] #so-dialog:has(.pos-fulfillment-picker) .pos-modal-sub{margin:0}
+#ski-ops[data-pos="true"] #so-dialog:has(.pos-fulfillment-picker) .pos-modal-footer{min-height:56px;padding:0}
+#ski-ops[data-pos="true"] .pos-fulfillment-picker{min-height:0;min-width:0}
+#ski-ops[data-pos="true"] .pos-fulfillment-row{height:64px;min-height:64px;padding:6px 12px;box-shadow:none;border-bottom:1px solid var(--so-line);border-radius:0}
+#ski-ops[data-pos="true"] .pos-fulfillment-row .pos-row-copy{flex:1;overflow:hidden}
+#ski-ops[data-pos="true"] .pos-fulfillment-row strong{display:block;white-space:nowrap;overflow:hidden}
+#ski-ops[data-pos="true"] .pos-fulfillment-row p{white-space:nowrap;overflow:hidden}
+#ski-ops[data-pos="true"] .pos-fulfillment-row output{display:flex;justify-content:center;min-width:40px}
+#ski-ops[data-pos="true"] .pos-fulfillment-money{display:flex;align-items:center;gap:12px;min-height:56px;padding:0 8px 0 16px;border-radius:10px;background:var(--so-bg)}
+#ski-ops[data-pos="true"] .pos-fulfillment-money b{margin-left:auto;font-size:var(--pos-fs-title);font-variant-numeric:tabular-nums}
+#ski-ops[data-pos="true"] .pos-fulfillment-money b[data-tone="red"]{color:var(--tone-red)}
+#ski-ops[data-pos="true"] .pos-fulfillment-money b[data-tone="green"]{color:var(--tone-green)}
+#ski-ops[data-pos="true"] .pos-fulfillment-extra{margin-right:auto}

@@ -5,9 +5,10 @@
 ## 0. 지금 상태
 
 - **UI v4 + 매장 설정 · 접수 확정(M0~M9)과 예전 화면 정리가 `main`에 반영됐다**(2026-09-21 · 사용자 확인 "메인페이지까지 반영"). 작업 브랜치는 `feat/pos-ui-v4`(같은 내용). 공개 체험판은 GitHub Pages(`main` 푸시 → Actions가 검사 · 빌드 · 배포).
-- 확인된 수치: 업무 검사 6종 · `test:pwa` · 단위 180 · 반납 25 · 알림 18 · `check` 통과, **화면 규칙 다섯 가지 154곳 0건**, 번들 1,110,342바이트(가드 2,000,000).
+- 기존 main의 확인된 수치: 업무 검사 6종 · `test:pwa` · 단위 180 · 반납 25 · 알림 18 · `check` 통과, **화면 규칙 다섯 가지 154곳 0건**, 번들 1,110,342바이트(가드 2,000,000).
 - 시안 원본 PNG(약 150MB)는 브랜치 `claude/pos-ui-improvement-q9yqku`에만 있다. **이 브랜치는 `main`에 합치지 않는다.** `main`에는 가벼운 미리보기(.jpg)만 둔다.
 - 사용자 파일 `docs/25-label-printer-purchase-notes.md`는 추적하지 않는 파일이다. 건드리거나 커밋하지 않는다.
+- **후속 A1 지급·반납 정리:** 사용자 확인 뒤 `feat/pos-ui-v4`에서 구현했다. 검증·시안 비교는 [`docs/47`](47-pos-fulfillment-ui.md). 이번 A1의 `main`·Pages 반영은 확인 대기이며, 다음 묶음은 A2다.
 
 ## 1. 먼저 읽을 것
 
@@ -26,9 +27,12 @@
 ```bash
 npm run build                      # dist/ 생성 (번들 크기 가드 2,000,000)
 npm run dev                        # http://127.0.0.1:58148/ 체험판 (촬영 스크립트가 이 서버를 쓴다)
-npm run test:pos:operating         # 업무 검사 6종: operating · fulfillment · tickets · management · preinput · keypad
+npm run test:pos:operating
+npm run test:pos:fulfillment && npm run test:pos:tickets && npm run test:pos:management && npm run test:pos:preinput && npm run test:pos:keypad  # 업무 검사 6종 전부
 npm run pos:rules                  # 포스 촬영(60장) + 규칙 검사   ← dev 서버가 켜져 있어야 한다
-npm run pos:screens:driver && node scripts/check-pos-ui-rules.cjs   # 기사 촬영(11장) + 전체 규칙 합산
+npm run pos:screens:driver        # 기사 촬영(11장)
+npm run pos:screens:fulfillment   # 지급·반납 15장 + 시안 비교 2장 (work/pos-ui-a1)
+node scripts/check-pos-ui-rules.cjs # 전체 규칙 합산
 npm run check && npm run test:workflows:unit && npm run test:returns && npm run test:notifications
 npm run test:pwa                   # 설치형 앱 흐름
 ```
@@ -68,7 +72,7 @@ npm run test:pwa                   # 설치형 앱 흐름
 
 | # | 화면 | 시안 | 코드 | 할 일 |
 |---|---|---|---|---|
-| A1 | 지급 · 반납 화면과 확인 창 | `p20-popup-issue` · `p22-popup-return` | `pos-fulfillment.js` `fulfillment() :78` · `pickerRow :67` · `showSummary :86` · `request :140` | 품목 행을 −/+(`.pos-stepper`)와 큰 수량으로, 제목을 `대표자 · 동작 수량` 형식으로, 확인 창을 요약 + 주 버튼 하나로. 카운터에서 가장 많이 쓰는 화면이라 먼저 한다. 검사: `test:pos:fulfillment`(16개 시나리오) |
+| A1 | 지급 · 반납 화면과 확인 창 | `p20-popup-issue` · `p22-popup-return` | `pos-fulfillment-view.js` · `pos-fulfillment.js` | **구현·검증 완료, main 반영 확인 대기.** 대표자·수량 제목, 공용 −/+, 미수·수납, 높이별 쪽 나눔. 검사 19개 및 5개 크기 촬영. 비교·검증 기록은 [`docs/47`](47-pos-fulfillment-ui.md). |
 | A2 | 기간 · 수거 변경 · 교환 · 문제 해결 | `p24` · `p25` · `p26` | `pos-fulfillment.js` `changes() :157` · `exchangeStart :312` · `exchangeRow :348` · `problems() :217` | 날짜 · 장소 · 시간은 선택 버튼(`.pos-option-row`)과 달력(`P.calendar`), 사이즈는 큰 버튼. `남은 1개만 연장` 등 부록 A 문구 유지 |
 | A3 | 발권 창 · 마감 확정 3단계 · 사이즈 입력 현황 · 사이즈 요청 창 · 업무 알림 | `p27` · `p28` · `p14` · `p31` · `p32` | `pos-tickets.js`, `pos-fulfillment.js`(발권), `pos-finance.js renderClosing() :105`, `pos-preinput.js render() :35 · requestModal :47`, `pos-notifications.js open() :19` | 선택형 입력은 `P.choice`, 목록은 `P.cards(..., { lines: true })`로. 검사: `test:pos:tickets` · `test:pos:preinput` · `test:pos:management` |
 | A4 | 재고 · 정비, 거래처 상세, 고객 상세 | `m02-inventory` · `m04-partner-detail` | `pos-management.js` `inventory() :47` · `partnerDetail() :77` · `customerDetail() :137` | 재고는 품목 타일 → 누르면 그 품목의 실물 목록(`pm-asset-*` 동작과 `[data-search="pm-assets"]` 유지). 거래처 · 고객 상세는 접수 상세와 같은 좌우 배치(`.pos-detail`) |

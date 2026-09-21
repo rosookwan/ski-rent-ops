@@ -295,7 +295,7 @@
     const key = target.dataset.posKey;
     const modalList = target.closest('#so-dialog .pos-paged-list');
     setPage(key, getPage(key) + Number(delta), { render: !modalList });
-    if (modalList) modalList.outerHTML = listRenders.get(pageKey(key))();
+    if (modalList) { modalList.outerHTML = listRenders.get(pageKey(key))(); fitPage(S.$('#so-dialog')); }
     const button = [...S.root.querySelectorAll('[data-action="pos-page-change"]')].find(el => el.dataset.posKey === key && el.dataset.id === delta && !el.disabled);
     (button || S.$('.pos-pager button:not(:disabled)'))?.focus({ preventScroll: true });
   });

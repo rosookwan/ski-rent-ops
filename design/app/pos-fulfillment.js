@@ -12,6 +12,7 @@
   const label = line => line.label || product(line)?.label || line.sku;
   const errorBox = () => '<p class="pos-error" data-fulfillment-error role="alert" hidden></p>';
   function error(reason) {
+    if (state.operation?.modal && S.$('#so-dialog[open] .pos-fulfillment-picker')) { state.operation.error = reason.message || String(reason); showSummary(state.operation); return; }
     const box = S.$('#so-dialog[open] [data-fulfillment-error]') || S.$('#so-page [data-fulfillment-error]');
     if (box) { box.hidden = false; box.textContent = reason.message || reason; } else S.toast(reason.message || reason);
   }
@@ -41,7 +42,7 @@
       if (kind === 'issue' || kind === 'dispatch') ids.filter(id => !used.has(id)).slice(0, count).forEach(id => used.add(id));
       return { lineId: line.id, ids, count };
     }).filter(row => ['issue', 'dispatch'].includes(kind) || row.ids.length);
-    return { kind, orderId, revision: D.snapshot.revision, rows, all, modal: all, busy: false };
+    return { kind, orderId, revision: D.snapshot.revision, rows, all, modal: ['issue', 'return', 'receive'].includes(kind), busy: false };
   }
   function count(operation = state.operation) { return operation.rows.reduce((total, row) => total + row.count, 0); }
   function lineItems(operation = state.operation) {
@@ -84,28 +85,30 @@
     return P.page(titles[operation.kind], description, body, footer(operation));
   }
   function showSummary(operation) {
-    const order = currentOrder(operation.orderId), groups = new Map();
-    for (const row of operation.rows) {
-      const line = order.lines.find(line => line.id === row.lineId), key = operation.kind === 'receive' ? null : (line.category || product(line)?.kind || line.sku);
-      if (operation.kind === 'receive') for (const id of row.ids) {
-        const asset = D.snapshot.assets.find(asset => asset.id === id), name = vehicleName(asset.location.id);
-        groups.set(name, (groups.get(name) || 0) + 1);
-      } else { const name = key === 'liftTicket' ? label(line) + ' · ' + line.start : { equipment: '장비', clothing: '의류', helmet: '헬멧' }[key] || label(line); groups.set(name, (groups.get(name) || 0) + row.count); }
-    }
-    const pages = Math.ceil(groups.size / 4), index = Math.max(0, Math.min(pages - 1, operation.summaryPage || 0));
-    operation.summaryPage = index;
-    const pageControls = pages > 1 ? '<div class="pos-summary-pages">' + button('앞 내역', 'pos-summary-page', '-1') + '<span>' + (index + 1) + ' / ' + pages + '쪽</span>' + button('뒤 내역', 'pos-summary-page', '1') + '</div>' : '';
-    P.modal(operation.kind === 'receive' ? '차량에서 받은 물품을 매장 입고할까요?' : '고객에게 모두 직접 받았나요?',
-      '<div class="pos-confirm-summary"><strong>' + e(order.customer.name) + ' · ' + e(operation.orderId) + '</strong><span>이번 확인 <b>' + count(operation) + '개</b></span></div>'
-      + '<div class="pos-return-summary">' + [...groups].slice(index * 4, index * 4 + 4).map(([name, quantity]) => '<div><span>' + e(name) + '</span><strong>' + quantity + '개</strong></div>').join('') + '</div>' + pageControls
-      + '<p class="pos-label">' + (operation.kind === 'receive' ? '실제 보관 차량별로 입고합니다.' : '고객이 지금 보유한 반납 대상만 처리합니다.') + ' 금액 정산은 고객 상세에서 이어집니다.</p>' + errorBox(),
-      button('수량을 따로 선택', 'pos-fulfillment-partial') + button('취소', 'close') + button(operation.kind === 'receive' ? '매장 입고 확정' : '모두 반납 확정', 'pos-fulfillment-confirm', '', 'primary'));
+    S.posFulfillmentView.show(operation, { limit, vehicleName, confirmLabels });
   }
-  function open(kind, id, all = false) {
+  function renderOperation() {
+    const operation = state.operation;
+    if (operation.modal) showSummary(operation); else S.render();
+  }
+  function refreshPrepared(orderId) {
+    const modal = state.operation.modal; state.operation = createOperation('issue', orderId); state.operation.modal = modal;
+    S.render(); renderOperation();
+  }
+  function resumeOperation(previous) {
+    const operation = createOperation(previous.kind, previous.orderId, previous.all);
+    for (const row of operation.rows) row.count = 0;
+    for (const row of operation.rows) row.count = Math.min(previous.rows.find(old => old.lineId === row.lineId)?.count || 0, limit(row, operation));
+    operation.all = previous.all && operation.rows.every(row => row.count === limit(row, operation));
+    state.operation = operation; S.render(); renderOperation();
+  }
+  function open(kind, id, all = false, modal) {
     try {
       const operation = createOperation(kind, id, all); state.operation = operation;
+      if (modal !== undefined) operation.modal = modal;
       if (!operation.rows.length) { S.toast('처리할 실물이 없습니다. 분실품은 문제 해결에서 발견을 확인하세요.'); return; }
-      if (all) showSummary(operation); else S.go(['issue', 'dispatch'].includes(kind) ? 'order-issue' : 'order-fulfillment', { id });
+      P.setPage(S.posFulfillmentView.key(operation), 0, { render: false });
+      if (operation.modal) showSummary(operation); else S.go(['issue', 'dispatch'].includes(kind) ? 'order-issue' : 'order-fulfillment', { id });
     } catch (reason) { error(reason); }
   }
   function ensureFresh(operation) {
@@ -138,9 +141,11 @@
     finally { operation.busy = false; controls.forEach(el => { el.disabled = false; }); }
   }
   function request(title, body, type, payload, done, confirmLabel = '확인하고 저장') {
+    const resume = state.operation?.modal && !!S.$('#so-dialog[open] .pos-fulfillment-picker');
     state.request = { revision: D.snapshot.revision, type, payload, done, busy: false };
-    P.modal(title, body + errorBox(), button('취소', 'close') + button(confirmLabel, 'pos-fulfillment-save', '', 'primary'));
+    P.modal(title, body + errorBox(), button('취소', resume ? 'pos-fulfillment-request-cancel' : 'close') + button(confirmLabel, 'pos-fulfillment-save', '', 'primary'));
   }
+  S.action('pos-fulfillment-request-cancel', () => { state.request = null; renderOperation(); });
   S.action('pos-fulfillment-save', async () => {
     const current = state.request; if (!current || current.busy) return;
     current.busy = true; const submit = S.$('[data-action="pos-fulfillment-save"]'); submit.disabled = true;
@@ -391,13 +396,13 @@
     + reasonSelect(['교환 요청 취소', '규격을 잘못 선택함', '다른 고객의 교환을 잘못 접수함']), 'exchange.cancel', () => ({ id, reason: readReason() }),
     () => { state.problemTab = 'equipment'; S.go('order-problems', { id: exchangeOf(id).orderId }); }, '교환 요청 취소'));
   S.action('pos-prepare-line', id => {
-    const order = currentOrder(), line = order.lines.find(line => line.id === id), stock = candidates(order, line).filter(asset => !asset.orderPreparation);
+    const order = currentOrder(state.operation?.orderId), line = order.lines.find(line => line.id === id), stock = candidates(order, line).filter(asset => !asset.orderPreparation);
     if (!stock.length || !unassignedQuantity(order, line)) { P.modal('준비할 물품을 먼저 확보하세요', '<p>정상 매장 재고와 기존 준비·배달 배정을 확인하세요. 부족한 장비는 거래처에서 확보할 수 있습니다.</p>', button('닫기', 'close') + '<button class="so-button pos-button primary" data-go="partners">거래처 장비 확보</button>'); return; }
     request('실제 물품과 규격 준비', '<div class="pos-info"><strong>' + e(label(line)) + '</strong><p>준비할 실물과 실제 규격을 확인하세요. 다른 일행이 가져갈 수 없도록 배정합니다.</p></div><div class="pos-form-grid">'
       + O.select('준비할 실물', 'prepare-asset', stock.map(asset => [asset.id, (asset.size || '규격 미기록') + ' · ' + asset.id]), stock[0].id)
       + O.input('실제 규격', 'prepare-size', stock[0].size || '', 'text', 'maxlength="24" placeholder="예: 160 / 260 / L / 공용"') + '</div>', 'ops.prepare',
       () => ({ orderId: order.id, lineItems: [{ lineId: line.id, assets: [{ assetId: O.read('prepare-asset'), size: O.read('prepare-size') }] }] }),
-      () => { state.operation = createOperation('issue', order.id); S.render(); S.toast('실제 물품·규격을 이 품목에 준비했습니다.'); }, '물품·규격 준비 확인');
+      () => { refreshPrepared(order.id); S.toast('실제 물품·규격을 이 품목에 준비했습니다.'); }, '물품·규격 준비 확인');
   });
   S.action('pos-prepare-cancel', id => {
     const order = currentOrder(), assets = D.snapshot.assets.filter(asset => asset.orderPreparation?.orderId === order.id && asset.orderPreparation.preparationId === id);
@@ -405,7 +410,7 @@
       + reasonSelect(['규격을 다시 준비함', '일행 미도착', '접수 취소 전 준비 해제']), 'ops.prepareCancel', () => ({ orderId: order.id, preparationId: id, reason: readReason() }), null, '미지급 준비 해제');
   });
   S.action('pos-ticket-issue', id => {
-    const order = currentOrder(), line = order.lines.find(line => line.id === id), allocated = D.snapshot.allocations.filter(a => a.reservationId === order.id && a.status === 'active' && !a.fulfilledAt && (line.reservationBindings || []).some(binding => binding.lineId === a.lineId)).length;
+    const order = currentOrder(state.operation?.orderId), line = order.lines.find(line => line.id === id), allocated = D.snapshot.allocations.filter(a => a.reservationId === order.id && a.status === 'active' && !a.fulfilledAt && (line.reservationBindings || []).some(binding => binding.lineId === a.lineId)).length;
     const left = line.unissuedQuantity - allocated;
     if (left <= 0) { error('이 품목은 이미 발권·배정했습니다. 지급할 수량을 선택하세요.'); return; }
     request('실제로 발권한 리프트권 기록', '<div class="pos-form-grid">'
@@ -416,7 +421,7 @@
       + O.select('반환 후 재사용 조건', 'ticket-transfer', [['false', '재사용 불가'], ['true', '유효시간 안에 양도 가능']], 'false') + '</div><p class="pos-label">실제 발권을 마친 권의 조건만 기록합니다. 판매 접수만으로 발권 완료되지 않습니다.</p>', 'ops.ticketIssue',
       () => { const sku = O.read('ticket-sku'); return { orderId: order.id, lineId: line.id, quantity: Number(O.read('ticket-quantity')), sku,
         ticket: { validFrom: O.read('ticket-from') + ':00+09:00', validTo: O.read('ticket-to') + ':00+09:00', acceptedTypes: [sku], transferable: O.read('ticket-transfer') === 'true', vendorId: O.read('ticket-vendor') } }; },
-      () => { state.operation = createOperation('issue', order.id); S.render(); S.toast('실제 발권·배정을 기록했습니다. 고객에게 지급할 권을 선택하세요.'); }, '실제 발권·배정 기록');
+      () => { refreshPrepared(order.id); S.toast('실제 발권·배정을 기록했습니다. 고객에게 지급할 권을 선택하세요.'); }, '실제 발권·배정 기록');
   });
   S.root.addEventListener('change', event => {
     const name = event.target.dataset.posInput;
@@ -435,12 +440,20 @@
   S.action('pos-return-some', id => open('return', id));
   S.action('pos-receive', id => open('receive', id, true));
   S.action('pos-fulfillment-confirm', confirm);
-  S.action('pos-summary-page', delta => { state.operation.summaryPage = (state.operation.summaryPage || 0) + Number(delta); showSummary(state.operation); });
-  S.action('pos-fulfillment-partial', () => { const op = state.operation; op.modal = false; op.all = false; S.go('order-fulfillment', { id: op.orderId }); });
-  S.action('pos-fulfillment-step', (id, target) => { const row = state.operation.rows.find(row => row.lineId === id); row.count = Math.max(0, Math.min(limit(row), row.count + Number(target.dataset.delta))); S.render(); });
-  S.action('pos-fulfillment-max', id => { const row = state.operation.rows.find(row => row.lineId === id); row.count = limit(row); S.render(); });
-  S.action('pos-fulfillment-clear', () => { state.operation.rows.forEach(row => { row.count = 0; }); S.render(); });
-  S.action('pos-fulfillment-refresh', async () => { try { const op = state.operation; await D.refresh(); open(op.kind, op.orderId, op.modal); } catch (reason) { error(reason); } });
+  S.action('pos-fulfillment-partial', () => { const op = state.operation; op.all = false; showSummary(op); });
+  S.action('pos-fulfillment-step', (id, target) => { const row = state.operation.rows.find(row => row.lineId === id); row.count = Math.max(0, Math.min(limit(row), row.count + Number(target.dataset.delta))); if (state.operation.kind === 'return') state.operation.all = false; renderOperation(); });
+  S.action('pos-fulfillment-max', id => { const row = state.operation.rows.find(row => row.lineId === id); row.count = limit(row); renderOperation(); });
+  S.action('pos-fulfillment-clear', () => { state.operation.rows.forEach(row => { row.count = 0; }); renderOperation(); });
+  S.action('pos-fulfillment-refresh', async () => { try { const op = state.operation; await D.refresh(); open(op.kind, op.orderId, op.all, op.modal); } catch (reason) { error(reason); } });
+  S.action('pos-fulfillment-tools', () => P.modal('수량 설정', '<div class="pos-fulfillment-toolbar">' + button('선택 초기화', 'pos-fulfillment-clear') + button('최신 수량으로 다시 선택', 'pos-fulfillment-refresh') + button('품목별 수량 상세', 'pos-fulfillment-detail') + '</div>' + errorBox(), button('돌아가기', 'pos-fulfillment-resume') + (D.pending ? button('같은 요청 다시 확인', 'pos-retry') : '')));
+  S.action('pos-fulfillment-resume', renderOperation);
+  S.action('pos-fulfillment-detail', () => { const op = state.operation; op.modal = false; S.go(op.kind === 'issue' ? 'order-issue' : 'order-fulfillment', { id: op.orderId }); });
+  S.action('pos-fulfillment-money', () => {
+    const previous = state.operation;
+    S.posFinance.openMoney(previous.orderId, 'payment', saved => { if (saved) resumeOperation(previous); else renderOperation(); });
+  });
+  let resizeTimer;
+  window.addEventListener('resize', () => { clearTimeout(resizeTimer); resizeTimer = setTimeout(() => { if (state.operation?.modal && S.$('#so-dialog[open] .pos-fulfillment-picker')) renderOperation(); }, 120); });
   S.register('order-fulfillment', { title: '지급·반납 처리', parent: 'returns', pos: true, render: fulfillment });
   S.register('order-issue', { title: '준비·지급 처리', parent: 'preparation', pos: true, render: fulfillment });
   S.register('order-changes', { title: '기간·수거 변경', parent: 'rentals', pos: true, render: changes });

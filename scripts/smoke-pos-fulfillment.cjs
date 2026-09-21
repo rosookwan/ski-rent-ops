@@ -47,6 +47,8 @@ const fs = require('node:fs');
         .filter(({ box }) => box.top < -1 || box.left < -1 || box.bottom > innerHeight + 1 || box.right > innerWidth + 1);
       const scroll = [...scope.querySelectorAll('*'), scope].filter(element => !element.hasAttribute('data-pos-scroll') && element.clientHeight && element.scrollHeight > element.clientHeight + 1 && ['auto', 'scroll'].includes(getComputedStyle(element).overflowY))
         .map(element => element.className || element.id);
+      const body = modal?.querySelector('.pos-modal-body');
+      if (body && body.scrollHeight > body.clientHeight + 2) scroll.push('pos-modal-body content overflow');
       return { width: innerWidth, height: innerHeight, outside, scroll };
     });
     layouts.push({ name, ...result }); assert.deepEqual(result.outside, [], name + ': content outside viewport'); assert.deepEqual(result.scroll, [], name + ': core needs scrolling'); await uiRules.add(name, frame);
@@ -102,28 +104,57 @@ const fs = require('node:fs');
         await D.execute('order.add', { orderId: 'pos-smoke', batch: { id: 'late-batch', lines: [{ id: 'late-ski', sku: 'ski', quantity: 1, start: D.today, end: D.today, price: { unitWon: 20000 } }] } });
         await D.execute('ops.issue', { orderId: 'pos-smoke', lineItems: [{ lineId: 'late-ski', assetIds }] }); SkiOps.render();
       });
-      await click('모두 받음'); assert.match(await dialog().innerText(), /이번 확인 1개/); await click('모두 반납 확정');
+      await click('모두 받음'); assert.match(await dialog().locator('#so-dialog-title').innerText(), /반납 확인 1개/); await click('모두 반납 확정');
       const result = await order(); assert.equal(result.lines[0].shopQuantity, 1); assert.equal(result.lines[1].shopQuantity, 1); assert.equal(result.totals.issuedQuantity, 2);
     });
     await test('500 order lines paginate without losing quantity selections or scrolling at 600 and 768 pixels', async () => {
       await fixture(Array.from({ length: 500 }, (_, index) => ({ id: 'line-' + index, sku: 'ski', quantity: 1 })));
-      await click('준비·지급하기'); await click('선택 초기화'); await action('pos-fulfillment-step', 'line-0').filter({ hasText: '+' }).click();
+      await click('준비·지급하기'); await click('수량 설정'); await click('선택 초기화'); await action('pos-fulfillment-step', 'line-0').filter({ hasText: '+' }).click();
       await click('다음'); await layout('500-lines-page-2-600'); await click('이전');
       assert.equal(await action('pos-fulfillment-step', 'line-0').first().locator('..').getByLabel('선택 수량').innerText(), '1');
       await page.screenshot({ path: output + '/500-lines-600.png' });
       await page.setViewportSize({ width: 1024, height: 768 }); await frame.waitForFunction(() => innerHeight === 768); await frame.evaluate(() => SkiOps.render()); await layout('500-lines-768');
       await page.setViewportSize({ width: 1024, height: 600 });
     });
+    await test('payment from the issue window preserves selected quantities and cancel returns without writing', async () => {
+      await fixture(); await click('준비·지급하기');
+      await action('pos-fulfillment-step', 'ski-today').filter({ hasText: '−' }).click();
+      const before = await snapshot(); await click('수납'); await click('취소');
+      assert.deepEqual(await snapshot(), before);
+      assert.equal(await action('pos-fulfillment-step', 'ski-today').first().locator('..').getByLabel('선택 수량').innerText(), '1');
+      await click('수납'); await click('수납 내역 확인'); await click('실제 처리 확인·기록');
+      assert.equal((await order()).finance.dueWon, 0);
+      assert.equal(await action('pos-fulfillment-step', 'ski-today').first().locator('..').getByLabel('선택 수량').innerText(), '1');
+      await layout('issue-after-payment-600'); await click('선택 물품 지급 확정');
+      assert.equal((await order()).totals.customerQuantity, 2);
+    });
+    await test('reducing a full return changes the confirmation to partial and leaves the other asset with the customer', async () => {
+      await fixture([{ id: 'ski-today', sku: 'ski', quantity: 2 }]); await click('준비·지급하기'); await click('선택 물품 지급 확정'); await click('모두 받음');
+      await action('pos-fulfillment-step', 'ski-today').filter({ hasText: '−' }).click();
+      assert.equal(await dialog().getByRole('button', { name: '모두 반납 확정', exact: true }).count(), 0);
+      await click('받은 수량 반납 확정');
+      assert.equal((await order()).totals.customerQuantity, 1); assert.equal((await order()).totals.shopQuantity, 1);
+    });
     await test('physical size preparation is saved and the same bound asset is issued', async () => {
       await fixture([{ id: 'ski-today', sku: 'ski', quantity: 1 }]); await click('준비·지급하기'); await click('규격·준비');
+      const before = await snapshot(); await click('취소'); assert.deepEqual(await snapshot(), before);
+      assert.match(await dialog().locator('#so-dialog-title').innerText(), /지급 1개/); await click('규격·준비');
       const assetId = await dialog().getByLabel('준비할 실물', { exact: true }).inputValue();
       await dialog().getByLabel('실제 규격', { exact: true }).fill('165'); await layout('preparation-confirm-600'); await click('물품·규격 준비 확인');
       assert.equal((await snapshot()).assets.find(asset => asset.id === assetId).orderPreparation.lineId, 'ski-today');
       await click('선택 물품 지급 확정'); const result = await order(); assert.deepEqual(result.lines[0].customerAssetIds, [assetId]); assert.equal((await snapshot()).assets.find(asset => asset.id === assetId).size, '165');
     });
+    await test('quantity detail retains per-line full selection and preparation without a second confirmation overlay', async () => {
+      await fixture([{ id: 'ski-today', sku: 'ski', quantity: 2 }]); await click('준비·지급하기'); await click('수량 설정'); await click('품목별 수량 상세');
+      await click('최신 수량으로 다시 선택'); assert.equal(await dialog().count(), 0);
+      await click('선택 초기화'); await click('전량');
+      assert.equal(await action('pos-fulfillment-step', 'ski-today').first().locator('..').getByLabel('선택 수량').innerText(), '2');
+      await click('규격·준비'); await dialog().getByLabel('실제 규격', { exact: true }).fill('165'); await click('물품·규격 준비 확인');
+      assert.equal(await dialog().count(), 0); await click('선택 물품 지급 확정'); assert.equal((await order()).totals.customerQuantity, 2);
+    });
     await test('cancelling an unissued prepared item leads to preparation release before cancelling only that item', async () => {
       await fixture([{ id: 'ski-today', sku: 'ski', quantity: 1 }]); await click('준비·지급하기'); await click('규격·준비');
-      await dialog().getByLabel('실제 규격', { exact: true }).fill('165'); await click('물품·규격 준비 확인'); await click('고객 상세로');
+      await dialog().getByLabel('실제 규격', { exact: true }).fill('165'); await click('물품·규격 준비 확인'); await click('취소');
       await action('pos-problems').click(); await click('미도착·배달 취소'); await click('이 미지급분 취소');
       assert.match(await dialog().innerText(), /준비 배정을 해제한 뒤/); await click('이 준비 해제'); await click('미지급 준비 해제');
       assert.ok(!(await snapshot()).assets.some(asset => asset.orderPreparation?.orderId === 'pos-smoke')); assert.equal((await order()).lines[0].cancelledQuantity, 0);
@@ -153,7 +184,7 @@ const fs = require('node:fs');
       await action('pos-problems').click(); await click('교환·분실·파손'); await click('상태·분실 확인'); await action('pos-condition-asset', assetId).click();
       await dialog().getByLabel('확인한 상태', { exact: true }).selectOption('lost'); await dialog().getByLabel('처리 사유', { exact: true }).selectOption('고객 분실 신고'); await layout('lost-confirm-600'); await click('확인하고 저장');
       assert.equal((await snapshot()).assets.find(asset => asset.id === assetId).condition, 'lost'); await go('order-detail');
-      await click('모두 받음'); assert.match(await dialog().innerText(), /이번 확인 1개/); await click('모두 반납 확정');
+      await click('모두 받음'); assert.match(await dialog().locator('#so-dialog-title').innerText(), /반납 확인 1개/); await click('모두 반납 확정');
       await action('pos-problems').click(); await click('교환·분실·파손'); await click('상태·분실 확인'); await click('실물 발견·매장 확인'); await click('실물 발견·매장 확인');
       const found = (await snapshot()).assets.find(asset => asset.id === assetId); assert.equal(found.condition, 'inspection'); assert.equal(found.location.kind, 'shop'); assert.equal((await order()).totals.customerQuantity, 0);
     });

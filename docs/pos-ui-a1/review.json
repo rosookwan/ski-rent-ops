@@ -1,0 +1,426 @@
+{
+  "checks": [
+    {
+      "key": "issue",
+      "file": "issue-1024x600.png",
+      "rules": {
+        "smallText": 0,
+        "clippedText": 0,
+        "halfCut": 0,
+        "shortTargets": 0,
+        "scrolling": 0
+      },
+      "geometry": {
+        "width": 1024,
+        "height": 600,
+        "bodies": [
+          {
+            "className": "pos-page-body is-cards",
+            "clientHeight": 408,
+            "scrollHeight": 408
+          },
+          {
+            "className": "pos-modal-body",
+            "clientHeight": 300,
+            "scrollHeight": 300
+          }
+        ],
+        "title": "박준호 팀 · 지급 5개"
+      }
+    },
+    {
+      "key": "partial-return",
+      "file": "partial-return-1024x600.png",
+      "rules": {
+        "smallText": 0,
+        "clippedText": 0,
+        "halfCut": 0,
+        "shortTargets": 0,
+        "scrolling": 0
+      },
+      "geometry": {
+        "width": 1024,
+        "height": 600,
+        "bodies": [
+          {
+            "className": "pos-page-body is-cards",
+            "clientHeight": 408,
+            "scrollHeight": 408
+          },
+          {
+            "className": "pos-modal-body",
+            "clientHeight": 300,
+            "scrollHeight": 300
+          }
+        ],
+        "title": "박준호 팀 · 반납 확인 0개"
+      }
+    },
+    {
+      "key": "return-confirm",
+      "file": "return-confirm-1024x600.png",
+      "rules": {
+        "smallText": 0,
+        "clippedText": 0,
+        "halfCut": 0,
+        "shortTargets": 0,
+        "scrolling": 0
+      },
+      "geometry": {
+        "width": 1024,
+        "height": 600,
+        "bodies": [
+          {
+            "className": "pos-page-body is-cards",
+            "clientHeight": 408,
+            "scrollHeight": 408
+          },
+          {
+            "className": "pos-modal-body",
+            "clientHeight": 300,
+            "scrollHeight": 300
+          }
+        ],
+        "title": "박준호 팀 · 반납 확인 5개"
+      }
+    },
+    {
+      "key": "issue",
+      "file": "issue-1024x768.png",
+      "rules": {
+        "smallText": 0,
+        "clippedText": 0,
+        "halfCut": 0,
+        "shortTargets": 0,
+        "scrolling": 0
+      },
+      "geometry": {
+        "width": 1024,
+        "height": 768,
+        "bodies": [
+          {
+            "className": "pos-page-body is-cards",
+            "clientHeight": 576,
+            "scrollHeight": 576
+          },
+          {
+            "className": "pos-modal-body",
+            "clientHeight": 300,
+            "scrollHeight": 300
+          }
+        ],
+        "title": "박준호 팀 · 지급 5개"
+      }
+    },
+    {
+      "key": "partial-return",
+      "file": "partial-return-1024x768.png",
+      "rules": {
+        "smallText": 0,
+        "clippedText": 0,
+        "halfCut": 0,
+        "shortTargets": 0,
+        "scrolling": 0
+      },
+      "geometry": {
+        "width": 1024,
+        "height": 768,
+        "bodies": [
+          {
+            "className": "pos-page-body is-cards",
+            "clientHeight": 576,
+            "scrollHeight": 576
+          },
+          {
+            "className": "pos-modal-body",
+            "clientHeight": 300,
+            "scrollHeight": 300
+          }
+        ],
+        "title": "박준호 팀 · 반납 확인 0개"
+      }
+    },
+    {
+      "key": "return-confirm",
+      "file": "return-confirm-1024x768.png",
+      "rules": {
+        "smallText": 0,
+        "clippedText": 0,
+        "halfCut": 0,
+        "shortTargets": 0,
+        "scrolling": 0
+      },
+      "geometry": {
+        "width": 1024,
+        "height": 768,
+        "bodies": [
+          {
+            "className": "pos-page-body is-cards",
+            "clientHeight": 576,
+            "scrollHeight": 576
+          },
+          {
+            "className": "pos-modal-body",
+            "clientHeight": 300,
+            "scrollHeight": 300
+          }
+        ],
+        "title": "박준호 팀 · 반납 확인 5개"
+      }
+    },
+    {
+      "key": "issue",
+      "file": "issue-1366x768.png",
+      "rules": {
+        "smallText": 0,
+        "clippedText": 0,
+        "halfCut": 0,
+        "shortTargets": 0,
+        "scrolling": 0
+      },
+      "geometry": {
+        "width": 1366,
+        "height": 768,
+        "bodies": [
+          {
+            "className": "pos-page-body is-cards",
+            "clientHeight": 576,
+            "scrollHeight": 576
+          },
+          {
+            "className": "pos-modal-body",
+            "clientHeight": 300,
+            "scrollHeight": 300
+          }
+        ],
+        "title": "박준호 팀 · 지급 5개"
+      }
+    },
+    {
+      "key": "partial-return",
+      "file": "partial-return-1366x768.png",
+      "rules": {
+        "smallText": 0,
+        "clippedText": 0,
+        "halfCut": 0,
+        "shortTargets": 0,
+        "scrolling": 0
+      },
+      "geometry": {
+        "width": 1366,
+        "height": 768,
+        "bodies": [
+          {
+            "className": "pos-page-body is-cards",
+            "clientHeight": 576,
+            "scrollHeight": 576
+          },
+          {
+            "className": "pos-modal-body",
+            "clientHeight": 300,
+            "scrollHeight": 300
+          }
+        ],
+        "title": "박준호 팀 · 반납 확인 0개"
+      }
+    },
+    {
+      "key": "return-confirm",
+      "file": "return-confirm-1366x768.png",
+      "rules": {
+        "smallText": 0,
+        "clippedText": 0,
+        "halfCut": 0,
+        "shortTargets": 0,
+        "scrolling": 0
+      },
+      "geometry": {
+        "width": 1366,
+        "height": 768,
+        "bodies": [
+          {
+            "className": "pos-page-body is-cards",
+            "clientHeight": 576,
+            "scrollHeight": 576
+          },
+          {
+            "className": "pos-modal-body",
+            "clientHeight": 300,
+            "scrollHeight": 300
+          }
+        ],
+        "title": "박준호 팀 · 반납 확인 5개"
+      }
+    },
+    {
+      "key": "issue",
+      "file": "issue-907x648.png",
+      "rules": {
+        "smallText": 0,
+        "clippedText": 0,
+        "halfCut": 0,
+        "shortTargets": 0,
+        "scrolling": 0
+      },
+      "geometry": {
+        "width": 907,
+        "height": 648,
+        "bodies": [
+          {
+            "className": "pos-page-body is-cards",
+            "clientHeight": 456,
+            "scrollHeight": 456
+          },
+          {
+            "className": "pos-modal-body",
+            "clientHeight": 300,
+            "scrollHeight": 300
+          }
+        ],
+        "title": "박준호 팀 · 지급 5개"
+      }
+    },
+    {
+      "key": "partial-return",
+      "file": "partial-return-907x648.png",
+      "rules": {
+        "smallText": 0,
+        "clippedText": 0,
+        "halfCut": 0,
+        "shortTargets": 0,
+        "scrolling": 0
+      },
+      "geometry": {
+        "width": 907,
+        "height": 648,
+        "bodies": [
+          {
+            "className": "pos-page-body is-cards",
+            "clientHeight": 456,
+            "scrollHeight": 456
+          },
+          {
+            "className": "pos-modal-body",
+            "clientHeight": 300,
+            "scrollHeight": 300
+          }
+        ],
+        "title": "박준호 팀 · 반납 확인 0개"
+      }
+    },
+    {
+      "key": "return-confirm",
+      "file": "return-confirm-907x648.png",
+      "rules": {
+        "smallText": 0,
+        "clippedText": 0,
+        "halfCut": 0,
+        "shortTargets": 0,
+        "scrolling": 0
+      },
+      "geometry": {
+        "width": 907,
+        "height": 648,
+        "bodies": [
+          {
+            "className": "pos-page-body is-cards",
+            "clientHeight": 456,
+            "scrollHeight": 456
+          },
+          {
+            "className": "pos-modal-body",
+            "clientHeight": 300,
+            "scrollHeight": 300
+          }
+        ],
+        "title": "박준호 팀 · 반납 확인 5개"
+      }
+    },
+    {
+      "key": "issue",
+      "file": "issue-875x600.png",
+      "rules": {
+        "smallText": 0,
+        "clippedText": 0,
+        "halfCut": 0,
+        "shortTargets": 0,
+        "scrolling": 0
+      },
+      "geometry": {
+        "width": 875,
+        "height": 600,
+        "bodies": [
+          {
+            "className": "pos-page-body is-cards",
+            "clientHeight": 408,
+            "scrollHeight": 408
+          },
+          {
+            "className": "pos-modal-body",
+            "clientHeight": 300,
+            "scrollHeight": 300
+          }
+        ],
+        "title": "박준호 팀 · 지급 5개"
+      }
+    },
+    {
+      "key": "partial-return",
+      "file": "partial-return-875x600.png",
+      "rules": {
+        "smallText": 0,
+        "clippedText": 0,
+        "halfCut": 0,
+        "shortTargets": 0,
+        "scrolling": 0
+      },
+      "geometry": {
+        "width": 875,
+        "height": 600,
+        "bodies": [
+          {
+            "className": "pos-page-body is-cards",
+            "clientHeight": 408,
+            "scrollHeight": 408
+          },
+          {
+            "className": "pos-modal-body",
+            "clientHeight": 300,
+            "scrollHeight": 300
+          }
+        ],
+        "title": "박준호 팀 · 반납 확인 0개"
+      }
+    },
+    {
+      "key": "return-confirm",
+      "file": "return-confirm-875x600.png",
+      "rules": {
+        "smallText": 0,
+        "clippedText": 0,
+        "halfCut": 0,
+        "shortTargets": 0,
+        "scrolling": 0
+      },
+      "geometry": {
+        "width": 875,
+        "height": 600,
+        "bodies": [
+          {
+            "className": "pos-page-body is-cards",
+            "clientHeight": 408,
+            "scrollHeight": 408
+          },
+          {
+            "className": "pos-modal-body",
+            "clientHeight": 300,
+            "scrollHeight": 300
+          }
+        ],
+        "title": "박준호 팀 · 반납 확인 5개"
+      }
+    }
+  ],
+  "errors": [],
+  "writes": []
+}

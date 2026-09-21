@@ -7,9 +7,9 @@
   const weekday = date => ['일', '월', '화', '수', '목', '금', '토'][new Date(date + 'T00:00:00').getDay()];
   const dayLabel = date => Number(date.slice(5, 7)) + '월 ' + Number(date.slice(8, 10)) + '일 ' + weekday(date) + '요일';
   let moneyDraft = null, closingDraft = null, listFilter = 'all', listQuery = '';
-  function openMoney(id, kind = 'payment') {
+  function openMoney(id, kind = 'payment', resume = null) {
     const o = D.order(id), f = o.finance;
-    moneyDraft = { orderId: id, kind, revision: D.snapshot.revision, amountWon: kind === 'payment' ? f.dueWon : kind === 'refund' ? f.creditWon : kind === 'deposit_out' ? f.depositHeldWon : '', method: 'cash', scope: '', payer: o.customer.name, reason: '' };
+    moneyDraft = { orderId: id, kind, resume, revision: D.snapshot.revision, amountWon: kind === 'payment' ? f.dueWon : kind === 'refund' ? f.creditWon : kind === 'deposit_out' ? f.depositHeldWon : '', method: 'cash', scope: '', payer: o.customer.name, reason: '' };
     renderMoney();
   }
   function renderMoney() {
@@ -20,12 +20,14 @@
     P.modal(o.customer.name + ' 팀 · ' + names[d.kind], tabs + '<div class="pos-money-head"><span>' + (deposit ? '보증금 보관' : '미수') + '</span><b data-tone="' + (deposit ? 'blue' : f.dueWon ? 'red' : 'green') + '">' + e(won(deposit ? f.depositHeldWon : f.dueWon)) + '</b></div>'
       + '<div class="pos-form-grid">' + input('실제로 처리한 금액 (원)', 'moneyAmount', d.amountWon, 'number', 'min="1" inputmode="numeric"') + '<div class="so-field">처리 수단' + P.choice('moneyMethod', [['cash', '현금'], ['card', '카드 단말'], ['transfer', '계좌이체']], d.method) + '</div></div>' + quick
       + '<div class="pos-form-grid">' + input('실제 결제자 (선택)', 'payer', d.payer) + (deposit ? '<div class="pos-info">보증금은 대여료와 별도 보관</div>' : select('금액 적용 대상', 'moneyScope', scope, d.scope)) + (d.kind === 'refund' || d.kind === 'deposit_out' ? input('환불·반환 사유', 'moneyReason', d.reason || '실제 반환 확인') : '') + '</div>' + errorBox(),
-      b('취소', 'close') + b('금액 조정', 'pos-adjust', o.id) + b(names[d.kind] + ' 내역 확인', 'pos-money-review', '', 'primary'), (o.receiptNo || o.id) + ' · 청구 ' + won(f.chargedWon) + ' · 수납 ' + won(f.netPaidWon || 0) + (f.creditWon ? ' · 초과 수납 ' + won(f.creditWon) : ''));
+      b('취소', 'pos-money-cancel') + b('금액 조정', 'pos-adjust', o.id) + b(names[d.kind] + ' 내역 확인', 'pos-money-review', '', 'primary'), (o.receiptNo || o.id) + ' · 청구 ' + won(f.chargedWon) + ' · 수납 ' + won(f.netPaidWon || 0) + (f.creditWon ? ' · 초과 수납 ' + won(f.creditWon) : ''));
   }
   S.action('pos-money-quick', value => { const el = S.$('#so-dialog[open] [data-pos-input="moneyAmount"]'); if (!el) return; const d = moneyDraft, f = D.order(d.orderId).finance, full = d.kind === 'payment' ? f.dueWon : d.kind === 'refund' ? f.netPaidWon : f.depositHeldWon; el.value = value === 'clear' ? '' : value === 'full' ? full : (Number(el.value) || 0) + Number(value); el.dispatchEvent(new Event('input', { bubbles: true })); });
   S.action('pos-money', id => openMoney(id || D.order().id));
   S.action('pos-deposit-out', id => openMoney(id, 'deposit_out'));
-  S.action('pos-money-kind', kind => openMoney(moneyDraft.orderId, kind));
+  S.action('pos-money-cancel', () => { const resume = moneyDraft?.resume; moneyDraft = null; S.close(); resume?.(false); });
+  S.posFinance = { openMoney };
+  S.action('pos-money-kind', kind => openMoney(moneyDraft.orderId, kind, moneyDraft.resume));
   S.action('pos-money-review', () => {
     try {
       const d = moneyDraft; d.amountWon = Number(read('moneyAmount')); d.method = read('moneyMethod'); d.payer = read('payer'); d.scope = read('moneyScope') || ''; d.reason = read('moneyReason') || '';
@@ -41,7 +43,7 @@
   S.action('pos-money-save', async () => {
     try { const d = moneyDraft; if (d.revision !== D.snapshot.revision) throw new Error('기록이 변경되었습니다. 금액을 다시 확인해 주세요.');
       await D.execute('finance.payment', { id: D.id('payment'), orderId: d.orderId, kind: d.kind, amountWon: d.amountWon, method: d.method, payer: d.payer, ...(d.scope ? { allocations: [{ lineId: d.scope, amountWon: d.amountWon }] } : {}), ...(d.reason ? { reason: d.reason } : {}) });
-      moneyDraft = null; S.close(); S.render(); S.toast(names[d.kind] + ' ' + won(d.amountWon) + ' 기록 완료');
+      moneyDraft = null; S.close(); S.render(); d.resume?.(true); S.toast(names[d.kind] + ' ' + won(d.amountWon) + ' 기록 완료');
     } catch (err) { error(err); }
   });
   S.action('pos-adjust', id => {
