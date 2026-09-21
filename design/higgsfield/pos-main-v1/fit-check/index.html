@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="ko">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>카드 목록 맞춤 검사</title>
+<style>
+  /* 실제 크기 검사용 화면. 시안(P02 카드 목록)을 요청서의 글자 크기 그대로 그려서
+     최저 표시 영역에서 글자·카드가 잘리는지 잰다. ?w=1024&h=600 처럼 크기를 바꿔 연다.
+     design/app 코드가 아니며, 구현할 때 참고할 규칙을 확인하는 용도다. */
+  @font-face { font-family: "Pretendard Variable"; src: url("../../../vendor/PretendardVariable.woff2") format("woff2-variations"); font-weight: 45 920; font-display: block; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: #d9d9d6; color: #1A1A1A; font-family: "Pretendard Variable", "Apple SD Gothic Neo", sans-serif; letter-spacing: -0.02em; }
+  .frame { position: relative; width: var(--w); height: var(--h); overflow: hidden; background: #F4F4F2; display: grid; grid-template-columns: var(--rail) minmax(0, 1fr); grid-template-rows: 60px minmax(0, 1fr); }
+  .rail { grid-row: 1 / 3; background: #fff; border-right: 1px solid #E3E3E3; padding: 12px 6px; display: flex; flex-direction: column; gap: 4px; }
+  .rail div { height: 56px; display: grid; place-items: end center; font-size: 16px; font-weight: 700; color: #3a3a3a; padding-bottom: 6px; border-radius: 12px; white-space: nowrap; }
+  .rail div.on { background: #FE4E10; color: #fff; } .rail div:last-child { margin-top: auto; }
+  .header { background: #fff; border-bottom: 1px solid #E3E3E3; display: flex; align-items: center; gap: 14px; padding: 0 16px; min-width: 0; white-space: nowrap; }
+  .header b { color: #5F33E1; font-size: 16px; } .header span { color: #5D5D5D; font-size: 18px; } .header strong { font-size: 24px; }
+  .header .sp { flex: 1; } .header i { font-style: normal; height: 48px; padding: 0 14px; border: 1px solid #cfcfcf; border-radius: 12px; display: grid; place-items: center; font-size: 18px; color: #1A1A1A; }
+  .main { display: grid; grid-template-rows: 60px minmax(0, 1fr) 72px; min-height: 0; min-width: 0; }
+  .toolbar { background: #fff; border-bottom: 1px solid #E3E3E3; display: flex; align-items: center; gap: 8px; padding: 0 16px; font-size: 18px; min-width: 0; white-space: nowrap; }
+  .toolbar i { font-style: normal; height: 52px; padding: 0 14px; border: 1px solid #cfcfcf; border-radius: 12px; display: grid; place-items: center; background: #fff; flex-shrink: 0; }
+  .toolbar i.on { background: #FE4E10; border-color: #FE4E10; color: #fff; font-weight: 700; }
+  .toolbar .search { flex: 1 1 0; min-width: 0; justify-content: start; color: #8a8a8a; display: flex; align-items: center; overflow: hidden; }
+  .toolbar .search .fit { flex: 1 1 0; min-width: 0; overflow: hidden; }
+  .toolbar .seg { display: flex; flex-shrink: 0; } .toolbar .seg i { border-radius: 0; } .toolbar .seg i:first-child { border-radius: 12px 0 0 12px; background: #24272e; color: #fff; border-color: #24272e; } .toolbar .seg i:last-child { border-radius: 0 12px 12px 0; border-left: 0; }
+  .content { padding: 8px 16px 0; min-height: 0; overflow: hidden; }
+  .group { display: flex; align-items: baseline; gap: 10px; height: 34px; white-space: nowrap; } .cards + .group { margin-top: 0; } .group b { font-size: 22px; } .group span { font-size: 18px; color: #5D5D5D; }
+  .cards { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 12px; align-items: start; margin-bottom: 12px; }
+  .footer { background: #fff; border-top: 1px solid #E3E3E3; display: flex; align-items: center; gap: 10px; padding: 0 16px; font-size: 18px; color: #3a3a3a; min-width: 0; white-space: nowrap; }
+  .footer .sum { flex: 1 1 0; min-width: 0; overflow: hidden; } .footer .pager { flex-shrink: 0; }
+  .footer i { font-style: normal; height: 56px; padding: 0 16px; border: 1px solid #cfcfcf; border-radius: 12px; display: grid; place-items: center; font-weight: 700; background: #fff; flex-shrink: 0; color: #1A1A1A; }
+  .footer i.on { background: #FE4E10; border-color: #FE4E10; color: #fff; }
+
+  .card { background: #fff; border: 1px solid #E3E3E3; border-radius: 16px; padding: 14px; display: flex; flex-direction: column; gap: 4px; min-width: 0; position: relative; }
+  .card.green { border: 2px solid #247A3D; padding: 13px; } .card.amber { border: 2px solid #B45309; padding: 13px; }
+  .legend { position: absolute; top: -13px; right: 18px; font-size: 16px; font-weight: 700; color: #fff; padding: 2px 10px; border-radius: 6px; line-height: 1.3; white-space: nowrap; }
+  .green .legend { background: #247A3D; } .amber .legend { background: #B45309; }
+  .row { display: flex; align-items: center; gap: 10px; min-width: 0; white-space: nowrap; overflow: hidden; }
+  .row .fit { flex: 1 1 0; min-width: 0; overflow: hidden; }
+  .l1 { align-items: baseline; } .l1 b { font-size: 22px; line-height: 1.25; } .l1 .phone { font-size: 18px; color: #5D5D5D; font-weight: 400; margin-left: 10px; }
+  .badge { flex-shrink: 0; font-size: 16px; font-weight: 700; padding: 2px 10px; border-radius: 6px; background: #ECECEC; color: #4a4a4a; }
+  .meta { font-size: 16px; line-height: 1.3; color: #5D5D5D; }
+  .items { font-size: 18px; font-weight: 700; line-height: 1.3; }
+  .chip { flex-shrink: 0; font-size: 16px; font-weight: 700; color: #fff; background: #0074D9; border-radius: 999px; padding: 3px 10px; line-height: 1.3; }
+  .bottom { margin-top: 2px; } .money { font-size: 18px; font-weight: 700; color: #B42318; }
+  .btn { flex: 0 0 56%; height: 52px; border: 1px solid #bdbdbd; border-radius: 12px; display: grid; place-items: center; font-size: 18px; font-weight: 700; background: #fff; }
+  #report { font: 14px/1.5 ui-monospace, monospace; white-space: pre-wrap; margin: 10px; color: #111; }
+</style>
+<body>
+<div id="app"></div>
+<pre id="report"></pre>
+<script>
+const q = new URLSearchParams(location.search);
+const W = +q.get("w") || 1024, H = +q.get("h") || 600;
+const RAIL = W >= 1000 ? 112 : 96; // 좁은 창에서는 v3의 96px 레일
+const TWO_GROUPS = q.get("groups") === "2";
+
+const KINDS = [["스키", 2], ["의류", 2], ["헬멧", 1], ["보드", 1], ["고글", 2], ["보호대", 1], ["스키부츠", 1], ["보드부츠", 1], ["폴대", 2], ["장갑", 3], ["오후권 성인", 4], ["야간권 성인", 2]];
+const kinds = n => KINDS.slice(0, n).map(([k, c]) => k + " " + c);
+const TEAMS = [
+  { name: "김영희 팀", phone: "010-0000-0021", meta: ["9/17 09:30 수령", "매장 수령", "9/17 이용", "R-021"], n: 8, tone: "green", legend: "지급 완료" },
+  { name: "한국대학교 스키동아리 팀", phone: "010-0000-0023", meta: ["9/17 10:00 수령", "무주덕유산리조트 설천하우스 앞 주차장", "9/17~9/19 이용", "R-023"], n: 12, tone: "amber", legend: "사이즈 미입력 2명" },
+  { name: "정하늘 팀", phone: "010-0000-0026", meta: ["9/17 11:00 수령", "매장 수령", "9/17 이용", "R-026"], n: 5, badge: "예약 확정" },
+  { name: "최은정 팀", phone: "010-0000-0024", meta: ["9/17 11:30 수령", "만선 티롤 앞", "9/17~9/18 이용", "R-024"], n: 3, badge: "예약 확정" }
+];
+
+let probe;
+function width(text, font) { probe.style.font = font; probe.textContent = text; return probe.getBoundingClientRect().width; }
+// 글자를 자르지 않는다. 자리가 모자라면 뒤쪽(덜 중요한) 조각부터 통째로 빼고, 품목 줄은 "외 N종"으로 끝낸다.
+function fitParts(parts, avail, font, joiner, tail) {
+  for (let k = parts.length; k >= 1; k--) {
+    const text = parts.slice(0, k).join(joiner) + (k < parts.length && tail ? tail(parts.length - k) : "");
+    if (width(text, font) <= avail) return { text, shown: k };
+  }
+  return { text: tail ? "품목 " + parts.length + "종" : parts[0], shown: 0 };
+}
+
+const EXTRA = [{ name: "박준호 팀", phone: "010-0000-0022", meta: ["9/17 11:40 수령", "설천 주차장", "9/17 이용", "R-022"], n: 3, badge: "예약 확정" }, { name: "한지훈 팀", phone: "010-0000-0027", meta: ["9/17 11:50 수령", "매장 수령", "9/17 이용", "R-027"], n: 2, badge: "예약 확정" }];
+const GROUPS = TWO_GROUPS ? [{ title: "09:00~12:00 수령", teams: TEAMS.slice(0, 2) }, { title: "12:00~17:00 수령", teams: TEAMS.slice(2, 4) }] : [{ title: "09:00~12:00 수령", teams: [...TEAMS, ...EXTRA] }];
+const ALL = GROUPS.flatMap(g => g.teams);
+
+function render() {
+  const rail = ["오늘 할 일", "1 접수·예약", "2 준비·지급", "3 이용·변경", "4 반납·회수", "5 정산·마감", "리프트권", "차량 운행", "관리"];
+  document.getElementById("app").innerHTML = `<div class="frame" id="frame" style="--w:${W}px;--h:${H}px;--rail:${RAIL}px">
+    <div class="rail">${rail.map((t, i) => `<div class="${i === 1 ? "on" : ""}">${t}</div>`).join("")}</div>
+    <div class="header"><b>스키노트</b><span>우리 스키샵</span><strong>1 접수·예약</strong><span class="sp"></span><i>알림 1</i><i>나가기</i></div>
+    <div class="main"><div class="toolbar"><i class="search"><span class="fit" data-fit="search"></span></i><i class="on">오늘 5</i><i>내일 2</i><i>전체 7</i><i>달력</i><span class="seg"><i>시간 묶음</i><i>접수 순서</i></span></div>
+    <div class="content">${GROUPS.map((g, gi) => `<div class="group" data-unit="h${gi}"><b>${g.title}</b><span>${g.teams.length}팀</span></div><div class="cards" data-group="${gi}">${g.teams.map(t => `<div class="card ${t.tone || ""}">${t.legend ? `<span class="legend">${t.legend}</span>` : ""}
+      <div class="row l1"><span class="fit" data-fit="name"></span>${t.badge ? `<span class="badge">${t.badge}</span>` : ""}</div>
+      <div class="row meta"><span class="fit" data-fit="meta"></span></div>
+      <div class="row items"><span class="fit" data-fit="items"></span><span class="chip">차량 수거 예정</span></div>
+      <div class="row bottom"><span class="fit money">미수 65,000원</span><span class="btn">접수 상세</span></div></div>`).join("")}</div>`).join("")}</div>
+    <div class="footer"><span class="sum fit" data-fit="sum"></span><span class="pager" id="pager"></span><i>최신 기록 확인</i><i class="on">새 접수</i></div></div></div>`;
+
+  const F = { name: "700 22px 'Pretendard Variable'", phone: "400 18px 'Pretendard Variable'", meta: "400 16px 'Pretendard Variable'", items: "700 18px 'Pretendard Variable'", body: "400 18px 'Pretendard Variable'" };
+  const notes = [];
+  document.querySelectorAll(".card").forEach((el, i) => {
+    const t = ALL[i], slot = k => el.querySelector(`[data-fit="${k}"]`), avail = k => slot(k).getBoundingClientRect().width;
+    // 1행: 이름은 늘 다 보이고, 전화번호는 자리가 있을 때만 옆에 둔다(없으면 접수 상세·검색에서 본다).
+    const nameW = width(t.name, F.name), phoneFits = nameW + 10 + width(t.phone, F.phone) <= avail("name");
+    slot("name").innerHTML = `<b>${t.name}</b>` + (phoneFits ? `<span class="phone">${t.phone}</span>` : "");
+    if (nameW > avail("name")) notes.push(`${t.name}: 이름이 1행 폭(${avail("name").toFixed(0)}px)을 넘음 ${nameW.toFixed(0)}px`);
+    // 2행: 시간 → 장소 → 이용일 → 접수번호 순. 장소가 시간 옆에 안 들어가면 날짜를 뺀 시간으로 줄여 다시 맞추고,
+    // 그래도 안 되면 장소만 둔다(시간대는 묶음 제목에 있다).
+    let m = fitParts(t.meta, avail("meta"), F.meta, " · ");
+    if (m.shown < 2) m = fitParts([t.meta[0].replace(/^\d+\/\d+ /, ""), ...t.meta.slice(1)], avail("meta"), F.meta, " · ");
+    if (m.shown < 2 && width(t.meta[1], F.meta) <= avail("meta")) m = { text: t.meta[1], shown: 1 };
+    slot("meta").textContent = m.text;
+    const it = fitParts(kinds(t.n), avail("items"), F.items, " · ", rest => " 외 " + rest + "종"); slot("items").textContent = it.text;
+    notes.push(`${t.name}: 전화번호 ${phoneFits ? "표시" : "생략"} · 메타 ${m.shown}/${t.meta.length}조각 · 품목 ${it.shown}/${t.n}종 표시 (품목 줄 ${avail("items").toFixed(0)}px)`);
+  });
+  const search = document.querySelector('[data-fit="search"]');
+  search.textContent = ["이름 · 연락처 뒷자리 · 접수번호", "이름 · 연락처 · 접수번호", "이름 · 접수번호", "검색"].find(t => width(t, F.body) <= search.getBoundingClientRect().width) || "검색";
+
+  // 쪽 나눔: 목록 영역 높이에 제목과 카드 줄을 위에서부터 채운다. 온전히 안 들어가는 줄은 다음 쪽으로 넘긴다.
+  const contentEl = document.querySelector(".content"), availH = contentEl.clientHeight - 8 - 8, GAP = 12, HEAD = 34;
+  const units = []; // {els, h, head}
+  document.querySelectorAll(".cards").forEach((grid, gi) => {
+    const head = document.querySelector(`[data-unit="h${gi}"]`), cs = [...grid.children];
+    for (let r = 0; r < cs.length; r += 2) units.push({ els: cs.slice(r, r + 2), h: Math.max(...cs.slice(r, r + 2).map(c => c.offsetHeight)) + GAP, head: r === 0 ? head : null, gi });
+  });
+  const pages = [[]]; let used = 0, lastGroup = -1;
+  for (const u of units) {
+    const needHead = u.gi !== lastGroup || pages[pages.length - 1].length === 0, cost = u.h + (needHead ? HEAD : 0);
+    if (used + cost - GAP > availH && pages[pages.length - 1].length) { pages.push([]); used = 0; }
+    pages[pages.length - 1].push(u); used += u.h + ((u.gi !== lastGroup || pages[pages.length - 1].length === 1) ? HEAD : 0); lastGroup = u.gi;
+  }
+  const first = new Set(pages[0]); // 첫 쪽만 그린다
+  units.forEach(u => { if (!first.has(u)) u.els.forEach(e => e.remove()); });
+  document.querySelectorAll(".cards").forEach((grid, gi) => { if (!grid.children.length) { grid.remove(); document.querySelector(`[data-unit="h${gi}"]`).remove(); } });
+  document.getElementById("pager").textContent = "‹ 1 / " + pages.length + "쪽 ›";
+  // 하단 요약은 쪽수 글자가 정해진 뒤에 맞춘다(쪽수가 자리를 먼저 차지한다).
+  const sum = document.querySelector('[data-fit="sum"]');
+  sum.textContent = fitParts(["수령 5팀", "예약 금액 435,000원", "예약 5세트", "사이즈 미입력 0명"], sum.getBoundingClientRect().width, F.body, " · ").text;
+  notes.push(`쪽 나눔: 목록 높이 ${availH}px → 첫 쪽 카드 ${pages[0].reduce((n, u) => n + u.els.length, 0)}장, 전체 ${pages.length}쪽 (${units.length}줄)`);
+
+  // 검사: 세로(아랫줄 카드가 하단 바에 가리는가), 가로(어느 줄이든 글자가 칸을 넘는가)
+  const content = document.querySelector(".content").getBoundingClientRect();
+  const cards = [...document.querySelectorAll(".card")].map(c => c.getBoundingClientRect());
+  const over = Math.max(...cards.map(r => r.bottom)) - content.bottom;
+  const clipped = [...document.querySelectorAll(".fit, .toolbar, .footer, .header, .rail div, .group")].filter(e => e.scrollWidth > e.clientWidth + 1).map(e => (e.dataset.fit || e.className) + " " + e.scrollWidth + ">" + e.clientWidth);
+  const rep = [`표시 영역 ${W}×${H} · 레일 ${RAIL}px · 카드 폭 ${cards[0].width.toFixed(0)}px · 카드 높이 ${cards.map(r => r.height.toFixed(0)).join("/")}px · 목록 영역 높이 ${content.height.toFixed(0)}px`,
+    over > 0 ? `세로: 아랫줄 카드가 ${over.toFixed(0)}px 잘림` : `세로: 보이는 카드 ${cards.length}장 모두 온전 (여유 ${(-over).toFixed(0)}px)`,
+    clipped.length ? "가로: 잘린 줄 → " + clipped.join(", ") : "가로: 잘린 글자 0", ...notes,
+    "검색창 문구: " + search.textContent, "하단 요약: " + sum.textContent];
+  document.getElementById("report").textContent = rep.join("\n");
+  window.__fit = { W, H, over, clipped, rep };
+}
+document.fonts.load("700 18px 'Pretendard Variable'").then(() => document.fonts.ready).then(() => {
+  probe = document.createElement("span"); probe.style.cssText = "position:absolute;visibility:hidden;white-space:nowrap;letter-spacing:-0.02em"; document.body.appendChild(probe);
+  render();
+});
+</script>
+</body>
+</html>
