@@ -1,0 +1,20 @@
+{
+  "checks": [
+    "management hub and inventory remain readable with a fixed action footer at three POS sizes",
+    "inventory status writes change actual ready counts and found items require inspection before reuse",
+    "partner borrowing, partial physical return and cash entries remain separate actual records",
+    "partner lending, actual recovery, explicit obligations and offset keep physical stock and cash separate",
+    "customer contact changes preserve accepted visit snapshots and explicitly link only chosen candidates",
+    "all setting tabs persist versions while existing charges stay unchanged",
+    "new equipment and lift ticket catalogs can be added without changing existing items",
+    "customer QR guidance keeps the existing guest route",
+    "daily closing shows current partner obligations and preserves the confirmed balances separately from customer handover"
+  ],
+  "screenshots": [
+    "work/screens/pos-management/inventory-1024-600.png",
+    "work/screens/pos-management/inventory-1024-768.png",
+    "work/screens/pos-management/inventory-1366-768.png"
+  ],
+  "errors": [],
+  "writes": []
+}

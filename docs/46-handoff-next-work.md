@@ -4,13 +4,14 @@
 
 ## 0. 지금 상태
 
-- **UI v4 + 매장 설정 · 접수 확정(M0~M9)과 예전 화면 정리가 `main`에 반영됐다**(2026-09-21 · 사용자 확인 "메인페이지까지 반영"). 작업 브랜치는 `feat/pos-ui-v4`이며, 아래 A1~A3 후속 변경은 아직 main에 반영하지 않았다. 공개 체험판은 GitHub Pages(`main` 푸시 → Actions가 검사 · 빌드 · 배포).
+- **UI v4 + 매장 설정 · 접수 확정(M0~M9)과 예전 화면 정리가 `main`에 반영됐다**(2026-09-21 · 사용자 확인 "메인페이지까지 반영"). 작업 브랜치는 `feat/pos-ui-v4`이며, 아래 A1~A4 후속 변경은 아직 main에 반영하지 않았다. 공개 체험판은 GitHub Pages(`main` 푸시 → Actions가 검사 · 빌드 · 배포).
 - 기존 main의 확인된 수치: 업무 검사 6종 · `test:pwa` · 단위 180 · 반납 25 · 알림 18 · `check` 통과, **화면 규칙 다섯 가지 154곳 0건**, 번들 1,110,342바이트(가드 2,000,000).
 - 시안 원본 PNG(약 150MB)는 브랜치 `claude/pos-ui-improvement-q9yqku`에만 있다. **이 브랜치는 `main`에 합치지 않는다.** `main`에는 가벼운 미리보기(.jpg)만 둔다.
 - 사용자 파일 `docs/25-label-printer-purchase-notes.md`는 추적하지 않는 파일이다. 건드리거나 커밋하지 않는다.
 - **후속 A1 지급·반납 정리:** 사용자 확인 뒤 `feat/pos-ui-v4`에서 구현했다. 검증·시안 비교는 [`docs/47`](47-pos-fulfillment-ui.md). A1의 `main`·Pages 반영은 확인 대기다.
 - **후속 A2 기간·수거 변경·교환·문제 해결:** 같은 브랜치에서 구현했다. 비교·검증은 [`docs/48`](48-pos-adjustments-ui.md). `main`·Pages 반영은 확인 대기다.
-- **후속 A3 발권·마감·사이즈 입력·알림:** 같은 브랜치에서 구현했다. 비교·검증은 [`docs/49`](49-pos-workflow-windows-ui.md). 전체 규칙 244곳 0건, `main`·Pages 반영은 확인 대기이며, 다음 묶음은 A4다.
+- **후속 A3 발권·마감·사이즈 입력·알림:** 같은 브랜치에서 구현했다. 비교·검증은 [`docs/49`](49-pos-workflow-windows-ui.md). 전체 규칙 244곳 0건, `main`·Pages 반영은 확인 대기다.
+- **후속 A4 재고·정비·거래처·고객 상세:** 같은 브랜치에서 구현했다. 비교·검증은 [`docs/50`](50-pos-management-details-ui.md). 전체 규칙 291곳 0건, `main`·Pages 반영은 확인 대기이며, 다음 묶음은 A5다.
 
 ## 1. 먼저 읽을 것
 
@@ -36,6 +37,7 @@ npm run pos:screens:driver        # 기사 촬영(11장)
 npm run pos:screens:fulfillment   # 지급·반납 15장 + 시안 비교 2장 (work/pos-ui-a1)
 npm run pos:screens:adjustments   # A2 20장 + 시안 비교 3장 (work/pos-ui-a2)
 npm run pos:screens:windows       # A3 48장 + 시안 비교 5장 (work/pos-ui-a3)
+npm run pos:screens:management    # A4 47장 + 시안 비교 3장 (work/pos-ui-a4)
 node scripts/check-pos-ui-rules.cjs # 전체 규칙 합산
 npm run check && npm run test:workflows:unit && npm run test:returns && npm run test:notifications
 npm run test:pwa                   # 설치형 앱 흐름
@@ -79,7 +81,7 @@ npm run test:pwa                   # 설치형 앱 흐름
 | A1 | 지급 · 반납 화면과 확인 창 | `p20-popup-issue` · `p22-popup-return` | `pos-fulfillment-view.js` · `pos-fulfillment.js` | **구현·검증 완료, main 반영 확인 대기.** 대표자·수량 제목, 공용 −/+, 미수·수납, 높이별 쪽 나눔. 검사 19개 및 5개 크기 촬영. 비교·검증 기록은 [`docs/47`](47-pos-fulfillment-ui.md). |
 | A2 | 기간 · 수거 변경 · 교환 · 문제 해결 | `p24` · `p25` · `p26` | `pos-adjustment-forms.js` · `pos-problem-picker.js` · `pos-fulfillment.js` | **구현·검증 완료, main 반영 확인 대기.** 날짜·장소·시간·차량 선택과 달력, 실제 규격 버튼, 문제 해결 여섯 선택지. 부록 A 문구·기존 실물 확인 절차 유지. 지급/반납/변경 24개·전체 검증 통과, 규칙 195곳 0건. 비교·검증은 [`docs/48`](48-pos-adjustments-ui.md). |
 | A3 | 발권 창 · 마감 확정 3단계 · 사이즈 입력 현황 · 사이즈 요청 창 · 업무 알림 | `p27` · `p28` · `p14` · `p31` · `p32` | `pos-ticket-form.js` · `pos-finance.js showClosing()` · `pos-size-status.js` · `pos-preinput.js` · `pos-notifications.js` | **구현·검증 완료, main 반영 확인 대기.** 공용 수량 조절·요약, 마감 3단계 창, 팀별 사이즈·적용 규격 집계, 일행/차수 선택, 알림 선택 상태. 사전입력 10개·전체 검증 통과, 규칙 244곳 0건. 비교·검증은 [`docs/49`](49-pos-workflow-windows-ui.md). |
-| A4 | 재고 · 정비, 거래처 상세, 고객 상세 | `m02-inventory` · `m04-partner-detail` | `pos-management.js` `inventory() :47` · `partnerDetail() :77` · `customerDetail() :137` | 재고는 품목 타일 → 누르면 그 품목의 실물 목록(`pm-asset-*` 동작과 `[data-search="pm-assets"]` 유지). 거래처 · 고객 상세는 접수 상세와 같은 좌우 배치(`.pos-detail`) |
+| A4 | 재고 · 정비, 거래처 상세, 고객 상세 | `m02-inventory` · `m04-partner-detail` · 고객은 P04 배치 기준 | `pos-management.js inventory()`·`inventoryAssets()`·`partnerDetail()`·`customerDetail()` | **구현·검증 완료, main 반영 확인 대기.** 실제 품목 타일 → 실물 목록, 거래처·고객의 좌우 상세와 높이별 쪽 나눔. 기존 물품 선택·돈 기록·과거 접수 보존. 관리 9개·전체 검증 통과, 규칙 291곳 0건. 비교·검증은 [`docs/50`](50-pos-management-details-ui.md). |
 | A5 | 기사 태블릿 업무 처리 · 차량 보관 | `d02-driver-task` · `d03-driver-stock` | `pos-dispatch.js` `taskPage() :68` · `vehicleStock() :114` | 행 목록은 유지(사용자 결정). 시안과 다른 곳만 맞춘다. `capture-pos-driver.cjs`의 줄 수 검사(3줄@1024×520 · 4줄@1024×600 · 휴대폰 4줄@360×640)를 깨지 않는다 |
 
 ### B. 나눠서 결제 (시안만 있음 · `docs/44` 6-1)

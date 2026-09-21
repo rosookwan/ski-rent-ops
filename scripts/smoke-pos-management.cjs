@@ -53,7 +53,7 @@ const { chooseTime } = require('./time-picker-helper.cjs');
     let assetId, partnerId, firstOrder, secondOrder, profileId;
     await test('inventory status writes change actual ready counts and found items require inspection before reuse', async () => {
       assetId = await raw.evaluate(async () => (await window.SkiOps.posData.execute('stock.receive', { sku: 'ski', quantity: 1, size: 'UI-QA' })).assetIds[0]);
-      await nav('inventory');
+      await nav('inventory'); await action('pm-inventory-open', 'ski');
       await f.locator('[data-pos-input="pmSkuFilter"]').selectOption('ski');
       await f.locator('[data-search="pm-assets"]').fill(assetId);
       await action('pm-asset-select', assetId); await action('pm-asset-state'); await geometry('asset state modal', true);

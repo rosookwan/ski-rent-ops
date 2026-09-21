@@ -12,7 +12,7 @@
     ['pos-return', '포스로', '', 'arrow-left'], ['inventory', '재고·정비', '', 'wrench'], ['partners', '거래처 장부', '', 'book-open'],
     ['customers', '고객 관리', '', 'users'], ['settings', '매장 설정', '', 'sliders-horizontal'], ['guide', '인쇄물', '', 'printer'], ['closing-history', '마감 이력', '', 'archive']
   ];
-  const alias = { 'partner-detail': 'partners', 'customer-profile': 'customers', 'order-preinput-guest': 'preparation' };
+  const alias = { 'inventory-assets': 'inventory', 'partner-detail': 'partners', 'customer-profile': 'customers', 'order-preinput-guest': 'preparation' };
   // Shared status vocabulary. Nouns only; no conversational endings.
   const terms = Object.freeze({
     status: { awaiting_exchange: '교환 대기', awaiting_issue: '지급 전', in_use: '이용 중', partial_return: '일부만 받음', awaiting_shop: '차량 보관 중', returned: '반납 완료', cancelled: '취소', needs_review: '확인 필요' },

@@ -1,0 +1,1515 @@
+{
+  "checks": [
+    {
+      "key": "inventory",
+      "file": "inventory-1024x600.png",
+      "rules": {
+        "smallText": 0,
+        "clippedText": 0,
+        "halfCut": 0,
+        "shortTargets": 0,
+        "scrolling": 0
+      },
+      "geometry": {
+        "viewport": [
+          1024,
+          600
+        ],
+        "body": {
+          "client": 408,
+          "scroll": 408
+        },
+        "footer": {
+          "x": 112,
+          "y": 528,
+          "width": 912,
+          "height": 72,
+          "top": 528,
+          "right": 1024,
+          "bottom": 600,
+          "left": 112
+        },
+        "outside": []
+      }
+    },
+    {
+      "key": "inventory-service",
+      "file": "inventory-service-1024x600.png",
+      "rules": {
+        "smallText": 0,
+        "clippedText": 0,
+        "halfCut": 0,
+        "shortTargets": 0,
+        "scrolling": 0
+      },
+      "geometry": {
+        "viewport": [
+          1024,
+          600
+        ],
+        "body": {
+          "client": 408,
+          "scroll": 408
+        },
+        "footer": {
+          "x": 112,
+          "y": 528,
+          "width": 912,
+          "height": 72,
+          "top": 528,
+          "right": 1024,
+          "bottom": 600,
+          "left": 112
+        },
+        "outside": []
+      }
+    },
+    {
+      "key": "inventory-assets",
+      "file": "inventory-assets-1024x600.png",
+      "rules": {
+        "smallText": 0,
+        "clippedText": 0,
+        "halfCut": 0,
+        "shortTargets": 0,
+        "scrolling": 0
+      },
+      "geometry": {
+        "viewport": [
+          1024,
+          600
+        ],
+        "body": {
+          "client": 408,
+          "scroll": 408
+        },
+        "footer": {
+          "x": 112,
+          "y": 528,
+          "width": 912,
+          "height": 72,
+          "top": 528,
+          "right": 1024,
+          "bottom": 600,
+          "left": 112
+        },
+        "outside": []
+      }
+    },
+    {
+      "key": "partner-loans",
+      "file": "partner-loans-1024x600.png",
+      "rules": {
+        "smallText": 0,
+        "clippedText": 0,
+        "halfCut": 0,
+        "shortTargets": 0,
+        "scrolling": 0
+      },
+      "geometry": {
+        "viewport": [
+          1024,
+          600
+        ],
+        "body": {
+          "client": 408,
+          "scroll": 408
+        },
+        "footer": {
+          "x": 112,
+          "y": 528,
+          "width": 912,
+          "height": 72,
+          "top": 528,
+          "right": 1024,
+          "bottom": 600,
+          "left": 112
+        },
+        "outside": []
+      }
+    },
+    {
+      "key": "partner-lendings",
+      "file": "partner-lendings-1024x600.png",
+      "rules": {
+        "smallText": 0,
+        "clippedText": 0,
+        "halfCut": 0,
+        "shortTargets": 0,
+        "scrolling": 0
+      },
+      "geometry": {
+        "viewport": [
+          1024,
+          600
+        ],
+        "body": {
+          "client": 408,
+          "scroll": 408
+        },
+        "footer": {
+          "x": 112,
+          "y": 528,
+          "width": 912,
+          "height": 72,
+          "top": 528,
+          "right": 1024,
+          "bottom": 600,
+          "left": 112
+        },
+        "outside": []
+      }
+    },
+    {
+      "key": "partner-agreements",
+      "file": "partner-agreements-1024x600.png",
+      "rules": {
+        "smallText": 0,
+        "clippedText": 0,
+        "halfCut": 0,
+        "shortTargets": 0,
+        "scrolling": 0
+      },
+      "geometry": {
+        "viewport": [
+          1024,
+          600
+        ],
+        "body": {
+          "client": 408,
+          "scroll": 408
+        },
+        "footer": {
+          "x": 112,
+          "y": 528,
+          "width": 912,
+          "height": 72,
+          "top": 528,
+          "right": 1024,
+          "bottom": 600,
+          "left": 112
+        },
+        "outside": []
+      }
+    },
+    {
+      "key": "partner-money",
+      "file": "partner-money-1024x600.png",
+      "rules": {
+        "smallText": 0,
+        "clippedText": 0,
+        "halfCut": 0,
+        "shortTargets": 0,
+        "scrolling": 0
+      },
+      "geometry": {
+        "viewport": [
+          1024,
+          600
+        ],
+        "body": {
+          "client": 408,
+          "scroll": 408
+        },
+        "footer": {
+          "x": 112,
+          "y": 528,
+          "width": 912,
+          "height": 72,
+          "top": 528,
+          "right": 1024,
+          "bottom": 600,
+          "left": 112
+        },
+        "outside": []
+      }
+    },
+    {
+      "key": "customer",
+      "file": "customer-1024x600.png",
+      "rules": {
+        "smallText": 0,
+        "clippedText": 0,
+        "halfCut": 0,
+        "shortTargets": 0,
+        "scrolling": 0
+      },
+      "geometry": {
+        "viewport": [
+          1024,
+          600
+        ],
+        "body": {
+          "client": 408,
+          "scroll": 408
+        },
+        "footer": {
+          "x": 112,
+          "y": 528,
+          "width": 912,
+          "height": 72,
+          "top": 528,
+          "right": 1024,
+          "bottom": 600,
+          "left": 112
+        },
+        "outside": []
+      }
+    },
+    {
+      "key": "customer-unregistered",
+      "file": "customer-unregistered-1024x600.png",
+      "rules": {
+        "smallText": 0,
+        "clippedText": 0,
+        "halfCut": 0,
+        "shortTargets": 0,
+        "scrolling": 0
+      },
+      "geometry": {
+        "viewport": [
+          1024,
+          600
+        ],
+        "body": {
+          "client": 408,
+          "scroll": 408
+        },
+        "footer": {
+          "x": 112,
+          "y": 528,
+          "width": 912,
+          "height": 72,
+          "top": 528,
+          "right": 1024,
+          "bottom": 600,
+          "left": 112
+        },
+        "outside": []
+      }
+    },
+    {
+      "key": "inventory",
+      "file": "inventory-1024x768.png",
+      "rules": {
+        "smallText": 0,
+        "clippedText": 0,
+        "halfCut": 0,
+        "shortTargets": 0,
+        "scrolling": 0
+      },
+      "geometry": {
+        "viewport": [
+          1024,
+          768
+        ],
+        "body": {
+          "client": 576,
+          "scroll": 576
+        },
+        "footer": {
+          "x": 112,
+          "y": 696,
+          "width": 912,
+          "height": 72,
+          "top": 696,
+          "right": 1024,
+          "bottom": 768,
+          "left": 112
+        },
+        "outside": []
+      }
+    },
+    {
+      "key": "inventory-service",
+      "file": "inventory-service-1024x768.png",
+      "rules": {
+        "smallText": 0,
+        "clippedText": 0,
+        "halfCut": 0,
+        "shortTargets": 0,
+        "scrolling": 0
+      },
+      "geometry": {
+        "viewport": [
+          1024,
+          768
+        ],
+        "body": {
+          "client": 576,
+          "scroll": 576
+        },
+        "footer": {
+          "x": 112,
+          "y": 696,
+          "width": 912,
+          "height": 72,
+          "top": 696,
+          "right": 1024,
+          "bottom": 768,
+          "left": 112
+        },
+        "outside": []
+      }
+    },
+    {
+      "key": "inventory-assets",
+      "file": "inventory-assets-1024x768.png",
+      "rules": {
+        "smallText": 0,
+        "clippedText": 0,
+        "halfCut": 0,
+        "shortTargets": 0,
+        "scrolling": 0
+      },
+      "geometry": {
+        "viewport": [
+          1024,
+          768
+        ],
+        "body": {
+          "client": 576,
+          "scroll": 576
+        },
+        "footer": {
+          "x": 112,
+          "y": 696,
+          "width": 912,
+          "height": 72,
+          "top": 696,
+          "right": 1024,
+          "bottom": 768,
+          "left": 112
+        },
+        "outside": []
+      }
+    },
+    {
+      "key": "partner-loans",
+      "file": "partner-loans-1024x768.png",
+      "rules": {
+        "smallText": 0,
+        "clippedText": 0,
+        "halfCut": 0,
+        "shortTargets": 0,
+        "scrolling": 0
+      },
+      "geometry": {
+        "viewport": [
+          1024,
+          768
+        ],
+        "body": {
+          "client": 576,
+          "scroll": 576
+        },
+        "footer": {
+          "x": 112,
+          "y": 696,
+          "width": 912,
+          "height": 72,
+          "top": 696,
+          "right": 1024,
+          "bottom": 768,
+          "left": 112
+        },
+        "outside": []
+      }
+    },
+    {
+      "key": "partner-lendings",
+      "file": "partner-lendings-1024x768.png",
+      "rules": {
+        "smallText": 0,
+        "clippedText": 0,
+        "halfCut": 0,
+        "shortTargets": 0,
+        "scrolling": 0
+      },
+      "geometry": {
+        "viewport": [
+          1024,
+          768
+        ],
+        "body": {
+          "client": 576,
+          "scroll": 576
+        },
+        "footer": {
+          "x": 112,
+          "y": 696,
+          "width": 912,
+          "height": 72,
+          "top": 696,
+          "right": 1024,
+          "bottom": 768,
+          "left": 112
+        },
+        "outside": []
+      }
+    },
+    {
+      "key": "partner-agreements",
+      "file": "partner-agreements-1024x768.png",
+      "rules": {
+        "smallText": 0,
+        "clippedText": 0,
+        "halfCut": 0,
+        "shortTargets": 0,
+        "scrolling": 0
+      },
+      "geometry": {
+        "viewport": [
+          1024,
+          768
+        ],
+        "body": {
+          "client": 576,
+          "scroll": 576
+        },
+        "footer": {
+          "x": 112,
+          "y": 696,
+          "width": 912,
+          "height": 72,
+          "top": 696,
+          "right": 1024,
+          "bottom": 768,
+          "left": 112
+        },
+        "outside": []
+      }
+    },
+    {
+      "key": "partner-money",
+      "file": "partner-money-1024x768.png",
+      "rules": {
+        "smallText": 0,
+        "clippedText": 0,
+        "halfCut": 0,
+        "shortTargets": 0,
+        "scrolling": 0
+      },
+      "geometry": {
+        "viewport": [
+          1024,
+          768
+        ],
+        "body": {
+          "client": 576,
+          "scroll": 576
+        },
+        "footer": {
+          "x": 112,
+          "y": 696,
+          "width": 912,
+          "height": 72,
+          "top": 696,
+          "right": 1024,
+          "bottom": 768,
+          "left": 112
+        },
+        "outside": []
+      }
+    },
+    {
+      "key": "customer",
+      "file": "customer-1024x768.png",
+      "rules": {
+        "smallText": 0,
+        "clippedText": 0,
+        "halfCut": 0,
+        "shortTargets": 0,
+        "scrolling": 0
+      },
+      "geometry": {
+        "viewport": [
+          1024,
+          768
+        ],
+        "body": {
+          "client": 576,
+          "scroll": 576
+        },
+        "footer": {
+          "x": 112,
+          "y": 696,
+          "width": 912,
+          "height": 72,
+          "top": 696,
+          "right": 1024,
+          "bottom": 768,
+          "left": 112
+        },
+        "outside": []
+      }
+    },
+    {
+      "key": "customer-unregistered",
+      "file": "customer-unregistered-1024x768.png",
+      "rules": {
+        "smallText": 0,
+        "clippedText": 0,
+        "halfCut": 0,
+        "shortTargets": 0,
+        "scrolling": 0
+      },
+      "geometry": {
+        "viewport": [
+          1024,
+          768
+        ],
+        "body": {
+          "client": 576,
+          "scroll": 576
+        },
+        "footer": {
+          "x": 112,
+          "y": 696,
+          "width": 912,
+          "height": 72,
+          "top": 696,
+          "right": 1024,
+          "bottom": 768,
+          "left": 112
+        },
+        "outside": []
+      }
+    },
+    {
+      "key": "inventory",
+      "file": "inventory-1366x768.png",
+      "rules": {
+        "smallText": 0,
+        "clippedText": 0,
+        "halfCut": 0,
+        "shortTargets": 0,
+        "scrolling": 0
+      },
+      "geometry": {
+        "viewport": [
+          1366,
+          768
+        ],
+        "body": {
+          "client": 576,
+          "scroll": 576
+        },
+        "footer": {
+          "x": 112,
+          "y": 696,
+          "width": 1254,
+          "height": 72,
+          "top": 696,
+          "right": 1366,
+          "bottom": 768,
+          "left": 112
+        },
+        "outside": []
+      }
+    },
+    {
+      "key": "inventory-service",
+      "file": "inventory-service-1366x768.png",
+      "rules": {
+        "smallText": 0,
+        "clippedText": 0,
+        "halfCut": 0,
+        "shortTargets": 0,
+        "scrolling": 0
+      },
+      "geometry": {
+        "viewport": [
+          1366,
+          768
+        ],
+        "body": {
+          "client": 576,
+          "scroll": 576
+        },
+        "footer": {
+          "x": 112,
+          "y": 696,
+          "width": 1254,
+          "height": 72,
+          "top": 696,
+          "right": 1366,
+          "bottom": 768,
+          "left": 112
+        },
+        "outside": []
+      }
+    },
+    {
+      "key": "inventory-assets",
+      "file": "inventory-assets-1366x768.png",
+      "rules": {
+        "smallText": 0,
+        "clippedText": 0,
+        "halfCut": 0,
+        "shortTargets": 0,
+        "scrolling": 0
+      },
+      "geometry": {
+        "viewport": [
+          1366,
+          768
+        ],
+        "body": {
+          "client": 576,
+          "scroll": 576
+        },
+        "footer": {
+          "x": 112,
+          "y": 696,
+          "width": 1254,
+          "height": 72,
+          "top": 696,
+          "right": 1366,
+          "bottom": 768,
+          "left": 112
+        },
+        "outside": []
+      }
+    },
+    {
+      "key": "partner-loans",
+      "file": "partner-loans-1366x768.png",
+      "rules": {
+        "smallText": 0,
+        "clippedText": 0,
+        "halfCut": 0,
+        "shortTargets": 0,
+        "scrolling": 0
+      },
+      "geometry": {
+        "viewport": [
+          1366,
+          768
+        ],
+        "body": {
+          "client": 576,
+          "scroll": 576
+        },
+        "footer": {
+          "x": 112,
+          "y": 696,
+          "width": 1254,
+          "height": 72,
+          "top": 696,
+          "right": 1366,
+          "bottom": 768,
+          "left": 112
+        },
+        "outside": []
+      }
+    },
+    {
+      "key": "partner-lendings",
+      "file": "partner-lendings-1366x768.png",
+      "rules": {
+        "smallText": 0,
+        "clippedText": 0,
+        "halfCut": 0,
+        "shortTargets": 0,
+        "scrolling": 0
+      },
+      "geometry": {
+        "viewport": [
+          1366,
+          768
+        ],
+        "body": {
+          "client": 576,
+          "scroll": 576
+        },
+        "footer": {
+          "x": 112,
+          "y": 696,
+          "width": 1254,
+          "height": 72,
+          "top": 696,
+          "right": 1366,
+          "bottom": 768,
+          "left": 112
+        },
+        "outside": []
+      }
+    },
+    {
+      "key": "partner-agreements",
+      "file": "partner-agreements-1366x768.png",
+      "rules": {
+        "smallText": 0,
+        "clippedText": 0,
+        "halfCut": 0,
+        "shortTargets": 0,
+        "scrolling": 0
+      },
+      "geometry": {
+        "viewport": [
+          1366,
+          768
+        ],
+        "body": {
+          "client": 576,
+          "scroll": 576
+        },
+        "footer": {
+          "x": 112,
+          "y": 696,
+          "width": 1254,
+          "height": 72,
+          "top": 696,
+          "right": 1366,
+          "bottom": 768,
+          "left": 112
+        },
+        "outside": []
+      }
+    },
+    {
+      "key": "partner-money",
+      "file": "partner-money-1366x768.png",
+      "rules": {
+        "smallText": 0,
+        "clippedText": 0,
+        "halfCut": 0,
+        "shortTargets": 0,
+        "scrolling": 0
+      },
+      "geometry": {
+        "viewport": [
+          1366,
+          768
+        ],
+        "body": {
+          "client": 576,
+          "scroll": 576
+        },
+        "footer": {
+          "x": 112,
+          "y": 696,
+          "width": 1254,
+          "height": 72,
+          "top": 696,
+          "right": 1366,
+          "bottom": 768,
+          "left": 112
+        },
+        "outside": []
+      }
+    },
+    {
+      "key": "customer",
+      "file": "customer-1366x768.png",
+      "rules": {
+        "smallText": 0,
+        "clippedText": 0,
+        "halfCut": 0,
+        "shortTargets": 0,
+        "scrolling": 0
+      },
+      "geometry": {
+        "viewport": [
+          1366,
+          768
+        ],
+        "body": {
+          "client": 576,
+          "scroll": 576
+        },
+        "footer": {
+          "x": 112,
+          "y": 696,
+          "width": 1254,
+          "height": 72,
+          "top": 696,
+          "right": 1366,
+          "bottom": 768,
+          "left": 112
+        },
+        "outside": []
+      }
+    },
+    {
+      "key": "customer-unregistered",
+      "file": "customer-unregistered-1366x768.png",
+      "rules": {
+        "smallText": 0,
+        "clippedText": 0,
+        "halfCut": 0,
+        "shortTargets": 0,
+        "scrolling": 0
+      },
+      "geometry": {
+        "viewport": [
+          1366,
+          768
+        ],
+        "body": {
+          "client": 576,
+          "scroll": 576
+        },
+        "footer": {
+          "x": 112,
+          "y": 696,
+          "width": 1254,
+          "height": 72,
+          "top": 696,
+          "right": 1366,
+          "bottom": 768,
+          "left": 112
+        },
+        "outside": []
+      }
+    },
+    {
+      "key": "inventory",
+      "file": "inventory-907x648.png",
+      "rules": {
+        "smallText": 0,
+        "clippedText": 0,
+        "halfCut": 0,
+        "shortTargets": 0,
+        "scrolling": 0
+      },
+      "geometry": {
+        "viewport": [
+          907,
+          648
+        ],
+        "body": {
+          "client": 456,
+          "scroll": 456
+        },
+        "footer": {
+          "x": 96,
+          "y": 576,
+          "width": 811,
+          "height": 72,
+          "top": 576,
+          "right": 907,
+          "bottom": 648,
+          "left": 96
+        },
+        "outside": []
+      }
+    },
+    {
+      "key": "inventory-service",
+      "file": "inventory-service-907x648.png",
+      "rules": {
+        "smallText": 0,
+        "clippedText": 0,
+        "halfCut": 0,
+        "shortTargets": 0,
+        "scrolling": 0
+      },
+      "geometry": {
+        "viewport": [
+          907,
+          648
+        ],
+        "body": {
+          "client": 456,
+          "scroll": 456
+        },
+        "footer": {
+          "x": 96,
+          "y": 576,
+          "width": 811,
+          "height": 72,
+          "top": 576,
+          "right": 907,
+          "bottom": 648,
+          "left": 96
+        },
+        "outside": []
+      }
+    },
+    {
+      "key": "inventory-assets",
+      "file": "inventory-assets-907x648.png",
+      "rules": {
+        "smallText": 0,
+        "clippedText": 0,
+        "halfCut": 0,
+        "shortTargets": 0,
+        "scrolling": 0
+      },
+      "geometry": {
+        "viewport": [
+          907,
+          648
+        ],
+        "body": {
+          "client": 456,
+          "scroll": 456
+        },
+        "footer": {
+          "x": 96,
+          "y": 576,
+          "width": 811,
+          "height": 72,
+          "top": 576,
+          "right": 907,
+          "bottom": 648,
+          "left": 96
+        },
+        "outside": []
+      }
+    },
+    {
+      "key": "partner-loans",
+      "file": "partner-loans-907x648.png",
+      "rules": {
+        "smallText": 0,
+        "clippedText": 0,
+        "halfCut": 0,
+        "shortTargets": 0,
+        "scrolling": 0
+      },
+      "geometry": {
+        "viewport": [
+          907,
+          648
+        ],
+        "body": {
+          "client": 456,
+          "scroll": 456
+        },
+        "footer": {
+          "x": 96,
+          "y": 576,
+          "width": 811,
+          "height": 72,
+          "top": 576,
+          "right": 907,
+          "bottom": 648,
+          "left": 96
+        },
+        "outside": []
+      }
+    },
+    {
+      "key": "partner-lendings",
+      "file": "partner-lendings-907x648.png",
+      "rules": {
+        "smallText": 0,
+        "clippedText": 0,
+        "halfCut": 0,
+        "shortTargets": 0,
+        "scrolling": 0
+      },
+      "geometry": {
+        "viewport": [
+          907,
+          648
+        ],
+        "body": {
+          "client": 456,
+          "scroll": 456
+        },
+        "footer": {
+          "x": 96,
+          "y": 576,
+          "width": 811,
+          "height": 72,
+          "top": 576,
+          "right": 907,
+          "bottom": 648,
+          "left": 96
+        },
+        "outside": []
+      }
+    },
+    {
+      "key": "partner-agreements",
+      "file": "partner-agreements-907x648.png",
+      "rules": {
+        "smallText": 0,
+        "clippedText": 0,
+        "halfCut": 0,
+        "shortTargets": 0,
+        "scrolling": 0
+      },
+      "geometry": {
+        "viewport": [
+          907,
+          648
+        ],
+        "body": {
+          "client": 456,
+          "scroll": 456
+        },
+        "footer": {
+          "x": 96,
+          "y": 576,
+          "width": 811,
+          "height": 72,
+          "top": 576,
+          "right": 907,
+          "bottom": 648,
+          "left": 96
+        },
+        "outside": []
+      }
+    },
+    {
+      "key": "partner-money",
+      "file": "partner-money-907x648.png",
+      "rules": {
+        "smallText": 0,
+        "clippedText": 0,
+        "halfCut": 0,
+        "shortTargets": 0,
+        "scrolling": 0
+      },
+      "geometry": {
+        "viewport": [
+          907,
+          648
+        ],
+        "body": {
+          "client": 456,
+          "scroll": 456
+        },
+        "footer": {
+          "x": 96,
+          "y": 576,
+          "width": 811,
+          "height": 72,
+          "top": 576,
+          "right": 907,
+          "bottom": 648,
+          "left": 96
+        },
+        "outside": []
+      }
+    },
+    {
+      "key": "customer",
+      "file": "customer-907x648.png",
+      "rules": {
+        "smallText": 0,
+        "clippedText": 0,
+        "halfCut": 0,
+        "shortTargets": 0,
+        "scrolling": 0
+      },
+      "geometry": {
+        "viewport": [
+          907,
+          648
+        ],
+        "body": {
+          "client": 456,
+          "scroll": 456
+        },
+        "footer": {
+          "x": 96,
+          "y": 576,
+          "width": 811,
+          "height": 72,
+          "top": 576,
+          "right": 907,
+          "bottom": 648,
+          "left": 96
+        },
+        "outside": []
+      }
+    },
+    {
+      "key": "customer-unregistered",
+      "file": "customer-unregistered-907x648.png",
+      "rules": {
+        "smallText": 0,
+        "clippedText": 0,
+        "halfCut": 0,
+        "shortTargets": 0,
+        "scrolling": 0
+      },
+      "geometry": {
+        "viewport": [
+          907,
+          648
+        ],
+        "body": {
+          "client": 456,
+          "scroll": 456
+        },
+        "footer": {
+          "x": 96,
+          "y": 576,
+          "width": 811,
+          "height": 72,
+          "top": 576,
+          "right": 907,
+          "bottom": 648,
+          "left": 96
+        },
+        "outside": []
+      }
+    },
+    {
+      "key": "inventory",
+      "file": "inventory-875x600.png",
+      "rules": {
+        "smallText": 0,
+        "clippedText": 0,
+        "halfCut": 0,
+        "shortTargets": 0,
+        "scrolling": 0
+      },
+      "geometry": {
+        "viewport": [
+          875,
+          600
+        ],
+        "body": {
+          "client": 408,
+          "scroll": 408
+        },
+        "footer": {
+          "x": 96,
+          "y": 528,
+          "width": 779,
+          "height": 72,
+          "top": 528,
+          "right": 875,
+          "bottom": 600,
+          "left": 96
+        },
+        "outside": []
+      }
+    },
+    {
+      "key": "inventory-service",
+      "file": "inventory-service-875x600.png",
+      "rules": {
+        "smallText": 0,
+        "clippedText": 0,
+        "halfCut": 0,
+        "shortTargets": 0,
+        "scrolling": 0
+      },
+      "geometry": {
+        "viewport": [
+          875,
+          600
+        ],
+        "body": {
+          "client": 408,
+          "scroll": 408
+        },
+        "footer": {
+          "x": 96,
+          "y": 528,
+          "width": 779,
+          "height": 72,
+          "top": 528,
+          "right": 875,
+          "bottom": 600,
+          "left": 96
+        },
+        "outside": []
+      }
+    },
+    {
+      "key": "inventory-assets",
+      "file": "inventory-assets-875x600.png",
+      "rules": {
+        "smallText": 0,
+        "clippedText": 0,
+        "halfCut": 0,
+        "shortTargets": 0,
+        "scrolling": 0
+      },
+      "geometry": {
+        "viewport": [
+          875,
+          600
+        ],
+        "body": {
+          "client": 408,
+          "scroll": 408
+        },
+        "footer": {
+          "x": 96,
+          "y": 528,
+          "width": 779,
+          "height": 72,
+          "top": 528,
+          "right": 875,
+          "bottom": 600,
+          "left": 96
+        },
+        "outside": []
+      }
+    },
+    {
+      "key": "partner-loans",
+      "file": "partner-loans-875x600.png",
+      "rules": {
+        "smallText": 0,
+        "clippedText": 0,
+        "halfCut": 0,
+        "shortTargets": 0,
+        "scrolling": 0
+      },
+      "geometry": {
+        "viewport": [
+          875,
+          600
+        ],
+        "body": {
+          "client": 408,
+          "scroll": 408
+        },
+        "footer": {
+          "x": 96,
+          "y": 528,
+          "width": 779,
+          "height": 72,
+          "top": 528,
+          "right": 875,
+          "bottom": 600,
+          "left": 96
+        },
+        "outside": []
+      }
+    },
+    {
+      "key": "partner-lendings",
+      "file": "partner-lendings-875x600.png",
+      "rules": {
+        "smallText": 0,
+        "clippedText": 0,
+        "halfCut": 0,
+        "shortTargets": 0,
+        "scrolling": 0
+      },
+      "geometry": {
+        "viewport": [
+          875,
+          600
+        ],
+        "body": {
+          "client": 408,
+          "scroll": 408
+        },
+        "footer": {
+          "x": 96,
+          "y": 528,
+          "width": 779,
+          "height": 72,
+          "top": 528,
+          "right": 875,
+          "bottom": 600,
+          "left": 96
+        },
+        "outside": []
+      }
+    },
+    {
+      "key": "partner-agreements",
+      "file": "partner-agreements-875x600.png",
+      "rules": {
+        "smallText": 0,
+        "clippedText": 0,
+        "halfCut": 0,
+        "shortTargets": 0,
+        "scrolling": 0
+      },
+      "geometry": {
+        "viewport": [
+          875,
+          600
+        ],
+        "body": {
+          "client": 408,
+          "scroll": 408
+        },
+        "footer": {
+          "x": 96,
+          "y": 528,
+          "width": 779,
+          "height": 72,
+          "top": 528,
+          "right": 875,
+          "bottom": 600,
+          "left": 96
+        },
+        "outside": []
+      }
+    },
+    {
+      "key": "partner-money",
+      "file": "partner-money-875x600.png",
+      "rules": {
+        "smallText": 0,
+        "clippedText": 0,
+        "halfCut": 0,
+        "shortTargets": 0,
+        "scrolling": 0
+      },
+      "geometry": {
+        "viewport": [
+          875,
+          600
+        ],
+        "body": {
+          "client": 408,
+          "scroll": 408
+        },
+        "footer": {
+          "x": 96,
+          "y": 528,
+          "width": 779,
+          "height": 72,
+          "top": 528,
+          "right": 875,
+          "bottom": 600,
+          "left": 96
+        },
+        "outside": []
+      }
+    },
+    {
+      "key": "customer",
+      "file": "customer-875x600.png",
+      "rules": {
+        "smallText": 0,
+        "clippedText": 0,
+        "halfCut": 0,
+        "shortTargets": 0,
+        "scrolling": 0
+      },
+      "geometry": {
+        "viewport": [
+          875,
+          600
+        ],
+        "body": {
+          "client": 408,
+          "scroll": 408
+        },
+        "footer": {
+          "x": 96,
+          "y": 528,
+          "width": 779,
+          "height": 72,
+          "top": 528,
+          "right": 875,
+          "bottom": 600,
+          "left": 96
+        },
+        "outside": []
+      }
+    },
+    {
+      "key": "customer-unregistered",
+      "file": "customer-unregistered-875x600.png",
+      "rules": {
+        "smallText": 0,
+        "clippedText": 0,
+        "halfCut": 0,
+        "shortTargets": 0,
+        "scrolling": 0
+      },
+      "geometry": {
+        "viewport": [
+          875,
+          600
+        ],
+        "body": {
+          "client": 408,
+          "scroll": 408
+        },
+        "footer": {
+          "x": 96,
+          "y": 528,
+          "width": 779,
+          "height": 72,
+          "top": 528,
+          "right": 875,
+          "bottom": 600,
+          "left": 96
+        },
+        "outside": []
+      }
+    },
+    {
+      "key": "partner-loans-next",
+      "file": "partner-loans-next-1024x600.png",
+      "rules": {
+        "smallText": 0,
+        "clippedText": 0,
+        "halfCut": 0,
+        "shortTargets": 0,
+        "scrolling": 0
+      },
+      "geometry": {
+        "viewport": [
+          1024,
+          600
+        ],
+        "body": {
+          "client": 408,
+          "scroll": 408
+        },
+        "footer": {
+          "x": 112,
+          "y": 528,
+          "width": 912,
+          "height": 72,
+          "top": 528,
+          "right": 1024,
+          "bottom": 600,
+          "left": 112
+        },
+        "outside": []
+      }
+    },
+    {
+      "key": "customer-next",
+      "file": "customer-next-1024x600.png",
+      "rules": {
+        "smallText": 0,
+        "clippedText": 0,
+        "halfCut": 0,
+        "shortTargets": 0,
+        "scrolling": 0
+      },
+      "geometry": {
+        "viewport": [
+          1024,
+          600
+        ],
+        "body": {
+          "client": 408,
+          "scroll": 408
+        },
+        "footer": {
+          "x": 112,
+          "y": 528,
+          "width": 912,
+          "height": 72,
+          "top": 528,
+          "right": 1024,
+          "bottom": 600,
+          "left": 112
+        },
+        "outside": []
+      }
+    }
+  ],
+  "scenarios": [
+    "대여 가능 수량과 실물 목록 일치, 준비 배정된 물품 제외, 필터 변경 시 선택 해제",
+    "차입 목록 다음 쪽에서도 거래처 전체 약정·실제 금액 구분 유지",
+    "여러 방문의 쪽 나눔과 선택한 방문 열기, 미등록 방문의 연락처 수정 입구 유지"
+  ],
+  "errors": [],
+  "writes": []
+}

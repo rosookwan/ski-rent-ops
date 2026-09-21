@@ -25,6 +25,7 @@
     "test:pos:preinput": "node scripts/smoke-pos-preinput.cjs",
     "test:pos:keypad": "node scripts/smoke-pos-keypad.cjs",
     "pos:screens:windows": "node scripts/capture-pos-windows.cjs",
+    "pos:screens:management": "node scripts/capture-pos-management-details.cjs",
     "pos:screens": "node scripts/capture-pos-release.cjs",
     "pos:screens:adjustments": "node scripts/capture-pos-adjustments.cjs",
     "pos:screens:fulfillment": "node scripts/capture-pos-fulfillment.cjs",
