@@ -10,7 +10,7 @@
     "aspect_ratio": "27:16",
     "creditsPerImage": 3,
     "variant": "flare",
-    "order": "wave 1 = 6장(이미 검수한 기준 화면을 참조) → wave 2 = 사용자 답변 반영 2장(S07R · S08, 이 묶음의 S07을 팝업 참조로)"
+    "order": "wave 1 = 6장(이미 검수한 기준 화면을 참조) → wave 2 = 사용자 답변 반영 2장(S07R · S08, 이 묶음의 S07을 팝업 참조로) → wave 3 = S08R(나눠서 결제를 사람별에서 품목 고르기로 · S08을 참조로)"
   },
   "references": {
     "note": "기준 화면의 job id(pos-main-v1 · pos-rest-v1 results.json).",
@@ -21,7 +21,8 @@
       "P12": "a4c65fbc-af99-4d4c-87bb-70f58ba680b5",
       "P20": "de333b51-84be-4955-a684-3fee0e3eddd5",
       "P21": "c3f4e8c8-e3f4-4b61-b382-29d21019d014",
-      "S07": "b0ea38b0-1162-4ed0-8f0e-328fc87c1b71"
+      "S07": "b0ea38b0-1162-4ed0-8f0e-328fc87c1b71",
+      "S08": "7b3e69f3-d46c-446c-befb-69e7032ae0ec"
     }
   },
   "screens": [
@@ -224,6 +225,31 @@
       ],
       "note": "더치페이. 일행마다 금액과 결제 수단을 따로 두고 한 사람씩 결제한다. 나중에 카드 단말을 붙이면 `결제`가 그 금액으로 단말을 부른다. 지금은 화면만.",
       "prompt": "High-fidelity UI design mockup of one screen of 스키노트, a touch-screen POS web app used at the counter of a Korean ski rental shop. The screen is shown flat and straight-on and fills the whole canvas edge to edge: no monitor bezel, no browser chrome, no hands, no perspective. Design frame 1024×600 px, so everything is large, nothing is cut off at any edge and nothing scrolls.\nUse the attached reference image(s) of this same app and keep the visual system IDENTICAL: page background #F4F4F2, white cards with 16px radius and a 1px hairline #E3E3E3, near-black text #1A1A1A, gray text #5D5D5D, status colors always paired with a text label (red #B42318, amber #B45309, green #247A3D, blue #0074D9, purple #5F33E1), Pretendard-like Korean sans-serif, simple 2px Lucide-like line icons. Sizes for older staff: smallest text 16px, body 18px, names and titles 22px bold, key numbers 32–40px bold, every touch target at least 52px tall. Small text (menu labels, badges, legends, chips, gray captions, phone numbers, small buttons) tends to come out too small: draw it at a full 16px, about three quarters of the height of the 22px names; shrink padding or icons, never the text. Never use an ellipsis or clipped text, and never show a half-cut card or row.\nAll UI text is Korean and must be rendered crisp and spelled EXACTLY as written below. No English UI labels, no lorem ipsum, no watermark, no annotations, no extra screens.\nPopup: a centered white modal panel about 780×480 px with 20px radius and a soft shadow, over the parent screen, which is the 새 접수 step 3 screen of the FIRST reference image, reproduced as it is (POS rail with nine buttons, header, toolbar with step chips, panels, footer) and dimmed by a 45% black overlay (still recognizable, clearly inactive). Inside the panel: a 24px bold title at the top left with a 16px gray subtitle under it, a 48px square outlined close button with an X icon at the top right, then the body, then a bottom button row aligned right: white outlined secondary buttons and exactly ONE solid orange #FE4E10 primary button (white bold text), all 56px tall with 18px bold labels. Option buttons and steppers are 52px tall; a selected option has a near-black fill with white text. Steppers are two 52px square white outlined buttons − and + with the 24px bold quantity between them.\nThe second reference image is another popup of this app (the confirm window); match its panel, title, close button, option buttons and bottom button row exactly. This popup is about 880×530 px.\nPopup title \"김민수 팀 · 나눠서 결제\" with the subtitle \"받을 금액 170,500원 · 일행 3명 · 사람마다 따로 결제합니다\".\nBody, top: one row of three mode option buttons 52px tall that share the width (a selected option has a near-black fill and white text): \"일행별\" (selected), \"똑같이 나누기\", \"금액 직접 나누기\".\nUnder it THREE person rows, each a white row 64px tall with 12px radius, a 1px hairline and 6px gaps. Each row from left to right: a 20px bold name; a 16px gray line of that person's items; a 20px bold amount right-aligned; two option buttons 52px tall \"카드\" and \"현금\" (the chosen one near-black with white text); and at the right end either a solid green pill with a check icon \"결제 완료\" or a white outlined button \"결제\" 52px tall. Row 1: \"김민수\" \"스키 1 · 의류 1 · 3시간권 1\" \"70,250원\", 카드 chosen, green pill \"결제 완료\". Row 2: \"이서연\" \"스키 1 · 의류 1 · 3시간권 1\" \"70,250원\", 현금 chosen, button \"결제\". Row 3: \"박지호\" \"스키 1\" \"30,000원\", 카드 chosen, button \"결제\".\nUnder the rows one line: left 16px gray \"결제 완료 1명 · 70,250원\"; right 18px gray \"남은 금액\" with a 36px bold \"100,250원\".\nBottom button row: white outlined \"‹ 접수 확정 창으로\", white outlined \"남은 금액은 나중에 수납\" and the solid orange primary button \"다음 결제 · 이서연 70,250원\" with an 18px bold label."
+    },
+    {
+      "code": "S08R",
+      "title": "팝업 · 나눠서 결제(품목 고르기 · S08 고침)",
+      "wave": 3,
+      "file": "s08r-popup-split-by-items.png",
+      "aspect_ratio": "27:16",
+      "model": "gpt_image_2_5",
+      "params": {
+        "quality": "high",
+        "resolution": "2k",
+        "variant": "flare"
+      },
+      "references": [
+        {
+          "code": "P12",
+          "job_id": "a4c65fbc-af99-4d4c-87bb-70f58ba680b5"
+        },
+        {
+          "code": "S08",
+          "job_id": "7b3e69f3-d46c-446c-befb-69e7032ae0ec"
+        }
+      ],
+      "note": "현장 대여는 대표자 이름만 적으므로 사람별로는 나눌 수 없다(사용자 · 2026-09-21). 남은 품목에서 수량을 골라 한 묶음씩 결제한다. 화면만 — 카드 단말을 붙일 때 구현.",
+      "prompt": "High-fidelity UI design mockup of one screen of 스키노트, a touch-screen POS web app used at the counter of a Korean ski rental shop. The screen is shown flat and straight-on and fills the whole canvas edge to edge: no monitor bezel, no browser chrome, no hands, no perspective. Design frame 1024×600 px, so everything is large, nothing is cut off at any edge and nothing scrolls.\nUse the attached reference image(s) of this same app and keep the visual system IDENTICAL: page background #F4F4F2, white cards with 16px radius and a 1px hairline #E3E3E3, near-black text #1A1A1A, gray text #5D5D5D, status colors always paired with a text label (red #B42318, amber #B45309, green #247A3D, blue #0074D9, purple #5F33E1), Pretendard-like Korean sans-serif, simple 2px Lucide-like line icons. Sizes for older staff: smallest text 16px, body 18px, names and titles 22px bold, key numbers 32–40px bold, every touch target at least 52px tall. Small text (menu labels, badges, legends, chips, gray captions, phone numbers, small buttons) tends to come out too small: draw it at a full 16px, about three quarters of the height of the 22px names; shrink padding or icons, never the text. Never use an ellipsis or clipped text, and never show a half-cut card or row.\nAll UI text is Korean and must be rendered crisp and spelled EXACTLY as written below. No English UI labels, no lorem ipsum, no watermark, no annotations, no extra screens.\nPopup: a centered white modal panel about 780×480 px with 20px radius and a soft shadow, over the parent screen, which is the 새 접수 step 3 screen of the FIRST reference image, reproduced as it is (POS rail with nine buttons, header, toolbar with step chips, panels, footer) and dimmed by a 45% black overlay (still recognizable, clearly inactive). Inside the panel: a 24px bold title at the top left with a 16px gray subtitle under it, a 48px square outlined close button with an X icon at the top right, then the body, then a bottom button row aligned right: white outlined secondary buttons and exactly ONE solid orange #FE4E10 primary button (white bold text), all 56px tall with 18px bold labels. Option buttons and steppers are 52px tall; a selected option has a near-black fill with white text. Steppers are two 52px square white outlined buttons − and + with the 24px bold quantity between them.\nThe second reference image is the earlier version of THIS popup; keep its panel, title, close button, option-button style, the summary line and the bottom button row, but replace the person rows with the item picker described below. The popup is about 880×530 px.\nPopup title \"김민수 팀 · 나눠서 결제\" with the subtitle \"받을 금액 170,500원 · 결제할 품목을 골라 한 번씩 결제합니다\".\nBody, top: one row of three option buttons 52px tall that share the width (a selected option has a near-black fill and white text): \"품목 고르기\" (selected), \"똑같이 나누기\", \"남은 것 모두 고르기\".\nUnder it TWO columns with a 12px gap. LEFT 58%: THREE item rows, each a white row 60px tall with 12px radius, a 1px hairline and 6px gaps. Each row from left to right: a 20px bold item name; a 16px gray line with what is left and the price of one; and at the right end a stepper: two 52px square white outlined buttons − and + with a 24px bold quantity between them. Row 1: \"스키\" \"남은 2대 · 1대 30,000원\" quantity 1. Row 2: \"의류\" \"남은 1벌 · 1벌 14,000원\" quantity 1. Row 3: \"3시간권\" \"남은 1매 · 1매 26,250원\" quantity 1. RIGHT 42%: a light-gray card (#F4F4F2, 14px radius, 14px padding) as tall as the three rows: header line with 20px bold \"이번 결제\" at the left and a 28px bold \"70,250원\" at the right; one 16px gray line \"스키 1 · 의류 1 · 3시간권 1\"; a 16px gray label \"결제 수단\" followed by three option buttons 52px tall: \"카드\" (selected), \"현금\", \"계좌이체\".\nUnder the two columns one line: left 16px gray \"결제 완료 1건 · 70,250원\"; right 18px gray \"남은 금액\" with a 36px bold \"100,250원\".\nBottom button row: white outlined \"‹ 접수 확정 창으로\", white outlined \"남은 금액은 나중에 수납\" and the solid orange primary button \"고른 품목 결제 · 70,250원\" with an 18px bold label."
     }
   ]
 }

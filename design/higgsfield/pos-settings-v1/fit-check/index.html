@@ -26,7 +26,7 @@ button{font:inherit;letter-spacing:inherit;min-height:52px;border:0;border-radiu
 .dfoot{display:flex;justify-content:flex-end;gap:8px;padding-top:6px}.chips{display:flex;gap:8px}.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.grid button{min-height:64px;font-size:20px}
 .note{color:#5d5d5d;line-height:22px}
 body[data-show="s06"] #d6,body[data-show="s07"] #d7,body[data-show="s08"] #d8{display:flex}
-.people{display:flex;flex-direction:column;gap:6px}.person{display:flex;align-items:center;gap:12px;min-height:64px;padding:6px 8px 6px 14px;border-radius:12px;box-shadow:inset 0 0 0 1px #e3e3e3;min-width:0}.person strong{flex:0 1 auto;min-width:0;overflow:hidden;white-space:nowrap;font-size:20px}.person>span:not(.btns):not(.done){flex:1 1 0;min-width:0;overflow:hidden;white-space:nowrap;color:#5d5d5d}.person>b{flex:0 0 auto;font-size:20px;white-space:nowrap}.person .btns{flex:0 0 150px}.done{flex:0 0 96px;text-align:center;background:#247a3d;color:#fff;border-radius:999px;font-weight:700;line-height:32px}.person>.sec{flex:0 0 96px}
+.people{display:flex;flex-direction:column;gap:6px}.person{display:flex;align-items:center;gap:12px;min-height:64px;padding:6px 8px 6px 14px;border-radius:12px;box-shadow:inset 0 0 0 1px #e3e3e3;min-width:0}.person strong{flex:0 1 auto;min-width:0;overflow:hidden;white-space:nowrap;font-size:20px}.person>span:not(.btns):not(.done):not(.stp){flex:1 1 0;min-width:0;overflow:hidden;white-space:nowrap;color:#5d5d5d}.person>b{flex:0 0 auto;font-size:20px;white-space:nowrap}.person .btns{flex:0 0 150px}.done{flex:0 0 96px;text-align:center;background:#247a3d;color:#fff;border-radius:999px;font-weight:700;line-height:32px}.person>.sec{flex:0 0 96px}.split2{display:grid;grid-template-columns:1.35fr 1fr;gap:12px}.stp{flex:0 0 auto;display:flex;align-items:center;gap:6px}.stp button{width:52px;font-size:24px;padding:0}.stp b{min-width:36px;text-align:center;font-size:24px}.pay{justify-content:space-between}
 </style>
 <body>
 <div class="frame"><div class="rail"></div><div class="work">
@@ -59,15 +59,18 @@ body[data-show="s06"] #d6,body[data-show="s07"] #d7,body[data-show="s08"] #d8{di
   </div>
   <div class="line total"><span id="split">할인 47,500원 · 카드 1,130,000원 · 현금 52,500원</span><span>합계 <b>1,182,500원</b></span></div>
   <div class="dfoot"><button class="sec">취소</button><button class="sec">나중에 수납</button><button class="sec">나눠서 결제</button><button class="primary">수납하고 접수 확정 · 1,182,500원</button></div></div></div></div>
-<div class="dim" id="d8"><div class="dlg" id="dlg8" style="--w:880px"><header><h2>아주 긴 이름의 단체 접수 대표자 팀 · 나눠서 결제</h2><button>✕</button></header><div class="in"><p class="sub">받을 금액 1,170,500원 · 일행 7명 · 사람마다 따로 결제합니다</p>
-  <div class="row" style="gap:8px"><div class="chips" style="flex:1 1 0"><button class="opt on">일행별</button><button class="opt">똑같이 나누기</button><button class="opt">금액 직접 나누기</button></div><span style="flex:0 0 auto;display:flex;gap:6px;align-items:center;font-weight:600"><button style="width:52px">‹</button> 1 / 3쪽 <button style="width:52px">›</button></span></div>
-  <div class="people">
-    <div class="person"><strong>김민수</strong><span>스키 1 · 의류 1 · 3시간권 1</span><b>1,070,250원</b><span class="btns"><button class="opt on">카드</button><button class="opt">현금</button></span><span class="done">결제 완료</span></div>
-    <div class="person"><strong>한국대학교 스키동아리 회장</strong><span>스키 1 · 의류 1 · 3시간권 1</span><b>70,250원</b><span class="btns"><button class="opt">카드</button><button class="opt on">현금</button></span><button class="sec">결제</button></div>
-    <div class="person"><strong>박지호</strong><span>스키 1</span><b>30,000원</b><span class="btns"><button class="opt on">카드</button><button class="opt">현금</button></span><button class="sec">결제</button></div>
+<div class="dim" id="d8"><div class="dlg" id="dlg8" style="--w:880px"><header><h2>아주 긴 이름의 단체 접수 대표자 팀 · 나눠서 결제</h2><button>✕</button></header><div class="in"><p class="sub">받을 금액 1,170,500원 · 결제할 품목을 골라 한 번씩 결제합니다</p>
+  <div class="row" style="gap:8px"><div class="chips" style="flex:1 1 0"><button class="opt on">품목 고르기</button><button class="opt">똑같이 나누기</button><button class="opt">남은 것 모두 고르기</button></div><span style="flex:0 0 auto;display:flex;gap:6px;align-items:center;font-weight:600"><button style="width:52px">‹</button> 1 / 3쪽 <button style="width:52px">›</button></span></div>
+  <div class="split2">
+    <div class="people">
+      <div class="person"><strong>바이저 헬멧 어린이용</strong><span>남은 12개 · 1개 130,000원</span><span class="stp"><button>−</button><b>10</b><button>+</button></span></div>
+      <div class="person"><strong>의류</strong><span>남은 1벌 · 1벌 14,000원</span><span class="stp"><button>−</button><b>1</b><button>+</button></span></div>
+      <div class="person"><strong>3시간권</strong><span>남은 1매 · 1매 26,250원</span><span class="stp"><button>−</button><b>1</b><button>+</button></span></div>
+    </div>
+    <div class="card pay"><div class="head"><span>이번 결제</span><b>1,070,250원</b></div><span class="lab" style="white-space:nowrap;overflow:hidden">바이저 헬멧 어린이용 10 · 의류 1 외 1종</span><span class="lab">결제 수단</span><div class="btns"><button class="opt on">카드</button><button class="opt">현금</button><button class="opt">계좌이체</button></div></div>
   </div>
-  <div class="line total"><span>결제 완료 1명 · 1,070,250원</span><span>남은 금액 <b>100,250원</b></span></div>
-  <div class="dfoot"><button class="sec">‹ 접수 확정 창으로</button><button class="sec">남은 금액은 나중에 수납</button><button class="primary">다음 결제 · 한국대학교 스키동아리 회장 70,250원</button></div></div></div></div>
+  <div class="line total"><span>결제 완료 1건 · 70,250원</span><span>남은 금액 <b>1,100,250원</b></span></div>
+  <div class="dfoot"><button class="sec">‹ 접수 확정 창으로</button><button class="sec">남은 금액은 나중에 수납</button><button class="primary">고른 품목 결제 · 1,070,250원</button></div></div></div></div>
 </div>
 <script>document.body.dataset.show=location.hash.slice(1)||'s05';</script>
 </body></html>
