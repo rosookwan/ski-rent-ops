@@ -68,6 +68,7 @@
   function taskPage() {
     const task = D.snapshot.tasks.find(t => t.id === taskDraft?.id);
     if (!task) return P.page('업무 선택', '', '<div class="pos-empty"><strong>업무 없음</strong><span>차량 운행 목록에서 다시 선택</span></div>', '<div class="so-actions">' + U.go('차량 업무', 'dispatch') + (!driver() ? b('리프트권 회수·재사용', 'pos-ticket-stock') : '') + '</div>');
+    const driverTask = driver() && ['delivery', 'collection'].includes(task.kind);
     const physical = task.physicalAssets || [];
     const groups = D.snapshot.catalog.flatMap(product => {
       const ids = task.remainingAssetIds.filter(id => physical.some(a => a.id === id && a.sku === product.id));
@@ -76,9 +77,26 @@
     const line = group => {
       const quantity = taskDraft.counts[group.product.id] || 0;
       const step = (n, text) => '<button class="so-button pos-button" type="button" data-action="pos-task-step" data-id="' + e(group.product.id) + '" data-delta="' + n + '" aria-label="' + e(group.product.label + ' ' + text) + '">' + text + '</button>';
-      return P.row(group.product.label + ' · 남음 ' + group.ids.length + group.product.unit, physical.filter(a => group.ids.includes(a.id)).map(a => a.location.kind === 'vehicle' ? '차량 보관' : a.location.kind === 'shop' ? '매장 보관' : '고객 보유').filter((x, i, rows) => rows.indexOf(x) === i).join(' · '), '<div class="pos-quantity">' + step(-1, '−') + '<output aria-label="선택 수량">' + quantity + '</output>' + step(1, '+') + '</div>');
+      const location = physical.filter(a => group.ids.includes(a.id)).map(a => a.location.kind === 'vehicle' ? '차량 보관' : a.location.kind === 'shop' ? '매장 보관' : '고객 보유').filter((x, i, rows) => rows.indexOf(x) === i).join(' · ');
+      return P.row(group.product.label + ' · 남음 ' + group.ids.length + (driverTask ? '' : group.product.unit), location, '<div class="pos-quantity">' + step(-1, '−') + '<output aria-label="선택 수량">' + quantity + '</output>' + step(1, '+') + '</div>', driverTask ? { phone: { title: group.product.label, description: '남음 ' + group.ids.length + ' · ' + location } } : {});
     };
     const phone = (task.customer?.phone || '').replace(/[^0-9+]/g, '');
+    if (driverTask) {
+      const remaining = task.remainingAssetIds.length + task.unassignedQuantity, selected = Object.values(taskDraft.counts).reduce((n, count) => n + count, 0);
+      const message = b('출발 문자', 'pos-task-message', task.id, 'pos-task-message', { icon: 'message-square-text' });
+      const call = phone ? '<a class="so-button pos-button pos-task-call" href="tel:' + e(phone) + '">' + S.icon('phone') + '전화</a>' : '<button type="button" class="so-button pos-button pos-task-call" disabled>' + S.icon('phone') + '전화</button>';
+      const rowLimit = innerWidth < 600 ? Math.max(1, Math.min(4, Math.floor((innerHeight - 472) / 80))) : innerHeight < 700 ? 2 : 4;
+      const pageSize = task.unassignedQuantity || taskDraft.error ? Math.max(1, rowLimit - 1) : rowLimit;
+      const body = '<div class="pos-task-customer"><div class="pos-task-name"><strong>' + e(task.customer?.name ? task.customer.name + ' 팀' : task.title) + '</strong>' + P.badge(names[task.kind] + ' ' + remaining + '개', 'blue') + '</div>'
+        + '<span class="pos-task-appointment">' + e(S.date(task.date) + ' ' + task.time + ' · ' + task.place) + '</span><span class="pos-task-phone">' + e(task.customer?.phone || '연락처 없음') + '</span>'
+        + '<div class="pos-task-contact">' + call + message + '</div></div>' + P.pager(groups, 'task-assets', line, pageSize)
+        + (task.unassignedQuantity ? '<p class="pos-label">미배정 ' + task.unassignedQuantity + '개 · 매장에서 준비·발권 필요</p>' : '')
+        + (taskDraft.error ? '<p class="pos-error" id="pos-error" role="alert">' + e(taskDraft.error) + '</p>' : U.errorBox());
+      const primary = b((task.kind === 'delivery' ? '실제 전달 확정 ' : '실제 수거 확정 ') + selected + '개', 'pos-task-complete', '', 'primary');
+      return P.page('배달·수거 처리', '', body, '<div class="so-actions"><button type="button" class="so-button pos-button pos-task-list" data-go="dispatch">' + S.icon('list') + '업무 목록</button>' + message
+        + b('못 받음·고객 부재', 'pos-task-visit', task.id, 'pos-task-visit', { icon: 'user-round' }) + '</div><div class="so-actions">' + primary + '</div>',
+      { layout: 'driver-task', title: '배달·수거 처리', phoneTitle: names[task.kind] + ' 처리', phoneBack: 'dispatch', wait: names[task.kind] + ' ' + remaining + '개', waitLabel: '' });
+    }
     const body = '<div class="pos-customer-strip"><strong>' + e(task.customer?.name ? task.customer.name + ' 팀' : task.title) + '</strong><span>' + e(task.date + ' ' + task.time + ' · ' + task.place) + '</span>' + (task.customer?.phone ? '<span>' + e(task.customer.phone) + '</span>' : '') + '</div>' + P.pager(groups, 'task-assets', line, innerHeight < 700 ? 2 : 4) + (task.unassignedQuantity ? '<p class="pos-label">미배정 ' + task.unassignedQuantity + '개 · 매장에서 준비·발권 필요</p>' : '') + U.errorBox();
     const physicalButton = task.kind === 'delivery' ? b('실제 전달 확정', 'pos-task-complete', '', 'primary') : task.kind === 'collection' ? b('실제 수거 확정', 'pos-task-complete', '', 'primary') : b('발권처 환불 확인', 'pos-vendor-refund', task.id, 'primary');
     return P.page(names[task.kind] + ' 업무', '', body, '<div class="so-actions">' + U.go('업무 목록', 'dispatch') + (phone ? '<a class="so-button pos-button" href="tel:' + e(phone) + '">' + S.icon('phone') + '전화</a>' : '') + b('못 받음·고객 부재', 'pos-task-visit', task.id) + '</div><div class="so-actions">' + (!driver() && task.kind === 'delivery' ? b('매장 수령으로 변경', 'pos-task-cancel', task.id) : '') + physicalButton + '</div>',
@@ -89,8 +107,23 @@
     for (const a of task.physicalAssets || []) if (task.remainingAssetIds.includes(a.id)) taskDraft.counts[a.sku] = (taskDraft.counts[a.sku] || 0) + 1;
     S.go('driver-task', { id });
   }
+  let taskResizeTimer;
+  window.addEventListener('resize', () => {
+    clearTimeout(taskResizeTimer);
+    taskResizeTimer = setTimeout(() => { if (S.state.page === 'driver-task' && S.root.dataset.posLayout === 'driver-task') S.render(); }, 120);
+  });
   S.action('pos-task', openTask); S.posDispatch = { openTask };
-  S.action('pos-task-step', (sku, button) => { const task = D.snapshot.tasks.find(t => t.id === taskDraft.id), max = task.remainingAssetIds.filter(id => task.physicalAssets.some(a => a.id === id && a.sku === sku)).length; taskDraft.counts[sku] = Math.max(0, Math.min(max, (taskDraft.counts[sku] || 0) + Number(button.dataset.delta))); S.render(); });
+  S.action('pos-task-message', id => {
+    const task = D.snapshot.tasks.find(t => t.id === id);
+    if (!task || !active(task) || !['delivery', 'collection'].includes(task.kind)) { S.toast('남은 배달·수거 업무를 다시 확인해 주세요.'); return; }
+    const kind = names[task.kind], shop = D.snapshot.management?.settings?.store?.name || S.operations.store().name;
+    const instruction = task.kind === 'collection' ? '장비와 함께 기다려 주세요.' : '물품을 받을 준비를 해 주세요.';
+    const message = '[' + shop + '] ' + kind + ' 차량이 출발했습니다. 10분 이내 도착 예정이니 ' + task.place + '에서 ' + instruction;
+    // The existing departure-SMS contract is a preview until a store sender/provider is connected (docs/04, docs/28).
+    // Opening it never sends a message, changes a task, or records a fabricated delivery result.
+    P.modal('출발 문자', '<p class="pos-task-message-copy">' + e(message) + '</p><p class="pos-info">문자 발송이 아직 연결되지 않았습니다. 안내 문구만 확인하며 고객에게 문자는 보내지 않습니다.</p>', b('닫기', 'close'), (task.customer?.name || task.title) + ' · ' + (task.customer?.phone || '연락처 없음'));
+  });
+  S.action('pos-task-step', (sku, button) => { const task = D.snapshot.tasks.find(t => t.id === taskDraft.id), max = task.remainingAssetIds.filter(id => task.physicalAssets.some(a => a.sku === sku && a.id === id)).length; taskDraft.counts[sku] = Math.max(0, Math.min(max, (taskDraft.counts[sku] || 0) + Number(button.dataset.delta))); taskDraft.error = ''; S.render(); });
   S.action('pos-task-complete', async () => {
     try {
       const task = D.snapshot.tasks.find(t => t.id === taskDraft.id);
@@ -99,7 +132,7 @@
       if (!ids.length) throw new Error('처리한 수량이 0개입니다. 고객 부재·못 받음에서 다음 약속을 남겨 주세요.');
       await D.execute('ops.taskMove', { taskId: task.id, assetIds: ids });
       S.go('dispatch'); S.toast('실제 처리 수량 기록 완료 · 남은 업무 유지');
-    } catch (err) { U.error(err); }
+    } catch (err) { if (driver()) { taskDraft.error = err.message; S.render(); } else U.error(err); }
   });
   S.action('pos-task-visit', id => {
     const task = D.snapshot.tasks.find(t => t.id === id);

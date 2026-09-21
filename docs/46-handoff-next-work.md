@@ -12,7 +12,7 @@
 - **후속 A2 기간·수거 변경·교환·문제 해결:** 같은 브랜치에서 구현했다. 비교·검증은 [`docs/48`](48-pos-adjustments-ui.md). `main`·Pages 반영은 확인 대기다.
 - **후속 A3 발권·마감·사이즈 입력·알림:** 같은 브랜치에서 구현했다. 비교·검증은 [`docs/49`](49-pos-workflow-windows-ui.md). 전체 규칙 244곳 0건, `main`·Pages 반영은 확인 대기다.
 - **후속 A4 재고·정비·거래처·고객 상세:** `aa1dae6`까지 구현·업무 검사를 마쳤지만 **시안 일치는 미완료**다. 사용자가 비교 그림의 차이를 지적했다. 전체 규칙 291곳 0건은 시안 일치의 근거가 아니다. 비교·검사는 [`docs/50`](50-pos-management-details-ui.md), 업무상 차이의 사유·미구현 기능·시안 불일치는 [`docs/51`](51-pos-ui-design-differences.md)에 구분했다.
-- **현재 상태(2026-09-22):** 화면 코드 기준은 A1~A4를 다시 맞춘 `3636a02`다. 사용자 요청으로 A5(1) 업무 처리의 D02·D12 시안 요소 표를 작성했으나, 출발 문자 기능·예약금 미수 자료가 없어 공통 규칙 6번에 따라 **코드 수정 전 중단**했다. 기준표·근거·재개 조건은 [`docs/51`](51-pos-ui-design-differences.md)의 A5(1) 기록을 따른다. (2) 차량 보관은 사용자 확인 전까지 미착수. `main`·Pages·PR 없이 `feat/pos-ui-v4`에만 커밋·푸시한다.
+- **현재 상태(2026-09-22):** A1~A4 기준 `3636a02` 위에서 A5(1) 업무 처리만 수정했다. 사용자가 출발 문구(차량 출발·10분 이내 도착)를 확인하고 예약금 미수를 보류해 재개했다. D02·D12 기준으로 전화·문자·목록·확정 버튼을 맞추고 행 목록·쪽 나눔을 유지했다. 실제 문자 발송은 미연결이며 문구 확인만 가능하다. **(1) 비교 그림 사용자 확인 대기, (2) 차량 보관 미착수.** 항목별 비교·검증·남은 차이는 [`docs/51`](51-pos-ui-design-differences.md) 문서 끝의 재개 기록을 따른다. `main`·Pages·PR 없이 `feat/pos-ui-v4`에만 커밋·푸시한다.
 
 ## 1. 먼저 읽을 것
 
@@ -35,7 +35,7 @@ npm run dev                        # http://127.0.0.1:58148/ 체험판 (촬영 �
 npm run test:pos:operating
 npm run test:pos:fulfillment && npm run test:pos:tickets && npm run test:pos:management && npm run test:pos:preinput && npm run test:pos:keypad  # 업무 검사 6종 전부
 npm run pos:rules                  # 포스 촬영(60장) + 규칙 검사   ← dev 서버가 켜져 있어야 한다
-npm run pos:screens:driver        # 기사 촬영(11장)
+npm run pos:screens:driver        # 기사 촬영(22개 상태) + D02·D12 비교
 npm run pos:screens:fulfillment   # 지급·반납 15장 + 시안 비교 2장 (work/pos-ui-a1)
 npm run pos:screens:adjustments   # A2 20장 + 시안 비교 3장 (work/pos-ui-a2)
 npm run pos:screens:windows       # A3 48장 + 시안 비교 5장 (work/pos-ui-a3)
@@ -84,7 +84,7 @@ npm run test:pwa                   # 설치형 앱 흐름
 | A2 | 기간 · 수거 변경 · 교환 · 문제 해결 | `p24` · `p25` · `p26` | `pos-adjustment-forms.js` · `pos-problem-picker.js` · `pos-fulfillment.js` | **구현·검증 완료, main 반영 확인 대기.** 날짜·장소·시간·차량 선택과 달력, 실제 규격 버튼, 문제 해결 여섯 선택지. 부록 A 문구·기존 실물 확인 절차 유지. 지급/반납/변경 24개·전체 검증 통과, 규칙 195곳 0건. 비교·검증은 [`docs/48`](48-pos-adjustments-ui.md). |
 | A3 | 발권 창 · 마감 확정 3단계 · 사이즈 입력 현황 · 사이즈 요청 창 · 업무 알림 | `p27` · `p28` · `p14` · `p31` · `p32` | `pos-ticket-form.js` · `pos-finance.js showClosing()` · `pos-size-status.js` · `pos-preinput.js` · `pos-notifications.js` | **구현·검증 완료, main 반영 확인 대기.** 공용 수량 조절·요약, 마감 3단계 창, 팀별 사이즈·적용 규격 집계, 일행/차수 선택, 알림 선택 상태. 사전입력 10개·전체 검증 통과, 규칙 244곳 0건. 비교·검증은 [`docs/49`](49-pos-workflow-windows-ui.md). |
 | A4 | 재고 · 정비, 거래처 상세, 고객 상세 | `m02-inventory` · `m04-partner-detail` · 고객은 P04 배치 기준 | `pos-management.js inventory()`·`inventoryAssets()`·`partnerDetail()`·`customerDetail()` | **업무 검사 통과, 시안 일치 미완료.** `aa1dae6` 상태로 마무리. 관리 9개·전체 검사 통과, 규칙 291곳 0건. 버튼 형태·패널 비율·금액표 여백·하단 주 동작 등 시안 불일치는 [`docs/51`](51-pos-ui-design-differences.md). 기존 비교·검사는 [`docs/50`](50-pos-management-details-ui.md). |
-| A5 | 기사 태블릿 업무 처리 · 차량 보관 | `d02-driver-task` · `d03-driver-stock` | `pos-dispatch.js` `taskPage() :68` · `vehicleStock() :114` | **미착수. 현재 추가 작업 중단.** 재개 시 행 목록 유지(사용자 결정). 시안과 다른 곳만 맞춘다. `capture-pos-driver.cjs`의 줄 수 검사(3줄@1024×520 · 4줄@1024×600 · 휴대폰 4줄@360×640)를 깨지 않는다 |
+| A5 | 기사 태블릿 업무 처리 · 차량 보관 | `d02-driver-task` · `d03-driver-stock` | `pos-dispatch.js` `taskPage()` · `vehicleStock()` | **(1) 업무 처리 수정·비교 후 사용자 확인 대기. (2) 차량 보관 미착수.** 행 목록·쪽 나눔, 목록 3줄@1024×520 · 4줄@1024×600 · 4줄@360×640 유지. 출발 문자 문구 확인 연결, 실제 발송 미연결·예약금 미수 보류. 비교 그림·요소 표·검증은 [`docs/51`](51-pos-ui-design-differences.md). 확인 전 다음 화면을 시작하지 않는다. |
 
 ### B. 나눠서 결제 (시안만 있음 · `docs/44` 6-1)
 

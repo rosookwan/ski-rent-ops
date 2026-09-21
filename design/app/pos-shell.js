@@ -39,14 +39,18 @@
   }
   function header(options) {
     const tools = S.$('#so-page-tools'), left = S.$('.so-topbar-left');
+    S.root.dataset.posLayout = options.layout || '';
     if (left) {
       // Same header on every screen: 스키노트 · 매장명 · 화면 제목 (docs/42 2-4).
       let shop = left.querySelector('.pos-shop');
       if (!shop) { shop = document.createElement('span'); shop.className = 'pos-shop'; left.insertBefore(shop, S.$('#so-breadcrumb')); }
       if (!left.querySelector('.pos-mark')) { const mark = document.createElement('span'); mark.className = 'pos-mark'; mark.textContent = '스키노트'; left.insertBefore(mark, shop); }
       shop.textContent = storeName();
+      left.querySelector('.pos-header-back')?.remove();
+      if (options.phoneBack) left.insertAdjacentHTML('afterbegin', '<button type="button" class="pos-header-back" data-go="' + e(options.phoneBack) + '">' + S.icon('chevron-left') + '목록</button>');
     }
     if (options.title && S.$('#so-breadcrumb')) S.$('#so-breadcrumb').textContent = options.title;
+    if (options.phoneTitle && S.$('#so-breadcrumb')) S.$('#so-breadcrumb').innerHTML = '<span class="pos-title-wide">' + e(options.title) + '</span><span class="pos-title-phone">' + e(options.phoneTitle) + '</span>';
     if (!tools) return;
     const D = S.posData;
     let html = D?.pending ? '<button type="button" class="pos-search-entry" data-action="pos-retry">앞선 처리 다시 확인</button>' : '';
@@ -55,8 +59,8 @@
     if (options.wait == null && !options.sums && !D?.pending) html += '<button type="button" data-go="rentals" class="pos-search-entry">' + S.icon('search') + '고객 찾기</button>';
     tools.innerHTML = html; tools.hidden = false;
   }
-  function button(text, action, id = '', kind = '') {
-    return '<button type="button" class="so-button pos-button ' + e(kind) + '" data-action="' + e(action) + '" data-id="' + e(id) + '">' + e(text) + '</button>';
+  function button(text, action, id = '', kind = '', options = {}) {
+    return '<button type="button" class="so-button pos-button ' + e(kind) + '" data-action="' + e(action) + '" data-id="' + e(id) + '">' + (options.icon ? S.icon(options.icon) : '') + e(text) + '</button>';
   }
   const meaningful = html => !!html && html.replace(/<span class="pos-toolbar-label">[\s\S]*?<\/span>/g, '').trim() !== '';
   function page(title, description, body, footer = '', options = {}) {
@@ -68,9 +72,10 @@
       + (meaningful(options.toolbar) ? '<div class="pos-toolbar">' + options.toolbar + '</div>' : '') + (description ? '<p>' + e(description) + '</p>' : '')
       + '</header><div class="pos-page-body' + (body.includes('data-pos-cards=') || body.includes('class="pos-split') ? ' is-cards' : '') + '">' + body + '</div>' + (footer ? '<footer class="pos-page-footer">' + footer + '</footer>' : '') + '</section>';
   }
-  function row(title, description, actions = '') {
-    return '<article class="pos-row"><div class="pos-row-copy"><strong>' + e(title) + '</strong>'
-      + (description ? '<p>' + e(description) + '</p>' : '') + '</div><div class="pos-row-actions">' + actions + '</div></article>';
+  function row(title, description, actions = '', options = {}) {
+    const text = (wide, small) => small == null ? e(wide) : '<span class="pos-row-wide">' + e(wide) + '</span><span class="pos-row-phone">' + e(small) + '</span>';
+    return '<article class="pos-row' + (options.phone ? ' has-phone-copy' : '') + '"><div class="pos-row-copy"><strong>' + text(title, options.phone?.title) + '</strong>'
+      + (description ? '<p>' + text(description, options.phone?.description) + '</p>' : '') + '</div><div class="pos-row-actions">' + actions + '</div></article>';
   }
   const badge = (text, tone = 'grey') => '<span class="pos-badge" data-tone="' + e(tone) + '">' + e(text) + '</span>';
   const search = (key, value, placeholder) => '<label class="pos-search">' + S.icon('search') + '<input type="text" data-search="' + e(key) + '" value="' + e(value) + '" placeholder="' + e(placeholder) + '" aria-label="' + e(placeholder) + '" autocomplete="off"></label>';
