@@ -23,6 +23,15 @@
       ],
       "metrics": "*",
       "viewports": "*"
+    },
+    {
+      "since": "M3 (2026-09-21)",
+      "keys": [
+        "home",
+        "closing"
+      ],
+      "metrics": "*",
+      "viewports": "*"
     }
   ]
 }

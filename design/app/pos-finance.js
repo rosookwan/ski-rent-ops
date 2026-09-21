@@ -45,35 +45,36 @@
     P.modal('청구 금액 조정', '<div class="pos-confirm-summary"><strong>' + e(o.customer.name) + ' 팀 · 현재 청구 ' + won(o.finance.chargedWon) + '</strong><span>원래 요금 보존 · 조정 근거 별도 기록</span></div><div class="pos-form-grid">' + select('조정 방향', 'adjustDirection', [['minus', '할인·청구 감소'], ['plus', '추가 청구']], 'minus') + input('조정 금액 (원)', 'adjustAmount', '', 'number', 'min="1" inputmode="numeric"') + select('사유', 'adjustReason', [['현장 할인 확인', '현장 할인 확인'], ['취소·조기반납 환불액 확인', '취소·조기반납 비용 조정'], ['연체 비용 직원 확인', '연체 비용 직원 확인'], ['파손·분실 배상액 확인', '파손·분실 배상액 확인']], '현장 할인 확인') + '</div><p class="pos-label">조기반납·연체·파손 비용은 확인한 금액만 입력 · 환불은 실제 반환 후 별도 기록</p>' + errorBox(), b('취소', 'close') + b('조정 기록', 'pos-adjust-save', '', 'primary'));
   });
   S.action('pos-adjust-save', async () => { try { const d = moneyDraft; if (d.revision !== D.snapshot.revision) throw new Error('변경된 금액을 다시 확인해 주세요.'); const amountWon = Number(read('adjustAmount')) * (read('adjustDirection') === 'minus' ? -1 : 1); await D.execute('finance.adjustment', { id: D.id('adjust'), orderId: d.orderId, amountWon, reason: read('adjustReason') }); S.close(); S.render(); S.toast('금액 조정 기록 완료'); } catch (err) { error(err); } });
-  function customerCard(o) {
+  // Closing list rows (UI v4): one 52px line per team or partner, the whole row opens its one action.
+  function customerRow(o) {
     const f = o.finance, due = f.dueWon > 0;
-    return P.card({ tone: due ? 'red' : '', badge: due ? ['미수', 'red'] : ['보증금 보관', 'blue'], name: o.customer.name + ' 팀', phone: o.customer.phone || '', meta: (o.receiptNo || o.id) + ' · ' + U.labels[o.status] + ' · ' + U.itemText(o.lines[0]) + (o.lines.length > 1 ? ' 외 ' + (o.lines.length - 1) : ''),
-      lines: [['대여 금액 ' + won(f.chargedWon) + ' · 수납 ' + won(f.netPaidWon || 0), ''], [f.depositHeldWon ? '보증금 ' + won(f.depositHeldWon) + ' 보관' : f.creditWon ? '초과 수납 ' + won(f.creditWon) : '수납 기록 ' + (f.payments?.length || 0) + '건', f.depositHeldWon ? 'purple' : '']],
-      money: due ? [['미수 ' + won(f.dueWon), 'red']] : [['보증금 ' + won(f.depositHeldWon), 'blue']],
-      actions: due ? b('수납 ' + won(f.dueWon), 'pos-money', o.id, 'soft') : b('보증금 반환', 'pos-deposit-out', o.id, 'soft'), go: { page: 'order-detail', id: o.id } });
+    return P.lineRow({ name: o.customer.name + ' 팀', noteParts: [due ? U.labels[o.status] : '보증금 보관', o.receiptNo || o.id], amount: won(due ? f.dueWon : f.depositHeldWon), tone: due ? 'red' : 'blue', label: due ? '수납' : '보증금 반환', action: due ? 'pos-money' : 'pos-deposit-out', id: o.id });
   }
-  function partnerCard(row) {
-    const tone = row.receivableWon ? 'red' : row.payableWon ? 'orange' : '';
-    return P.card({ tone, badge: row.receivableWon ? ['미수', 'red'] : row.payableWon ? ['미지급', 'orange'] : ['실물 정산', 'purple'], name: row.name, meta: '거래처' + (row.agreementUnconfirmed ? ' · 약정 확인 필요' : ''),
-      lines: [['받을 약정 ' + won(row.receivableWon) + ' · 줄 약정 ' + won(row.payableWon), ''], ['빌린 미반환 ' + row.borrowedPendingQuantity + '개 · 빌려준 미회수 ' + row.lentPendingQuantity + '개', row.borrowedPendingQuantity || row.lentPendingQuantity ? 'purple' : '']],
-      money: [[row.receivableWon ? '미수 ' + won(row.receivableWon) : '미지급 ' + won(row.payableWon), row.receivableWon ? 'red' : 'orange']],
-      actions: go('장부 열기', 'partner-detail', row.id), go: { page: 'partner-detail', id: row.id } });
+  function partnerRow(row) {
+    const pending = row.borrowedPendingQuantity + row.lentPendingQuantity;
+    return P.lineRow({ name: row.name, noteParts: ['거래처', row.receivableWon ? '받을 약정' : row.payableWon ? '줄 약정' : '실물 정산', row.agreementUnconfirmed ? '약정 확인 필요' : ''], amount: row.receivableWon ? won(row.receivableWon) : row.payableWon ? won(row.payableWon) : pending + '개', tone: row.receivableWon ? 'red' : row.payableWon ? 'orange' : 'purple', label: '장부 열기', go: { page: 'partner-detail', id: row.id } });
   }
   function closing() {
     const f = D.snapshot.finance, closed = D.snapshot.closings.find(c => c.date === D.today && !c.reopenings.length);
     const q = listQuery.replace(/[\s-]/g, '').toLowerCase(), hit = text => text.replace(/[\s-]/g, '').toLowerCase().includes(q);
-    const orders = D.snapshot.orders.filter(o => (o.finance.dueWon > 0 || o.finance.depositHeldWon > 0) && hit(o.customer.name + o.customer.phone + (o.receiptNo || o.id)));
-    const partners = (f.partnerBalances || []).filter(row => (row.receivableWon || row.payableWon || row.borrowedPendingQuantity || row.lentPendingQuantity) && hit(row.name));
+    const open = D.snapshot.orders.filter(o => o.finance.dueWon > 0 || o.finance.depositHeldWon > 0), openPartners = (f.partnerBalances || []).filter(row => row.receivableWon || row.payableWon || row.borrowedPendingQuantity || row.lentPendingQuantity);
+    const orders = open.filter(o => hit(o.customer.name + o.customer.phone + (o.receiptNo || o.id))), partners = openPartners.filter(row => hit(row.name));
     const dueTeams = orders.filter(o => o.finance.dueWon > 0), depositTeams = orders.filter(o => !o.finance.dueWon && o.finance.depositHeldWon > 0);
-    const due = dueTeams.reduce((n, o) => n + o.finance.dueWon, 0), deposit = orders.reduce((n, o) => n + o.finance.depositHeldWon, 0), payable = partners.reduce((n, r) => n + r.payableWon, 0), receivable = partners.reduce((n, r) => n + r.receivableWon, 0);
-    const groups = [];
-    if (listFilter !== 'partners') { groups.push({ title: '수납 대기', sub: dueTeams.length + '건 · ' + won(due), cards: dueTeams.map(customerCard) }); groups.push({ title: '보증금 보관', sub: depositTeams.length + '건', cards: depositTeams.map(customerCard) }); }
-    if (listFilter !== 'customers') groups.push({ title: '거래처', sub: partners.length + '곳 · 미수 ' + won(receivable) + ' · 미지급 ' + won(payable), cards: partners.map(partnerCard) });
+    const due = dueTeams.reduce((n, o) => n + o.finance.dueWon, 0), deposit = orders.reduce((n, o) => n + o.finance.depositHeldWon, 0), payable = partners.reduce((n, r) => n + r.payableWon, 0);
+    const rows = [...(listFilter !== 'partners' ? [...dueTeams, ...depositTeams].map(customerRow) : []), ...(listFilter !== 'customers' ? partners.map(partnerRow) : [])];
     const total = dueTeams.length + depositTeams.length + partners.length;
+    // The side panel always shows the whole business day, whatever the search box says.
+    const dueAll = open.filter(o => o.finance.dueWon > 0), dueAllWon = dueAll.reduce((n, o) => n + o.finance.dueWon, 0), depositAll = open.reduce((n, o) => n + o.finance.depositHeldWon, 0);
+    const figure = (label, value, tone = '') => '<div class="pos-side-figure"><small>' + e(label) + '</small><b data-tone="' + tone + '">' + e(value) + '</b></div>';
+    const check = (state, text) => '<li data-state="' + state + '">' + S.icon(state === 'done' ? 'circle-check' : 'circle') + '<span>' + e(text) + '</span></li>';
+    const side = '<aside class="pos-panel pos-side" aria-label="오늘 마감 준비"><div class="pos-side-head"><strong>오늘 마감 준비</strong><span>' + e(Number(D.today.slice(5, 7)) + '월 ' + Number(D.today.slice(8, 10)) + '일 (' + weekday(D.today) + ')') + '</span></div>'
+      + figure('오늘 수납', won(f.paymentWon || 0), 'green') + figure('미수', won(dueAllWon), dueAllWon ? 'red' : '') + figure('보증금 보관', won(depositAll), 'blue') + figure('예상 현금', won((f.openingCashWon || 0) + (f.cashMovementWon || 0)))
+      + '<ul class="pos-checks">' + check(openPartners.length ? 'todo' : 'done', '거래처 미정산 ' + openPartners.length + '건') + check(dueAll.length ? 'todo' : 'done', dueAll.length ? '미수 ' + dueAll.length + '건 · 내일로 이월' : '미수 없음') + check(closed ? 'done' : 'wait', closed ? '오늘 마감 확정' : '현금 대조 전') + '</ul></aside>';
+    const list = P.cards([{ cards: rows }], { fixed: true, lines: true, signature: [listFilter, listQuery].join('|'), empty: listQuery ? '검색 결과 없음' : '정산 대기 없음', emptyNote: closed ? '오늘 마감 확정' : '오늘 수납·미수 없음' });
     const toolbar = P.search('pos-closing-search', listQuery, '고객 · 거래처 · 접수번호') + P.toolbarLabel('영업일 ' + D.today.slice(5).replace('-', '/'))
-      + P.group(P.chip('전체', 'pos-closing-filter', 'all', listFilter === 'all', dueTeams.length + depositTeams.length + partners.length) + P.chip('고객', 'pos-closing-filter', 'customers', listFilter === 'customers', dueTeams.length + depositTeams.length) + P.chip('거래처', 'pos-closing-filter', 'partners', listFilter === 'partners', partners.length))
+      + P.group(P.chip('전체', 'pos-closing-filter', 'all', listFilter === 'all', total) + P.chip('고객', 'pos-closing-filter', 'customers', listFilter === 'customers', dueTeams.length + depositTeams.length) + P.chip('거래처', 'pos-closing-filter', 'partners', listFilter === 'partners', partners.length))
       + P.group(P.chipGo('마감 이력', 'closing-history'));
-    return P.page('5 정산·마감', '', P.cards(groups, { empty: listQuery ? '검색 결과 없음' : '정산 대기 없음', emptyNote: closed ? '오늘 마감 확정' : '오늘 수납·미수 없음' }),
+    return P.page('5 정산·마감', '', '<div class="pos-split"><div class="pos-panel">' + list + '</div>' + side + '</div>',
       '<span>' + e('정산 대기 ' + total + '건 · 미수 ' + won(due) + ' · 미지급 ' + won(payable) + ' · 보증금 ' + won(deposit)) + '</span><div class="so-actions">' + b('현금 입출금', 'pos-cash') + b('거래처 미정산 확인', 'pos-closing-partners') + (closed ? b('마감표 확인', 'pos-closing-view', closed.id, 'primary') : b('마감 확정', 'pos-closing-start', '', 'primary')) + '</div>',
       { toolbar, wait: total ? total + '건' : '없음', sums: [['오늘 수납', won(f.paymentWon || 0), 'green'], ['고객 환불', won(f.refundWon || 0)], ['현금 증감', won(f.cashMovementWon || 0), (f.cashMovementWon || 0) < 0 ? 'red' : '']] });
   }

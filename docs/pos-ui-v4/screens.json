@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-21T03:55:27.662Z",
+  "generatedAt": "2026-09-21T04:10:12.778Z",
   "mode": "static memory demonstration; screenshots are not evidence of physical hardware",
   "checks": [
     {
@@ -15,54 +15,16 @@
         "minTarget": 52,
         "smallText": [],
         "clippedText": [],
-        "halfCut": [
-          {
-            "sel": "div.pos-page-body article.pos-card",
-            "sample": "미반납 있음4 반납·회수미반납13개기한16:30김민수 팀 · 김영희 팀 ",
-            "count": 1
-          },
-          {
-            "sel": "div.pos-page-body article.pos-card",
-            "sample": "미수 7팀5 정산·마감정산 대기7건기한오늘 밤미수 970,000원마감 전",
-            "count": 1
-          },
-          {
-            "sel": "div.pos-page-body article.pos-card",
-            "sample": "발권 필요리프트권발권 필요8매기한오늘 안김민수 팀 · 박준호 팀 발권 전",
-            "count": 1
-          },
-          {
-            "sel": "div.pos-cards article.pos-card",
-            "sample": "미반납 있음4 반납·회수미반납13개기한16:30김민수 팀 · 김영희 팀 ",
-            "count": 1
-          },
-          {
-            "sel": "div.pos-cards article.pos-card",
-            "sample": "미수 7팀5 정산·마감정산 대기7건기한오늘 밤미수 970,000원마감 전",
-            "count": 1
-          },
-          {
-            "sel": "div.pos-cards article.pos-card",
-            "sample": "발권 필요리프트권발권 필요8매기한오늘 안김민수 팀 · 박준호 팀 발권 전",
-            "count": 1
-          }
-        ],
+        "halfCut": [],
         "shortTargets": [],
-        "scrolling": [
-          {
-            "sel": "div.pos-cards",
-            "need": 738,
-            "has": 380,
-            "allowed": false
-          }
-        ]
+        "scrolling": []
       },
       "ruleTotals": {
         "smallText": 0,
         "clippedText": 0,
-        "halfCut": 6,
+        "halfCut": 0,
         "shortTargets": 0,
-        "scrolling": 1
+        "scrolling": 0
       }
     },
     {
@@ -178,44 +140,16 @@
         "minTarget": 52,
         "smallText": [],
         "clippedText": [],
-        "halfCut": [
-          {
-            "sel": "div.pos-page-body article.pos-card",
-            "sample": "미수박준호 팀010-0000-0022R-022 · 지급 전 · 스키 2개",
-            "count": 1
-          },
-          {
-            "sel": "div.pos-page-body article.pos-card",
-            "sample": "미수이수진 팀010-0000-0023R-023 · 이용 중 · 보드 2개",
-            "count": 1
-          },
-          {
-            "sel": "div.pos-cards article.pos-card",
-            "sample": "미수박준호 팀010-0000-0022R-022 · 지급 전 · 스키 2개",
-            "count": 1
-          },
-          {
-            "sel": "div.pos-cards article.pos-card",
-            "sample": "미수이수진 팀010-0000-0023R-023 · 이용 중 · 보드 2개",
-            "count": 1
-          }
-        ],
+        "halfCut": [],
         "shortTargets": [],
-        "scrolling": [
-          {
-            "sel": "div.pos-cards",
-            "need": 1016,
-            "has": 384,
-            "allowed": false
-          }
-        ]
+        "scrolling": []
       },
       "ruleTotals": {
         "smallText": 0,
         "clippedText": 0,
-        "halfCut": 4,
+        "halfCut": 0,
         "shortTargets": 0,
-        "scrolling": 1
+        "scrolling": 0
       }
     },
     {
@@ -364,54 +298,16 @@
         "minTarget": 52,
         "smallText": [],
         "clippedText": [],
-        "halfCut": [
-          {
-            "sel": "div.pos-page-body article.pos-card",
-            "sample": "차량 운행남은 7건남은 업무7건기한16:3016:30 김영희 수거차량 보",
-            "count": 1
-          },
-          {
-            "sel": "div.pos-page-body article.pos-card",
-            "sample": "정비 없음재고·정비정비0점기한오늘 안세척·점검·수리 0점분실 0점열기",
-            "count": 1
-          },
-          {
-            "sel": "div.pos-page-body article.pos-card",
-            "sample": "마감 대기 1일마감 이력마감 대기1일기한오늘 밤2026-09-21 마감 ",
-            "count": 1
-          },
-          {
-            "sel": "div.pos-cards article.pos-card",
-            "sample": "차량 운행남은 7건남은 업무7건기한16:3016:30 김영희 수거차량 보",
-            "count": 1
-          },
-          {
-            "sel": "div.pos-cards article.pos-card",
-            "sample": "정비 없음재고·정비정비0점기한오늘 안세척·점검·수리 0점분실 0점열기",
-            "count": 1
-          },
-          {
-            "sel": "div.pos-cards article.pos-card",
-            "sample": "마감 대기 1일마감 이력마감 대기1일기한오늘 밤2026-09-21 마감 ",
-            "count": 1
-          }
-        ],
+        "halfCut": [],
         "shortTargets": [],
-        "scrolling": [
-          {
-            "sel": "div.pos-cards",
-            "need": 738,
-            "has": 548,
-            "allowed": false
-          }
-        ]
+        "scrolling": []
       },
       "ruleTotals": {
         "smallText": 0,
         "clippedText": 0,
-        "halfCut": 6,
+        "halfCut": 0,
         "shortTargets": 0,
-        "scrolling": 1
+        "scrolling": 0
       }
     },
     {
@@ -527,44 +423,16 @@
         "minTarget": 52,
         "smallText": [],
         "clippedText": [],
-        "halfCut": [
-          {
-            "sel": "div.pos-page-body article.pos-card",
-            "sample": "미수최은정 팀010-0000-0024R-024 · 차량 보관 중 · 스키",
-            "count": 1
-          },
-          {
-            "sel": "div.pos-page-body article.pos-card",
-            "sample": "미수정하늘 팀010-0000-0026R-026 · 지급 전 · 오후권 성",
-            "count": 1
-          },
-          {
-            "sel": "div.pos-cards article.pos-card",
-            "sample": "미수최은정 팀010-0000-0024R-024 · 차량 보관 중 · 스키",
-            "count": 1
-          },
-          {
-            "sel": "div.pos-cards article.pos-card",
-            "sample": "미수정하늘 팀010-0000-0026R-026 · 지급 전 · 오후권 성",
-            "count": 1
-          }
-        ],
+        "halfCut": [],
         "shortTargets": [],
-        "scrolling": [
-          {
-            "sel": "div.pos-cards",
-            "need": 1016,
-            "has": 552,
-            "allowed": false
-          }
-        ]
+        "scrolling": []
       },
       "ruleTotals": {
         "smallText": 0,
         "clippedText": 0,
-        "halfCut": 4,
+        "halfCut": 0,
         "shortTargets": 0,
-        "scrolling": 1
+        "scrolling": 0
       }
     },
     {
@@ -713,34 +581,16 @@
         "minTarget": 52,
         "smallText": [],
         "clippedText": [],
-        "halfCut": [
-          {
-            "sel": "div.pos-page-body article.pos-card",
-            "sample": "마감 대기 1일마감 이력마감 대기1일기한오늘 밤2026-09-21 마감 ",
-            "count": 1
-          },
-          {
-            "sel": "div.pos-cards article.pos-card",
-            "sample": "마감 대기 1일마감 이력마감 대기1일기한오늘 밤2026-09-21 마감 ",
-            "count": 1
-          }
-        ],
+        "halfCut": [],
         "shortTargets": [],
-        "scrolling": [
-          {
-            "sel": "div.pos-cards",
-            "need": 738,
-            "has": 548,
-            "allowed": false
-          }
-        ]
+        "scrolling": []
       },
       "ruleTotals": {
         "smallText": 0,
         "clippedText": 0,
-        "halfCut": 2,
+        "halfCut": 0,
         "shortTargets": 0,
-        "scrolling": 1
+        "scrolling": 0
       }
     },
     {
@@ -856,34 +706,16 @@
         "minTarget": 52,
         "smallText": [],
         "clippedText": [],
-        "halfCut": [
-          {
-            "sel": "div.pos-page-body article.pos-card",
-            "sample": "미수윤서준 팀010-0000-0027R-027 · 지급 전 · 스키 2개",
-            "count": 1
-          },
-          {
-            "sel": "div.pos-cards article.pos-card",
-            "sample": "미수윤서준 팀010-0000-0027R-027 · 지급 전 · 스키 2개",
-            "count": 1
-          }
-        ],
+        "halfCut": [],
         "shortTargets": [],
-        "scrolling": [
-          {
-            "sel": "div.pos-cards",
-            "need": 771,
-            "has": 552,
-            "allowed": false
-          }
-        ]
+        "scrolling": []
       },
       "ruleTotals": {
         "smallText": 0,
         "clippedText": 0,
-        "halfCut": 2,
+        "halfCut": 0,
         "shortTargets": 0,
-        "scrolling": 1
+        "scrolling": 0
       }
     },
     {
@@ -1032,44 +864,16 @@
         "minTarget": 52,
         "smallText": [],
         "clippedText": [],
-        "halfCut": [
-          {
-            "sel": "div.pos-page-body article.pos-card",
-            "sample": "3 이용·변경이용 중 3팀요청0건기한없음변경 요청 없음이용 중 3팀열기",
-            "count": 1
-          },
-          {
-            "sel": "div.pos-page-body article.pos-card",
-            "sample": "미반납 있음4 반납·회수미반납13개기한16:30김민수 팀 · 김영희 팀 ",
-            "count": 1
-          },
-          {
-            "sel": "div.pos-cards article.pos-card",
-            "sample": "3 이용·변경이용 중 3팀요청0건기한없음변경 요청 없음이용 중 3팀열기",
-            "count": 1
-          },
-          {
-            "sel": "div.pos-cards article.pos-card",
-            "sample": "미반납 있음4 반납·회수미반납13개기한16:30김민수 팀 · 김영희 팀 ",
-            "count": 1
-          }
-        ],
+        "halfCut": [],
         "shortTargets": [],
-        "scrolling": [
-          {
-            "sel": "div.pos-cards",
-            "need": 1230,
-            "has": 428,
-            "allowed": false
-          }
-        ]
+        "scrolling": []
       },
       "ruleTotals": {
         "smallText": 0,
         "clippedText": 0,
-        "halfCut": 4,
+        "halfCut": 0,
         "shortTargets": 0,
-        "scrolling": 1
+        "scrolling": 0
       }
     },
     {
@@ -1185,44 +989,16 @@
         "minTarget": 52,
         "smallText": [],
         "clippedText": [],
-        "halfCut": [
-          {
-            "sel": "div.pos-page-body article.pos-card",
-            "sample": "미수박준호 팀010-0000-0022R-022 · 지급 전 · 스키 2개",
-            "count": 1
-          },
-          {
-            "sel": "div.pos-page-body article.pos-card",
-            "sample": "미수이수진 팀010-0000-0023R-023 · 이용 중 · 보드 2개",
-            "count": 1
-          },
-          {
-            "sel": "div.pos-cards article.pos-card",
-            "sample": "미수박준호 팀010-0000-0022R-022 · 지급 전 · 스키 2개",
-            "count": 1
-          },
-          {
-            "sel": "div.pos-cards article.pos-card",
-            "sample": "미수이수진 팀010-0000-0023R-023 · 이용 중 · 보드 2개",
-            "count": 1
-          }
-        ],
+        "halfCut": [],
         "shortTargets": [],
-        "scrolling": [
-          {
-            "sel": "div.pos-cards",
-            "need": 1016,
-            "has": 432,
-            "allowed": false
-          }
-        ]
+        "scrolling": []
       },
       "ruleTotals": {
         "smallText": 0,
         "clippedText": 0,
-        "halfCut": 4,
+        "halfCut": 0,
         "shortTargets": 0,
-        "scrolling": 1
+        "scrolling": 0
       }
     },
     {
@@ -1619,7 +1395,7 @@
   "screens": [
     {
       "title": "오늘 할 일",
-      "detail": "9단계 업무 카드와 지금 급한 일을 한 화면에서 시작합니다.",
+      "detail": "지금 급한 일 한 줄과 여섯 가지 업무 타일. 타일 전체가 누르는 곳입니다.",
       "file": "home-1024x600.png",
       "size": "1024×600"
     },
@@ -1649,7 +1425,7 @@
     },
     {
       "title": "5 정산·마감",
-      "detail": "수납 대기·보증금·거래처 카드와 마감 확정.",
+      "detail": "왼쪽은 수납 대기 행(한 줄 전체가 누르는 곳), 오른쪽은 오늘 마감 준비.",
       "file": "closing-1024x600.png",
       "size": "1024×600"
     },
@@ -1685,7 +1461,7 @@
     },
     {
       "title": "오늘 할 일",
-      "detail": "9단계 업무 카드와 지금 급한 일을 한 화면에서 시작합니다.",
+      "detail": "지금 급한 일 한 줄과 여섯 가지 업무 타일. 타일 전체가 누르는 곳입니다.",
       "file": "home-1024x768.png",
       "size": "1024×768"
     },
@@ -1715,7 +1491,7 @@
     },
     {
       "title": "5 정산·마감",
-      "detail": "수납 대기·보증금·거래처 카드와 마감 확정.",
+      "detail": "왼쪽은 수납 대기 행(한 줄 전체가 누르는 곳), 오른쪽은 오늘 마감 준비.",
       "file": "closing-1024x768.png",
       "size": "1024×768"
     },
@@ -1751,7 +1527,7 @@
     },
     {
       "title": "오늘 할 일",
-      "detail": "9단계 업무 카드와 지금 급한 일을 한 화면에서 시작합니다.",
+      "detail": "지금 급한 일 한 줄과 여섯 가지 업무 타일. 타일 전체가 누르는 곳입니다.",
       "file": "home-1366x768.png",
       "size": "1366×768"
     },
@@ -1781,7 +1557,7 @@
     },
     {
       "title": "5 정산·마감",
-      "detail": "수납 대기·보증금·거래처 카드와 마감 확정.",
+      "detail": "왼쪽은 수납 대기 행(한 줄 전체가 누르는 곳), 오른쪽은 오늘 마감 준비.",
       "file": "closing-1366x768.png",
       "size": "1366×768"
     },
@@ -1817,7 +1593,7 @@
     },
     {
       "title": "오늘 할 일",
-      "detail": "9단계 업무 카드와 지금 급한 일을 한 화면에서 시작합니다.",
+      "detail": "지금 급한 일 한 줄과 여섯 가지 업무 타일. 타일 전체가 누르는 곳입니다.",
       "file": "home-907x648.png",
       "size": "907×648"
     },
@@ -1847,7 +1623,7 @@
     },
     {
       "title": "5 정산·마감",
-      "detail": "수납 대기·보증금·거래처 카드와 마감 확정.",
+      "detail": "왼쪽은 수납 대기 행(한 줄 전체가 누르는 곳), 오른쪽은 오늘 마감 준비.",
       "file": "closing-907x648.png",
       "size": "907×648"
     },

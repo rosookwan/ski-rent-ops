@@ -100,7 +100,7 @@
       const key = pageKey('cards'), signature = filled.map(g => g.title + ':' + g.cards.length).join('|') + '|' + (options.signature || '');
       if (cardSets.get(key)?.signature !== signature) pages.set(key, 0);
       cardSets.set(key, { groups: filled, signature });
-      return '<div class="pos-cards" data-pos-scroll data-pos-cards="' + e(key) + '"><section class="pos-group"><div class="pos-card-grid">' + filled.flatMap(g => g.cards).slice(0, 4).join('') + '</div></section></div>';
+      return '<div class="pos-cards" data-pos-scroll data-pos-cards="' + e(key) + '"' + (options.lines ? ' data-lines' : '') + '><section class="pos-group"><div class="' + (options.lines ? 'pos-line-list' : 'pos-card-grid') + '">' + filled.flatMap(g => g.cards).slice(0, 4).join('') + '</div></section></div>';
     }
     if (!filled.length) return '<div class="pos-cards" data-pos-scroll><div class="pos-empty"><strong>' + e(options.empty || '항목 없음') + '</strong>' + (options.emptyNote ? '<span>' + e(options.emptyNote) + '</span>' : '') + (options.emptyAction || '') + '</div></div>';
     return '<div class="pos-cards" data-pos-scroll>' + filled.map(g => '<section class="pos-group">' + (g.title ? '<div class="pos-group-head">' + e(g.title) + (g.sub ? '<small>' + e(g.sub) + '</small>' : '') + '</div>' : '')
@@ -123,7 +123,23 @@
     return '<article class="pos-card is-fixed"' + (tone ? ' data-tone="' + e(tone) + '"' : '') + (c.id ? ' data-card-id="' + e(c.id) + '"' : '') + '>' + legend + open
       + '<div class="pos-card-bottom"><span class="pos-card-money" data-tone="' + e(c.money?.[1] || 'ink') + '">' + e(c.money?.[0] || '') + '</span>' + (c.actions ? '<div class="pos-card-actions">' + c.actions + '</div>' : '') + '</div></article>';
   }
+  // Home tile: the whole tile is one touch target, "열기" is only a hint. Lines may carry shorter alternatives ([long, shorter, shortest]).
+  function tile(c) {
+    const tone = c.tone || '', strong = ['red', 'orange', 'green'].includes(tone);
+    const line = row => { const alts = [].concat(row?.[0] || []); return '<span class="pos-tile-line" data-tone="' + e(row?.[1] || '') + '" data-fit="alts" data-alts="' + partsAttr(alts) + '">' + e(alts[0] || '') + '</span>'; };
+    return '<button type="button" class="pos-tile" data-go="' + e(c.route) + '"' + (tone ? ' data-tone="' + e(tone) + '"' : '') + '>' + (strong && c.badge ? '<span class="pos-card-legend">' + e(c.badge[0]) + '</span>' : '')
+      + '<span class="pos-tile-head"><strong>' + e(c.name) + '</strong>' + (!strong && c.badge ? badge(c.badge[0], c.badge[1] || 'grey') : '') + '</span>'
+      + '<span class="pos-tile-figures">' + c.figures.map(f => '<span><small>' + e(f.label) + '</small><b' + (f.when ? ' class="is-when"' : '') + ' data-tone="' + e(f.tone || '') + '">' + e(f.value) + '</b></span>').join('') + '</span>'
+      + line(c.lines?.[0]) + '<span class="pos-tile-last">' + line(c.lines?.[1]) + '<span class="pos-tile-open">열기 ›</span></span></button>';
+  }
+  // One-line list row (52px): the whole row is the touch target, the label at the end only names what a tap does.
+  function lineRow(c) {
+    const target = c.go ? 'data-go="' + e(c.go.page) + '" data-id="' + e(c.go.id ?? '') + '"' : 'data-action="' + e(c.action) + '" data-id="' + e(c.id ?? '') + '"';
+    return '<button type="button" class="pos-line-row" ' + target + '><strong>' + e(c.name) + '</strong><span class="pos-line-note" data-fit="parts" data-parts="' + partsAttr(c.noteParts || []) + '">' + e((c.noteParts || []).filter(Boolean).join(' · ')) + '</span>'
+      + '<b data-tone="' + e(c.tone || '') + '">' + e(c.amount || '') + '</b><span class="pos-line-do">' + e(c.label) + '</span></button>';
+  }
   function fitParts(el) {
+    if (el.dataset.fit === 'alts') { let alts; try { alts = JSON.parse(el.dataset.alts || '[]'); } catch { return; } for (const text of alts) { el.textContent = text; if (el.scrollWidth <= el.clientWidth + 1) return; } return; }
     let parts; try { parts = JSON.parse(el.dataset.parts || '[]'); } catch { return; }
     const items = el.dataset.fit === 'items';
     for (let k = parts.length; k >= 1; k--) {
@@ -141,11 +157,22 @@
     if (over(card.querySelector('.pos-card-actions .pos-button'))) card.classList.add('is-widebutton');
     card.querySelectorAll('[data-fit]').forEach(fitParts);
   }
+  // Row names: the note gives way first, then the name takes two lines, and as a last resort whole words drop from the end.
+  function fitLine(row) {
+    const name = row.querySelector('strong'), note = row.querySelector('.pos-line-note'); if (!name) return;
+    const full = name.dataset.full || (name.dataset.full = name.textContent), over = () => name.scrollWidth > name.clientWidth + 1 || name.scrollHeight > name.clientHeight + 2;
+    row.classList.remove('is-longname'); name.textContent = full; if (note) note.hidden = false;
+    if (over() && note) note.hidden = true;
+    if (over()) row.classList.add('is-longname');
+    for (const words = full.split(' '); over() && words.length > 1;) { words.pop(); name.textContent = words.join(' '); }
+    if (note && !note.hidden) { fitParts(note); if (note.scrollWidth > note.clientWidth + 1) note.hidden = true; }
+  }
   function fitPage(scope) {
     const pageEl = scope || S.$('.pos-page'); if (!pageEl) return;
-    const summary = pageEl.querySelector('.pos-page-footer > span:first-child');
-    if (summary && !summary.dataset.fit) { summary.dataset.fit = 'parts'; summary.dataset.parts = JSON.stringify(summary.textContent.split(' · ')); }
-    pageEl.querySelectorAll('.pos-page-footer [data-fit], .pos-group-head [data-fit]').forEach(fitParts);
+    const auto = el => { if (el && !el.dataset.parts) { el.dataset.fit = 'parts'; el.dataset.parts = JSON.stringify(el.textContent.split(' · ')); } };
+    auto(pageEl.querySelector('.pos-page-footer > span:first-child')); pageEl.querySelectorAll('[data-fit="auto"]').forEach(auto);
+    pageEl.querySelectorAll('.pos-page-footer [data-fit], .pos-group-head [data-fit], .pos-now [data-fit], .pos-tile [data-fit]').forEach(fitParts);
+    pageEl.querySelectorAll('.pos-line-row').forEach(fitLine);
     // Search hints are fitted the same way: whole words drop from the end instead of being cut by the field.
     pageEl.querySelectorAll('.pos-search input[placeholder]').forEach(input => {
       const full = input.dataset.hint || (input.dataset.hint = input.placeholder), parts = full.split(' · ');
@@ -190,16 +217,17 @@
     const set = cardSets.get(container.dataset.posCards); if (!set) return;
     const flat = set.groups.flatMap((g, gi) => g.cards.map(html => ({ html, gi })));
     const css = getComputedStyle(container), num = name => parseFloat(css.getPropertyValue(name)) || 0;
-    const gap = num('--pos-card-gap') || 12, cardHeight = num('--pos-card-h') || 171, headHeight = num('--pos-group-head') || 34;
-    const cols = Math.max(1, Math.min(3, Math.floor((container.clientWidth + gap) / (360 + gap))));
+    const lines = container.hasAttribute('data-lines');
+    const gap = lines ? 0 : num('--pos-card-gap') || 12, cardHeight = lines ? num('--pos-line-h') || 52 : num('--pos-card-h') || 171, headHeight = lines ? 0 : num('--pos-group-head') || 34;
+    const cols = lines ? 1 : Math.max(1, Math.min(3, Math.floor((container.clientWidth + gap) / (360 + gap))));
     const list = paginate(flat, cols, container.clientHeight, cardHeight, headHeight, gap);
     const index = Math.min(getPage('cards'), list.length - 1); limits.set(pageKey('cards'), list.length - 1); pages.set(pageKey('cards'), index);
     container.style.setProperty('--pos-cols', cols);
     container.innerHTML = list[index].sections.map(section => {
       const groupIds = [...new Set(flat.slice(section.from, section.to).map(item => item.gi))], groups = groupIds.map(gi => set.groups[gi]);
-      const title = joinTitles(groups.map(g => g.title).filter(Boolean)), sub = joinSubs(groups.map(g => g.sub));
+      const title = lines ? '' : joinTitles(groups.map(g => g.title).filter(Boolean)), sub = joinSubs(groups.map(g => g.sub));
       return '<section class="pos-group">' + (title ? '<div class="pos-group-head"><span>' + e(title) + '</span>' + (sub ? '<small>' + e(sub) + '</small>' : '') + '</div>' : '')
-        + '<div class="pos-card-grid">' + flat.slice(section.from, section.to).map(item => item.html).join('') + '</div></section>';
+        + '<div class="' + (lines ? 'pos-line-list' : 'pos-card-grid') + '">' + flat.slice(section.from, section.to).map(item => item.html).join('') + '</div></section>';
     }).join('');
     S.icons?.();
     const nav = S.$('.pos-cards-pager');
@@ -263,7 +291,7 @@
     const container = S.$('.pos-cards[data-pos-cards]'); if (!container) return;
     setPage('cards', getPage('cards') + Number(delta), { render: false }); layoutCards(container, delta);
   });
-  S.pos = Object.freeze({ navigation, page, button, row, pager, getPage, setPage, modal, prepareModal, card, orderCard, cards, fitPage, badge, search, chip, chipGo, toolbarLabel, group, terms, storeName, menus,
+  S.pos = Object.freeze({ navigation, page, button, row, pager, getPage, setPage, modal, prepareModal, card, orderCard, tile, lineRow, cards, fitPage, badge, search, chip, chipGo, toolbarLabel, group, terms, storeName, menus,
     field: (label, value = '', type = 'text', attrs = '') => S.field(e(label), value, type, attrs),
     label: value => '<span class="pos-label">' + e(value) + '</span>'
   });

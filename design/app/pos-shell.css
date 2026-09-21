@@ -171,10 +171,6 @@
 #ski-ops[data-pos="true"] .pos-card.is-fixed,
 #ski-ops[data-pos="true"] .pos-card.is-fixed[data-tone]{height:var(--pos-card-h);padding:14px;gap:0;justify-content:space-between;border-radius:16px}
 #ski-ops[data-pos="true"] .pos-card.is-fixed[data-tone="green"]{background:#fff}
-#ski-ops[data-pos="true"] .pos-card.is-fixed .pos-card-legend{top:-12px;left:auto;right:16px;padding:1px 10px;border-radius:6px;color:#fff;line-height:22px}
-#ski-ops[data-pos="true"] .pos-card.is-fixed[data-tone="red"] .pos-card-legend{background:var(--tone-red);color:#fff}
-#ski-ops[data-pos="true"] .pos-card.is-fixed[data-tone="orange"] .pos-card-legend{background:var(--tone-orange);color:#fff}
-#ski-ops[data-pos="true"] .pos-card.is-fixed[data-tone="green"] .pos-card-legend{background:var(--tone-green);color:#fff}
 #ski-ops[data-pos="true"] .pos-card.is-fixed .pos-card-open{gap:3px}
 #ski-ops[data-pos="true"] .pos-card.is-fixed .pos-card-head{height:27px;gap:10px;align-items:baseline}
 #ski-ops[data-pos="true"] .pos-card.is-fixed .pos-card-name{flex:0 1 auto;min-width:0;font-size:var(--pos-fs-title);line-height:27px;text-overflow:clip}
@@ -209,10 +205,67 @@
 #ski-ops[data-pos="true"] .pos-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;box-sizing:border-box;min-height:220px;padding:32px;border-radius:14px;background:#fff;box-shadow:inset 0 0 0 1px var(--so-line);text-align:center}
 #ski-ops[data-pos="true"] .pos-empty strong{font-size:22px;font-weight:700;letter-spacing:-.03em}
 #ski-ops[data-pos="true"] .pos-empty span{font-size:17px;color:var(--so-muted)}
-/* Quick "now" strip on home */
-#ski-ops[data-pos="true"] .pos-now{display:flex;align-items:center;gap:10px;flex-shrink:0;min-width:0}
-#ski-ops[data-pos="true"] .pos-now>strong{flex-shrink:0;font-size:16px;font-weight:700;letter-spacing:-.02em;white-space:nowrap}
-#ski-ops[data-pos="true"] .pos-now>span{min-width:0;font-size:16px;color:var(--so-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+/* Home (UI v4 · P01): the "now" strip and six tiles that fill the screen; a whole tile is one touch target */
+#ski-ops[data-pos="true"] .pos-now{display:flex;align-items:center;gap:14px;flex-shrink:0;box-sizing:border-box;min-width:0;height:68px;padding:0 8px 0 16px;border-radius:16px;background:#fff;box-shadow:inset 0 0 0 1px var(--so-line)}
+#ski-ops[data-pos="true"] .pos-now>strong{flex-shrink:0;font-size:var(--pos-fs-title);font-weight:700;letter-spacing:-.02em;white-space:nowrap}
+#ski-ops[data-pos="true"] .pos-now>span{flex:1 1 0;min-width:0;font-size:var(--pos-fs-body);color:var(--so-muted);white-space:nowrap;overflow:hidden}
+#ski-ops[data-pos="true"] .pos-now .pos-button{flex-shrink:0}
+#ski-ops[data-pos="true"] .pos-tiles{flex:1;min-height:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));grid-template-rows:repeat(2,minmax(0,1fr));gap:12px;padding-top:4px}
+#ski-ops[data-pos="true"] .pos-tile{position:relative;display:flex;flex-direction:column;justify-content:space-between;box-sizing:border-box;min-width:0;min-height:0;margin:0;padding:14px 16px 12px;border:0;border-radius:16px;background:#fff;box-shadow:inset 0 0 0 1px var(--so-line);color:inherit;font:inherit;text-align:left;cursor:pointer}
+#ski-ops[data-pos="true"] .pos-tile:focus-visible{outline:3px solid var(--so-accent);outline-offset:2px}
+#ski-ops[data-pos="true"] .pos-tile[data-tone="red"]{box-shadow:inset 0 0 0 2px var(--tone-red)}
+#ski-ops[data-pos="true"] .pos-tile[data-tone="orange"]{box-shadow:inset 0 0 0 2px var(--tone-orange)}
+#ski-ops[data-pos="true"] .pos-tile[data-tone="green"]{box-shadow:inset 0 0 0 2px var(--tone-green)}
+#ski-ops[data-pos="true"] .pos-tile-head{display:flex;align-items:center;gap:8px;min-width:0;height:28px}
+#ski-ops[data-pos="true"] .pos-tile-head strong{font-size:var(--pos-fs-title);font-weight:700;letter-spacing:-.03em;line-height:28px;white-space:nowrap}
+#ski-ops[data-pos="true"] .pos-tile-head .pos-badge{margin-left:auto}
+#ski-ops[data-pos="true"] .pos-tile-figures{display:grid;grid-template-columns:1fr 1fr;gap:12px;min-width:0}
+#ski-ops[data-pos="true"] .pos-tile-figures>span{display:flex;flex-direction:column;min-width:0}
+#ski-ops[data-pos="true"] .pos-tile-figures>span+span{padding-left:12px;box-shadow:inset 1px 0 0 var(--so-line)}
+#ski-ops[data-pos="true"] .pos-tile-figures small{font-size:var(--pos-fs-min);font-weight:600;line-height:20px;color:var(--so-muted)}
+#ski-ops[data-pos="true"] .pos-tile-figures b{font-size:34px;font-weight:700;letter-spacing:-.03em;line-height:38px;font-variant-numeric:tabular-nums;white-space:nowrap}
+#ski-ops[data-pos="true"] .pos-tile-figures b.is-when{font-size:26px}
+#ski-ops[data-pos="true"] .pos-tile-line{display:block;min-width:0;min-height:22px;overflow:hidden;font-size:var(--pos-fs-min);line-height:22px;color:var(--so-muted);white-space:nowrap}
+#ski-ops[data-pos="true"] .pos-tile-last{display:flex;align-items:center;gap:10px;min-width:0}
+#ski-ops[data-pos="true"] .pos-tile-last .pos-tile-line{flex:1 1 0}
+#ski-ops[data-pos="true"] .pos-tile-open{flex:0 0 auto;font-size:var(--pos-fs-body);font-weight:700;line-height:22px;color:var(--so-accent-dark)}
+#ski-ops[data-pos="true"] .pos-tile .pos-card-legend,
+#ski-ops[data-pos="true"] .pos-card.is-fixed .pos-card-legend{top:-12px;left:auto;right:16px;padding:1px 10px;border-radius:6px;color:#fff;line-height:22px}
+#ski-ops[data-pos="true"] [data-tone="red"]>.pos-card-legend{background:var(--tone-red)}
+#ski-ops[data-pos="true"] [data-tone="orange"]>.pos-card-legend{background:var(--tone-orange)}
+#ski-ops[data-pos="true"] [data-tone="green"]>.pos-card-legend{background:var(--tone-green)}
+#ski-ops[data-pos="true"] :is(.pos-tile-figures,.pos-tile,.pos-line-row,.pos-side-figure) :is(b,.pos-tile-line)[data-tone="red"]{color:var(--tone-red)}
+#ski-ops[data-pos="true"] :is(.pos-tile-figures,.pos-tile,.pos-line-row,.pos-side-figure) :is(b,.pos-tile-line)[data-tone="orange"]{color:var(--tone-orange)}
+#ski-ops[data-pos="true"] :is(.pos-tile-figures,.pos-tile,.pos-line-row,.pos-side-figure) :is(b,.pos-tile-line)[data-tone="green"]{color:var(--tone-green)}
+#ski-ops[data-pos="true"] :is(.pos-tile-figures,.pos-tile,.pos-line-row,.pos-side-figure) :is(b,.pos-tile-line)[data-tone="blue"]{color:var(--tone-blue)}
+#ski-ops[data-pos="true"] :is(.pos-tile-figures,.pos-tile,.pos-line-row,.pos-side-figure) :is(b,.pos-tile-line)[data-tone="purple"]{color:var(--tone-purple)}
+#ski-ops[data-pos="true"] .pos-tile-line[data-tone]:not([data-tone=""]){font-weight:600}
+/* Two panels side by side (UI v4 · P07): paged 52px rows on the left, a summary on the right */
+#ski-ops[data-pos="true"] .pos-split{flex:1;min-height:0;display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:12px;padding-bottom:8px}
+#ski-ops[data-pos="true"] .pos-panel{display:flex;flex-direction:column;box-sizing:border-box;min-width:0;min-height:0;padding:8px 16px;border-radius:16px;background:#fff;box-shadow:inset 0 0 0 1px var(--so-line)}
+#ski-ops[data-pos="true"] .pos-panel .pos-empty{flex:1;min-height:0;box-shadow:none}
+#ski-ops[data-pos="true"] .pos-line-list{display:flex;flex-direction:column;min-width:0}
+#ski-ops[data-pos="true"] .pos-line-row{--pos-line-h:52px;display:flex;align-items:center;gap:12px;box-sizing:border-box;width:100%;min-width:0;height:var(--pos-line-h);margin:0;padding:0 4px;border:0;border-radius:0;background:transparent;box-shadow:inset 0 -1px 0 var(--so-line);color:inherit;font:inherit;text-align:left;cursor:pointer}
+#ski-ops[data-pos="true"] .pos-line-row:last-child{box-shadow:none}
+#ski-ops[data-pos="true"] .pos-line-row:focus-visible{outline:3px solid var(--so-accent);outline-offset:-3px}
+#ski-ops[data-pos="true"] .pos-line-row>strong{flex:0 1 auto;min-width:0;overflow:hidden;font-size:20px;font-weight:700;letter-spacing:-.03em;line-height:26px;white-space:nowrap}
+#ski-ops[data-pos="true"] .pos-line-row.is-longname>strong{font-size:var(--pos-fs-body);line-height:22px;max-height:44px;white-space:normal;overflow-wrap:anywhere}
+#ski-ops[data-pos="true"] .pos-line-note{flex:1 1 0;min-width:0;overflow:hidden;font-size:var(--pos-fs-min);color:var(--so-muted);white-space:nowrap}
+#ski-ops[data-pos="true"] .pos-line-note[hidden]{display:block;visibility:hidden}
+#ski-ops[data-pos="true"] .pos-line-row>b{flex:0 0 auto;font-size:20px;font-weight:700;letter-spacing:-.02em;font-variant-numeric:tabular-nums;white-space:nowrap}
+#ski-ops[data-pos="true"] .pos-line-do{flex:0 0 auto;display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box;min-width:72px;height:40px;padding:0 12px;border-radius:10px;box-shadow:inset 0 0 0 1px var(--so-line-strong,#cfcfcf);font-size:var(--pos-fs-min);font-weight:700;white-space:nowrap}
+#ski-ops[data-pos="true"] .pos-side{justify-content:space-between;padding:12px 18px}
+#ski-ops[data-pos="true"] .pos-side-head{display:flex;align-items:baseline;gap:10px;min-width:0;white-space:nowrap}
+#ski-ops[data-pos="true"] .pos-side-head strong{font-size:var(--pos-fs-title);font-weight:700;letter-spacing:-.03em;line-height:28px}
+#ski-ops[data-pos="true"] .pos-side-head span{font-size:var(--pos-fs-min);color:var(--so-muted)}
+#ski-ops[data-pos="true"] .pos-side-figure{display:flex;flex-direction:column;min-width:0}
+#ski-ops[data-pos="true"] .pos-side-figure small{font-size:var(--pos-fs-min);font-weight:600;line-height:20px;color:var(--so-muted)}
+#ski-ops[data-pos="true"] .pos-side-figure b{font-size:30px;font-weight:700;letter-spacing:-.03em;line-height:34px;font-variant-numeric:tabular-nums;white-space:nowrap}
+#ski-ops[data-pos="true"] .pos-checks{display:flex;flex-direction:column;gap:2px;margin:0;padding:8px 0 0;list-style:none;box-shadow:inset 0 1px 0 var(--so-line)}
+#ski-ops[data-pos="true"] .pos-checks li{display:flex;align-items:center;gap:10px;min-width:0;font-size:var(--pos-fs-min);font-weight:600;line-height:24px;white-space:nowrap}
+#ski-ops[data-pos="true"] .pos-checks li svg{flex-shrink:0;width:22px;height:22px;color:#b5b5b5}
+#ski-ops[data-pos="true"] .pos-checks li[data-state="done"] svg{color:var(--tone-green)}
+#ski-ops[data-pos="true"] .pos-checks li[data-state="todo"] svg{color:var(--tone-orange)}
 /* Row lists (operation sub-screens keep paged rows) */
 #ski-ops[data-pos="true"] .pos-paged-list{display:grid;grid-template-rows:minmax(0,1fr) var(--pos-touch);gap:8px;min-width:0;min-height:0;flex:1}
 #ski-ops[data-pos="true"] .pos-list{display:flex;flex-direction:column;gap:6px;min-width:0;min-height:0}

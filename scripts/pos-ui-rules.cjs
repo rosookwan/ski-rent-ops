@@ -48,7 +48,7 @@ function measure(options) {
 
   const halfCut = group([...root.querySelectorAll('[data-pos-scroll],.pos-list,.pos-page-body,.pos-modal-body')].filter(el => el.getClientRects().length).flatMap(container => {
     const c = container.getBoundingClientRect(), box = { top: Math.max(c.top, 0), bottom: Math.min(c.bottom, innerHeight) };
-    return [...container.querySelectorAll('.pos-card,.pos-row')].filter(item => item.getClientRects().length).filter(item => {
+    return [...container.querySelectorAll('.pos-card,.pos-row,.pos-tile,.pos-line-row')].filter(item => item.getClientRects().length).filter(item => {
       const r = item.getBoundingClientRect();
       return r.top < box.bottom - 1 && r.bottom > box.bottom + 1 || r.top < box.top - 1 && r.bottom > box.top + 1;
     }).map(item => ({ sel: signature(container) + ' ' + signature(item), sample: sample(item) }));
