@@ -1,0 +1,589 @@
+{
+  "generatedAt": "2026-09-21T03:30:50.129Z",
+  "what": "UI v3 상태(main 1d1ae7f)에서 잰 기준선. UI v4 단계가 끝날 때마다 같은 검사를 돌려 이 숫자를 0으로 줄여 간다(docs/42 5~6절).",
+  "labels": {
+    "smallText": "① 16px 미만 글자",
+    "clippedText": "② 잘린 글자",
+    "halfCut": "③ 반쯤 잘린 카드·행",
+    "shortTargets": "④ 낮은 누르는 곳",
+    "scrolling": "⑤ 스크롤"
+  },
+  "minFont": 16,
+  "minTarget": {
+    "pos": 52,
+    "driver": 56
+  },
+  "captures": {
+    "pos": 52,
+    "driver": 5
+  },
+  "totals": {
+    "smallText": 1354,
+    "clippedText": 6,
+    "halfCut": 99,
+    "shortTargets": 631,
+    "scrolling": 36
+  },
+  "mostCommon": {
+    "smallText": [
+      "button.pos-rail-item>span 14px ×426",
+      "span.pos-card-lines>span 15px ×143",
+      "span.pos-card-item>span 15px ×142",
+      "span.pos-card-meta 15px ×132",
+      "button.pos-chip>b 15px ×105",
+      "span.pos-card-legend 15px ×87",
+      "span.pos-badge 14px ×82",
+      "span>small 14px ×64",
+      "span.pos-wait>span 14px ×55",
+      "span.pos-sum>span 14px ×41",
+      "button.pos-settings-tab>b 15px ×24",
+      "span.so-demo-label 14px ×12"
+    ],
+    "shortTargets": [
+      "button.so-button 48px ×274",
+      "button.pos-chip 48px ×190",
+      "button#pos-notice-bell 48px ×56",
+      "div.so-topbar-right>button 48px ×56",
+      "label.pos-search>input 48px ×29",
+      "button.pos-settings-tab 48px ×14",
+      "span.pos-keypad-control>input 48px ×3",
+      "button.pos-keypad-trigger 48px ×3",
+      "label.so-field>select 48px ×2",
+      "a.so-button 48px ×2",
+      "button.pos-search-entry 48px ×1",
+      "div.so-dialog-heading>button 48px ×1"
+    ],
+    "clippedText": [
+      "span.pos-card-lines>span ×2",
+      "span.pos-card-meta ×2",
+      "span.pos-card-name ×2"
+    ],
+    "scrolling": [
+      "div.pos-cards ×36"
+    ]
+  },
+  "smokeSuitesOnV3": {
+    "test:pos:operating": "PASS (12)",
+    "test:pos:fulfillment": "PASS (16 scenarios)",
+    "test:pos:tickets": "PASS (5 scenarios)",
+    "test:pos:management": "PASS",
+    "test:pos:preinput": "PASS (9)",
+    "test:pos:keypad": "PASS (7)"
+  },
+  "bundleBytes": 1511218,
+  "screens": [
+    {
+      "key": "home",
+      "viewport": "1024x600",
+      "smallText": 40,
+      "clippedText": 0,
+      "halfCut": 6,
+      "shortTargets": 8,
+      "scrolling": 1
+    },
+    {
+      "key": "intake",
+      "viewport": "1024x600",
+      "smallText": 27,
+      "clippedText": 0,
+      "halfCut": 4,
+      "shortTargets": 12,
+      "scrolling": 1
+    },
+    {
+      "key": "preparation",
+      "viewport": "1024x600",
+      "smallText": 19,
+      "clippedText": 0,
+      "halfCut": 2,
+      "shortTargets": 11,
+      "scrolling": 1
+    },
+    {
+      "key": "rentals",
+      "viewport": "1024x600",
+      "smallText": 24,
+      "clippedText": 0,
+      "halfCut": 2,
+      "shortTargets": 12,
+      "scrolling": 1
+    },
+    {
+      "key": "returns",
+      "viewport": "1024x600",
+      "smallText": 21,
+      "clippedText": 0,
+      "halfCut": 4,
+      "shortTargets": 11,
+      "scrolling": 1
+    },
+    {
+      "key": "closing",
+      "viewport": "1024x600",
+      "smallText": 29,
+      "clippedText": 0,
+      "halfCut": 4,
+      "shortTargets": 11,
+      "scrolling": 1
+    },
+    {
+      "key": "tickets",
+      "viewport": "1024x600",
+      "smallText": 23,
+      "clippedText": 0,
+      "halfCut": 2,
+      "shortTargets": 11,
+      "scrolling": 1
+    },
+    {
+      "key": "dispatch",
+      "viewport": "1024x600",
+      "smallText": 30,
+      "clippedText": 0,
+      "halfCut": 4,
+      "shortTargets": 14,
+      "scrolling": 1
+    },
+    {
+      "key": "management",
+      "viewport": "1024x600",
+      "smallText": 28,
+      "clippedText": 1,
+      "halfCut": 0,
+      "shortTargets": 9,
+      "scrolling": 0
+    },
+    {
+      "key": "settings",
+      "viewport": "1024x600",
+      "smallText": 14,
+      "clippedText": 0,
+      "halfCut": 0,
+      "shortTargets": 16,
+      "scrolling": 0
+    },
+    {
+      "key": "closing-history",
+      "viewport": "1024x600",
+      "smallText": 12,
+      "clippedText": 0,
+      "halfCut": 0,
+      "shortTargets": 4,
+      "scrolling": 0
+    },
+    {
+      "key": "home",
+      "viewport": "1024x768",
+      "smallText": 49,
+      "clippedText": 0,
+      "halfCut": 6,
+      "shortTargets": 11,
+      "scrolling": 1
+    },
+    {
+      "key": "intake",
+      "viewport": "1024x768",
+      "smallText": 29,
+      "clippedText": 0,
+      "halfCut": 0,
+      "shortTargets": 14,
+      "scrolling": 1
+    },
+    {
+      "key": "preparation",
+      "viewport": "1024x768",
+      "smallText": 21,
+      "clippedText": 0,
+      "halfCut": 0,
+      "shortTargets": 12,
+      "scrolling": 1
+    },
+    {
+      "key": "rentals",
+      "viewport": "1024x768",
+      "smallText": 27,
+      "clippedText": 0,
+      "halfCut": 2,
+      "shortTargets": 13,
+      "scrolling": 1
+    },
+    {
+      "key": "returns",
+      "viewport": "1024x768",
+      "smallText": 27,
+      "clippedText": 0,
+      "halfCut": 4,
+      "shortTargets": 13,
+      "scrolling": 1
+    },
+    {
+      "key": "closing",
+      "viewport": "1024x768",
+      "smallText": 31,
+      "clippedText": 0,
+      "halfCut": 4,
+      "shortTargets": 13,
+      "scrolling": 1
+    },
+    {
+      "key": "tickets",
+      "viewport": "1024x768",
+      "smallText": 23,
+      "clippedText": 0,
+      "halfCut": 0,
+      "shortTargets": 12,
+      "scrolling": 1
+    },
+    {
+      "key": "dispatch",
+      "viewport": "1024x768",
+      "smallText": 34,
+      "clippedText": 0,
+      "halfCut": 4,
+      "shortTargets": 16,
+      "scrolling": 1
+    },
+    {
+      "key": "management",
+      "viewport": "1024x768",
+      "smallText": 28,
+      "clippedText": 1,
+      "halfCut": 0,
+      "shortTargets": 9,
+      "scrolling": 0
+    },
+    {
+      "key": "settings",
+      "viewport": "1024x768",
+      "smallText": 14,
+      "clippedText": 0,
+      "halfCut": 0,
+      "shortTargets": 11,
+      "scrolling": 0
+    },
+    {
+      "key": "closing-history",
+      "viewport": "1024x768",
+      "smallText": 12,
+      "clippedText": 0,
+      "halfCut": 0,
+      "shortTargets": 4,
+      "scrolling": 0
+    },
+    {
+      "key": "home",
+      "viewport": "1366x768",
+      "smallText": 57,
+      "clippedText": 0,
+      "halfCut": 2,
+      "shortTargets": 13,
+      "scrolling": 1
+    },
+    {
+      "key": "intake",
+      "viewport": "1366x768",
+      "smallText": 34,
+      "clippedText": 0,
+      "halfCut": 1,
+      "shortTargets": 14,
+      "scrolling": 1
+    },
+    {
+      "key": "preparation",
+      "viewport": "1366x768",
+      "smallText": 26,
+      "clippedText": 0,
+      "halfCut": 0,
+      "shortTargets": 12,
+      "scrolling": 1
+    },
+    {
+      "key": "rentals",
+      "viewport": "1366x768",
+      "smallText": 32,
+      "clippedText": 0,
+      "halfCut": 2,
+      "shortTargets": 13,
+      "scrolling": 1
+    },
+    {
+      "key": "returns",
+      "viewport": "1366x768",
+      "smallText": 32,
+      "clippedText": 0,
+      "halfCut": 4,
+      "shortTargets": 13,
+      "scrolling": 1
+    },
+    {
+      "key": "closing",
+      "viewport": "1366x768",
+      "smallText": 43,
+      "clippedText": 0,
+      "halfCut": 2,
+      "shortTargets": 15,
+      "scrolling": 1
+    },
+    {
+      "key": "tickets",
+      "viewport": "1366x768",
+      "smallText": 31,
+      "clippedText": 0,
+      "halfCut": 0,
+      "shortTargets": 13,
+      "scrolling": 1
+    },
+    {
+      "key": "dispatch",
+      "viewport": "1366x768",
+      "smallText": 44,
+      "clippedText": 0,
+      "halfCut": 2,
+      "shortTargets": 18,
+      "scrolling": 1
+    },
+    {
+      "key": "management",
+      "viewport": "1366x768",
+      "smallText": 32,
+      "clippedText": 0,
+      "halfCut": 0,
+      "shortTargets": 9,
+      "scrolling": 0
+    },
+    {
+      "key": "settings",
+      "viewport": "1366x768",
+      "smallText": 18,
+      "clippedText": 0,
+      "halfCut": 0,
+      "shortTargets": 11,
+      "scrolling": 0
+    },
+    {
+      "key": "closing-history",
+      "viewport": "1366x768",
+      "smallText": 15,
+      "clippedText": 0,
+      "halfCut": 0,
+      "shortTargets": 4,
+      "scrolling": 0
+    },
+    {
+      "key": "home",
+      "viewport": "907x648",
+      "smallText": 30,
+      "clippedText": 0,
+      "halfCut": 4,
+      "shortTargets": 9,
+      "scrolling": 1
+    },
+    {
+      "key": "intake",
+      "viewport": "907x648",
+      "smallText": 29,
+      "clippedText": 0,
+      "halfCut": 4,
+      "shortTargets": 12,
+      "scrolling": 1
+    },
+    {
+      "key": "preparation",
+      "viewport": "907x648",
+      "smallText": 21,
+      "clippedText": 0,
+      "halfCut": 2,
+      "shortTargets": 11,
+      "scrolling": 1
+    },
+    {
+      "key": "rentals",
+      "viewport": "907x648",
+      "smallText": 26,
+      "clippedText": 1,
+      "halfCut": 2,
+      "shortTargets": 12,
+      "scrolling": 1
+    },
+    {
+      "key": "returns",
+      "viewport": "907x648",
+      "smallText": 25,
+      "clippedText": 1,
+      "halfCut": 4,
+      "shortTargets": 11,
+      "scrolling": 1
+    },
+    {
+      "key": "closing",
+      "viewport": "907x648",
+      "smallText": 29,
+      "clippedText": 0,
+      "halfCut": 4,
+      "shortTargets": 11,
+      "scrolling": 1
+    },
+    {
+      "key": "tickets",
+      "viewport": "907x648",
+      "smallText": 23,
+      "clippedText": 0,
+      "halfCut": 2,
+      "shortTargets": 11,
+      "scrolling": 1
+    },
+    {
+      "key": "dispatch",
+      "viewport": "907x648",
+      "smallText": 32,
+      "clippedText": 0,
+      "halfCut": 4,
+      "shortTargets": 15,
+      "scrolling": 1
+    },
+    {
+      "key": "management",
+      "viewport": "907x648",
+      "smallText": 26,
+      "clippedText": 0,
+      "halfCut": 4,
+      "shortTargets": 7,
+      "scrolling": 1
+    },
+    {
+      "key": "settings",
+      "viewport": "907x648",
+      "smallText": 14,
+      "clippedText": 0,
+      "halfCut": 0,
+      "shortTargets": 16,
+      "scrolling": 0
+    },
+    {
+      "key": "closing-history",
+      "viewport": "907x648",
+      "smallText": 12,
+      "clippedText": 0,
+      "halfCut": 0,
+      "shortTargets": 4,
+      "scrolling": 0
+    },
+    {
+      "key": "group-30",
+      "viewport": "1024x600",
+      "smallText": 10,
+      "clippedText": 0,
+      "halfCut": 0,
+      "shortTargets": 18,
+      "scrolling": 0
+    },
+    {
+      "key": "group-review",
+      "viewport": "1024x600",
+      "smallText": 10,
+      "clippedText": 0,
+      "halfCut": 0,
+      "shortTargets": 9,
+      "scrolling": 0
+    },
+    {
+      "key": "order-detail",
+      "viewport": "1024x600",
+      "smallText": 41,
+      "clippedText": 0,
+      "halfCut": 2,
+      "shortTargets": 14,
+      "scrolling": 1
+    },
+    {
+      "key": "preinput",
+      "viewport": "1024x600",
+      "smallText": 9,
+      "clippedText": 0,
+      "halfCut": 0,
+      "shortTargets": 9,
+      "scrolling": 0
+    },
+    {
+      "key": "notifications",
+      "viewport": "1024x600",
+      "smallText": 0,
+      "clippedText": 0,
+      "halfCut": 0,
+      "shortTargets": 9,
+      "scrolling": 0
+    },
+    {
+      "key": "driver-demo",
+      "viewport": "1024x600",
+      "smallText": 4,
+      "clippedText": 0,
+      "halfCut": 0,
+      "shortTargets": 8,
+      "scrolling": 0
+    },
+    {
+      "key": "tomorrow-100",
+      "viewport": "1024x600",
+      "smallText": 26,
+      "clippedText": 2,
+      "halfCut": 4,
+      "shortTargets": 12,
+      "scrolling": 1
+    },
+    {
+      "key": "twelve-products",
+      "viewport": "1024x600",
+      "smallText": 41,
+      "clippedText": 0,
+      "halfCut": 2,
+      "shortTargets": 15,
+      "scrolling": 1
+    },
+    {
+      "key": "driver-dispatch",
+      "viewport": "1024x520",
+      "smallText": 4,
+      "clippedText": 0,
+      "halfCut": 0,
+      "shortTargets": 8,
+      "scrolling": 0
+    },
+    {
+      "key": "driver-dispatch",
+      "viewport": "1024x600",
+      "smallText": 4,
+      "clippedText": 0,
+      "halfCut": 0,
+      "shortTargets": 8,
+      "scrolling": 0
+    },
+    {
+      "key": "driver-dispatch",
+      "viewport": "1280x720",
+      "smallText": 10,
+      "clippedText": 0,
+      "halfCut": 0,
+      "shortTargets": 8,
+      "scrolling": 0
+    },
+    {
+      "key": "driver-task",
+      "viewport": "1024x520",
+      "smallText": 1,
+      "clippedText": 0,
+      "halfCut": 0,
+      "shortTargets": 8,
+      "scrolling": 0
+    },
+    {
+      "key": "driver-stock",
+      "viewport": "1024x520",
+      "smallText": 1,
+      "clippedText": 0,
+      "halfCut": 0,
+      "shortTargets": 4,
+      "scrolling": 0
+    }
+  ]
+}

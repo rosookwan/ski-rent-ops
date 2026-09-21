@@ -1,6 +1,6 @@
 'use strict';
 // Captures the driver (vehicle tablet) screens against a real API server at tablet sizes
-// and asserts nothing overflows and the page body never scrolls. Output: docs/pos-ui-v3/driver-*.png
+// and asserts nothing overflows and the page body never scrolls. Output: docs/pos-ui-v4/driver-*.png (SKI_DRIVER_OUT to change)
 const assert = require('node:assert/strict');
 const { chromium } = require('playwright');
 const { once } = require('node:events');
@@ -11,7 +11,8 @@ const path = require('node:path');
 const { createApiServer, tokenAuthenticator } = require('../server/returns-api.cjs');
 const { createSqliteRepository } = require('../server/returns-repository.cjs');
 const { createHttpClient, newCommand } = require('../src/workflows/client.js');
-const OUT = path.resolve(process.env.SKI_DRIVER_OUT || 'docs/pos-ui-v3'); mkdirSync(OUT, { recursive: true });
+const { measure, totals } = require('./pos-ui-rules.cjs');
+const OUT = path.resolve(process.env.SKI_DRIVER_OUT || 'docs/pos-ui-v4'); mkdirSync(OUT, { recursive: true });
 const temp = mkdtempSync(path.join(tmpdir(), 'ski-pos-driver-'));
 const token = 'local-driver-capture-store-'.padEnd(48, 'x'), driverToken = 'local-driver-capture-driver-'.padEnd(48, 'x');
 const hash = value => createHash('sha256').update(value).digest('hex');
@@ -56,7 +57,8 @@ async function main() {
       return { viewport: [innerWidth, innerHeight], outside, bodyScroll: body ? body.scrollHeight > body.clientHeight + 1 : false, rows: root.querySelectorAll('.pos-row').length, smallestButton: Math.min(...buttons), rail: !!document.querySelector('.pos-rail') };
     });
     assert.deepEqual(geometry.outside, [], key + ' outside viewport'); assert.equal(geometry.bodyScroll, false, key + ' body scroll'); assert.equal(geometry.rail, false, key + ' rail must be hidden for drivers');
-    const file = 'driver-' + key + '-' + width + 'x' + height + '.png'; await page.screenshot({ path: path.join(OUT, file) }); results.push({ key, file, ...geometry });
+    const rules = await page.evaluate(measure, { minFont: 16, minTarget: 56 });
+    const file = 'driver-' + key + '-' + width + 'x' + height + '.png'; await page.screenshot({ path: path.join(OUT, file) }); results.push({ key, file, ...geometry, rules, ruleTotals: totals(rules) });
   }
   for (const [width, height] of sizes) { await page.evaluate(() => window.SkiOps.go('dispatch')); await capture('dispatch', width, height); }
   assert.equal(results.find(r => r.key === 'dispatch' && r.viewport[1] === 520).rows, 3); assert.equal(results.find(r => r.key === 'dispatch' && r.viewport[1] === 600).rows, 4);

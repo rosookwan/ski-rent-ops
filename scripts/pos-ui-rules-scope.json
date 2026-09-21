@@ -1,0 +1,4 @@
+{
+  "note": "UI v4 규칙 검사의 강제 범위(docs/42 5절). 단계가 끝날 때마다 화면(keys)과 항목(metrics)을 넓힌다. 여기에 없는 화면은 보고만 한다. metrics: smallText, clippedText, halfCut, shortTargets, scrolling. keys는 촬영 키(기사 화면은 driver- 접두어), '*'는 전부.",
+  "enforce": []
+}
