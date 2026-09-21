@@ -1,0 +1,144 @@
+{
+  "project": "ski-rent-ops · 스키노트 POS",
+  "library": "design/higgsfield/driver-phone-v1",
+  "workspace": {
+    "id": "a3cca891-ff82-4041-9d9a-0584cef69319",
+    "type": "private",
+    "name": null,
+    "note": "개인 워크스페이스 그대로(별도 선택 없음)."
+  },
+  "generation": {
+    "model": "gpt_image_2_5",
+    "variant": "flare",
+    "quality": "high",
+    "resolution": "2k",
+    "aspect_ratio": "9:16",
+    "output": "1520×2688",
+    "creditsPerImage": 3
+  },
+  "frame": {
+    "css": "360×640 (세로)",
+    "why": "작은 안드로이드폰(360×800)에서 브라우저 주소창이 보일 때의 표시 영역. 가장 빡빡한 조건이며, 화면이 더 길면 줄 수만 늘어난다(쪽 나눔은 높이로 계산).",
+    "aspect_ratio": "9:16"
+  },
+  "anchors": {
+    "phone": "D11",
+    "tablet": {
+      "D01": "27c00e31-e89a-4c9c-b8f1-a7628c8da874",
+      "D02": "ad282bec-bb3c-4302-98be-b795ffae040c",
+      "D03": "577f76b0-1eca-4709-9f5e-18ab05437d74"
+    },
+    "note": "D11을 먼저 만들어 검수한 뒤 D12~D14의 첫 참조로 넣었다. 둘째 참조는 같은 화면의 태블릿 시안(pos-rest-v1 D02 · D03)이다."
+  },
+  "final": [
+    {
+      "code": "D11",
+      "title": "기사 휴대폰 · 차량 운행",
+      "file": "d11-phone-dispatch.png",
+      "job_id": "da4b1b02-abe6-4b78-b09e-953f7fd243c3",
+      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J2y32mXmk1jhAd5qmEsy69365Q/hf_20260921_023106_da4b1b02-abe6-4b78-b09e-953f7fd243c3.png",
+      "references": [
+        "D01",
+        "D02"
+      ],
+      "verdict": "통과",
+      "review": "휴대폰 기준 화면. 헤더(스키노트 · 차량 운행 · 알림 종 · 나가기), 필터 3칸(오늘·이전 7 · 내일 0 · 달력), 쪽수 줄(1호 차량 · 남은 7건, ‹ 1 / 2쪽 ›), 업무 4줄(시간 · 팀 / 배달·수거 배지와 장소 / 품목, 오른쪽 보라 업무 처리), 하단 차량 보관 · 최신 업무 확인. 문구 전부 일치.",
+      "regenerations": 0,
+      "preview": "d11-phone-dispatch.jpg"
+    },
+    {
+      "code": "D12",
+      "title": "기사 휴대폰 · 배달 처리",
+      "file": "d12-phone-task.png",
+      "job_id": "828ae9b5-b796-4814-acf3-bad8e6a3c2ce",
+      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J2y32mXmk1jhAd5qmEsy69365Q/hf_20260921_023251_828ae9b5-b796-4814-acf3-bad8e6a3c2ce.png",
+      "references": [
+        "D11",
+        "D02"
+      ],
+      "verdict": "통과",
+      "review": "‹ 목록 · 배달 처리 · 알림 종, 팀 카드(배달 3개 배지 · 시간·장소 · 전화번호 · 전화/출발 문자 버튼), 품목 2줄의 큰 −/+ 수량, 미수 안내 띠 두 줄, 맨 아래 못 받음·고객 부재와 폭 전체 보라 실제 전달 확정 3개.",
+      "regenerations": 0,
+      "preview": "d12-phone-task.jpg"
+    },
+    {
+      "code": "D13",
+      "title": "기사 휴대폰 · 차량 보관",
+      "file": "d13-phone-stock.png",
+      "job_id": "caf57e23-882b-4471-a086-069f51d9ba09",
+      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J2y32mXmk1jhAd5qmEsy69365Q/hf_20260921_023250_caf57e23-882b-4471-a086-069f51d9ba09.png",
+      "references": [
+        "D11",
+        "D03"
+      ],
+      "verdict": "통과",
+      "review": "‹ 목록 · 차량 보관 · 보관 21개, 숫자 4칸(2×2: 장비 8 · 의류 6 · 헬멧 3 · 리프트권 4매), 품목 4줄과 상태 배지(배달 예정 · 매장 입고 대기), 맨 아래 폭 전체 보라 매장 입고 8개.",
+      "regenerations": 0,
+      "preview": "d13-phone-stock.jpg"
+    },
+    {
+      "code": "D14",
+      "title": "기사 휴대폰 · 못 받음·방문 결과",
+      "file": "d14-phone-visit-result.png",
+      "job_id": "0dd13825-ca16-4dc1-9556-046002eb4943",
+      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3J2y32mXmk1jhAd5qmEsy69365Q/hf_20260921_023250_0dd13825-ca16-4dc1-9556-046002eb4943.png",
+      "references": [
+        "D11",
+        "D02"
+      ],
+      "verdict": "통과",
+      "review": "아래에서 올라오는 판. 방문 결과 3칸(고객 부재 선택), 다음 방문일 3칸, 다음 시간 3칸, 다음 장소와 변경, 취소와 보라 방문 결과·다음 약속 저장. 타이핑 없이 선택 버튼만으로 끝난다. 문구는 현재 앱의 '못 받음·방문 결과' 창과 같다.",
+      "regenerations": 0,
+      "preview": "d14-phone-visit-result.jpg"
+    }
+  ],
+  "fitCheck": {
+    "folder": "fit-check/",
+    "credits": 0,
+    "method": "시안 4장을 요청서의 글자·버튼 크기 그대로(Pretendard · 제목 22 · 본문 18 · 작은 글자 16px · 버튼 52~64px) HTML로 그려 실제 폭과 높이를 픽셀로 쟀다. 긴 팀 이름(한국대학교 스키동아리 팀)과 긴 장소(무주덕유산리조트 설천하우스 앞 주차장)를 섞어 넣었다.",
+    "results": [
+      {
+        "area": "360×640",
+        "list": "4줄 · 여유 0px · 7건이면 2쪽",
+        "task": "품목 2종까지(미수 띠가 없으면 3종) · 여유 25px",
+        "stock": "온전 · 여유 39px",
+        "sheet": "판 높이 568px · 헤더 아래로 들어감",
+        "clipped": 0,
+        "capture": "phone-360x640.png"
+      },
+      {
+        "area": "390×740",
+        "list": "4줄(긴 이름 줄이 끼면) ~ 5줄",
+        "task": "품목 3종까지(미수 띠가 없으면 4종)",
+        "stock": "온전",
+        "sheet": "위 여유 172px",
+        "clipped": 0,
+        "capture": "phone-390x740.png"
+      },
+      {
+        "area": "412×780",
+        "list": "5줄",
+        "task": "품목 3종까지(미수 띠가 없으면 4종)",
+        "stock": "온전",
+        "sheet": "위 여유 212px",
+        "clipped": 0,
+        "capture": "phone-412x780-items3.png"
+      }
+    ]
+  },
+  "credits": {
+    "perImage": 3,
+    "images": 4,
+    "total": 12,
+    "balance": {
+      "before": 1453,
+      "after": 1441
+    }
+  },
+  "storage": {
+    "here": "가벼운 미리보기(.jpg · 폭 1440~1500px)만 둔다. final[].preview가 그 파일이다.",
+    "originals": "원본 PNG(1520×2688)는 브랜치 claude/pos-ui-improvement-q9yqku의 같은 폴더와 힉스필드(각 항목의 url)에 있다.",
+    "decidedAt": "2026-09-21",
+    "why": "원본 46장은 약 127MB라서 main 기록에 넣지 않기로 했다(docs/42 10절 1번 · 12절)."
+  }
+}

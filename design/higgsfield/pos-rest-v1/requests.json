@@ -1,0 +1,830 @@
+{
+  "project": "ski-rent-ops · 스키노트 POS",
+  "library": "design/higgsfield/pos-rest-v1",
+  "createdAt": "2026-09-21",
+  "purpose": "POS 나머지 화면 시안. pos-main-v1과 같은 템플릿(앵커 P01 D)으로 포스 화면 · 팝업 · 관리 · 기사 태블릿을 그린다. 카드 목록은 docs/38 7-5 배치(금액과 버튼 한 줄, 쪽마다 제목 한 줄).",
+  "generation": {
+    "model": "gpt_image_2_5",
+    "quality": "high",
+    "resolution": "2k",
+    "aspect_ratio": "27:16",
+    "creditsPerImage": 3,
+    "variant": "flare",
+    "order": "wave 1 = 기준 화면(P02R 카드 목록 · M01 관리 허브 · P20 팝업 · D01 기사)과 독립 화면 → wave 2~4 = 기준 화면의 job id를 image_references로 넘겨 생성"
+  },
+  "references": {
+    "note": "이 묶음에서 먼저 만든 기준 화면(P02R · M01 · P20 · D01 · P12 · P09 · P14 · P21)의 job id는 검수 뒤에 채웠다. 제출에 쓴 값 그대로다.",
+    "fromMainV1": {
+      "P01": "8d6e31bf-6f35-4a6b-bb11-65a3f1ab8ebc",
+      "P02": "2d623ca4-56c6-4e29-89e5-cd595a8567fc",
+      "P04": "1cc53988-9bfe-4a98-be82-ab1dc3f55b81",
+      "P05": "854409ed-dbfb-4dae-aca6-d2b6275c716b",
+      "P06": "98eab95c-d419-4f7e-953e-9108c8164840",
+      "P07": "2246226f-da6f-4c88-928c-3c6d9bfa1418",
+      "P08": "ddcf2620-1720-4054-ae9a-517083392c5d"
+    }
+  },
+  "screens": [
+    {
+      "code": "P02R",
+      "title": "1 접수·예약 (카드 목록 · 확정 배치)",
+      "wave": 1,
+      "file": "p02r-intake-cards.png",
+      "aspect_ratio": "27:16",
+      "model": "gpt_image_2_5",
+      "params": {
+        "quality": "high",
+        "resolution": "2k",
+        "variant": "flare"
+      },
+      "references": [
+        {
+          "code": "P01",
+          "job_id": "8d6e31bf-6f35-4a6b-bb11-65a3f1ab8ebc"
+        },
+        {
+          "code": "P02",
+          "job_id": "2d623ca4-56c6-4e29-89e5-cd595a8567fc"
+        }
+      ],
+      "note": "채택한 카드 목록을 docs/38 7-5 배치(금액과 버튼 한 줄, 쪽마다 제목 한 줄)로 다시 그림. 목록 화면의 기준.",
+      "prompt": "High-fidelity UI design mockup of one screen of 스키노트, a touch-screen POS web app used at the counter of a Korean ski rental shop. The screen is shown flat and straight-on and fills the whole canvas edge to edge: no monitor bezel, no browser chrome, no hands, no perspective. Design frame 1024×600 px, so everything is large, nothing is cut off at any edge and nothing scrolls.\nUse the attached reference image(s) of this same app and keep the visual system IDENTICAL: page background #F4F4F2, white cards with 16px radius and a 1px hairline #E3E3E3, near-black text #1A1A1A, gray text #5D5D5D, status colors always paired with a text label (red #B42318, amber #B45309, green #247A3D, blue #0074D9, purple #5F33E1), Pretendard-like Korean sans-serif, simple 2px Lucide-like line icons. Sizes for older staff: smallest text 16px, body 18px, names and titles 22px bold, key numbers 32–40px bold, every touch target at least 52px tall. Small text (menu labels, badges, legends, chips, gray captions, phone numbers, small buttons) tends to come out too small: draw it at a full 16px, about three quarters of the height of the 22px names; shrink padding or icons, never the text. Never use an ellipsis or clipped text, and never show a half-cut card or row.\nAll UI text is Korean and must be rendered crisp and spelled EXACTLY as written below. No English UI labels, no lorem ipsum, no watermark, no annotations, no extra screens.\nShell, identical to the first reference image. Brand orange #FE4E10 is used only for the active menu item and for solid primary buttons (white bold text). Left rail 112px wide with nine buttons, each a 26px icon above a 16px bold label, in this exact order from the top: 오늘 할 일 (home icon), 1 접수·예약 (calendar icon), 2 준비·지급 (box icon), 3 이용·변경 (people icon), 4 반납·회수 (return arrow icon), 5 정산·마감 (won icon), 리프트권 (ticket icon), 차량 운행 (car icon), and 관리 (gear icon) pinned at the bottom. Do not remove, rename, renumber or duplicate any of them. Only the orange highlight moves: on this screen it is on the SECOND button from the top, the one labelled 1 접수·예약; every other button stays white with dark text. Header 60px, always complete: purple 16px bold wordmark 스키노트, gray 18px store name 우리 스키샵, the bold 24px screen title, a small pill, and at the right end a white outlined bell button with a red badge 1 and a white outlined button 나가기 with a door icon. Footer 72px: an 18px summary sentence on the left; buttons 56px tall with 18px bold labels on the right.\nThe second reference image is the earlier version of THIS screen; keep its toolbar, colors and content, but rebuild the cards as described here (the button moves into row 4 next to the money, so the cards become shorter).\nScreen: 1 접수·예약. Header title \"1 접수·예약\" followed by a light-gray pill \"처리 대기 없음\".\nToolbar row 60px under the header: a search field with a magnifier icon and gray placeholder \"이름 · 연락처 뒷자리 · 접수번호\"; filter chips 52px tall: solid orange \"오늘 5\", white \"내일 2\", white \"전체 7\", white \"달력\" with a calendar icon; at the right end a two-segment toggle \"시간 묶음 | 접수 순서\" with 시간 묶음 selected (dark fill, white text).\nCards: white, 16px radius, 14px padding, about 171px tall, in 2 columns with a 12px gap; only COMPLETE cards are shown, nothing is cut off at the bottom. There is exactly ONE group heading row above the cards (22px bold title with a gray 18px count). Each card has exactly four rows and each row is ONE line: row 1 = name 22px bold with the phone number in 18px gray next to it, and a status badge at the right end (6px radius, 16px bold text on a tinted background); row 2 = 16px gray meta text; row 3 = the items in 18px bold with a small status chip at the right end; row 4 = money in 18px bold at the left and exactly ONE button 52px tall with an 18px bold label at the right, taking about 56% of the card width. Cards that need attention have a 2px colored border and, instead of the row-1 badge, a small legend label sitting on the top border line at the right end.\nHeading row: \"09:00~12:00 수령\" with gray \"4팀\". Four cards:\nCard 1 (green 2px border, legend \"지급 완료\"): \"김영희 팀\" \"010-0000-0021\"; meta \"9/17 09:30 수령 · 매장 수령 · R-021\"; items \"스키 2 · 의류 2 · 헬멧 1\" with a blue chip \"차량 수거 예정\"; red \"미수 65,000원\"; white outlined button \"접수 상세\".\nCard 2 (green border, legend \"지급 완료\"): \"이수진 팀\" \"010-0000-0023\"; \"9/17 10:00 수령 · 매장 수령 · R-023\"; \"보드 2 · 의류 2\" with a blue chip \"차량 수거 예정\"; red \"미수 60,000원\"; \"접수 상세\".\nCard 3 (plain, gray badge \"리프트권만\"): \"정하늘 팀\" \"010-0000-0026\"; \"9/17 11:00 수령 · 매장 수령 · R-026\"; \"오후권 성인 4매\" with a purple chip \"발권 예정\"; red \"미수 180,000원\"; \"접수 상세\".\nCard 4 (plain, gray badge \"예약 확정\"): \"최은정 팀\" \"010-0000-0024\"; \"9/17 11:30 수령 · 만선 티롤 앞 · R-024\"; \"스키 2 · 의류 2 · 헬멧 1 · 보드 1 외 4종\" with a gray chip \"지급 전\"; dark \"예약 금액 230,000원\"; \"접수 상세\".\nFooter: left \"수령 5팀 · 예약 금액 435,000원 · 예약 5세트\"; then a compact pager: white outlined square button \"‹\", 18px text \"1 / 2쪽\", white outlined square button \"›\"; right: white outlined \"최신 기록 확인\" and the solid orange primary button \"새 접수\"."
+    },
+    {
+      "code": "M01",
+      "title": "관리 허브",
+      "wave": 1,
+      "file": "m01-management-hub.png",
+      "aspect_ratio": "27:16",
+      "model": "gpt_image_2_5",
+      "params": {
+        "quality": "high",
+        "resolution": "2k",
+        "variant": "flare"
+      },
+      "references": [
+        {
+          "code": "P01",
+          "job_id": "8d6e31bf-6f35-4a6b-bb11-65a3f1ab8ebc"
+        }
+      ],
+      "note": "관리 영역의 기준 화면. 관리 레일 7개를 여기서 정한다.",
+      "prompt": "High-fidelity UI design mockup of one screen of 스키노트, a touch-screen POS web app used at the counter of a Korean ski rental shop. The screen is shown flat and straight-on and fills the whole canvas edge to edge: no monitor bezel, no browser chrome, no hands, no perspective. Design frame 1024×600 px, so everything is large, nothing is cut off at any edge and nothing scrolls.\nUse the attached reference image(s) of this same app and keep the visual system IDENTICAL: page background #F4F4F2, white cards with 16px radius and a 1px hairline #E3E3E3, near-black text #1A1A1A, gray text #5D5D5D, status colors always paired with a text label (red #B42318, amber #B45309, green #247A3D, blue #0074D9, purple #5F33E1), Pretendard-like Korean sans-serif, simple 2px Lucide-like line icons. Sizes for older staff: smallest text 16px, body 18px, names and titles 22px bold, key numbers 32–40px bold, every touch target at least 52px tall. Small text (menu labels, badges, legends, chips, gray captions, phone numbers, small buttons) tends to come out too small: draw it at a full 16px, about three quarters of the height of the 22px names; shrink padding or icons, never the text. Never use an ellipsis or clipped text, and never show a half-cut card or row.\nAll UI text is Korean and must be rendered crisp and spelled EXACTLY as written below. No English UI labels, no lorem ipsum, no watermark, no annotations, no extra screens.\nShell: this is the management area of the same app. It keeps the header, footer, colors and typography of the first reference image, but the left rail (same 112px width and button style: a 26px icon above a 16px bold label) holds exactly SEVEN buttons in this order from the top: 포스로 (left arrow icon), 재고·정비 (wrench icon), 거래처 장부 (open book icon), 고객 관리 (people icon), 매장 설정 (sliders icon), 인쇄물 (printer icon), 마감 이력 (archive box icon). None of the nine POS menu buttons appear here. No rail button is highlighted on this hub screen; all seven stay white with dark text. Brand orange #FE4E10 is used only for the active menu item and for solid primary buttons (white bold text). Header 60px, always complete: purple 16px bold wordmark 스키노트, gray 18px store name 우리 스키샵, the bold 24px screen title, a small pill, and at the right end a white outlined bell button with a red badge 1 and a white outlined button 나가기 with a door icon. Footer 72px: an 18px summary sentence on the left; buttons 56px tall with 18px bold labels on the right.\nScreen: 관리 (management hub). Header title \"관리\" followed by a light-orange pill with dark-orange text \"오늘 마감 전\". There is no toolbar row on this screen.\nContent: one heading row \"관리 업무\" with gray \"6가지\", then six large white tiles in 3 columns × 2 rows with 12px gaps that fill the content area (same tile style as the six tiles of the reference image). Each tile: 22px bold title at the top left, a status badge at the top right, two 18px detail lines, and an orange 18px bold text \"열기 ›\" at the bottom right.\nTile 1: \"재고·정비\", green badge \"정상\", \"대여 가능 156개 · 전체 188개\", \"세척 대기 0 · 정비 중 2 · 분실 0\".\nTile 2: \"거래처 장부\", amber badge \"정산 대기 1곳\", \"거래처 3곳\", \"미수 100,000원 · 미지급 180,000원\".\nTile 3: \"고객 관리\", blue badge \"고객 124명\", \"연락처 등록 117명\", \"미등록 방문 7건\".\nTile 4: \"매장 설정\", gray badge \"설정 7판\", \"장비 요금 10건 · 수령 장소 3곳\", \"차량 2대 · 직원 4명\".\nTile 5: \"인쇄물\", gray badge \"3종\", \"준비표 · 스티커 · QR 안내문\", \"오늘 준비표 6장\".\nTile 6 (2px red border, red legend \"오늘 마감 전\" sitting on the top border line at the right end instead of a badge): \"마감 이력\", \"마감 기록 12일\", \"최근 9/16 · 현금 차이 0원\".\nFooter: left \"정비 중 2개 · 분실 0개 · 거래처 정산 대기 1곳\"; right: one white outlined button \"오늘 할 일\" (no orange button on this screen)."
+    },
+    {
+      "code": "P20",
+      "title": "팝업 · 지급 확정",
+      "wave": 1,
+      "file": "p20-popup-issue.png",
+      "aspect_ratio": "27:16",
+      "model": "gpt_image_2_5",
+      "params": {
+        "quality": "high",
+        "resolution": "2k",
+        "variant": "flare"
+      },
+      "references": [
+        {
+          "code": "P05",
+          "job_id": "854409ed-dbfb-4dae-aca6-d2b6275c716b"
+        },
+        {
+          "code": "P01",
+          "job_id": "8d6e31bf-6f35-4a6b-bb11-65a3f1ab8ebc"
+        }
+      ],
+      "note": "팝업의 기준 화면. 부모 화면은 2 준비·지급.",
+      "prompt": "High-fidelity UI design mockup of one screen of 스키노트, a touch-screen POS web app used at the counter of a Korean ski rental shop. The screen is shown flat and straight-on and fills the whole canvas edge to edge: no monitor bezel, no browser chrome, no hands, no perspective. Design frame 1024×600 px, so everything is large, nothing is cut off at any edge and nothing scrolls.\nUse the attached reference image(s) of this same app and keep the visual system IDENTICAL: page background #F4F4F2, white cards with 16px radius and a 1px hairline #E3E3E3, near-black text #1A1A1A, gray text #5D5D5D, status colors always paired with a text label (red #B42318, amber #B45309, green #247A3D, blue #0074D9, purple #5F33E1), Pretendard-like Korean sans-serif, simple 2px Lucide-like line icons. Sizes for older staff: smallest text 16px, body 18px, names and titles 22px bold, key numbers 32–40px bold, every touch target at least 52px tall. Small text (menu labels, badges, legends, chips, gray captions, phone numbers, small buttons) tends to come out too small: draw it at a full 16px, about three quarters of the height of the 22px names; shrink padding or icons, never the text. Never use an ellipsis or clipped text, and never show a half-cut card or row.\nAll UI text is Korean and must be rendered crisp and spelled EXACTLY as written below. No English UI labels, no lorem ipsum, no watermark, no annotations, no extra screens.\nPopup: a centered white modal panel about 780×480 px with 20px radius and a soft shadow, over the parent screen, which is the 2 준비·지급 screen of the FIRST reference image, reproduced as it is (rail, header, cards, footer) and dimmed by a 45% black overlay (still recognizable, clearly inactive). Inside the panel: a 24px bold title at the top left with a 16px gray subtitle under it, a 48px square outlined close button with an X icon at the top right, then the body, then a bottom button row aligned right: white outlined secondary buttons and exactly ONE solid orange #FE4E10 primary button (white bold text), all 56px tall with 18px bold labels. Option buttons and steppers are 52px tall; a selected option has a near-black fill with white text. Steppers are two 52px square white outlined buttons − and + with the 24px bold quantity between them.\nThe second reference image shows the app's general style (colors, buttons, typography).\nPopup content. Title \"박준호 팀 · 지급 5개\"; subtitle \"R-022 · 9/17 16:40 수령 · 설천 주차장\".\nBody: three item rows 64px tall separated by hairlines; each row has the 20px bold item name at the left with a 16px gray caption under it, and a stepper at the right: \"스키 2\" caption \"예약 2 · 지급 0\" quantity 2; \"의류 2\" caption \"예약 2 · 지급 0\" quantity 2; \"헬멧 1\" caption \"예약 1 · 지급 0\" quantity 1.\nUnder the rows an info row with a light-gray background: 18px label \"미수 · 지급 시 수납\", 22px bold red \"100,000원\", and a white outlined button \"수납\" 52px tall at the right end.\nBottom button row: white outlined \"취소\" and the solid orange primary button \"선택 물품 지급 확정\"."
+    },
+    {
+      "code": "D01",
+      "title": "기사 태블릿 · 차량 운행",
+      "wave": 1,
+      "file": "d01-driver-dispatch.png",
+      "aspect_ratio": "27:16",
+      "model": "gpt_image_2_5",
+      "params": {
+        "quality": "high",
+        "resolution": "2k",
+        "variant": "flare"
+      },
+      "references": [
+        {
+          "code": "P01",
+          "job_id": "8d6e31bf-6f35-4a6b-bb11-65a3f1ab8ebc"
+        }
+      ],
+      "note": "기사 화면의 기준. 레일 없음, 보라색, 행 목록(카드 아님).",
+      "prompt": "High-fidelity UI design mockup of one screen of 스키노트, a touch-screen POS web app used at the counter of a Korean ski rental shop. The screen is shown flat and straight-on and fills the whole canvas edge to edge: no monitor bezel, no browser chrome, no hands, no perspective. Design frame 1024×600 px, so everything is large, nothing is cut off at any edge and nothing scrolls.\nUse the attached reference image(s) of this same app and keep the visual system IDENTICAL: page background #F4F4F2, white cards with 16px radius and a 1px hairline #E3E3E3, near-black text #1A1A1A, gray text #5D5D5D, status colors always paired with a text label (red #B42318, amber #B45309, green #247A3D, blue #0074D9, purple #5F33E1), Pretendard-like Korean sans-serif, simple 2px Lucide-like line icons. Sizes for older staff: smallest text 16px, body 18px, names and titles 22px bold, key numbers 32–40px bold, every touch target at least 52px tall. Small text (menu labels, badges, legends, chips, gray captions, phone numbers, small buttons) tends to come out too small: draw it at a full 16px, about three quarters of the height of the 22px names; shrink padding or icons, never the text. Never use an ellipsis or clipped text, and never show a half-cut card or row.\nAll UI text is Korean and must be rendered crisp and spelled EXACTLY as written below. No English UI labels, no lorem ipsum, no watermark, no annotations, no extra screens.\nShell: this is the DRIVER TABLET screen of the same app, used in the delivery van. There is NO left rail; the content uses the full width. Keep the typography, spacing, card style and header/footer structure of the first reference image, but the accent color is purple #5F33E1 instead of orange: the active chip and the solid primary buttons are purple with white bold text, and no orange appears anywhere. Header 60px: purple 16px bold wordmark 스키노트, gray 18px store name 우리 스키샵, the bold 24px screen title, a light-purple pill, and at the right end a white outlined bell button with a red badge 3 and a white outlined button 나가기 with a door icon. Footer 80px: an 18px summary sentence on the left; white outlined buttons 60px tall and, when the screen has one, a solid purple primary button 72px tall with a 20px bold label. Lists are compact ROWS (not cards), with a pager instead of scrolling.\nScreen: 차량 운행 (the driver's job list). Header title \"차량 운행\" followed by a light-purple pill with purple text \"남은 7건\".\nToolbar row 60px: filter chips 52px tall: solid purple \"오늘·이전 7\", white \"내일 0\", white \"전체 7\", white \"달력\" with a calendar icon; at the right end gray 18px text \"1호 차량\".\nContent: four white rows 84px tall with 16px radius and 8px gaps. Each row: line 1 in 22px bold \"시간 · 팀 · 종류\", line 2 in 16px gray \"장소 · 남은 물품 · 품목\", and at the right end a solid purple button 64px tall and 150px wide with a white 20px bold label \"업무 처리\".\nRow 1: \"09:00 · 김민재 팀 · 배달\" / \"만선 광장 · 남은 물품 3개 · 스키 2 · 의류 1\". Row 2: \"09:40 · 박서윤 팀 · 배달\" / \"설천 주차장 · 남은 물품 3개 · 스키 2 · 의류 1\". Row 3: \"10:20 · 이도윤 팀 · 배달\" / \"만선 티롤 앞 · 남은 물품 3개 · 보드 2 · 의류 1\". Row 4: \"16:30 · 김영희 팀 · 수거\" / \"만선 티롤 앞 · 남은 물품 5개 · 스키 2 · 의류 2 · 헬멧 1\".\nUnder the rows one line: left 16px gray \"전체 7건 · 1–4건\"; right a compact pager: white outlined button \"‹\", 18px text \"1 / 2쪽\", white outlined button \"›\".\nFooter: left \"1호 차량 · 배달 6건 · 수거 1건 · 차량 보관 21개\"; right: white outlined buttons \"보관 물품 보기\" and \"최신 업무 확인\" (no solid purple button in this footer; the purple action is on each row)."
+    },
+    {
+      "code": "P11",
+      "title": "새 접수 · 1 고객",
+      "wave": 1,
+      "file": "p11-intake-customer.png",
+      "aspect_ratio": "27:16",
+      "model": "gpt_image_2_5",
+      "params": {
+        "quality": "high",
+        "resolution": "2k",
+        "variant": "flare"
+      },
+      "references": [
+        {
+          "code": "P01",
+          "job_id": "8d6e31bf-6f35-4a6b-bb11-65a3f1ab8ebc"
+        }
+      ],
+      "note": "끝 4자리로 고객을 찾고 고른다. 타이핑 대신 숫자판.",
+      "prompt": "High-fidelity UI design mockup of one screen of 스키노트, a touch-screen POS web app used at the counter of a Korean ski rental shop. The screen is shown flat and straight-on and fills the whole canvas edge to edge: no monitor bezel, no browser chrome, no hands, no perspective. Design frame 1024×600 px, so everything is large, nothing is cut off at any edge and nothing scrolls.\nUse the attached reference image(s) of this same app and keep the visual system IDENTICAL: page background #F4F4F2, white cards with 16px radius and a 1px hairline #E3E3E3, near-black text #1A1A1A, gray text #5D5D5D, status colors always paired with a text label (red #B42318, amber #B45309, green #247A3D, blue #0074D9, purple #5F33E1), Pretendard-like Korean sans-serif, simple 2px Lucide-like line icons. Sizes for older staff: smallest text 16px, body 18px, names and titles 22px bold, key numbers 32–40px bold, every touch target at least 52px tall. Small text (menu labels, badges, legends, chips, gray captions, phone numbers, small buttons) tends to come out too small: draw it at a full 16px, about three quarters of the height of the 22px names; shrink padding or icons, never the text. Never use an ellipsis or clipped text, and never show a half-cut card or row.\nAll UI text is Korean and must be rendered crisp and spelled EXACTLY as written below. No English UI labels, no lorem ipsum, no watermark, no annotations, no extra screens.\nShell, identical to the first reference image. Brand orange #FE4E10 is used only for the active menu item and for solid primary buttons (white bold text). Left rail 112px wide with nine buttons, each a 26px icon above a 16px bold label, in this exact order from the top: 오늘 할 일 (home icon), 1 접수·예약 (calendar icon), 2 준비·지급 (box icon), 3 이용·변경 (people icon), 4 반납·회수 (return arrow icon), 5 정산·마감 (won icon), 리프트권 (ticket icon), 차량 운행 (car icon), and 관리 (gear icon) pinned at the bottom. Do not remove, rename, renumber or duplicate any of them. Only the orange highlight moves: on this screen it is on the SECOND button from the top, the one labelled 1 접수·예약; every other button stays white with dark text. Header 60px, always complete: purple 16px bold wordmark 스키노트, gray 18px store name 우리 스키샵, the bold 24px screen title, a small pill, and at the right end a white outlined bell button with a red badge 1 and a white outlined button 나가기 with a door icon. Footer 72px: an 18px summary sentence on the left; buttons 56px tall with 18px bold labels on the right.\nScreen: 새 접수, step 1 of 3, finding the customer. Header title \"새 접수\" followed by a light-orange pill \"1 / 3 단계\".\nToolbar row 60px: a white outlined button \"‹ 목록\"; three step chips 52px tall: \"1 고객\" (solid orange, active), \"2 품목\" (white, gray text), \"3 일정·장소\" (white, gray text); at the right end a two-segment toggle \"예약 | 방문\" with 예약 selected (dark fill, white text).\nContent split in two panels with a 12px gap. LEFT 46%, white panel: 22px bold heading \"고객 찾기\" with 16px gray \"연락처 끝 4자리\"; a display field 64px tall showing the four digits \"5 6 7 8\" in 36px bold; under it a numeric keypad of 3 columns × 4 rows of white outlined keys 56px tall with 24px bold labels: 1 2 3 / 4 5 6 / 7 8 9 / \"지우기\" 0 \"찾기\" (the key 찾기 is near-black with white text).\nRIGHT 54%, white panel: 22px bold heading \"찾은 고객\" with gray \"2명\"; two result rows 84px tall separated by a hairline. Row 1 is selected (light-orange background, 4px orange bar on its left edge): 22px bold \"김민수\", 18px gray \"010-0000-5678\", 16px gray \"최근 이용 2026-02-14 · 일행 3명\", and a green badge \"선택됨\" at the right. Row 2: \"김민서\", \"010-1234-5678\", \"최근 이용 2025-12-28 · 일행 2명\", and a white outlined button \"선택\" 52px tall at the right. Under the rows a 16px gray line \"동명이인 2명 · 연락처 뒷자리 확인\" and a white outlined button \"새 고객 등록\" 52px tall.\nFooter: left \"김민수 · 010-0000-5678 · 예약\"; right: white outlined \"임시 저장\" and the solid orange primary button \"다음 · 품목\"."
+    },
+    {
+      "code": "P12",
+      "title": "새 접수 · 3 일정·장소",
+      "wave": 1,
+      "file": "p12-intake-schedule.png",
+      "aspect_ratio": "27:16",
+      "model": "gpt_image_2_5",
+      "params": {
+        "quality": "high",
+        "resolution": "2k",
+        "variant": "flare"
+      },
+      "references": [
+        {
+          "code": "P01",
+          "job_id": "8d6e31bf-6f35-4a6b-bb11-65a3f1ab8ebc"
+        }
+      ],
+      "note": "날짜·시간·장소를 큰 선택 버튼으로 고른다. 오른쪽에 접수 요약과 합계.",
+      "prompt": "High-fidelity UI design mockup of one screen of 스키노트, a touch-screen POS web app used at the counter of a Korean ski rental shop. The screen is shown flat and straight-on and fills the whole canvas edge to edge: no monitor bezel, no browser chrome, no hands, no perspective. Design frame 1024×600 px, so everything is large, nothing is cut off at any edge and nothing scrolls.\nUse the attached reference image(s) of this same app and keep the visual system IDENTICAL: page background #F4F4F2, white cards with 16px radius and a 1px hairline #E3E3E3, near-black text #1A1A1A, gray text #5D5D5D, status colors always paired with a text label (red #B42318, amber #B45309, green #247A3D, blue #0074D9, purple #5F33E1), Pretendard-like Korean sans-serif, simple 2px Lucide-like line icons. Sizes for older staff: smallest text 16px, body 18px, names and titles 22px bold, key numbers 32–40px bold, every touch target at least 52px tall. Small text (menu labels, badges, legends, chips, gray captions, phone numbers, small buttons) tends to come out too small: draw it at a full 16px, about three quarters of the height of the 22px names; shrink padding or icons, never the text. Never use an ellipsis or clipped text, and never show a half-cut card or row.\nAll UI text is Korean and must be rendered crisp and spelled EXACTLY as written below. No English UI labels, no lorem ipsum, no watermark, no annotations, no extra screens.\nShell, identical to the first reference image. Brand orange #FE4E10 is used only for the active menu item and for solid primary buttons (white bold text). Left rail 112px wide with nine buttons, each a 26px icon above a 16px bold label, in this exact order from the top: 오늘 할 일 (home icon), 1 접수·예약 (calendar icon), 2 준비·지급 (box icon), 3 이용·변경 (people icon), 4 반납·회수 (return arrow icon), 5 정산·마감 (won icon), 리프트권 (ticket icon), 차량 운행 (car icon), and 관리 (gear icon) pinned at the bottom. Do not remove, rename, renumber or duplicate any of them. Only the orange highlight moves: on this screen it is on the SECOND button from the top, the one labelled 1 접수·예약; every other button stays white with dark text. Header 60px, always complete: purple 16px bold wordmark 스키노트, gray 18px store name 우리 스키샵, the bold 24px screen title, a small pill, and at the right end a white outlined bell button with a red badge 1 and a white outlined button 나가기 with a door icon. Footer 72px: an 18px summary sentence on the left; buttons 56px tall with 18px bold labels on the right.\nScreen: 새 접수, step 3 of 3, schedule and place. Header title \"새 접수\" followed by a light-orange pill \"3 / 3 단계\".\nToolbar row 60px: a white outlined button \"‹ 이전\"; three step chips 52px tall: \"1 고객 · 김민수 팀\" (white with a small green check icon), \"2 품목 · 5개\" (white with a small green check icon), \"3 일정·장소\" (solid orange, active).\nContent split in two with a 12px gap. LEFT 58%, white panel with four option groups stacked; each group is an 18px bold label with a row of option buttons 52px tall under it (a selected option has a near-black fill and white text, the others are white outlined): \"수령일\": \"오늘 9/17\" (selected), \"내일 9/18\", \"달력\". \"수령 시간\": \"09:00\", \"09:30\" (selected), \"12:00\", \"직접 입력\". \"수령 장소\": \"매장 수령\", \"만선 티롤 앞\" (selected), \"설천 주차장\", \"장소 더 보기\". \"반납 시간\": \"오후타임 후 16:30\" (selected), \"야간타임 후 22:00\", \"익일 오전 09:00\".\nRIGHT 42%, white panel titled 22px bold \"접수 요약\": 18px label/value rows (labels gray, values dark): \"대표자\" \"김민수 · 010-0000-5678\"; \"대여 품목\" \"스키 세트 2 · 의류 2 · 헬멧 1\"; \"이용\" \"9/17 · 1일\"; \"수령\" \"9/17 09:30 · 만선 티롤 앞\"; \"반납\" \"9/17 16:30 · 차량 수거\"; then a row with the label \"할인\" the value \"없음\" and a small white outlined button \"할인 선택\"; at the bottom, above a hairline, 18px gray \"합계\" and a 36px bold \"105,000원\".\nFooter: left \"김민수 팀 · 일행 3명 · 품목 5개\"; right: white outlined \"임시 저장\" and the solid orange primary button \"접수 확정 · 105,000원\"."
+    },
+    {
+      "code": "P13",
+      "title": "새 접수 · 일행마다 다르게 입력",
+      "wave": 1,
+      "file": "p13-intake-per-person.png",
+      "aspect_ratio": "27:16",
+      "model": "gpt_image_2_5",
+      "params": {
+        "quality": "high",
+        "resolution": "2k",
+        "variant": "flare"
+      },
+      "references": [
+        {
+          "code": "P01",
+          "job_id": "8d6e31bf-6f35-4a6b-bb11-65a3f1ab8ebc"
+        }
+      ],
+      "note": "단체 접수. 왼쪽 일행 목록(쪽수), 오른쪽 품목 버튼. 같은 품목은 한 번에 채운다.",
+      "prompt": "High-fidelity UI design mockup of one screen of 스키노트, a touch-screen POS web app used at the counter of a Korean ski rental shop. The screen is shown flat and straight-on and fills the whole canvas edge to edge: no monitor bezel, no browser chrome, no hands, no perspective. Design frame 1024×600 px, so everything is large, nothing is cut off at any edge and nothing scrolls.\nUse the attached reference image(s) of this same app and keep the visual system IDENTICAL: page background #F4F4F2, white cards with 16px radius and a 1px hairline #E3E3E3, near-black text #1A1A1A, gray text #5D5D5D, status colors always paired with a text label (red #B42318, amber #B45309, green #247A3D, blue #0074D9, purple #5F33E1), Pretendard-like Korean sans-serif, simple 2px Lucide-like line icons. Sizes for older staff: smallest text 16px, body 18px, names and titles 22px bold, key numbers 32–40px bold, every touch target at least 52px tall. Small text (menu labels, badges, legends, chips, gray captions, phone numbers, small buttons) tends to come out too small: draw it at a full 16px, about three quarters of the height of the 22px names; shrink padding or icons, never the text. Never use an ellipsis or clipped text, and never show a half-cut card or row.\nAll UI text is Korean and must be rendered crisp and spelled EXACTLY as written below. No English UI labels, no lorem ipsum, no watermark, no annotations, no extra screens.\nShell, identical to the first reference image. Brand orange #FE4E10 is used only for the active menu item and for solid primary buttons (white bold text). Left rail 112px wide with nine buttons, each a 26px icon above a 16px bold label, in this exact order from the top: 오늘 할 일 (home icon), 1 접수·예약 (calendar icon), 2 준비·지급 (box icon), 3 이용·변경 (people icon), 4 반납·회수 (return arrow icon), 5 정산·마감 (won icon), 리프트권 (ticket icon), 차량 운행 (car icon), and 관리 (gear icon) pinned at the bottom. Do not remove, rename, renumber or duplicate any of them. Only the orange highlight moves: on this screen it is on the SECOND button from the top, the one labelled 1 접수·예약; every other button stays white with dark text. Header 60px, always complete: purple 16px bold wordmark 스키노트, gray 18px store name 우리 스키샵, the bold 24px screen title, a small pill, and at the right end a white outlined bell button with a red badge 1 and a white outlined button 나가기 with a door icon. Footer 72px: an 18px summary sentence on the left; buttons 56px tall with 18px bold labels on the right.\nScreen: 새 접수, step 2, entering items person by person for a large group. Header title \"새 접수\" followed by a light-orange pill \"2 / 3 단계 · 일행별\".\nToolbar row 60px: a white outlined button \"‹ 이전\"; three step chips 52px tall: \"1 고객 · 한국대 동아리 · 30명\" (white with a small green check icon), \"2 품목 · 일행별\" (solid orange, active), \"3 일정·장소\" (white, gray text).\nContent split in two with a 12px gap. LEFT 40%, white panel: 22px bold heading \"일행 30명\" with gray \"입력 2명\"; five rows 56px tall separated by hairlines, each with a 20px bold number and name and an 16px gray item summary at the right: \"1 김민수\" \"스키 세트 · 의류 · 헬멧\" with a small green check icon; \"2 이서연\" \"보드 세트 · 의류\" with a small green check icon; \"3 박지호\" \"선택 중\" (this row is selected: light-orange background and a 4px orange bar on its left edge); \"4 최유나\" \"미선택\"; \"5 정우진\" \"미선택\". Under the rows a compact pager: \"‹\" \"1 / 6쪽\" \"›\".\nRIGHT 60%, white panel: 22px bold heading \"3 박지호 · 품목 선택\"; a grid of 3 columns × 2 rows of large white product buttons (about 170×88 px each, 12px gaps) each with a 20px bold name and a 16px gray price: \"스키 세트\" \"35,000원\", \"보드 세트\" \"35,000원\", \"의류\" \"15,000원\", \"헬멧\" \"5,000원\", \"고글\" \"5,000원\", \"보호대\" \"5,000원\". 스키 세트 and 의류 are selected (2px orange border, light-orange background, a small solid orange circle badge with a white 1 at the top right). Under the grid two white outlined buttons 52px tall side by side: \"앞사람과 같게\" and \"남은 27명 모두 같게\".\nFooter: left \"입력 2 / 30명 · 합계 105,000원\"; right: white outlined \"임시 저장\" and the solid orange primary button \"다음 일행 · 4 최유나\"."
+    },
+    {
+      "code": "P09",
+      "title": "리프트권",
+      "wave": 2,
+      "file": "p09-tickets.png",
+      "aspect_ratio": "27:16",
+      "model": "gpt_image_2_5",
+      "params": {
+        "quality": "high",
+        "resolution": "2k",
+        "variant": "flare"
+      },
+      "references": [
+        {
+          "code": "P01",
+          "job_id": "8d6e31bf-6f35-4a6b-bb11-65a3f1ab8ebc"
+        },
+        {
+          "code": "P02R",
+          "job_id": "c3a5f3bd-6b54-4e0d-a37c-1f2fcb6522fe"
+        }
+      ],
+      "note": "발권 필요한 팀을 카드로. 주황은 카드의 발권 버튼에만.",
+      "prompt": "High-fidelity UI design mockup of one screen of 스키노트, a touch-screen POS web app used at the counter of a Korean ski rental shop. The screen is shown flat and straight-on and fills the whole canvas edge to edge: no monitor bezel, no browser chrome, no hands, no perspective. Design frame 1024×600 px, so everything is large, nothing is cut off at any edge and nothing scrolls.\nUse the attached reference image(s) of this same app and keep the visual system IDENTICAL: page background #F4F4F2, white cards with 16px radius and a 1px hairline #E3E3E3, near-black text #1A1A1A, gray text #5D5D5D, status colors always paired with a text label (red #B42318, amber #B45309, green #247A3D, blue #0074D9, purple #5F33E1), Pretendard-like Korean sans-serif, simple 2px Lucide-like line icons. Sizes for older staff: smallest text 16px, body 18px, names and titles 22px bold, key numbers 32–40px bold, every touch target at least 52px tall. Small text (menu labels, badges, legends, chips, gray captions, phone numbers, small buttons) tends to come out too small: draw it at a full 16px, about three quarters of the height of the 22px names; shrink padding or icons, never the text. Never use an ellipsis or clipped text, and never show a half-cut card or row.\nAll UI text is Korean and must be rendered crisp and spelled EXACTLY as written below. No English UI labels, no lorem ipsum, no watermark, no annotations, no extra screens.\nShell, identical to the first reference image. Brand orange #FE4E10 is used only for the active menu item and for solid primary buttons (white bold text). Left rail 112px wide with nine buttons, each a 26px icon above a 16px bold label, in this exact order from the top: 오늘 할 일 (home icon), 1 접수·예약 (calendar icon), 2 준비·지급 (box icon), 3 이용·변경 (people icon), 4 반납·회수 (return arrow icon), 5 정산·마감 (won icon), 리프트권 (ticket icon), 차량 운행 (car icon), and 관리 (gear icon) pinned at the bottom. Do not remove, rename, renumber or duplicate any of them. Only the orange highlight moves: on this screen it is on the SEVENTH button from the top, the one labelled 리프트권; every other button stays white with dark text. Header 60px, always complete: purple 16px bold wordmark 스키노트, gray 18px store name 우리 스키샵, the bold 24px screen title, a small pill, and at the right end a white outlined bell button with a red badge 1 and a white outlined button 나가기 with a door icon. Footer 72px: an 18px summary sentence on the left; buttons 56px tall with 18px bold labels on the right.\nThe second reference image shows this app's card-list layout; use the same toolbar and card structure.\nScreen: 리프트권. Header title \"리프트권\" followed by a light-orange pill \"처리 대기 발권 8매\".\nToolbar row 60px: a search field with a magnifier icon and gray placeholder \"이름 · 접수번호 · 권종\"; filter chips 52px tall: solid orange \"전체 4\", white \"발권 필요 3\", white \"지급 대기 0\", white \"사용 중 1\".\nCards: white, 16px radius, 14px padding, about 171px tall, in 2 columns with a 12px gap; only COMPLETE cards are shown, nothing is cut off at the bottom. There is exactly ONE group heading row above the cards (22px bold title with a gray 18px count). Each card has exactly four rows and each row is ONE line: row 1 = name 22px bold with the phone number in 18px gray next to it, and a status badge at the right end (6px radius, 16px bold text on a tinted background); row 2 = 16px gray meta text; row 3 = the items in 18px bold with a small status chip at the right end; row 4 = money in 18px bold at the left and exactly ONE button 52px tall with an 18px bold label at the right, taking about 56% of the card width. Cards that need attention have a 2px colored border and, instead of the row-1 badge, a small legend label sitting on the top border line at the right end.\nHeading row: \"발권 필요 · 사용 중\" with gray \"4팀\". Four cards:\nCard 1 (red 2px border, legend \"발권 필요\"): \"김민수 팀\" \"010-0000-0025\"; meta \"9/18 이용 · 오후권 성인 · R-025\"; items \"오후권 성인 3매\" with a purple chip \"발권 예정\"; red \"미수 415,000원\"; solid orange button \"발권 3매\".\nCard 2 (red border, legend \"발권 필요\"): \"박준호 팀\" \"010-0000-0022\"; \"9/17 이용 · 야간권 성인 · R-022\"; \"야간권 성인 1매\" with a purple chip \"발권 예정\"; red \"미수 100,000원\"; solid orange button \"발권 1매\".\nCard 3 (red border, legend \"발권 필요\"): \"정하늘 팀\" \"010-0000-0026\"; \"9/17 이용 · 오후권 성인 · R-026\"; \"오후권 성인 4매\" with a purple chip \"발권 예정\"; red \"미수 180,000원\"; solid orange button \"발권 4매\".\nCard 4 (plain, blue badge \"사용 중\"): \"김영희 팀\" \"010-0000-0021\"; \"9/17 이용 · 주간권 성인 · R-021\"; \"주간권 성인 2매\" with a blue chip \"대여 중\"; green \"수납 완료\"; white outlined button \"리프트권 회수 2매\".\nFooter: left \"발권 필요 8매 · 지급 대기 0매 · 예비권 25매\"; then a compact pager \"‹\" \"1 / 1쪽\" \"›\"; right: white outlined buttons \"예비권 25매\" and \"최신 기록 확인\" (no orange button in this footer; the orange action is on the cards)."
+    },
+    {
+      "code": "P10",
+      "title": "차량 운행 (포스)",
+      "wave": 2,
+      "file": "p10-dispatch.png",
+      "aspect_ratio": "27:16",
+      "model": "gpt_image_2_5",
+      "params": {
+        "quality": "high",
+        "resolution": "2k",
+        "variant": "flare"
+      },
+      "references": [
+        {
+          "code": "P01",
+          "job_id": "8d6e31bf-6f35-4a6b-bb11-65a3f1ab8ebc"
+        },
+        {
+          "code": "P02R",
+          "job_id": "c3a5f3bd-6b54-4e0d-a37c-1f2fcb6522fe"
+        }
+      ],
+      "note": "카운터에서 보는 차량별 배달·수거. 카드 버튼은 업무 처리, 주황은 하단 하나.",
+      "prompt": "High-fidelity UI design mockup of one screen of 스키노트, a touch-screen POS web app used at the counter of a Korean ski rental shop. The screen is shown flat and straight-on and fills the whole canvas edge to edge: no monitor bezel, no browser chrome, no hands, no perspective. Design frame 1024×600 px, so everything is large, nothing is cut off at any edge and nothing scrolls.\nUse the attached reference image(s) of this same app and keep the visual system IDENTICAL: page background #F4F4F2, white cards with 16px radius and a 1px hairline #E3E3E3, near-black text #1A1A1A, gray text #5D5D5D, status colors always paired with a text label (red #B42318, amber #B45309, green #247A3D, blue #0074D9, purple #5F33E1), Pretendard-like Korean sans-serif, simple 2px Lucide-like line icons. Sizes for older staff: smallest text 16px, body 18px, names and titles 22px bold, key numbers 32–40px bold, every touch target at least 52px tall. Small text (menu labels, badges, legends, chips, gray captions, phone numbers, small buttons) tends to come out too small: draw it at a full 16px, about three quarters of the height of the 22px names; shrink padding or icons, never the text. Never use an ellipsis or clipped text, and never show a half-cut card or row.\nAll UI text is Korean and must be rendered crisp and spelled EXACTLY as written below. No English UI labels, no lorem ipsum, no watermark, no annotations, no extra screens.\nShell, identical to the first reference image. Brand orange #FE4E10 is used only for the active menu item and for solid primary buttons (white bold text). Left rail 112px wide with nine buttons, each a 26px icon above a 16px bold label, in this exact order from the top: 오늘 할 일 (home icon), 1 접수·예약 (calendar icon), 2 준비·지급 (box icon), 3 이용·변경 (people icon), 4 반납·회수 (return arrow icon), 5 정산·마감 (won icon), 리프트권 (ticket icon), 차량 운행 (car icon), and 관리 (gear icon) pinned at the bottom. Do not remove, rename, renumber or duplicate any of them. Only the orange highlight moves: on this screen it is on the EIGHTH button from the top, the one labelled 차량 운행; every other button stays white with dark text. Header 60px, always complete: purple 16px bold wordmark 스키노트, gray 18px store name 우리 스키샵, the bold 24px screen title, a small pill, and at the right end a white outlined bell button with a red badge 1 and a white outlined button 나가기 with a door icon. Footer 72px: an 18px summary sentence on the left; buttons 56px tall with 18px bold labels on the right.\nThe second reference image shows this app's card-list layout; use the same toolbar and card structure.\nScreen: 차량 운행 (vehicle jobs seen from the counter). Header title \"차량 운행\" followed by a light-orange pill \"처리 대기 남은 7건\".\nToolbar row 60px: a search field with a magnifier icon and gray placeholder \"이름 · 장소 · 연락처 뒷자리\"; filter chips 52px tall: solid orange \"오늘·이전 7\", white \"내일 1\", white \"전체 8\", white \"달력\" with a calendar icon; at the right end a three-segment toggle \"전체 차량 | 1호 차량 | 2호 차량\" with 전체 차량 selected (dark fill, white text).\nCards: white, 16px radius, 14px padding, about 171px tall, in 2 columns with a 12px gap; only COMPLETE cards are shown, nothing is cut off at the bottom. There is exactly ONE group heading row above the cards (22px bold title with a gray 18px count). Each card has exactly four rows and each row is ONE line: row 1 = name 22px bold with the phone number in 18px gray next to it, and a status badge at the right end (6px radius, 16px bold text on a tinted background); row 2 = 16px gray meta text; row 3 = the items in 18px bold with a small status chip at the right end; row 4 = money in 18px bold at the left and exactly ONE button 52px tall with an 18px bold label at the right, taking about 56% of the card width. Cards that need attention have a 2px colored border and, instead of the row-1 badge, a small legend label sitting on the top border line at the right end.\nOn this screen row 1 of a card is \"시간 · 팀\" in 22px bold with the phone in 18px gray, and row 4 shows gray 18px text at the left instead of money.\nHeading row: \"1호 차량\" with gray \"7건\". Four cards:\nCard 1 (plain, amber badge \"수거\"): \"12:00 · 김민재 팀\" \"010-1111-1111\"; meta \"만선 광장 · 1호 차량\"; items \"스키 2 · 6시간권 2매\" with an amber chip \"고객 보유\"; \"남은 물품 4개\"; white outlined button \"업무 처리\".\nCard 2 (plain, blue badge \"배달\"): \"12:15 · 박서윤 팀\" \"010-2222-2222\"; \"만선 광장 · 1호 차량\"; \"6시간권 2매\" with a blue chip \"차량 보관\"; \"남은 물품 2개\"; \"업무 처리\".\nCard 3 (plain, purple badge \"발권처 환불\"): \"13:00 · 리프트권 2매 환불\"; \"리조트 매표소 · 1호 차량\"; \"4시간권 2매\" with a blue chip \"차량 보관\"; \"남은 물품 2개\"; \"업무 처리\".\nCard 4 (plain, amber badge \"수거\"): \"16:30 · 김영희 팀\" \"010-0000-0021\"; \"만선 티롤 앞 · 1호 차량\"; \"스키 2 · 의류 2 · 헬멧 1\" with an amber chip \"고객 보유\"; \"남은 물품 5개\"; \"업무 처리\".\nFooter: left \"운행 7건 · 배달 3건 · 수거 3건 · 차량 보관 12개\"; then a compact pager \"‹\" \"1 / 2쪽\" \"›\"; right: white outlined \"보관 물품 보기\" and the solid orange primary button \"배달할 팀 찾기\"."
+    },
+    {
+      "code": "P14",
+      "title": "사이즈 입력 현황",
+      "wave": 2,
+      "file": "p14-size-status.png",
+      "aspect_ratio": "27:16",
+      "model": "gpt_image_2_5",
+      "params": {
+        "quality": "high",
+        "resolution": "2k",
+        "variant": "flare"
+      },
+      "references": [
+        {
+          "code": "P01",
+          "job_id": "8d6e31bf-6f35-4a6b-bb11-65a3f1ab8ebc"
+        },
+        {
+          "code": "P02R",
+          "job_id": "c3a5f3bd-6b54-4e0d-a37c-1f2fcb6522fe"
+        }
+      ],
+      "note": "2 준비·지급에서 여는 화면. 팀별 사이즈 입력 상태와 재요청.",
+      "prompt": "High-fidelity UI design mockup of one screen of 스키노트, a touch-screen POS web app used at the counter of a Korean ski rental shop. The screen is shown flat and straight-on and fills the whole canvas edge to edge: no monitor bezel, no browser chrome, no hands, no perspective. Design frame 1024×600 px, so everything is large, nothing is cut off at any edge and nothing scrolls.\nUse the attached reference image(s) of this same app and keep the visual system IDENTICAL: page background #F4F4F2, white cards with 16px radius and a 1px hairline #E3E3E3, near-black text #1A1A1A, gray text #5D5D5D, status colors always paired with a text label (red #B42318, amber #B45309, green #247A3D, blue #0074D9, purple #5F33E1), Pretendard-like Korean sans-serif, simple 2px Lucide-like line icons. Sizes for older staff: smallest text 16px, body 18px, names and titles 22px bold, key numbers 32–40px bold, every touch target at least 52px tall. Small text (menu labels, badges, legends, chips, gray captions, phone numbers, small buttons) tends to come out too small: draw it at a full 16px, about three quarters of the height of the 22px names; shrink padding or icons, never the text. Never use an ellipsis or clipped text, and never show a half-cut card or row.\nAll UI text is Korean and must be rendered crisp and spelled EXACTLY as written below. No English UI labels, no lorem ipsum, no watermark, no annotations, no extra screens.\nShell, identical to the first reference image. Brand orange #FE4E10 is used only for the active menu item and for solid primary buttons (white bold text). Left rail 112px wide with nine buttons, each a 26px icon above a 16px bold label, in this exact order from the top: 오늘 할 일 (home icon), 1 접수·예약 (calendar icon), 2 준비·지급 (box icon), 3 이용·변경 (people icon), 4 반납·회수 (return arrow icon), 5 정산·마감 (won icon), 리프트권 (ticket icon), 차량 운행 (car icon), and 관리 (gear icon) pinned at the bottom. Do not remove, rename, renumber or duplicate any of them. Only the orange highlight moves: on this screen it is on the THIRD button from the top, the one labelled 2 준비·지급; every other button stays white with dark text. Header 60px, always complete: purple 16px bold wordmark 스키노트, gray 18px store name 우리 스키샵, the bold 24px screen title, a small pill, and at the right end a white outlined bell button with a red badge 1 and a white outlined button 나가기 with a door icon. Footer 72px: an 18px summary sentence on the left; buttons 56px tall with 18px bold labels on the right.\nThe second reference image shows this app's card-list layout; use the same card structure.\nScreen: 사이즈 입력 현황 (which teams have sent their sizes). Header title \"사이즈 입력 현황\" followed by a light-orange pill \"미입력 3명\".\nToolbar row 60px: a white outlined button \"‹ 준비·지급\"; tab chips 52px tall: solid orange \"팀별 현황 4\", white \"사이즈 집계\", white \"준비표·스티커\".\nCards: white, 16px radius, 14px padding, about 171px tall, in 2 columns with a 12px gap; only COMPLETE cards are shown, nothing is cut off at the bottom. There is exactly ONE group heading row above the cards (22px bold title with a gray 18px count). Each card has exactly four rows and each row is ONE line: row 1 = name 22px bold with the phone number in 18px gray next to it, and a status badge at the right end (6px radius, 16px bold text on a tinted background); row 2 = 16px gray meta text; row 3 = the items in 18px bold with a small status chip at the right end; row 4 = money in 18px bold at the left and exactly ONE button 52px tall with an 18px bold label at the right, taking about 56% of the card width. Cards that need attention have a 2px colored border and, instead of the row-1 badge, a small legend label sitting on the top border line at the right end.\nOn this screen row 3 shows the input progress and row 4 shows gray 18px text at the left instead of money.\nHeading row: \"오늘·내일 수령\" with gray \"4팀\". Four cards:\nCard 1 (amber 2px border, legend \"미입력 2명\"): \"이수진 팀\" \"010-0000-0023\"; meta \"9/18 09:30 수령 · 매장 수령 · R-023\"; \"입력 2 / 4명\" with a gray chip \"발송 9/16 18:20\"; \"현장 측정 0명\"; solid orange button \"재요청 2명\".\nCard 2 (amber border, legend \"미입력 1명\"): \"박준호 팀\" \"010-0000-0022\"; \"9/17 16:40 수령 · 설천 주차장 · R-022\"; \"입력 2 / 3명\" with a gray chip \"발송 9/16 18:25\"; \"현장 측정 0명\"; solid orange button \"재요청 1명\".\nCard 3 (green border, legend \"입력 완료\"): \"최은정 팀\" \"010-0000-0024\"; \"9/18 10:00 수령 · 매장 수령 · R-024\"; \"입력 2 / 2명\" with a green chip \"입력 완료\"; \"현장 측정 0명\"; white outlined button \"상세\".\nCard 4 (plain, gray badge \"발송 전\"): \"한지훈 팀\" \"010-0000-0027\"; \"9/18 11:00 수령 · 매장 수령 · R-027\"; \"입력 0 / 5명\" with a gray chip \"발송 전\"; \"현장 측정 0명\"; white outlined button \"입력폼 보내기\".\nFooter: left \"미입력 3명 · 입력 완료 1팀 · 발송 전 1팀\"; then a compact pager \"‹\" \"1 / 1쪽\" \"›\"; right: white outlined buttons \"사이즈 집계\" and \"준비표 인쇄 2팀\" (no orange button in this footer)."
+    },
+    {
+      "code": "P15",
+      "title": "접수 상세 · 수납·환불",
+      "wave": 2,
+      "file": "p15-order-money.png",
+      "aspect_ratio": "27:16",
+      "model": "gpt_image_2_5",
+      "params": {
+        "quality": "high",
+        "resolution": "2k",
+        "variant": "flare"
+      },
+      "references": [
+        {
+          "code": "P01",
+          "job_id": "8d6e31bf-6f35-4a6b-bb11-65a3f1ab8ebc"
+        },
+        {
+          "code": "P04",
+          "job_id": "1cc53988-9bfe-4a98-be82-ab1dc3f55b81"
+        }
+      ],
+      "note": "접수 상세의 둘째 탭. 청구·수납·환불·보증금·미수를 한 줄씩.",
+      "prompt": "High-fidelity UI design mockup of one screen of 스키노트, a touch-screen POS web app used at the counter of a Korean ski rental shop. The screen is shown flat and straight-on and fills the whole canvas edge to edge: no monitor bezel, no browser chrome, no hands, no perspective. Design frame 1024×600 px, so everything is large, nothing is cut off at any edge and nothing scrolls.\nUse the attached reference image(s) of this same app and keep the visual system IDENTICAL: page background #F4F4F2, white cards with 16px radius and a 1px hairline #E3E3E3, near-black text #1A1A1A, gray text #5D5D5D, status colors always paired with a text label (red #B42318, amber #B45309, green #247A3D, blue #0074D9, purple #5F33E1), Pretendard-like Korean sans-serif, simple 2px Lucide-like line icons. Sizes for older staff: smallest text 16px, body 18px, names and titles 22px bold, key numbers 32–40px bold, every touch target at least 52px tall. Small text (menu labels, badges, legends, chips, gray captions, phone numbers, small buttons) tends to come out too small: draw it at a full 16px, about three quarters of the height of the 22px names; shrink padding or icons, never the text. Never use an ellipsis or clipped text, and never show a half-cut card or row.\nAll UI text is Korean and must be rendered crisp and spelled EXACTLY as written below. No English UI labels, no lorem ipsum, no watermark, no annotations, no extra screens.\nShell, identical to the first reference image. Brand orange #FE4E10 is used only for the active menu item and for solid primary buttons (white bold text). Left rail 112px wide with nine buttons, each a 26px icon above a 16px bold label, in this exact order from the top: 오늘 할 일 (home icon), 1 접수·예약 (calendar icon), 2 준비·지급 (box icon), 3 이용·변경 (people icon), 4 반납·회수 (return arrow icon), 5 정산·마감 (won icon), 리프트권 (ticket icon), 차량 운행 (car icon), and 관리 (gear icon) pinned at the bottom. Do not remove, rename, renumber or duplicate any of them. Only the orange highlight moves: on this screen it is on the THIRD button from the top, the one labelled 2 준비·지급; every other button stays white with dark text. Header 60px, always complete: purple 16px bold wordmark 스키노트, gray 18px store name 우리 스키샵, the bold 24px screen title, a small pill, and at the right end a white outlined bell button with a red badge 1 and a white outlined button 나가기 with a door icon. Footer 72px: an 18px summary sentence on the left; buttons 56px tall with 18px bold labels on the right.\nThe second reference image is the 접수 상세 screen with the 품목 tab open; keep its rail, header, toolbar and LEFT panel exactly the same. Only the active tab, the RIGHT side and the footer button change.\nScreen: 접수 상세 with the 수납·환불 tab open. Header title \"접수 상세\" followed by a light-orange pill \"미수 105,000원\".\nToolbar row 60px: white outlined button \"‹ 목록\"; three tab chips 52px tall: \"품목 3\" (white), \"수납·환불\" (solid orange, active), \"이력\" (white); at the right end three compact stats, each a 16px gray label above a 22px bold value: \"청구\" \"105,000원\" dark, \"수납\" \"0원\" green, \"미수\" \"105,000원\" red.\nLEFT 36%, white panel (same as the reference): 26px bold \"김민수 팀\" with an amber badge \"지급 전\"; 18px label/value rows: \"연락처\" \"010-0000-0025\"; \"접수번호\" \"R-025\"; \"이용\" \"9/17~9/18 · 2일\"; \"수령\" \"9/17 16:30 · 만선 티롤 앞\"; \"반납\" \"9/18 16:30 · 차량 수거\"; then a 2-column grid of six white outlined buttons 52px tall: \"일행·장비 추가\", \"사이즈 요청\", \"기간·수거 변경\", \"수납·환불\", \"문제 해결·정정\", \"전화\" (with a phone icon).\nRIGHT 64%, one white panel: five rows 56px tall separated by hairlines, each with an 18px gray label at the left and a 22px bold value at the right: \"대여 요금\" \"105,000원\"; \"수납\" \"0원\" in green; \"환불\" \"0원\"; \"보증금\" \"0원\" in blue; \"미수\" \"105,000원\" in red (this last row is 28px bold). Under the rows a light-gray strip with 18px gray text \"수납 기록 없음\" and a white outlined button \"보증금 받기\" 52px tall at the right.\nFooter: left \"미수 105,000원 · 지급 시 수납 · 보증금 0원\"; right: white outlined \"목록으로\" and the solid orange primary button \"수납 105,000원\"."
+    },
+    {
+      "code": "P17",
+      "title": "일행·장비 추가 · 1 대상",
+      "wave": 2,
+      "file": "p17-add-party.png",
+      "aspect_ratio": "27:16",
+      "model": "gpt_image_2_5",
+      "params": {
+        "quality": "high",
+        "resolution": "2k",
+        "variant": "flare"
+      },
+      "references": [
+        {
+          "code": "P01",
+          "job_id": "8d6e31bf-6f35-4a6b-bb11-65a3f1ab8ebc"
+        }
+      ],
+      "note": "이용 중인 팀에 늦게 온 일행이나 장비를 더한다. 대표자는 다시 적지 않는다.",
+      "prompt": "High-fidelity UI design mockup of one screen of 스키노트, a touch-screen POS web app used at the counter of a Korean ski rental shop. The screen is shown flat and straight-on and fills the whole canvas edge to edge: no monitor bezel, no browser chrome, no hands, no perspective. Design frame 1024×600 px, so everything is large, nothing is cut off at any edge and nothing scrolls.\nUse the attached reference image(s) of this same app and keep the visual system IDENTICAL: page background #F4F4F2, white cards with 16px radius and a 1px hairline #E3E3E3, near-black text #1A1A1A, gray text #5D5D5D, status colors always paired with a text label (red #B42318, amber #B45309, green #247A3D, blue #0074D9, purple #5F33E1), Pretendard-like Korean sans-serif, simple 2px Lucide-like line icons. Sizes for older staff: smallest text 16px, body 18px, names and titles 22px bold, key numbers 32–40px bold, every touch target at least 52px tall. Small text (menu labels, badges, legends, chips, gray captions, phone numbers, small buttons) tends to come out too small: draw it at a full 16px, about three quarters of the height of the 22px names; shrink padding or icons, never the text. Never use an ellipsis or clipped text, and never show a half-cut card or row.\nAll UI text is Korean and must be rendered crisp and spelled EXACTLY as written below. No English UI labels, no lorem ipsum, no watermark, no annotations, no extra screens.\nShell, identical to the first reference image. Brand orange #FE4E10 is used only for the active menu item and for solid primary buttons (white bold text). Left rail 112px wide with nine buttons, each a 26px icon above a 16px bold label, in this exact order from the top: 오늘 할 일 (home icon), 1 접수·예약 (calendar icon), 2 준비·지급 (box icon), 3 이용·변경 (people icon), 4 반납·회수 (return arrow icon), 5 정산·마감 (won icon), 리프트권 (ticket icon), 차량 운행 (car icon), and 관리 (gear icon) pinned at the bottom. Do not remove, rename, renumber or duplicate any of them. Only the orange highlight moves: on this screen it is on the SECOND button from the top, the one labelled 1 접수·예약; every other button stays white with dark text. Header 60px, always complete: purple 16px bold wordmark 스키노트, gray 18px store name 우리 스키샵, the bold 24px screen title, a small pill, and at the right end a white outlined bell button with a red badge 1 and a white outlined button 나가기 with a door icon. Footer 72px: an 18px summary sentence on the left; buttons 56px tall with 18px bold labels on the right.\nScreen: 일행·장비 추가, step 1 of 3 (adding people or items to a team that is already renting). Header title \"일행·장비 추가\" followed by a light-orange pill \"1 / 3 단계\".\nToolbar row 60px: a white outlined button \"‹ 접수 상세\"; three step chips 52px tall: \"1 대상\" (solid orange, active), \"2 품목\" (white, gray text), \"3 일정·장소\" (white, gray text).\nContent split in two with a 12px gap. LEFT 58%, white panel: at the top a light-gray strip 64px tall with 22px bold \"김민수 팀\", 18px gray \"R-025 · 010-0000-0025\" and a blue badge \"이용 중\" at the right; then three option groups, each an 18px bold label with a row of option buttons 52px tall under it (selected = near-black fill, white text): \"추가 대상\": \"새 일행\" (selected), \"기존 일행에 추가\". \"수령일\": \"오늘 9/17\" (selected), \"내일 9/18\". \"새 일행 수\": a stepper made of two 52px square white outlined buttons \"−\" and \"+\" with a 24px bold \"2\" between them, followed by 18px text \"명\".\nRIGHT 42%, white panel titled 22px bold \"현재 접수\": 18px label/value rows: \"일행\" \"3명\"; \"대여 품목\" \"스키 2 · 의류 2 · 헬멧 1\"; \"이용\" \"9/17~9/18 · 2일\"; \"반납\" \"9/18 16:30 · 차량 수거\"; then 22px bold red \"미수 105,000원\"; at the bottom a 16px gray line \"기존 기록은 그대로 · 추가분만 따로 계산\".\nFooter: left \"김민수 팀 · 새 일행 2명 · 오늘 수령\"; right: white outlined \"취소\" and the solid orange primary button \"다음 · 품목\"."
+    },
+    {
+      "code": "M02",
+      "title": "관리 · 재고·정비",
+      "wave": 2,
+      "file": "m02-inventory.png",
+      "aspect_ratio": "27:16",
+      "model": "gpt_image_2_5",
+      "params": {
+        "quality": "high",
+        "resolution": "2k",
+        "variant": "flare"
+      },
+      "references": [
+        {
+          "code": "P01",
+          "job_id": "8d6e31bf-6f35-4a6b-bb11-65a3f1ab8ebc"
+        },
+        {
+          "code": "M01",
+          "job_id": "ebc4a6ca-2d86-473f-a84a-74a08261a65f"
+        }
+      ],
+      "note": "품목별 수량을 타일 6개로. 상태 변경은 타일 버튼.",
+      "prompt": "High-fidelity UI design mockup of one screen of 스키노트, a touch-screen POS web app used at the counter of a Korean ski rental shop. The screen is shown flat and straight-on and fills the whole canvas edge to edge: no monitor bezel, no browser chrome, no hands, no perspective. Design frame 1024×600 px, so everything is large, nothing is cut off at any edge and nothing scrolls.\nUse the attached reference image(s) of this same app and keep the visual system IDENTICAL: page background #F4F4F2, white cards with 16px radius and a 1px hairline #E3E3E3, near-black text #1A1A1A, gray text #5D5D5D, status colors always paired with a text label (red #B42318, amber #B45309, green #247A3D, blue #0074D9, purple #5F33E1), Pretendard-like Korean sans-serif, simple 2px Lucide-like line icons. Sizes for older staff: smallest text 16px, body 18px, names and titles 22px bold, key numbers 32–40px bold, every touch target at least 52px tall. Small text (menu labels, badges, legends, chips, gray captions, phone numbers, small buttons) tends to come out too small: draw it at a full 16px, about three quarters of the height of the 22px names; shrink padding or icons, never the text. Never use an ellipsis or clipped text, and never show a half-cut card or row.\nAll UI text is Korean and must be rendered crisp and spelled EXACTLY as written below. No English UI labels, no lorem ipsum, no watermark, no annotations, no extra screens.\nShell: this is the management area of the same app. It keeps the header, footer, colors and typography of the first reference image, but the left rail (same 112px width and button style: a 26px icon above a 16px bold label) holds exactly SEVEN buttons in this order from the top: 포스로 (left arrow icon), 재고·정비 (wrench icon), 거래처 장부 (open book icon), 고객 관리 (people icon), 매장 설정 (sliders icon), 인쇄물 (printer icon), 마감 이력 (archive box icon). None of the nine POS menu buttons appear here. The orange highlight is on the SECOND button from the top, the one labelled 재고·정비; the others stay white with dark text. Brand orange #FE4E10 is used only for the active menu item and for solid primary buttons (white bold text). Header 60px, always complete: purple 16px bold wordmark 스키노트, gray 18px store name 우리 스키샵, the bold 24px screen title, a small pill, and at the right end a white outlined bell button with a red badge 1 and a white outlined button 나가기 with a door icon. Footer 72px: an 18px summary sentence on the left; buttons 56px tall with 18px bold labels on the right.\nThe second reference image is the management hub of this app; keep its rail, header and footer style.\nScreen: 재고·정비. Header title \"관리 · 재고·정비\" followed by a light-orange pill \"정비 중 2개\".\nToolbar row 60px: a search field with a magnifier icon and gray placeholder \"품목 · 번호\"; filter chips 52px tall: solid orange \"전체 188\", white \"대여 가능 156\", white \"세척 대기 0\", white \"정비 중 2\", white \"분실 0\".\nContent: six white tiles in 3 columns × 2 rows with 12px gaps that fill the content area. Each tile: 22px bold item name at the top left, a status badge at the top right, a 16px gray label \"대여 가능\" with a 36px bold number under it, one 16px gray line of counts, and a white outlined button \"상태 변경\" 52px tall at the bottom.\nTile 1: \"스키\", green badge \"정상\", number \"42\", \"보유 60 · 대여 중 16 · 정비 중 2\". Tile 2: \"보드\", green badge \"정상\", \"28\", \"보유 36 · 대여 중 8 · 정비 중 0\". Tile 3 (2px amber border, amber legend \"정비 중 2\" on the top border line instead of a badge): \"부츠\", \"36\", \"보유 52 · 대여 중 14 · 정비 중 2\". Tile 4: \"의류\", green badge \"정상\", \"30\", \"보유 40 · 대여 중 10 · 세척 대기 0\". Tile 5: \"헬멧\", green badge \"정상\", \"14\", \"보유 20 · 대여 중 6 · 분실 0\". Tile 6: \"보호대\", green badge \"정상\", \"6\", \"보유 8 · 대여 중 2 · 분실 0\".\nFooter: left \"대여 가능 156개 · 대여 중 56개 · 정비 중 2개 · 분실 0개\"; right: white outlined buttons \"관리 목록\" and \"재고 목록 인쇄\" (no orange button on this screen)."
+    },
+    {
+      "code": "M03",
+      "title": "관리 · 거래처 장부",
+      "wave": 2,
+      "file": "m03-partners.png",
+      "aspect_ratio": "27:16",
+      "model": "gpt_image_2_5",
+      "params": {
+        "quality": "high",
+        "resolution": "2k",
+        "variant": "flare"
+      },
+      "references": [
+        {
+          "code": "P01",
+          "job_id": "8d6e31bf-6f35-4a6b-bb11-65a3f1ab8ebc"
+        },
+        {
+          "code": "M01",
+          "job_id": "ebc4a6ca-2d86-473f-a84a-74a08261a65f"
+        }
+      ],
+      "note": "거래처별 미수·미지급 카드. 주황은 하단 거래 추가 하나.",
+      "prompt": "High-fidelity UI design mockup of one screen of 스키노트, a touch-screen POS web app used at the counter of a Korean ski rental shop. The screen is shown flat and straight-on and fills the whole canvas edge to edge: no monitor bezel, no browser chrome, no hands, no perspective. Design frame 1024×600 px, so everything is large, nothing is cut off at any edge and nothing scrolls.\nUse the attached reference image(s) of this same app and keep the visual system IDENTICAL: page background #F4F4F2, white cards with 16px radius and a 1px hairline #E3E3E3, near-black text #1A1A1A, gray text #5D5D5D, status colors always paired with a text label (red #B42318, amber #B45309, green #247A3D, blue #0074D9, purple #5F33E1), Pretendard-like Korean sans-serif, simple 2px Lucide-like line icons. Sizes for older staff: smallest text 16px, body 18px, names and titles 22px bold, key numbers 32–40px bold, every touch target at least 52px tall. Small text (menu labels, badges, legends, chips, gray captions, phone numbers, small buttons) tends to come out too small: draw it at a full 16px, about three quarters of the height of the 22px names; shrink padding or icons, never the text. Never use an ellipsis or clipped text, and never show a half-cut card or row.\nAll UI text is Korean and must be rendered crisp and spelled EXACTLY as written below. No English UI labels, no lorem ipsum, no watermark, no annotations, no extra screens.\nShell: this is the management area of the same app. It keeps the header, footer, colors and typography of the first reference image, but the left rail (same 112px width and button style: a 26px icon above a 16px bold label) holds exactly SEVEN buttons in this order from the top: 포스로 (left arrow icon), 재고·정비 (wrench icon), 거래처 장부 (open book icon), 고객 관리 (people icon), 매장 설정 (sliders icon), 인쇄물 (printer icon), 마감 이력 (archive box icon). None of the nine POS menu buttons appear here. The orange highlight is on the THIRD button from the top, the one labelled 거래처 장부; the others stay white with dark text. Brand orange #FE4E10 is used only for the active menu item and for solid primary buttons (white bold text). Header 60px, always complete: purple 16px bold wordmark 스키노트, gray 18px store name 우리 스키샵, the bold 24px screen title, a small pill, and at the right end a white outlined bell button with a red badge 1 and a white outlined button 나가기 with a door icon. Footer 72px: an 18px summary sentence on the left; buttons 56px tall with 18px bold labels on the right.\nThe second reference image is the management hub of this app; keep its rail, header and footer style.\nScreen: 거래처 장부. Header title \"관리 · 거래처 장부\" followed by a light-orange pill \"정산 대기 2곳\".\nToolbar row 60px: a search field with a magnifier icon and gray placeholder \"거래처 · 전화\"; filter chips 52px tall: solid orange \"전체 3\", white \"미수 1\", white \"미지급 1\", white \"정산 완료 1\".\nCards: white, 16px radius, 14px padding, about 171px tall, in 2 columns with a 12px gap; only COMPLETE cards are shown, nothing is cut off at the bottom. There is exactly ONE group heading row above the cards (22px bold title with a gray 18px count). Each card has exactly four rows and each row is ONE line: row 1 = name 22px bold with the phone number in 18px gray next to it, and a status badge at the right end (6px radius, 16px bold text on a tinted background); row 2 = 16px gray meta text; row 3 = the items in 18px bold with a small status chip at the right end; row 4 = money in 18px bold at the left and exactly ONE button 52px tall with an 18px bold label at the right, taking about 56% of the card width. Cards that need attention have a 2px colored border and, instead of the row-1 badge, a small legend label sitting on the top border line at the right end.\nHeading row: \"거래처\" with gray \"3곳\". Three cards (the fourth position stays empty):\nCard 1 (red 2px border, legend \"미수\"): \"A스키샵\" \"063-000-0001\"; meta \"장비 대여 · 9/10~9/17\"; items \"스키 5세트 · 2일\" with an amber chip \"반환 전 2세트\"; red \"미수 100,000원\"; white outlined button \"수납\".\nCard 2 (amber border, legend \"미지급\"): \"설천 매표소\" \"063-000-0002\"; \"리프트권 매입 · 9/17\"; \"오후권 성인 10매\" with a purple chip \"예비권 25매\"; dark \"미지급 180,000원\"; white outlined button \"지급\".\nCard 3 (plain, green badge \"정산 완료\"): \"B렌탈\" \"063-000-0003\"; \"장비 차입 · 9/12~9/14\"; \"보드 3세트\" with a green chip \"반환 완료\"; green \"정산 완료\"; white outlined button \"상세\".\nFooter: left \"거래처 3곳 · 미수 100,000원 · 미지급 180,000원\"; then a compact pager \"‹\" \"1 / 1쪽\" \"›\"; right: white outlined \"장부 인쇄\" and the solid orange primary button \"거래 추가\"."
+    },
+    {
+      "code": "M04",
+      "title": "관리 · 거래처 상세",
+      "wave": 2,
+      "file": "m04-partner-detail.png",
+      "aspect_ratio": "27:16",
+      "model": "gpt_image_2_5",
+      "params": {
+        "quality": "high",
+        "resolution": "2k",
+        "variant": "flare"
+      },
+      "references": [
+        {
+          "code": "P01",
+          "job_id": "8d6e31bf-6f35-4a6b-bb11-65a3f1ab8ebc"
+        },
+        {
+          "code": "P04",
+          "job_id": "1cc53988-9bfe-4a98-be82-ab1dc3f55b81"
+        }
+      ],
+      "note": "거래처 한 곳의 장부. 접수 상세와 같은 좌우 배치.",
+      "prompt": "High-fidelity UI design mockup of one screen of 스키노트, a touch-screen POS web app used at the counter of a Korean ski rental shop. The screen is shown flat and straight-on and fills the whole canvas edge to edge: no monitor bezel, no browser chrome, no hands, no perspective. Design frame 1024×600 px, so everything is large, nothing is cut off at any edge and nothing scrolls.\nUse the attached reference image(s) of this same app and keep the visual system IDENTICAL: page background #F4F4F2, white cards with 16px radius and a 1px hairline #E3E3E3, near-black text #1A1A1A, gray text #5D5D5D, status colors always paired with a text label (red #B42318, amber #B45309, green #247A3D, blue #0074D9, purple #5F33E1), Pretendard-like Korean sans-serif, simple 2px Lucide-like line icons. Sizes for older staff: smallest text 16px, body 18px, names and titles 22px bold, key numbers 32–40px bold, every touch target at least 52px tall. Small text (menu labels, badges, legends, chips, gray captions, phone numbers, small buttons) tends to come out too small: draw it at a full 16px, about three quarters of the height of the 22px names; shrink padding or icons, never the text. Never use an ellipsis or clipped text, and never show a half-cut card or row.\nAll UI text is Korean and must be rendered crisp and spelled EXACTLY as written below. No English UI labels, no lorem ipsum, no watermark, no annotations, no extra screens.\nShell: this is the management area of the same app. It keeps the header, footer, colors and typography of the first reference image, but the left rail (same 112px width and button style: a 26px icon above a 16px bold label) holds exactly SEVEN buttons in this order from the top: 포스로 (left arrow icon), 재고·정비 (wrench icon), 거래처 장부 (open book icon), 고객 관리 (people icon), 매장 설정 (sliders icon), 인쇄물 (printer icon), 마감 이력 (archive box icon). None of the nine POS menu buttons appear here. The orange highlight is on the THIRD button from the top, the one labelled 거래처 장부; the others stay white with dark text. Brand orange #FE4E10 is used only for the active menu item and for solid primary buttons (white bold text). Header 60px, always complete: purple 16px bold wordmark 스키노트, gray 18px store name 우리 스키샵, the bold 24px screen title, a small pill, and at the right end a white outlined bell button with a red badge 1 and a white outlined button 나가기 with a door icon. Footer 72px: an 18px summary sentence on the left; buttons 56px tall with 18px bold labels on the right.\nThe second reference image is the 접수 상세 screen of this app; reuse its two-panel layout (summary panel with a button grid at the left, stacked item cards at the right), but with the management rail described above instead of the POS rail.\nScreen: 거래처 상세 for one partner. Header title \"관리 · 거래처 장부\" followed by a light-orange pill \"미수 100,000원\".\nToolbar row 60px: white outlined button \"‹ 목록\"; four tab chips 52px tall: \"빌려준 물품 1\" (solid orange, active), \"빌린 물품 0\" (white), \"약정·상계\" (white), \"실제 금액\" (white); at the right end two compact stats, each a 16px gray label above a 22px bold value: \"미수\" \"100,000원\" red, \"미지급\" \"0원\" dark.\nLEFT 36%, white panel: 26px bold \"A스키샵\" with a red badge \"미수\"; 18px label/value rows (labels gray, values dark): \"연락처\" \"063-000-0001\"; \"담당\" \"박사장\"; \"약정\" \"1일 10,000원 · 세트\"; \"최근 거래\" \"9/10 장비 대여\"; then a 2-column grid of six white outlined buttons 52px tall with 18px bold labels: \"거래 추가\", \"수납\", \"지급\", \"반환 2세트\", \"장부 인쇄\", \"전화\" (with a phone icon).\nRIGHT 64%: one full-width white item card about 110px tall: at the left 20px bold \"스키 5세트\" with 16px gray \"9/10~9/17 · 1일 10,000원 × 5세트 × 2일\" under it; in the middle three small figures, each a 16px gray label above a 22px bold number: \"대여\" 5, \"반환\" 3, \"미반환\" 2; at the right an amber badge \"반환 전\". Under the card a white panel with three rows 52px tall (18px gray label, 20px bold value at the right): \"대여 요금\" \"100,000원\"; \"수납\" \"0원\" in green; \"미수\" \"100,000원\" in red.\nFooter: left \"미수 100,000원 · 미반환 2세트 · 반환일 9/17\"; right: white outlined \"목록으로\" and the solid orange primary button \"수납 100,000원\"."
+    },
+    {
+      "code": "M05",
+      "title": "관리 · 고객 관리",
+      "wave": 3,
+      "file": "m05-customers.png",
+      "aspect_ratio": "27:16",
+      "model": "gpt_image_2_5",
+      "params": {
+        "quality": "high",
+        "resolution": "2k",
+        "variant": "flare"
+      },
+      "references": [
+        {
+          "code": "P01",
+          "job_id": "8d6e31bf-6f35-4a6b-bb11-65a3f1ab8ebc"
+        },
+        {
+          "code": "M01",
+          "job_id": "ebc4a6ca-2d86-473f-a84a-74a08261a65f"
+        }
+      ],
+      "note": "고객 카드. 미수와 연락처 미등록을 테두리로 구분.",
+      "prompt": "High-fidelity UI design mockup of one screen of 스키노트, a touch-screen POS web app used at the counter of a Korean ski rental shop. The screen is shown flat and straight-on and fills the whole canvas edge to edge: no monitor bezel, no browser chrome, no hands, no perspective. Design frame 1024×600 px, so everything is large, nothing is cut off at any edge and nothing scrolls.\nUse the attached reference image(s) of this same app and keep the visual system IDENTICAL: page background #F4F4F2, white cards with 16px radius and a 1px hairline #E3E3E3, near-black text #1A1A1A, gray text #5D5D5D, status colors always paired with a text label (red #B42318, amber #B45309, green #247A3D, blue #0074D9, purple #5F33E1), Pretendard-like Korean sans-serif, simple 2px Lucide-like line icons. Sizes for older staff: smallest text 16px, body 18px, names and titles 22px bold, key numbers 32–40px bold, every touch target at least 52px tall. Small text (menu labels, badges, legends, chips, gray captions, phone numbers, small buttons) tends to come out too small: draw it at a full 16px, about three quarters of the height of the 22px names; shrink padding or icons, never the text. Never use an ellipsis or clipped text, and never show a half-cut card or row.\nAll UI text is Korean and must be rendered crisp and spelled EXACTLY as written below. No English UI labels, no lorem ipsum, no watermark, no annotations, no extra screens.\nShell: this is the management area of the same app. It keeps the header, footer, colors and typography of the first reference image, but the left rail (same 112px width and button style: a 26px icon above a 16px bold label) holds exactly SEVEN buttons in this order from the top: 포스로 (left arrow icon), 재고·정비 (wrench icon), 거래처 장부 (open book icon), 고객 관리 (people icon), 매장 설정 (sliders icon), 인쇄물 (printer icon), 마감 이력 (archive box icon). None of the nine POS menu buttons appear here. The orange highlight is on the FOURTH button from the top, the one labelled 고객 관리; the others stay white with dark text. Brand orange #FE4E10 is used only for the active menu item and for solid primary buttons (white bold text). Header 60px, always complete: purple 16px bold wordmark 스키노트, gray 18px store name 우리 스키샵, the bold 24px screen title, a small pill, and at the right end a white outlined bell button with a red badge 1 and a white outlined button 나가기 with a door icon. Footer 72px: an 18px summary sentence on the left; buttons 56px tall with 18px bold labels on the right.\nThe second reference image is the management hub of this app; keep its rail, header and footer style.\nScreen: 고객 관리. Header title \"관리 · 고객 관리\" followed by a light-gray pill \"처리 대기 없음\".\nToolbar row 60px: a search field with a magnifier icon and gray placeholder \"이름 · 연락처 뒷자리\"; filter chips 52px tall: solid orange \"전체 124\", white \"미수 2\", white \"연락처 미등록 7\".\nCards: white, 16px radius, 14px padding, about 171px tall, in 2 columns with a 12px gap; only COMPLETE cards are shown, nothing is cut off at the bottom. There is exactly ONE group heading row above the cards (22px bold title with a gray 18px count). Each card has exactly four rows and each row is ONE line: row 1 = name 22px bold with the phone number in 18px gray next to it, and a status badge at the right end (6px radius, 16px bold text on a tinted background); row 2 = 16px gray meta text; row 3 = the items in 18px bold with a small status chip at the right end; row 4 = money in 18px bold at the left and exactly ONE button 52px tall with an 18px bold label at the right, taking about 56% of the card width. Cards that need attention have a 2px colored border and, instead of the row-1 badge, a small legend label sitting on the top border line at the right end.\nHeading row: \"고객\" with gray \"124명\". Four cards:\nCard 1 (red 2px border, legend \"미수\"): \"김민수\" \"010-0000-0025\"; meta \"방문 3회 · 최근 9/17\"; items \"이번 시즌 이용 3건\" with a blue chip \"이용 중\"; red \"미수 415,000원\"; white outlined button \"이용 내역\".\nCard 2 (red border, legend \"미수\"): \"김영희\" \"010-0000-0021\"; \"방문 5회 · 최근 9/17\"; \"이번 시즌 이용 5건\" with a blue chip \"이용 중\"; red \"미수 65,000원\"; \"이용 내역\".\nCard 3 (plain, gray badge \"등록 고객\"): \"이수진\" \"010-0000-0023\"; \"방문 1회 · 최근 9/17\"; \"이번 시즌 이용 1건\" with a green chip \"반납 완료\"; green \"미수 없음\"; \"이용 내역\".\nCard 4 (amber border, legend \"연락처 미등록\"): \"현장 방문 고객\" with no phone number; \"방문 1회 · 9/16\"; \"스키 1 · 의류 1\" with a green chip \"반납 완료\"; green \"미수 없음\"; white outlined button \"연락처로 확인\".\nFooter: left \"고객 124명 · 미수 2명 480,000원 · 연락처 미등록 7건\"; then a compact pager \"‹\" \"1 / 31쪽\" \"›\"; right: white outlined buttons \"동명이인 확인\" and \"명단 인쇄\" (no orange button on this screen)."
+    },
+    {
+      "code": "M06",
+      "title": "관리 · 매장 설정",
+      "wave": 3,
+      "file": "m06-settings.png",
+      "aspect_ratio": "27:16",
+      "model": "gpt_image_2_5",
+      "params": {
+        "quality": "high",
+        "resolution": "2k",
+        "variant": "flare"
+      },
+      "references": [
+        {
+          "code": "P01",
+          "job_id": "8d6e31bf-6f35-4a6b-bb11-65a3f1ab8ebc"
+        },
+        {
+          "code": "M01",
+          "job_id": "ebc4a6ca-2d86-473f-a84a-74a08261a65f"
+        }
+      ],
+      "note": "왼쪽 항목 7개, 오른쪽 행 목록과 쪽수.",
+      "prompt": "High-fidelity UI design mockup of one screen of 스키노트, a touch-screen POS web app used at the counter of a Korean ski rental shop. The screen is shown flat and straight-on and fills the whole canvas edge to edge: no monitor bezel, no browser chrome, no hands, no perspective. Design frame 1024×600 px, so everything is large, nothing is cut off at any edge and nothing scrolls.\nUse the attached reference image(s) of this same app and keep the visual system IDENTICAL: page background #F4F4F2, white cards with 16px radius and a 1px hairline #E3E3E3, near-black text #1A1A1A, gray text #5D5D5D, status colors always paired with a text label (red #B42318, amber #B45309, green #247A3D, blue #0074D9, purple #5F33E1), Pretendard-like Korean sans-serif, simple 2px Lucide-like line icons. Sizes for older staff: smallest text 16px, body 18px, names and titles 22px bold, key numbers 32–40px bold, every touch target at least 52px tall. Small text (menu labels, badges, legends, chips, gray captions, phone numbers, small buttons) tends to come out too small: draw it at a full 16px, about three quarters of the height of the 22px names; shrink padding or icons, never the text. Never use an ellipsis or clipped text, and never show a half-cut card or row.\nAll UI text is Korean and must be rendered crisp and spelled EXACTLY as written below. No English UI labels, no lorem ipsum, no watermark, no annotations, no extra screens.\nShell: this is the management area of the same app. It keeps the header, footer, colors and typography of the first reference image, but the left rail (same 112px width and button style: a 26px icon above a 16px bold label) holds exactly SEVEN buttons in this order from the top: 포스로 (left arrow icon), 재고·정비 (wrench icon), 거래처 장부 (open book icon), 고객 관리 (people icon), 매장 설정 (sliders icon), 인쇄물 (printer icon), 마감 이력 (archive box icon). None of the nine POS menu buttons appear here. The orange highlight is on the FIFTH button from the top, the one labelled 매장 설정; the others stay white with dark text. Brand orange #FE4E10 is used only for the active menu item and for solid primary buttons (white bold text). Header 60px, always complete: purple 16px bold wordmark 스키노트, gray 18px store name 우리 스키샵, the bold 24px screen title, a small pill, and at the right end a white outlined bell button with a red badge 1 and a white outlined button 나가기 with a door icon. Footer 72px: an 18px summary sentence on the left; buttons 56px tall with 18px bold labels on the right.\nThe second reference image is the management hub of this app; keep its rail, header and footer style.\nScreen: 매장 설정. Header title \"관리 · 매장 설정\" followed by a light-gray pill \"처리 대기 없음\". There is no toolbar row on this screen.\nContent split in two with a 12px gap. LEFT 30%: a vertical list of seven white tab buttons 52px tall with 4px gaps, each with an 18px bold label at the left and a gray count at the right: \"매장 정보\", \"수령 장소\" 3, \"장비 요금\" 10 (selected: light-orange background, 2px orange border, orange text), \"반납 타임\" 3, \"직원\" 4, \"차량\" 2, \"야간 기준\".\nRIGHT 70%: five white rows 64px tall with 16px radius and 6px gaps, each with a 20px bold name, a 16px gray line under it, and a white outlined button \"수정\" 52px tall at the right: \"스키 세트\" \"1일 요금 35,000원\"; \"보드 세트\" \"1일 요금 35,000원\"; \"의류\" \"1일 요금 15,000원\"; \"헬멧\" \"1일 요금 5,000원\"; \"고글\" \"1일 요금 5,000원\". Under the rows one line: left 16px gray \"전체 10건 · 1–5건\"; right a compact pager \"‹\" \"1 / 2쪽\" \"›\".\nFooter: left \"장비 요금 10건 · 사용 10건\"; right: white outlined \"관리 목록\" and the solid orange primary button \"품목 추가\"."
+    },
+    {
+      "code": "M07",
+      "title": "관리 · 인쇄물",
+      "wave": 3,
+      "file": "m07-prints.png",
+      "aspect_ratio": "27:16",
+      "model": "gpt_image_2_5",
+      "params": {
+        "quality": "high",
+        "resolution": "2k",
+        "variant": "flare"
+      },
+      "references": [
+        {
+          "code": "P01",
+          "job_id": "8d6e31bf-6f35-4a6b-bb11-65a3f1ab8ebc"
+        },
+        {
+          "code": "M01",
+          "job_id": "ebc4a6ca-2d86-473f-a84a-74a08261a65f"
+        }
+      ],
+      "note": "준비표·스티커·QR 안내문. 왼쪽 목록, 오른쪽 미리보기.",
+      "prompt": "High-fidelity UI design mockup of one screen of 스키노트, a touch-screen POS web app used at the counter of a Korean ski rental shop. The screen is shown flat and straight-on and fills the whole canvas edge to edge: no monitor bezel, no browser chrome, no hands, no perspective. Design frame 1024×600 px, so everything is large, nothing is cut off at any edge and nothing scrolls.\nUse the attached reference image(s) of this same app and keep the visual system IDENTICAL: page background #F4F4F2, white cards with 16px radius and a 1px hairline #E3E3E3, near-black text #1A1A1A, gray text #5D5D5D, status colors always paired with a text label (red #B42318, amber #B45309, green #247A3D, blue #0074D9, purple #5F33E1), Pretendard-like Korean sans-serif, simple 2px Lucide-like line icons. Sizes for older staff: smallest text 16px, body 18px, names and titles 22px bold, key numbers 32–40px bold, every touch target at least 52px tall. Small text (menu labels, badges, legends, chips, gray captions, phone numbers, small buttons) tends to come out too small: draw it at a full 16px, about three quarters of the height of the 22px names; shrink padding or icons, never the text. Never use an ellipsis or clipped text, and never show a half-cut card or row.\nAll UI text is Korean and must be rendered crisp and spelled EXACTLY as written below. No English UI labels, no lorem ipsum, no watermark, no annotations, no extra screens.\nShell: this is the management area of the same app. It keeps the header, footer, colors and typography of the first reference image, but the left rail (same 112px width and button style: a 26px icon above a 16px bold label) holds exactly SEVEN buttons in this order from the top: 포스로 (left arrow icon), 재고·정비 (wrench icon), 거래처 장부 (open book icon), 고객 관리 (people icon), 매장 설정 (sliders icon), 인쇄물 (printer icon), 마감 이력 (archive box icon). None of the nine POS menu buttons appear here. The orange highlight is on the SIXTH button from the top, the one labelled 인쇄물; the others stay white with dark text. Brand orange #FE4E10 is used only for the active menu item and for solid primary buttons (white bold text). Header 60px, always complete: purple 16px bold wordmark 스키노트, gray 18px store name 우리 스키샵, the bold 24px screen title, a small pill, and at the right end a white outlined bell button with a red badge 1 and a white outlined button 나가기 with a door icon. Footer 72px: an 18px summary sentence on the left; buttons 56px tall with 18px bold labels on the right.\nThe second reference image is the management hub of this app; keep its rail, header and footer style.\nScreen: 인쇄물. Header title \"관리 · 인쇄물\" followed by a light-orange pill \"오늘 준비표 6장\".\nToolbar row 60px: three tab chips 52px tall: solid orange \"준비표 6\", white \"스티커 12\", white \"QR 안내문\".\nContent split in two with a 12px gap. LEFT 55%, white panel: 22px bold heading \"오늘·내일 준비표\"; three rows 72px tall separated by hairlines, each with a 20px bold title, a 16px gray line under it, and a white outlined button \"인쇄\" 52px tall at the right: \"09:00~12:00 수령\" \"4팀 · 준비표 4장\"; \"12:00~17:00 수령\" \"2팀 · 준비표 2장\" with a small amber badge \"사이즈 미입력 1명\"; \"내일 수령\" \"2팀 · 준비표 2장\".\nRIGHT 45%, white panel: 22px bold heading \"미리보기\"; a light-gray area containing a small white A4 sheet thumbnail with a thin border; on the sheet: 16px bold \"준비표 · 김영희 팀\", a gray line \"R-021 · 9/17 09:30 수령\", and a simple four-column table with header cells \"이름\" \"장비\" \"사이즈\" \"확인\" and three light rows.\nFooter: left \"오늘 준비표 6장 · 스티커 12장\"; right: white outlined \"프린터 확인\" and the solid orange primary button \"모두 인쇄 6장\"."
+    },
+    {
+      "code": "M08",
+      "title": "관리 · 마감 이력",
+      "wave": 3,
+      "file": "m08-closing-history.png",
+      "aspect_ratio": "27:16",
+      "model": "gpt_image_2_5",
+      "params": {
+        "quality": "high",
+        "resolution": "2k",
+        "variant": "flare"
+      },
+      "references": [
+        {
+          "code": "P01",
+          "job_id": "8d6e31bf-6f35-4a6b-bb11-65a3f1ab8ebc"
+        },
+        {
+          "code": "M01",
+          "job_id": "ebc4a6ca-2d86-473f-a84a-74a08261a65f"
+        }
+      ],
+      "note": "날짜별 마감 카드. 오늘만 마감 확정(주황).",
+      "prompt": "High-fidelity UI design mockup of one screen of 스키노트, a touch-screen POS web app used at the counter of a Korean ski rental shop. The screen is shown flat and straight-on and fills the whole canvas edge to edge: no monitor bezel, no browser chrome, no hands, no perspective. Design frame 1024×600 px, so everything is large, nothing is cut off at any edge and nothing scrolls.\nUse the attached reference image(s) of this same app and keep the visual system IDENTICAL: page background #F4F4F2, white cards with 16px radius and a 1px hairline #E3E3E3, near-black text #1A1A1A, gray text #5D5D5D, status colors always paired with a text label (red #B42318, amber #B45309, green #247A3D, blue #0074D9, purple #5F33E1), Pretendard-like Korean sans-serif, simple 2px Lucide-like line icons. Sizes for older staff: smallest text 16px, body 18px, names and titles 22px bold, key numbers 32–40px bold, every touch target at least 52px tall. Small text (menu labels, badges, legends, chips, gray captions, phone numbers, small buttons) tends to come out too small: draw it at a full 16px, about three quarters of the height of the 22px names; shrink padding or icons, never the text. Never use an ellipsis or clipped text, and never show a half-cut card or row.\nAll UI text is Korean and must be rendered crisp and spelled EXACTLY as written below. No English UI labels, no lorem ipsum, no watermark, no annotations, no extra screens.\nShell: this is the management area of the same app. It keeps the header, footer, colors and typography of the first reference image, but the left rail (same 112px width and button style: a 26px icon above a 16px bold label) holds exactly SEVEN buttons in this order from the top: 포스로 (left arrow icon), 재고·정비 (wrench icon), 거래처 장부 (open book icon), 고객 관리 (people icon), 매장 설정 (sliders icon), 인쇄물 (printer icon), 마감 이력 (archive box icon). None of the nine POS menu buttons appear here. The orange highlight is on the SEVENTH button from the top, the one labelled 마감 이력; the others stay white with dark text. Brand orange #FE4E10 is used only for the active menu item and for solid primary buttons (white bold text). Header 60px, always complete: purple 16px bold wordmark 스키노트, gray 18px store name 우리 스키샵, the bold 24px screen title, a small pill, and at the right end a white outlined bell button with a red badge 1 and a white outlined button 나가기 with a door icon. Footer 72px: an 18px summary sentence on the left; buttons 56px tall with 18px bold labels on the right.\nThe second reference image is the management hub of this app; keep its rail, header and footer style.\nScreen: 마감 이력. Header title \"관리 · 마감 이력\" followed by a light-orange pill \"마감 대기 1일\". There is no toolbar row on this screen.\nCards: white, 16px radius, 14px padding, about 171px tall, in 2 columns with a 12px gap; only COMPLETE cards are shown, nothing is cut off at the bottom. There is exactly ONE group heading row above the cards (22px bold title with a gray 18px count). Each card has exactly four rows and each row is ONE line: row 1 = name 22px bold with the phone number in 18px gray next to it, and a status badge at the right end (6px radius, 16px bold text on a tinted background); row 2 = 16px gray meta text; row 3 = the items in 18px bold with a small status chip at the right end; row 4 = money in 18px bold at the left and exactly ONE button 52px tall with an 18px bold label at the right, taking about 56% of the card width. Cards that need attention have a 2px colored border and, instead of the row-1 badge, a small legend label sitting on the top border line at the right end.\nOn this screen row 1 of a card is the date in 22px bold (no phone number).\nHeading row: \"마감 기록\" with gray \"최근 4일\". Four cards:\nCard 1 (red 2px border, legend \"마감 대기\"): \"9월 17일 (수)\"; meta \"오늘 · 마감 전\"; items \"수납 612,000원 · 지급 0원\" with an amber chip \"미처리 7건\"; dark \"예상 현금 380,000원\"; solid orange button \"마감 확정\".\nCard 2 (plain, green badge \"마감 완료\"): \"9월 16일 (화)\"; \"마감 21:40 · 김직원\"; \"수납 540,000원 · 지급 180,000원\" with a gray chip \"미처리 3건\"; green \"현금 차이 0원\"; white outlined button \"마감표 인쇄\".\nCard 3 (plain, green badge \"마감 완료\"): \"9월 15일 (월)\"; \"마감 21:55 · 김직원\"; \"수납 320,000원 · 지급 0원\" with a gray chip \"미처리 1건\"; red \"현금 차이 −20,000원\"; \"마감표 인쇄\".\nCard 4 (plain, green badge \"마감 완료\"): \"9월 14일 (일)\"; \"마감 22:10 · 이직원\"; \"수납 880,000원 · 지급 60,000원\" with a gray chip \"미처리 0건\"; green \"현금 차이 0원\"; \"마감표 인쇄\".\nFooter: left \"마감 대기 1일 · 마감 기록 12일\"; then a compact pager \"‹\" \"1 / 4쪽\" \"›\"; right: white outlined buttons \"마감 재개\" and \"정산·마감\" (no orange button in this footer; the orange action is on the first card)."
+    },
+    {
+      "code": "D02",
+      "title": "기사 태블릿 · 배달·수거 처리",
+      "wave": 3,
+      "file": "d02-driver-task.png",
+      "aspect_ratio": "27:16",
+      "model": "gpt_image_2_5",
+      "params": {
+        "quality": "high",
+        "resolution": "2k",
+        "variant": "flare"
+      },
+      "references": [
+        {
+          "code": "D01",
+          "job_id": "27c00e31-e89a-4c9c-b8f1-a7628c8da874"
+        },
+        {
+          "code": "P01",
+          "job_id": "8d6e31bf-6f35-4a6b-bb11-65a3f1ab8ebc"
+        }
+      ],
+      "note": "한 팀의 전달 수량을 −/+ 로 고르고 큰 보라 버튼으로 확정.",
+      "prompt": "High-fidelity UI design mockup of one screen of 스키노트, a touch-screen POS web app used at the counter of a Korean ski rental shop. The screen is shown flat and straight-on and fills the whole canvas edge to edge: no monitor bezel, no browser chrome, no hands, no perspective. Design frame 1024×600 px, so everything is large, nothing is cut off at any edge and nothing scrolls.\nUse the attached reference image(s) of this same app and keep the visual system IDENTICAL: page background #F4F4F2, white cards with 16px radius and a 1px hairline #E3E3E3, near-black text #1A1A1A, gray text #5D5D5D, status colors always paired with a text label (red #B42318, amber #B45309, green #247A3D, blue #0074D9, purple #5F33E1), Pretendard-like Korean sans-serif, simple 2px Lucide-like line icons. Sizes for older staff: smallest text 16px, body 18px, names and titles 22px bold, key numbers 32–40px bold, every touch target at least 52px tall. Small text (menu labels, badges, legends, chips, gray captions, phone numbers, small buttons) tends to come out too small: draw it at a full 16px, about three quarters of the height of the 22px names; shrink padding or icons, never the text. Never use an ellipsis or clipped text, and never show a half-cut card or row.\nAll UI text is Korean and must be rendered crisp and spelled EXACTLY as written below. No English UI labels, no lorem ipsum, no watermark, no annotations, no extra screens.\nShell: this is the DRIVER TABLET screen of the same app, used in the delivery van. There is NO left rail; the content uses the full width. Keep the typography, spacing, card style and header/footer structure of the FIRST reference image (the driver's job list of this app), but the accent color is purple #5F33E1 instead of orange: the active chip and the solid primary buttons are purple with white bold text, and no orange appears anywhere. Header 60px: purple 16px bold wordmark 스키노트, gray 18px store name 우리 스키샵, the bold 24px screen title, a light-purple pill, and at the right end a white outlined bell button with a red badge 3 and a white outlined button 나가기 with a door icon. Footer 80px: an 18px summary sentence on the left; white outlined buttons 60px tall and, when the screen has one, a solid purple primary button 72px tall with a 20px bold label. Lists are compact ROWS (not cards), with a pager instead of scrolling.\nScreen: 배달·수거 처리 for one team. Header title \"배달·수거 처리\" followed by a light-purple pill \"배달 3개\".\nUnder the header a white strip 64px tall: 22px bold \"김민재 팀\", 18px gray \"9/17 09:00 · 만선 광장\", 18px gray \"010-1234-1000\", and at the right end a white outlined button \"전화\" 52px tall with a phone icon.\nContent: two white rows 84px tall with 16px radius and 8px gaps; each row has a 22px bold line at the left with a 16px gray caption under it, and at the right a stepper made of two 64px square white outlined buttons \"−\" and \"+\" with a 28px bold quantity between them: \"스키 · 남음 2\" caption \"차량 보관\" quantity 2; \"의류 · 남음 1\" caption \"차량 보관\" quantity 1.\nUnder the rows a light-amber strip 56px tall with an amber warning icon and 18px dark-amber text \"예약금 65,000원 미수 · 수납은 매장에서\".\nFooter: left side three white outlined buttons 60px tall: \"업무 목록\", \"출발 문자\", \"못 받음·고객 부재\"; at the right end the solid purple primary button 72px tall \"실제 전달 확정 3개\"."
+    },
+    {
+      "code": "D03",
+      "title": "기사 태블릿 · 차량 보관",
+      "wave": 3,
+      "file": "d03-driver-stock.png",
+      "aspect_ratio": "27:16",
+      "model": "gpt_image_2_5",
+      "params": {
+        "quality": "high",
+        "resolution": "2k",
+        "variant": "flare"
+      },
+      "references": [
+        {
+          "code": "D01",
+          "job_id": "27c00e31-e89a-4c9c-b8f1-a7628c8da874"
+        },
+        {
+          "code": "P01",
+          "job_id": "8d6e31bf-6f35-4a6b-bb11-65a3f1ab8ebc"
+        }
+      ],
+      "note": "지금 차에 실린 물품. 큰 숫자 4칸과 행 목록.",
+      "prompt": "High-fidelity UI design mockup of one screen of 스키노트, a touch-screen POS web app used at the counter of a Korean ski rental shop. The screen is shown flat and straight-on and fills the whole canvas edge to edge: no monitor bezel, no browser chrome, no hands, no perspective. Design frame 1024×600 px, so everything is large, nothing is cut off at any edge and nothing scrolls.\nUse the attached reference image(s) of this same app and keep the visual system IDENTICAL: page background #F4F4F2, white cards with 16px radius and a 1px hairline #E3E3E3, near-black text #1A1A1A, gray text #5D5D5D, status colors always paired with a text label (red #B42318, amber #B45309, green #247A3D, blue #0074D9, purple #5F33E1), Pretendard-like Korean sans-serif, simple 2px Lucide-like line icons. Sizes for older staff: smallest text 16px, body 18px, names and titles 22px bold, key numbers 32–40px bold, every touch target at least 52px tall. Small text (menu labels, badges, legends, chips, gray captions, phone numbers, small buttons) tends to come out too small: draw it at a full 16px, about three quarters of the height of the 22px names; shrink padding or icons, never the text. Never use an ellipsis or clipped text, and never show a half-cut card or row.\nAll UI text is Korean and must be rendered crisp and spelled EXACTLY as written below. No English UI labels, no lorem ipsum, no watermark, no annotations, no extra screens.\nShell: this is the DRIVER TABLET screen of the same app, used in the delivery van. There is NO left rail; the content uses the full width. Keep the typography, spacing, card style and header/footer structure of the FIRST reference image (the driver's job list of this app), but the accent color is purple #5F33E1 instead of orange: the active chip and the solid primary buttons are purple with white bold text, and no orange appears anywhere. Header 60px: purple 16px bold wordmark 스키노트, gray 18px store name 우리 스키샵, the bold 24px screen title, a light-purple pill, and at the right end a white outlined bell button with a red badge 3 and a white outlined button 나가기 with a door icon. Footer 80px: an 18px summary sentence on the left; white outlined buttons 60px tall and, when the screen has one, a solid purple primary button 72px tall with a 20px bold label. Lists are compact ROWS (not cards), with a pager instead of scrolling.\nScreen: 차량 보관 (what is in the van right now). Header title \"차량 보관\" followed by a light-purple pill \"보관 21개\".\nUnder the header a row of four white tiles 96px tall with 12px gaps; each tile has a 16px gray label and a 36px bold number: \"장비\" \"8\", \"의류\" \"6\", \"헬멧\" \"3\", \"리프트권\" \"4매\".\nContent: four white rows 72px tall with 16px radius and 8px gaps; each row has a 22px bold line at the left, a 16px gray caption under it, and a status badge at the right end: \"스키 6대\" caption \"배달 예정 6\" blue badge \"배달 예정\"; \"보드 2대\" caption \"수거 보관 2\" amber badge \"매장 입고 대기\"; \"의류 6벌\" caption \"배달 예정 3 · 수거 보관 3\" blue badge \"배달 예정\"; \"헬멧 3개\" caption \"수거 보관 3\" amber badge \"매장 입고 대기\".\nFooter: left \"1호 차량 · 보관 21개 · 매장 입고 대기 8개\"; white outlined button 60px tall \"업무 목록\"; at the right end the solid purple primary button 72px tall \"매장 입고 8개\"."
+    },
+    {
+      "code": "P21",
+      "title": "팝업 · 수납",
+      "wave": 3,
+      "file": "p21-popup-payment.png",
+      "aspect_ratio": "27:16",
+      "model": "gpt_image_2_5",
+      "params": {
+        "quality": "high",
+        "resolution": "2k",
+        "variant": "flare"
+      },
+      "references": [
+        {
+          "code": "P04",
+          "job_id": "1cc53988-9bfe-4a98-be82-ab1dc3f55b81"
+        },
+        {
+          "code": "P20",
+          "job_id": "de333b51-84be-4955-a684-3fee0e3eddd5"
+        }
+      ],
+      "note": "금액은 숫자판으로. 수납 방법은 큰 선택 버튼.",
+      "prompt": "High-fidelity UI design mockup of one screen of 스키노트, a touch-screen POS web app used at the counter of a Korean ski rental shop. The screen is shown flat and straight-on and fills the whole canvas edge to edge: no monitor bezel, no browser chrome, no hands, no perspective. Design frame 1024×600 px, so everything is large, nothing is cut off at any edge and nothing scrolls.\nUse the attached reference image(s) of this same app and keep the visual system IDENTICAL: page background #F4F4F2, white cards with 16px radius and a 1px hairline #E3E3E3, near-black text #1A1A1A, gray text #5D5D5D, status colors always paired with a text label (red #B42318, amber #B45309, green #247A3D, blue #0074D9, purple #5F33E1), Pretendard-like Korean sans-serif, simple 2px Lucide-like line icons. Sizes for older staff: smallest text 16px, body 18px, names and titles 22px bold, key numbers 32–40px bold, every touch target at least 52px tall. Small text (menu labels, badges, legends, chips, gray captions, phone numbers, small buttons) tends to come out too small: draw it at a full 16px, about three quarters of the height of the 22px names; shrink padding or icons, never the text. Never use an ellipsis or clipped text, and never show a half-cut card or row.\nAll UI text is Korean and must be rendered crisp and spelled EXACTLY as written below. No English UI labels, no lorem ipsum, no watermark, no annotations, no extra screens.\nPopup: a centered white modal panel about 780×480 px with 20px radius and a soft shadow, over the parent screen, which is the 접수 상세 screen of the FIRST reference image, reproduced as it is (rail, header, panels, footer) and dimmed by a 45% black overlay (still recognizable, clearly inactive). Inside the panel: a 24px bold title at the top left with a 16px gray subtitle under it, a 48px square outlined close button with an X icon at the top right, then the body, then a bottom button row aligned right: white outlined secondary buttons and exactly ONE solid orange #FE4E10 primary button (white bold text), all 56px tall with 18px bold labels. Option buttons and steppers are 52px tall; a selected option has a near-black fill with white text. Steppers are two 52px square white outlined buttons − and + with the 24px bold quantity between them.\nThe second reference image is another popup of this app; match its panel, title, close button and bottom button row exactly.\nPopup content. Title \"김민수 팀 · 수납\"; subtitle \"R-025 · 청구 105,000원 · 수납 0원\".\nBody split in two. LEFT 52%: a row with an 18px gray label \"미수\" and a 28px bold red \"105,000원\"; an 18px bold label \"수납 방법\" with three option buttons 52px tall under it: \"현금\" (selected), \"카드\", \"계좌이체\"; an 18px bold label \"받은 금액\" with a display field 60px tall showing 32px bold \"105,000원\"; a row of three white outlined quick buttons 52px tall: \"전액\", \"50,000원\", \"10,000원\".\nRIGHT 48%: a numeric keypad of 3 columns × 4 rows of white outlined keys 56px tall with 24px bold labels: 1 2 3 / 4 5 6 / 7 8 9 / \"00\" 0 \"지우기\".\nBottom button row: white outlined \"취소\" and the solid orange primary button \"수납 확정 · 105,000원\"."
+    },
+    {
+      "code": "P22",
+      "title": "팝업 · 반납 확인",
+      "wave": 3,
+      "file": "p22-popup-return.png",
+      "aspect_ratio": "27:16",
+      "model": "gpt_image_2_5",
+      "params": {
+        "quality": "high",
+        "resolution": "2k",
+        "variant": "flare"
+      },
+      "references": [
+        {
+          "code": "P06",
+          "job_id": "98eab95c-d419-4f7e-953e-9108c8164840"
+        },
+        {
+          "code": "P20",
+          "job_id": "de333b51-84be-4955-a684-3fee0e3eddd5"
+        }
+      ],
+      "note": "받은 수량을 −/+ 로. 모두 받음이 주 버튼, 일부만 받음은 보조.",
+      "prompt": "High-fidelity UI design mockup of one screen of 스키노트, a touch-screen POS web app used at the counter of a Korean ski rental shop. The screen is shown flat and straight-on and fills the whole canvas edge to edge: no monitor bezel, no browser chrome, no hands, no perspective. Design frame 1024×600 px, so everything is large, nothing is cut off at any edge and nothing scrolls.\nUse the attached reference image(s) of this same app and keep the visual system IDENTICAL: page background #F4F4F2, white cards with 16px radius and a 1px hairline #E3E3E3, near-black text #1A1A1A, gray text #5D5D5D, status colors always paired with a text label (red #B42318, amber #B45309, green #247A3D, blue #0074D9, purple #5F33E1), Pretendard-like Korean sans-serif, simple 2px Lucide-like line icons. Sizes for older staff: smallest text 16px, body 18px, names and titles 22px bold, key numbers 32–40px bold, every touch target at least 52px tall. Small text (menu labels, badges, legends, chips, gray captions, phone numbers, small buttons) tends to come out too small: draw it at a full 16px, about three quarters of the height of the 22px names; shrink padding or icons, never the text. Never use an ellipsis or clipped text, and never show a half-cut card or row.\nAll UI text is Korean and must be rendered crisp and spelled EXACTLY as written below. No English UI labels, no lorem ipsum, no watermark, no annotations, no extra screens.\nPopup: a centered white modal panel about 780×480 px with 20px radius and a soft shadow, over the parent screen, which is the 4 반납·회수 screen of the FIRST reference image, reproduced as it is (rail, header, cards, footer) and dimmed by a 45% black overlay (still recognizable, clearly inactive). Inside the panel: a 24px bold title at the top left with a 16px gray subtitle under it, a 48px square outlined close button with an X icon at the top right, then the body, then a bottom button row aligned right: white outlined secondary buttons and exactly ONE solid orange #FE4E10 primary button (white bold text), all 56px tall with 18px bold labels. Option buttons and steppers are 52px tall; a selected option has a near-black fill with white text. Steppers are two 52px square white outlined buttons − and + with the 24px bold quantity between them.\nThe second reference image is another popup of this app; match its panel, title, close button, item rows with steppers and bottom button row exactly.\nPopup content. Title \"김영희 팀 · 반납 확인 5개\"; subtitle \"R-021 · 9/17 16:30 반납 · 만선 티롤 앞\".\nBody: three item rows 64px tall separated by hairlines; each row has the 20px bold item name at the left with a 16px gray caption under it, and a stepper at the right: \"스키 2\" caption \"고객 보유 2\" quantity 2; \"의류 2\" caption \"고객 보유 2\" quantity 2; \"헬멧 1\" caption \"고객 보유 1\" quantity 1.\nUnder the rows an info row with a light-gray background: 18px label \"미수 · 반납 시 수납\", 22px bold red \"65,000원\", and a white outlined button \"수납\" 52px tall at the right end.\nBottom button row: white outlined \"취소\", white outlined \"일부만 받음\" and the solid orange primary button \"모두 반납 확정\"."
+    },
+    {
+      "code": "P24",
+      "title": "팝업 · 반납 일정 변경",
+      "wave": 4,
+      "file": "p24-popup-reschedule.png",
+      "aspect_ratio": "27:16",
+      "model": "gpt_image_2_5",
+      "params": {
+        "quality": "high",
+        "resolution": "2k",
+        "variant": "flare"
+      },
+      "references": [
+        {
+          "code": "P08",
+          "job_id": "ddcf2620-1720-4054-ae9a-517083392c5d"
+        },
+        {
+          "code": "P20",
+          "job_id": "de333b51-84be-4955-a684-3fee0e3eddd5"
+        }
+      ],
+      "note": "날짜·장소·시간을 선택 버튼으로 바꾼다.",
+      "prompt": "High-fidelity UI design mockup of one screen of 스키노트, a touch-screen POS web app used at the counter of a Korean ski rental shop. The screen is shown flat and straight-on and fills the whole canvas edge to edge: no monitor bezel, no browser chrome, no hands, no perspective. Design frame 1024×600 px, so everything is large, nothing is cut off at any edge and nothing scrolls.\nUse the attached reference image(s) of this same app and keep the visual system IDENTICAL: page background #F4F4F2, white cards with 16px radius and a 1px hairline #E3E3E3, near-black text #1A1A1A, gray text #5D5D5D, status colors always paired with a text label (red #B42318, amber #B45309, green #247A3D, blue #0074D9, purple #5F33E1), Pretendard-like Korean sans-serif, simple 2px Lucide-like line icons. Sizes for older staff: smallest text 16px, body 18px, names and titles 22px bold, key numbers 32–40px bold, every touch target at least 52px tall. Small text (menu labels, badges, legends, chips, gray captions, phone numbers, small buttons) tends to come out too small: draw it at a full 16px, about three quarters of the height of the 22px names; shrink padding or icons, never the text. Never use an ellipsis or clipped text, and never show a half-cut card or row.\nAll UI text is Korean and must be rendered crisp and spelled EXACTLY as written below. No English UI labels, no lorem ipsum, no watermark, no annotations, no extra screens.\nPopup: a centered white modal panel about 780×480 px with 20px radius and a soft shadow, over the parent screen, which is the 3 이용 중·변경 screen of the FIRST reference image, reproduced as it is and dimmed by a 45% black overlay (still recognizable, clearly inactive). Inside the panel: a 24px bold title at the top left with a 16px gray subtitle under it, a 48px square outlined close button with an X icon at the top right, then the body, then a bottom button row aligned right: white outlined secondary buttons and exactly ONE solid orange #FE4E10 primary button (white bold text), all 56px tall with 18px bold labels. Option buttons and steppers are 52px tall; a selected option has a near-black fill with white text. Steppers are two 52px square white outlined buttons − and + with the 24px bold quantity between them.\nThe second reference image is another popup of this app; match its panel, title, close button and bottom button row exactly.\nPopup content. Title \"김민수 팀 · 반납 일정 변경\"; subtitle \"현재 약속: 9/18 16:30 만선 티롤 앞\".\nBody: three option groups stacked, each an 18px bold label with a row of option buttons 52px tall under it (selected = near-black fill, white text): \"반납일\": \"9/18 (목)\" (selected), \"9/19 (금)\", \"달력\". \"반납 장소\": \"매장 직접\", \"만선 티롤 앞\" (selected), \"설천 주차장\". \"반납 시간\": \"오후타임 후 16:30\", \"야간타임 후 22:00\" (selected), \"익일 오전 09:00\". Under the groups an info row with a light-gray background: 18px label \"변경 후 반납\" and 20px bold \"9/18 22:00 · 만선 티롤 앞 · 차량 수거\"; and a second info row: 18px label \"추가 금액\" and 20px bold \"없음\".\nBottom button row: white outlined \"취소\" and the solid orange primary button \"반납 일정 변경 · 9/18 22:00\"."
+    },
+    {
+      "code": "P25",
+      "title": "팝업 · 교환",
+      "wave": 4,
+      "file": "p25-popup-exchange.png",
+      "aspect_ratio": "27:16",
+      "model": "gpt_image_2_5",
+      "params": {
+        "quality": "high",
+        "resolution": "2k",
+        "variant": "flare"
+      },
+      "references": [
+        {
+          "code": "P08",
+          "job_id": "ddcf2620-1720-4054-ae9a-517083392c5d"
+        },
+        {
+          "code": "P20",
+          "job_id": "de333b51-84be-4955-a684-3fee0e3eddd5"
+        }
+      ],
+      "note": "사이즈를 큰 버튼으로 고른다. 현재 사이즈는 눌리지 않게 표시.",
+      "prompt": "High-fidelity UI design mockup of one screen of 스키노트, a touch-screen POS web app used at the counter of a Korean ski rental shop. The screen is shown flat and straight-on and fills the whole canvas edge to edge: no monitor bezel, no browser chrome, no hands, no perspective. Design frame 1024×600 px, so everything is large, nothing is cut off at any edge and nothing scrolls.\nUse the attached reference image(s) of this same app and keep the visual system IDENTICAL: page background #F4F4F2, white cards with 16px radius and a 1px hairline #E3E3E3, near-black text #1A1A1A, gray text #5D5D5D, status colors always paired with a text label (red #B42318, amber #B45309, green #247A3D, blue #0074D9, purple #5F33E1), Pretendard-like Korean sans-serif, simple 2px Lucide-like line icons. Sizes for older staff: smallest text 16px, body 18px, names and titles 22px bold, key numbers 32–40px bold, every touch target at least 52px tall. Small text (menu labels, badges, legends, chips, gray captions, phone numbers, small buttons) tends to come out too small: draw it at a full 16px, about three quarters of the height of the 22px names; shrink padding or icons, never the text. Never use an ellipsis or clipped text, and never show a half-cut card or row.\nAll UI text is Korean and must be rendered crisp and spelled EXACTLY as written below. No English UI labels, no lorem ipsum, no watermark, no annotations, no extra screens.\nPopup: a centered white modal panel about 780×480 px with 20px radius and a soft shadow, over the parent screen, which is the 3 이용 중·변경 screen of the FIRST reference image, reproduced as it is and dimmed by a 45% black overlay (still recognizable, clearly inactive). Inside the panel: a 24px bold title at the top left with a 16px gray subtitle under it, a 48px square outlined close button with an X icon at the top right, then the body, then a bottom button row aligned right: white outlined secondary buttons and exactly ONE solid orange #FE4E10 primary button (white bold text), all 56px tall with 18px bold labels. Option buttons and steppers are 52px tall; a selected option has a near-black fill with white text. Steppers are two 52px square white outlined buttons − and + with the 24px bold quantity between them.\nThe second reference image is another popup of this app; match its panel, title, close button and bottom button row exactly.\nPopup content. Title \"이수진 팀 · 교환 1켤레\"; subtitle \"R-023 · 보드 부츠 · 현재 265mm\".\nBody: an 18px bold label \"교환 사이즈\" with gray 16px \"현재 265mm\" next to it; under it a grid of 4 columns × 2 rows of option buttons 60px tall with 22px bold labels: \"250\", \"255\", \"260\", \"265 현재\" (disabled: light-gray fill, gray text), \"270\" (selected: near-black fill, white text), \"275\", \"280\", \"285\". Under the grid two info rows with a light-gray background: 18px label \"교환\" with 20px bold \"265mm 회수 · 270mm 지급\"; 18px label \"추가 금액\" with 20px bold \"없음\".\nBottom button row: white outlined \"취소\" and the solid orange primary button \"교환 확정 270mm\"."
+    },
+    {
+      "code": "P26",
+      "title": "팝업 · 문제 해결·정정",
+      "wave": 4,
+      "file": "p26-popup-problem.png",
+      "aspect_ratio": "27:16",
+      "model": "gpt_image_2_5",
+      "params": {
+        "quality": "high",
+        "resolution": "2k",
+        "variant": "flare"
+      },
+      "references": [
+        {
+          "code": "P04",
+          "job_id": "1cc53988-9bfe-4a98-be82-ab1dc3f55b81"
+        },
+        {
+          "code": "P20",
+          "job_id": "de333b51-84be-4955-a684-3fee0e3eddd5"
+        }
+      ],
+      "note": "무슨 문제인지와 대상 품목을 고른다. 타이핑 없음.",
+      "prompt": "High-fidelity UI design mockup of one screen of 스키노트, a touch-screen POS web app used at the counter of a Korean ski rental shop. The screen is shown flat and straight-on and fills the whole canvas edge to edge: no monitor bezel, no browser chrome, no hands, no perspective. Design frame 1024×600 px, so everything is large, nothing is cut off at any edge and nothing scrolls.\nUse the attached reference image(s) of this same app and keep the visual system IDENTICAL: page background #F4F4F2, white cards with 16px radius and a 1px hairline #E3E3E3, near-black text #1A1A1A, gray text #5D5D5D, status colors always paired with a text label (red #B42318, amber #B45309, green #247A3D, blue #0074D9, purple #5F33E1), Pretendard-like Korean sans-serif, simple 2px Lucide-like line icons. Sizes for older staff: smallest text 16px, body 18px, names and titles 22px bold, key numbers 32–40px bold, every touch target at least 52px tall. Small text (menu labels, badges, legends, chips, gray captions, phone numbers, small buttons) tends to come out too small: draw it at a full 16px, about three quarters of the height of the 22px names; shrink padding or icons, never the text. Never use an ellipsis or clipped text, and never show a half-cut card or row.\nAll UI text is Korean and must be rendered crisp and spelled EXACTLY as written below. No English UI labels, no lorem ipsum, no watermark, no annotations, no extra screens.\nPopup: a centered white modal panel about 780×480 px with 20px radius and a soft shadow, over the parent screen, which is the 접수 상세 screen of the FIRST reference image, reproduced as it is and dimmed by a 45% black overlay (still recognizable, clearly inactive). Inside the panel: a 24px bold title at the top left with a 16px gray subtitle under it, a 48px square outlined close button with an X icon at the top right, then the body, then a bottom button row aligned right: white outlined secondary buttons and exactly ONE solid orange #FE4E10 primary button (white bold text), all 56px tall with 18px bold labels. Option buttons and steppers are 52px tall; a selected option has a near-black fill with white text. Steppers are two 52px square white outlined buttons − and + with the 24px bold quantity between them.\nThe second reference image is another popup of this app; match its panel, title, close button and bottom button row exactly.\nPopup content. Title \"김민수 팀 · 문제 해결·정정\"; subtitle \"R-025 · 품목 3 · 미수 105,000원\".\nBody: an 18px bold label \"처리 선택\" with a grid of 3 columns × 2 rows of option buttons 60px tall with 20px bold labels under it: \"파손\" (selected: near-black fill, white text), \"분실\", \"못 받음\", \"수량 정정\", \"금액 정정\", \"접수 취소\". Then an 18px bold label \"대상 품목\" with a row of three option buttons 52px tall: \"스키 2\" (selected), \"의류 2\", \"헬멧 1\". Under them an info row with a light-gray background: 18px label \"추가 청구\" and 20px bold \"다음 단계에서 입력\".\nBottom button row: white outlined \"취소\" and the solid orange primary button \"다음 · 파손 내용\"."
+    },
+    {
+      "code": "P27",
+      "title": "팝업 · 발권",
+      "wave": 4,
+      "file": "p27-popup-ticket.png",
+      "aspect_ratio": "27:16",
+      "model": "gpt_image_2_5",
+      "params": {
+        "quality": "high",
+        "resolution": "2k",
+        "variant": "flare"
+      },
+      "references": [
+        {
+          "code": "P09",
+          "job_id": "994055c5-d0b4-4df6-bde2-67c663bfa7bb"
+        },
+        {
+          "code": "P20",
+          "job_id": "de333b51-84be-4955-a684-3fee0e3eddd5"
+        }
+      ],
+      "note": "예비권을 먼저 쓰고 모자란 만큼만 새로 발권.",
+      "prompt": "High-fidelity UI design mockup of one screen of 스키노트, a touch-screen POS web app used at the counter of a Korean ski rental shop. The screen is shown flat and straight-on and fills the whole canvas edge to edge: no monitor bezel, no browser chrome, no hands, no perspective. Design frame 1024×600 px, so everything is large, nothing is cut off at any edge and nothing scrolls.\nUse the attached reference image(s) of this same app and keep the visual system IDENTICAL: page background #F4F4F2, white cards with 16px radius and a 1px hairline #E3E3E3, near-black text #1A1A1A, gray text #5D5D5D, status colors always paired with a text label (red #B42318, amber #B45309, green #247A3D, blue #0074D9, purple #5F33E1), Pretendard-like Korean sans-serif, simple 2px Lucide-like line icons. Sizes for older staff: smallest text 16px, body 18px, names and titles 22px bold, key numbers 32–40px bold, every touch target at least 52px tall. Small text (menu labels, badges, legends, chips, gray captions, phone numbers, small buttons) tends to come out too small: draw it at a full 16px, about three quarters of the height of the 22px names; shrink padding or icons, never the text. Never use an ellipsis or clipped text, and never show a half-cut card or row.\nAll UI text is Korean and must be rendered crisp and spelled EXACTLY as written below. No English UI labels, no lorem ipsum, no watermark, no annotations, no extra screens.\nPopup: a centered white modal panel about 780×480 px with 20px radius and a soft shadow, over the parent screen, which is the 리프트권 screen of the FIRST reference image, reproduced as it is and dimmed by a 45% black overlay (still recognizable, clearly inactive). Inside the panel: a 24px bold title at the top left with a 16px gray subtitle under it, a 48px square outlined close button with an X icon at the top right, then the body, then a bottom button row aligned right: white outlined secondary buttons and exactly ONE solid orange #FE4E10 primary button (white bold text), all 56px tall with 18px bold labels. Option buttons and steppers are 52px tall; a selected option has a near-black fill with white text. Steppers are two 52px square white outlined buttons − and + with the 24px bold quantity between them.\nThe second reference image is another popup of this app; match its panel, title, close button, item rows with steppers and bottom button row exactly.\nPopup content. Title \"김민수 팀 · 발권 3매\"; subtitle \"R-025 · 오후권 성인 · 9/18 이용\".\nBody: two item rows 64px tall separated by a hairline; each row has a 20px bold name at the left with a 16px gray caption under it, and a stepper at the right: \"예비권 배정\" caption \"매장 보관 오후권 9/18 · 2매\" quantity 2; \"추가 발권\" caption \"예비권 배정 후 남은 수량\" quantity 1. Under the rows two info rows with a light-gray background: 18px label \"접수 매수\" with 20px bold \"3매\"; 18px label \"청구 · 지급 시 수납\" with 22px bold red \"120,000원\".\nBottom button row: white outlined \"취소\" and the solid orange primary button \"발권 3매\"."
+    },
+    {
+      "code": "P28",
+      "title": "팝업 · 마감 확정",
+      "wave": 4,
+      "file": "p28-popup-closing.png",
+      "aspect_ratio": "27:16",
+      "model": "gpt_image_2_5",
+      "params": {
+        "quality": "high",
+        "resolution": "2k",
+        "variant": "flare"
+      },
+      "references": [
+        {
+          "code": "P07",
+          "job_id": "2246226f-da6f-4c88-928c-3c6d9bfa1418"
+        },
+        {
+          "code": "P20",
+          "job_id": "de333b51-84be-4955-a684-3fee0e3eddd5"
+        }
+      ],
+      "note": "3단계 중 1단계 현금 대조. 차이는 빨간 숫자로.",
+      "prompt": "High-fidelity UI design mockup of one screen of 스키노트, a touch-screen POS web app used at the counter of a Korean ski rental shop. The screen is shown flat and straight-on and fills the whole canvas edge to edge: no monitor bezel, no browser chrome, no hands, no perspective. Design frame 1024×600 px, so everything is large, nothing is cut off at any edge and nothing scrolls.\nUse the attached reference image(s) of this same app and keep the visual system IDENTICAL: page background #F4F4F2, white cards with 16px radius and a 1px hairline #E3E3E3, near-black text #1A1A1A, gray text #5D5D5D, status colors always paired with a text label (red #B42318, amber #B45309, green #247A3D, blue #0074D9, purple #5F33E1), Pretendard-like Korean sans-serif, simple 2px Lucide-like line icons. Sizes for older staff: smallest text 16px, body 18px, names and titles 22px bold, key numbers 32–40px bold, every touch target at least 52px tall. Small text (menu labels, badges, legends, chips, gray captions, phone numbers, small buttons) tends to come out too small: draw it at a full 16px, about three quarters of the height of the 22px names; shrink padding or icons, never the text. Never use an ellipsis or clipped text, and never show a half-cut card or row.\nAll UI text is Korean and must be rendered crisp and spelled EXACTLY as written below. No English UI labels, no lorem ipsum, no watermark, no annotations, no extra screens.\nPopup: a centered white modal panel about 780×480 px with 20px radius and a soft shadow, over the parent screen, which is the 5 정산·마감 screen of the FIRST reference image, reproduced as it is and dimmed by a 45% black overlay (still recognizable, clearly inactive). Inside the panel: a 24px bold title at the top left with a 16px gray subtitle under it, a 48px square outlined close button with an X icon at the top right, then the body, then a bottom button row aligned right: white outlined secondary buttons and exactly ONE solid orange #FE4E10 primary button (white bold text), all 56px tall with 18px bold labels. Option buttons and steppers are 52px tall; a selected option has a near-black fill with white text. Steppers are two 52px square white outlined buttons − and + with the 24px bold quantity between them.\nThe second reference image is another popup of this app; match its panel, title, close button and bottom button row exactly.\nPopup content. Title \"9월 17일 마감 확정 · 미처리 7건\"; subtitle \"1 / 3 단계 · 현금 대조\".\nBody: at the top a row of three step chips 44px tall: \"1 현금 대조\" (solid orange, active), \"2 미처리 이월\" (white, gray text), \"3 확정\" (white, gray text). Then three rows 60px tall separated by hairlines, each with an 18px gray label at the left and a value at the right: \"예상 현금\" 24px bold \"380,000원\"; \"실사 현금\" a display field showing 24px bold \"360,000원\" with a white outlined button \"숫자판\" 52px tall next to it; \"차이 · 부족\" 24px bold red \"20,000원\". Then an 18px bold label \"현금 차이 처리\" with two option buttons 52px tall: \"현금 재확인\", \"차이 기록\" (selected: near-black fill, white text).\nBottom button row: white outlined \"취소\" and the solid orange primary button \"다음 · 미처리 이월\"."
+    },
+    {
+      "code": "P29",
+      "title": "팝업 · 현금 입출금",
+      "wave": 4,
+      "file": "p29-popup-cash.png",
+      "aspect_ratio": "27:16",
+      "model": "gpt_image_2_5",
+      "params": {
+        "quality": "high",
+        "resolution": "2k",
+        "variant": "flare"
+      },
+      "references": [
+        {
+          "code": "P07",
+          "job_id": "2246226f-da6f-4c88-928c-3c6d9bfa1418"
+        },
+        {
+          "code": "P21",
+          "job_id": "c3f4e8c8-e3f4-4b61-b382-29d21019d014"
+        }
+      ],
+      "note": "입금/출금, 사유, 금액. 금액은 숫자판.",
+      "prompt": "High-fidelity UI design mockup of one screen of 스키노트, a touch-screen POS web app used at the counter of a Korean ski rental shop. The screen is shown flat and straight-on and fills the whole canvas edge to edge: no monitor bezel, no browser chrome, no hands, no perspective. Design frame 1024×600 px, so everything is large, nothing is cut off at any edge and nothing scrolls.\nUse the attached reference image(s) of this same app and keep the visual system IDENTICAL: page background #F4F4F2, white cards with 16px radius and a 1px hairline #E3E3E3, near-black text #1A1A1A, gray text #5D5D5D, status colors always paired with a text label (red #B42318, amber #B45309, green #247A3D, blue #0074D9, purple #5F33E1), Pretendard-like Korean sans-serif, simple 2px Lucide-like line icons. Sizes for older staff: smallest text 16px, body 18px, names and titles 22px bold, key numbers 32–40px bold, every touch target at least 52px tall. Small text (menu labels, badges, legends, chips, gray captions, phone numbers, small buttons) tends to come out too small: draw it at a full 16px, about three quarters of the height of the 22px names; shrink padding or icons, never the text. Never use an ellipsis or clipped text, and never show a half-cut card or row.\nAll UI text is Korean and must be rendered crisp and spelled EXACTLY as written below. No English UI labels, no lorem ipsum, no watermark, no annotations, no extra screens.\nPopup: a centered white modal panel about 780×480 px with 20px radius and a soft shadow, over the parent screen, which is the 5 정산·마감 screen of the FIRST reference image, reproduced as it is and dimmed by a 45% black overlay (still recognizable, clearly inactive). Inside the panel: a 24px bold title at the top left with a 16px gray subtitle under it, a 48px square outlined close button with an X icon at the top right, then the body, then a bottom button row aligned right: white outlined secondary buttons and exactly ONE solid orange #FE4E10 primary button (white bold text), all 56px tall with 18px bold labels. Option buttons and steppers are 52px tall; a selected option has a near-black fill with white text. Steppers are two 52px square white outlined buttons − and + with the 24px bold quantity between them.\nThe second reference image is the 수납 popup of this app; match its panel, title, close button, two-column body with the numeric keypad at the right, and bottom button row exactly.\nPopup content. Title \"현금 입출금\"; subtitle \"9월 17일 (수) · 예상 현금 380,000원\".\nBody split in two. LEFT 52%: a two-segment toggle 52px tall \"입금 | 출금\" with 출금 selected (near-black fill, white text); an 18px bold label \"사유\" with three option buttons 52px tall under it: \"거스름돈 보충\", \"비품 구입\" (selected), \"기타\"; an 18px bold label \"금액\" with a display field 60px tall showing 32px bold \"15,000원\"; a 16px gray line \"출금 후 예상 현금 365,000원\".\nRIGHT 48%: a numeric keypad of 3 columns × 4 rows of white outlined keys 56px tall with 24px bold labels: 1 2 3 / 4 5 6 / 7 8 9 / \"00\" 0 \"지우기\".\nBottom button row: white outlined \"취소\" and the solid orange primary button \"출금 기록 · 15,000원\"."
+    },
+    {
+      "code": "P30",
+      "title": "팝업 · 달력",
+      "wave": 4,
+      "file": "p30-popup-calendar.png",
+      "aspect_ratio": "27:16",
+      "model": "gpt_image_2_5",
+      "params": {
+        "quality": "high",
+        "resolution": "2k",
+        "variant": "flare"
+      },
+      "references": [
+        {
+          "code": "P02R",
+          "job_id": "c3a5f3bd-6b54-4e0d-a37c-1f2fcb6522fe"
+        },
+        {
+          "code": "P20",
+          "job_id": "de333b51-84be-4955-a684-3fee0e3eddd5"
+        }
+      ],
+      "note": "날짜 칸이 크고, 예약이 있는 날은 팀 수를 적는다.",
+      "prompt": "High-fidelity UI design mockup of one screen of 스키노트, a touch-screen POS web app used at the counter of a Korean ski rental shop. The screen is shown flat and straight-on and fills the whole canvas edge to edge: no monitor bezel, no browser chrome, no hands, no perspective. Design frame 1024×600 px, so everything is large, nothing is cut off at any edge and nothing scrolls.\nUse the attached reference image(s) of this same app and keep the visual system IDENTICAL: page background #F4F4F2, white cards with 16px radius and a 1px hairline #E3E3E3, near-black text #1A1A1A, gray text #5D5D5D, status colors always paired with a text label (red #B42318, amber #B45309, green #247A3D, blue #0074D9, purple #5F33E1), Pretendard-like Korean sans-serif, simple 2px Lucide-like line icons. Sizes for older staff: smallest text 16px, body 18px, names and titles 22px bold, key numbers 32–40px bold, every touch target at least 52px tall. Small text (menu labels, badges, legends, chips, gray captions, phone numbers, small buttons) tends to come out too small: draw it at a full 16px, about three quarters of the height of the 22px names; shrink padding or icons, never the text. Never use an ellipsis or clipped text, and never show a half-cut card or row.\nAll UI text is Korean and must be rendered crisp and spelled EXACTLY as written below. No English UI labels, no lorem ipsum, no watermark, no annotations, no extra screens.\nPopup: a centered white modal panel about 780×480 px with 20px radius and a soft shadow, over the parent screen, which is the 1 접수·예약 screen of the FIRST reference image, reproduced as it is and dimmed by a 45% black overlay (still recognizable, clearly inactive). Inside the panel: a 24px bold title at the top left with a 16px gray subtitle under it, a 48px square outlined close button with an X icon at the top right, then the body, then a bottom button row aligned right: white outlined secondary buttons and exactly ONE solid orange #FE4E10 primary button (white bold text), all 56px tall with 18px bold labels. Option buttons and steppers are 52px tall; a selected option has a near-black fill with white text. Steppers are two 52px square white outlined buttons − and + with the 24px bold quantity between them.\nThe second reference image is another popup of this app; match its panel, title, close button and bottom button row exactly.\nPopup content. Title \"날짜 선택\"; subtitle \"예약이 있는 날에 팀 수 표시\".\nBody: a month header row with a white outlined square button \"‹\", 22px bold \"2026년 9월\" centered, and a white outlined square button \"›\"; under it a weekday row in 16px gray: 일 월 화 수 목 금 토; then a calendar grid of 7 columns × 5 rows of day cells 52px tall, each with a 20px bold day number and, on some days, a 16px gray count under it. September 2026 starts on a Tuesday: the first row is empty, empty, 1, 2, 3, 4, 5; the last row is 27, 28, 29, 30 and three empty cells. Day 17 has a 2px orange outline and the caption \"오늘 5팀\"; day 18 is selected (solid orange fill, white text) with the caption \"2팀\"; day 19 shows \"3팀\"; day 20 shows \"6팀\"; the other days have no caption.\nBottom button row: white outlined \"취소\", white outlined \"오늘\" and the solid orange primary button \"9월 18일 보기\"."
+    },
+    {
+      "code": "P31",
+      "title": "팝업 · 사이즈 입력 재요청",
+      "wave": 4,
+      "file": "p31-popup-size-request.png",
+      "aspect_ratio": "27:16",
+      "model": "gpt_image_2_5",
+      "params": {
+        "quality": "high",
+        "resolution": "2k",
+        "variant": "flare"
+      },
+      "references": [
+        {
+          "code": "P14",
+          "job_id": "bafdc2aa-6230-4016-a491-141685223a72"
+        },
+        {
+          "code": "P20",
+          "job_id": "de333b51-84be-4955-a684-3fee0e3eddd5"
+        }
+      ],
+      "note": "보낼 문자 내용을 그대로 보여 주고 확인만 한다.",
+      "prompt": "High-fidelity UI design mockup of one screen of 스키노트, a touch-screen POS web app used at the counter of a Korean ski rental shop. The screen is shown flat and straight-on and fills the whole canvas edge to edge: no monitor bezel, no browser chrome, no hands, no perspective. Design frame 1024×600 px, so everything is large, nothing is cut off at any edge and nothing scrolls.\nUse the attached reference image(s) of this same app and keep the visual system IDENTICAL: page background #F4F4F2, white cards with 16px radius and a 1px hairline #E3E3E3, near-black text #1A1A1A, gray text #5D5D5D, status colors always paired with a text label (red #B42318, amber #B45309, green #247A3D, blue #0074D9, purple #5F33E1), Pretendard-like Korean sans-serif, simple 2px Lucide-like line icons. Sizes for older staff: smallest text 16px, body 18px, names and titles 22px bold, key numbers 32–40px bold, every touch target at least 52px tall. Small text (menu labels, badges, legends, chips, gray captions, phone numbers, small buttons) tends to come out too small: draw it at a full 16px, about three quarters of the height of the 22px names; shrink padding or icons, never the text. Never use an ellipsis or clipped text, and never show a half-cut card or row.\nAll UI text is Korean and must be rendered crisp and spelled EXACTLY as written below. No English UI labels, no lorem ipsum, no watermark, no annotations, no extra screens.\nPopup: a centered white modal panel about 780×480 px with 20px radius and a soft shadow, over the parent screen, which is the 사이즈 입력 현황 screen of the FIRST reference image, reproduced as it is and dimmed by a 45% black overlay (still recognizable, clearly inactive). Inside the panel: a 24px bold title at the top left with a 16px gray subtitle under it, a 48px square outlined close button with an X icon at the top right, then the body, then a bottom button row aligned right: white outlined secondary buttons and exactly ONE solid orange #FE4E10 primary button (white bold text), all 56px tall with 18px bold labels. Option buttons and steppers are 52px tall; a selected option has a near-black fill with white text. Steppers are two 52px square white outlined buttons − and + with the 24px bold quantity between them.\nThe second reference image is another popup of this app; match its panel, title, close button and bottom button row exactly.\nPopup content. Title \"이수진 팀 · 재요청 2명\"; subtitle \"R-023 · 9/18 09:30 수령 · 입력 2 / 4명\".\nBody: three rows 56px tall separated by hairlines, each with an 18px gray label at the left and a 20px bold value at the right: \"미입력\" \"이지민 · 이지호\"; \"받는 번호\" \"010-0000-0023\"; \"발송\" \"9/16 18:20 · 1회\". Then an 18px bold label \"문자 내용\" with a light-gray box under it containing 18px text on two lines: \"[우리 스키샵] 이수진 님, 일행 사이즈를 미리 입력해 주세요.\" and \"skinote.kr/s/R023\". Under the box a light-amber strip with an amber warning icon and 18px dark-amber text \"사이즈 미입력 · 미입력 시 현장 측정\".\nBottom button row: white outlined \"취소\", white outlined \"현장 측정 2명\" and the solid orange primary button \"재요청 2명\"."
+    },
+    {
+      "code": "P32",
+      "title": "팝업 · 업무 알림",
+      "wave": 4,
+      "file": "p32-popup-alerts.png",
+      "aspect_ratio": "27:16",
+      "model": "gpt_image_2_5",
+      "params": {
+        "quality": "high",
+        "resolution": "2k",
+        "variant": "flare"
+      },
+      "references": [
+        {
+          "code": "P01",
+          "job_id": "8d6e31bf-6f35-4a6b-bb11-65a3f1ab8ebc"
+        },
+        {
+          "code": "P20",
+          "job_id": "de333b51-84be-4955-a684-3fee0e3eddd5"
+        }
+      ],
+      "note": "기사·매장에서 온 확인 요청. 주황 버튼 없이 행마다 내용 보기.",
+      "prompt": "High-fidelity UI design mockup of one screen of 스키노트, a touch-screen POS web app used at the counter of a Korean ski rental shop. The screen is shown flat and straight-on and fills the whole canvas edge to edge: no monitor bezel, no browser chrome, no hands, no perspective. Design frame 1024×600 px, so everything is large, nothing is cut off at any edge and nothing scrolls.\nUse the attached reference image(s) of this same app and keep the visual system IDENTICAL: page background #F4F4F2, white cards with 16px radius and a 1px hairline #E3E3E3, near-black text #1A1A1A, gray text #5D5D5D, status colors always paired with a text label (red #B42318, amber #B45309, green #247A3D, blue #0074D9, purple #5F33E1), Pretendard-like Korean sans-serif, simple 2px Lucide-like line icons. Sizes for older staff: smallest text 16px, body 18px, names and titles 22px bold, key numbers 32–40px bold, every touch target at least 52px tall. Small text (menu labels, badges, legends, chips, gray captions, phone numbers, small buttons) tends to come out too small: draw it at a full 16px, about three quarters of the height of the 22px names; shrink padding or icons, never the text. Never use an ellipsis or clipped text, and never show a half-cut card or row.\nAll UI text is Korean and must be rendered crisp and spelled EXACTLY as written below. No English UI labels, no lorem ipsum, no watermark, no annotations, no extra screens.\nPopup: a centered white modal panel about 780×480 px with 20px radius and a soft shadow, over the parent screen, which is the 오늘 할 일 screen of the FIRST reference image, reproduced as it is and dimmed by a 45% black overlay (still recognizable, clearly inactive). Inside the panel: a 24px bold title at the top left with a 16px gray subtitle under it, a 48px square outlined close button with an X icon at the top right, then the body, then a bottom button row aligned right: white outlined secondary buttons all 56px tall (this popup has NO orange button) with 18px bold labels. Option buttons and steppers are 52px tall; a selected option has a near-black fill with white text. Steppers are two 52px square white outlined buttons − and + with the 24px bold quantity between them.\nThe second reference image is another popup of this app; match its panel, title and close button exactly.\nPopup content. Title \"업무 알림\"; subtitle \"미확인 2건\".\nBody: a row of two filter chips 52px tall: \"미확인 2\" (near-black fill, white text, selected), \"전체 기록\" (white). Then two white rows 76px tall with a 1px hairline border and 12px radius, each with a 20px bold title, a 16px gray line under it, and a white outlined button \"내용 보기\" 52px tall at the right: \"최은정 팀 · 수거 내역\" / \"1호 차량 · 스키 1 · 의류 1 수거 · 14:32\"; \"김영희 팀 · 방문 순서 변경\" / \"1호 차량 · 16:30 → 16:00 · 14:40\". Under the rows one line: left 16px gray \"전체 2건 · 1–2건\"; right a compact pager \"‹\" \"1 / 1쪽\" \"›\".\nBottom button row: white outlined \"닫기\", white outlined \"이 기기 소리 켜기\" and white outlined \"최신 알림\"."
+    },
+    {
+      "code": "P33",
+      "title": "팝업 · 접수 완료",
+      "wave": 4,
+      "file": "p33-popup-intake-done.png",
+      "aspect_ratio": "27:16",
+      "model": "gpt_image_2_5",
+      "params": {
+        "quality": "high",
+        "resolution": "2k",
+        "variant": "flare"
+      },
+      "references": [
+        {
+          "code": "P12",
+          "job_id": "a4c65fbc-af99-4d4c-87bb-70f58ba680b5"
+        },
+        {
+          "code": "P20",
+          "job_id": "de333b51-84be-4955-a684-3fee0e3eddd5"
+        }
+      ],
+      "note": "접수 직후 다음 할 일 3가지를 큰 버튼으로.",
+      "prompt": "High-fidelity UI design mockup of one screen of 스키노트, a touch-screen POS web app used at the counter of a Korean ski rental shop. The screen is shown flat and straight-on and fills the whole canvas edge to edge: no monitor bezel, no browser chrome, no hands, no perspective. Design frame 1024×600 px, so everything is large, nothing is cut off at any edge and nothing scrolls.\nUse the attached reference image(s) of this same app and keep the visual system IDENTICAL: page background #F4F4F2, white cards with 16px radius and a 1px hairline #E3E3E3, near-black text #1A1A1A, gray text #5D5D5D, status colors always paired with a text label (red #B42318, amber #B45309, green #247A3D, blue #0074D9, purple #5F33E1), Pretendard-like Korean sans-serif, simple 2px Lucide-like line icons. Sizes for older staff: smallest text 16px, body 18px, names and titles 22px bold, key numbers 32–40px bold, every touch target at least 52px tall. Small text (menu labels, badges, legends, chips, gray captions, phone numbers, small buttons) tends to come out too small: draw it at a full 16px, about three quarters of the height of the 22px names; shrink padding or icons, never the text. Never use an ellipsis or clipped text, and never show a half-cut card or row.\nAll UI text is Korean and must be rendered crisp and spelled EXACTLY as written below. No English UI labels, no lorem ipsum, no watermark, no annotations, no extra screens.\nPopup: a centered white modal panel about 780×480 px with 20px radius and a soft shadow, over the parent screen, which is the 새 접수 step 3 screen of the FIRST reference image, reproduced as it is and dimmed by a 45% black overlay (still recognizable, clearly inactive). Inside the panel: a 24px bold title at the top left with a 16px gray subtitle under it, a 48px square outlined close button with an X icon at the top right, then the body, then a bottom button row aligned right: white outlined secondary buttons and exactly ONE solid orange #FE4E10 primary button (white bold text), all 56px tall with 18px bold labels. Option buttons and steppers are 52px tall; a selected option has a near-black fill with white text. Steppers are two 52px square white outlined buttons − and + with the 24px bold quantity between them.\nThe second reference image is another popup of this app; match its panel, title, close button and bottom button row exactly.\nPopup content. At the top left a green circle icon with a white check, then the title \"접수 완료 · 260917-031\"; subtitle \"김민수 팀 · 3명 · 예약\".\nBody: four rows 56px tall separated by hairlines, each with an 18px gray label at the left and a 20px bold value at the right: \"대여 품목\" \"스키 세트 2 · 의류 2 · 헬멧 1\"; \"일정\" \"9/17 09:30 수령 · 16:30 반납\"; \"합계\" \"105,000원\"; \"사이즈 입력 요청\" with an amber badge \"미발송\".\nBottom button row with three buttons of equal width, 60px tall: white outlined \"사이즈 입력 요청 보내기\", white outlined \"준비표 인쇄\" and the solid orange primary button \"접수 목록\"."
+    }
+  ]
+}

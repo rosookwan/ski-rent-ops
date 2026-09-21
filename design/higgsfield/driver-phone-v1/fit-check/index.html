@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="ko">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>기사 휴대폰 화면 맞춤 검사</title>
+<style>
+  /* 실제 크기 검사용 화면. 기사 휴대폰 시안 4장(D11~D14)을 요청서의 글자·버튼 크기 그대로 그려서
+     휴대폰 표시 영역에서 글자가 잘리는지, 몇 줄이 들어가는지 잰다. ?w=360&h=640 처럼 크기를 바꿔 연다.
+     design/app 코드가 아니며, 구현할 때 참고할 수치를 확인하는 용도다. */
+  @font-face { font-family: "Pretendard Variable"; src: url("../../../vendor/PretendardVariable.woff2") format("woff2-variations"); font-weight: 45 920; font-display: block; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: #d9d9d6; color: #1A1A1A; font-family: "Pretendard Variable", "Apple SD Gothic Neo", sans-serif; letter-spacing: -0.02em; }
+  #app { display: flex; gap: 24px; padding: 16px; align-items: flex-start; }
+  .frame { position: relative; flex: 0 0 auto; width: var(--w); height: var(--h); overflow: hidden; background: #F4F4F2; display: flex; flex-direction: column; }
+  .bar { flex: 0 0 auto; display: flex; align-items: center; gap: 8px; padding: 0 16px; white-space: nowrap; min-width: 0; }
+  .header { height: 56px; background: #fff; border-bottom: 1px solid #E3E3E3; }
+  .header .mark { color: #5F33E1; font-size: 16px; font-weight: 700; } .header .title { font-size: 22px; font-weight: 700; margin-left: 2px; }
+  .sp { flex: 1 1 0; min-width: 0; }
+  .obtn { flex: 0 0 auto; display: inline-flex; align-items: center; justify-content: center; gap: 6px; height: 48px; padding: 0 12px; background: #fff; border: 1px solid #c9c9c9; border-radius: 12px; font-size: 16px; font-weight: 600; color: #1A1A1A; }
+  .obtn.sq { width: 48px; padding: 0; position: relative; } .obtn .dot { position: absolute; top: -5px; right: -5px; min-width: 20px; height: 20px; border-radius: 10px; background: #D92D20; color: #fff; font-size: 13px; font-weight: 700; display: grid; place-items: center; }
+  .ico { width: 20px; height: 20px; border: 2px solid currentColor; border-radius: 5px; flex: 0 0 auto; opacity: .75; }
+  .pill { flex: 0 0 auto; font-size: 16px; font-weight: 700; color: #5F33E1; background: #ECE6FD; border-radius: 999px; padding: 3px 12px; }
+  .chips { height: 60px; } .chip { flex: 0 0 auto; display: inline-flex; align-items: center; gap: 6px; height: 52px; padding: 0 14px; border: 1px solid #c9c9c9; border-radius: 14px; background: #fff; font-size: 16px; font-weight: 700; }
+  .chip.on { background: #5F33E1; border-color: #5F33E1; color: #fff; }
+  .pager { height: 56px; font-size: 16px; color: #5D5D5D; } .pager b { font-size: 18px; font-weight: 500; color: #3a3a3a; min-width: 60px; text-align: center; }
+  .pbtn { flex: 0 0 auto; width: 52px; height: 52px; border: 1px solid #c9c9c9; border-radius: 12px; background: #fff; display: grid; place-items: center; font-size: 22px; color: #1A1A1A; }
+  .body { flex: 1 1 0; min-height: 0; overflow: hidden; padding: 8px 16px 0; display: flex; flex-direction: column; gap: 8px; }
+  .card { flex: 0 0 auto; background: #fff; border: 1px solid #E3E3E3; border-radius: 16px; min-width: 0; }
+  .job { min-height: 91px; padding: 7px 12px; display: flex; align-items: center; gap: 10px; } /* 테두리 포함 91px = 7 + 26 + 2 + 24 + 2 + 21 + 7 + 테두리 2 */
+  .job .txt { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; gap: 2px; white-space: nowrap; overflow: hidden; }
+  .l22 { font-size: 22px; font-weight: 700; line-height: 26px; } .l20 { font-size: 20px; font-weight: 700; line-height: 25px; } .l18 { font-size: 18px; line-height: 24px; } .l16 { font-size: 16px; line-height: 21px; color: #5D5D5D; }
+  .row2 { display: flex; align-items: flex-start; gap: 6px; min-height: 24px; font-size: 16px; line-height: 24px; color: #5D5D5D; }
+  .wrap { white-space: normal; overflow-wrap: anywhere; word-break: keep-all; }
+  .badge { flex: 0 0 auto; font-size: 16px; font-weight: 700; line-height: 20px; padding: 2px 8px; border-radius: 999px; }
+  .blue { color: #0060b8; background: #E0EEFB; } .amber { color: #9a4607; background: #FCEBD9; } .sblue { color: #fff; background: #0074D9; } .samber { color: #fff; background: #B45309; }
+  .go { flex: 0 0 auto; width: 96px; height: 64px; border-radius: 12px; background: #5F33E1; color: #fff; font-size: 18px; font-weight: 700; display: grid; place-items: center; }
+  .footer { height: 72px; background: #fff; border-top: 1px solid #E3E3E3; } .fbtn { flex: 1 1 0; min-width: 0; height: 56px; border: 1px solid #c9c9c9; border-radius: 12px; background: #fff; display: grid; place-items: center; font-size: 18px; font-weight: 700; white-space: nowrap; overflow: hidden; }
+  .team { padding: 12px; display: flex; flex-direction: column; gap: 3px; white-space: nowrap; overflow: hidden; } .team .two { display: flex; gap: 8px; margin-top: 6px; } .team .two .fbtn { height: 52px; display: flex; gap: 6px; justify-content: center; align-items: center; }
+  .item { height: 76px; padding: 0 12px; display: flex; align-items: center; gap: 10px; } .item .txt { flex: 1 1 0; min-width: 0; white-space: nowrap; overflow: hidden; }
+  .step { flex: 0 0 auto; display: flex; align-items: center; gap: 8px; } .step .pbtn { width: 56px; height: 56px; font-size: 26px; } .step b { min-width: 36px; text-align: center; font-size: 28px; font-weight: 700; }
+  .warn { flex: 0 0 auto; display: flex; gap: 10px; align-items: center; padding: 8px 12px; border: 1px solid #F5D3A8; background: #FFF4E5; border-radius: 12px; color: #9a4607; font-size: 16px; font-weight: 700; line-height: 22px; white-space: nowrap; overflow: hidden; }
+  .actions { flex: 0 0 auto; background: #fff; border-top: 1px solid #E3E3E3; padding: 8px 16px 12px; display: flex; flex-direction: column; gap: 8px; } .actions .fbtn { flex: 0 0 auto; }
+  .primary { flex: 0 0 auto; height: 64px; border-radius: 14px; background: #5F33E1; color: #fff; font-size: 20px; font-weight: 700; display: grid; place-items: center; white-space: nowrap; overflow: hidden; }
+  .tiles { flex: 0 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; } .tile { height: 76px; padding: 8px 14px; } .tile .n { font-size: 32px; font-weight: 700; line-height: 36px; }
+  .stock { height: 64px; padding: 0 12px; display: flex; align-items: center; gap: 8px; } .stock .txt { flex: 1 1 0; min-width: 0; white-space: nowrap; overflow: hidden; }
+  .dim { position: absolute; inset: 0; background: rgba(0,0,0,.45); }
+  .sheet { position: absolute; left: 0; right: 0; bottom: 0; background: #fff; border-radius: 20px 20px 0 0; padding: 8px 16px 12px; display: flex; flex-direction: column; gap: 6px; }
+  .grab { width: 40px; height: 4px; border-radius: 2px; background: #c9c9c9; margin: 0 auto 2px; flex: 0 0 auto; }
+  .sheet h3 { margin: 0; font-size: 22px; line-height: 27px; } .sheet .head { display: flex; align-items: flex-start; gap: 8px; white-space: nowrap; } .sheet .lbl { font-size: 18px; font-weight: 700; line-height: 24px; margin-top: 2px; }
+  .opts { display: grid; gap: 8px; } .opt { height: 56px; border: 1px solid #c9c9c9; border-radius: 12px; background: #fff; display: grid; place-items: center; font-size: 18px; white-space: nowrap; overflow: hidden; min-width: 0; } .opt.on { background: #24272e; border-color: #24272e; color: #fff; font-weight: 700; }
+  .info { display: flex; align-items: center; gap: 8px; background: #F2F3F5; border-radius: 12px; padding: 6px 12px; white-space: nowrap; } .info .obtn { height: 52px; }
+  .srow { display: flex; gap: 8px; margin-top: 2px; } .srow .fbtn { flex: 0 0 96px; height: 64px; } .srow .primary { flex: 1 1 0; min-width: 0; font-size: 16px; }
+  #report { font: 14px/1.5 ui-monospace, monospace; white-space: pre-wrap; margin: 0 16px 16px; color: #111; }
+</style>
+<body>
+<div id="app"></div>
+<pre id="report"></pre>
+<script>
+const q = new URLSearchParams(location.search);
+const W = +q.get("w") || 360, H = +q.get("h") || 640, ITEMS = +q.get("items") || 2;
+const JOBS = [["09:00 · 김민재 팀", "배달", "만선 광장", "스키 2 · 의류 1"], ["09:40 · 박서윤 팀", "배달", "설천 주차장", "스키 2 · 의류 1"], ["10:20 · 이도윤 팀", "배달", "만선 티롤 앞", "보드 2 · 의류 1"], ["16:30 · 김영희 팀", "수거", "만선 티롤 앞", "스키 2 · 의류 2 · 헬멧 1"],
+  ["16:40 · 한국대학교 스키동아리 팀", "수거", "무주덕유산리조트 설천하우스 앞 주차장", "스키 2 · 의류 2 · 헬멧 1 · 보드 1 · 고글 2"], ["17:00 · 최은정 팀", "수거", "만선 광장", "스키 1 · 의류 1"], ["17:20 · 정하늘 팀", "배달", "설천 주차장", "오후권 성인 4매"]];
+const KINDS = [["스키", 2], ["의류", 1], ["헬멧", 1], ["고글", 2]].slice(0, ITEMS);
+const bell = `<span class="obtn sq"><span class="ico" style="border-radius:50% 50% 6px 6px"></span><span class="dot">3</span></span>`;
+const frame = (id, inner) => `<div class="frame" id="${id}" style="--w:${W}px;--h:${H}px">${inner}</div>`;
+
+const list = frame("f1", `<div class="bar header"><span class="mark">스키노트</span><span class="title">차량 운행</span><span class="sp"></span>${bell}<span class="obtn"><span class="ico"></span>나가기</span></div>
+  <div class="bar chips"><span class="chip on">오늘·이전 7</span><span class="chip">내일 0</span><span class="chip"><span class="ico"></span>달력</span></div>
+  <div class="bar pager"><span class="fit sp" data-k="count">1호 차량 · 남은 7건</span><span class="pbtn">‹</span><b id="pg"></b><span class="pbtn">›</span></div>
+  <div class="body" id="jobs">${JOBS.map(j => `<div class="card job"><div class="txt"><span class="l22 fit" data-k="job title"></span><span class="row2"><span class="badge ${j[1] === "배달" ? "blue" : "amber"}">${j[1]}</span><span class="fit" data-k="place" style="flex:1 1 0;min-width:0;overflow:hidden"></span></span><span class="l16 fit" data-k="items"></span></div><span class="go">업무 처리</span></div>`).join("")}</div>
+  <div class="bar footer"><span class="fbtn">차량 보관</span><span class="fbtn">최신 업무 확인</span></div>`);
+
+const task = frame("f2", `<div class="bar header"><span class="obtn">‹ 목록</span><span class="title">배달 처리</span><span class="sp"></span>${bell}</div>
+  <div class="body" id="taskBody"><div class="card team"><span style="display:flex;align-items:center;gap:8px"><span class="l22">김민재 팀</span><span class="badge blue">배달 ${KINDS.reduce((n, k) => n + k[1], 0)}개</span></span><span class="l16">9/17 09:00 · 만선 광장</span><span class="l18">010-1234-1000</span><span class="two"><span class="fbtn"><span class="ico"></span>전화</span><span class="fbtn"><span class="ico"></span>출발 문자</span></span></div>
+  ${KINDS.map(([k, n]) => `<div class="card item"><div class="txt"><div class="l20">${k}</div><div class="l16">남음 ${n} · 차량 보관</div></div><span class="step"><span class="pbtn">−</span><b>${n}</b><span class="pbtn">+</span></span></div>`).join("")}
+  <div class="warn"><span class="ico" style="border-radius:3px"></span><span>예약금 65,000원 미수<br>수납은 매장에서</span></div></div>
+  <div class="actions"><span class="fbtn" style="height:56px">못 받음·고객 부재</span><span class="primary">실제 전달 확정 ${KINDS.reduce((n, k) => n + k[1], 0)}개</span></div>`);
+
+const stock = frame("f3", `<div class="bar header"><span class="obtn">‹ 목록</span><span class="title">차량 보관</span><span class="pill">보관 21개</span><span class="sp"></span>${bell}</div>
+  <div class="body" id="stockBody"><div class="tiles">${[["장비", "8"], ["의류", "6"], ["헬멧", "3"], ["리프트권", "4매"]].map(([l, n]) => `<div class="card tile"><div class="l16">${l}</div><div class="n">${n}</div></div>`).join("")}</div>
+  ${[["스키 6대", "배달 예정 6", "sblue", "배달 예정"], ["보드 2대", "수거 보관 2", "samber", "매장 입고 대기"], ["의류 6벌", "배달 3 · 수거 3", "sblue", "배달 예정"], ["헬멧 3개", "수거 보관 3", "samber", "매장 입고 대기"]].map(r => `<div class="card stock"><div class="txt"><div class="l20">${r[0]}</div><div class="l16">${r[1]}</div></div><span class="badge ${r[2]}" style="padding:6px 12px">${r[3]}</span></div>`).join("")}</div>
+  <div class="actions"><span class="primary">매장 입고 8개</span></div>`);
+
+const opts = (cols, arr) => `<div class="opts" style="grid-template-columns:repeat(${cols},minmax(0,1fr))">${arr.map(([t, on, span]) => `<span class="opt ${on ? "on" : ""}" style="${span ? "grid-column:1/-1" : ""}">${t}</span>`).join("")}</div>`;
+const sheet = frame("f4", `<div class="bar header"><span class="obtn">‹ 목록</span><span class="title">배달 처리</span><span class="sp"></span>${bell}</div><div class="body"><div class="card team"><span class="l22">김민재 팀</span></div></div><div class="dim"></div>
+  <div class="sheet" id="sheet"><div class="grab"></div><div class="head"><div class="sp"><h3>못 받음·방문 결과</h3><div class="l16">김민재 팀 · 물품 수량 이동 없음</div></div><span class="obtn sq">✕</span></div>
+  <div class="lbl">방문 결과</div>${opts(2, [["고객 부재", 1], ["장소 변경"], ["물품을 받지 못함", 0, 1]])}
+  <div class="lbl">다음 방문일</div>${opts(3, [["오늘 다시", 1], ["내일"], ["달력"]])}
+  <div class="lbl">다음 시간</div>${opts(3, [["16:30"], ["17:00", 1], ["직접 입력"]])}
+  <div class="info"><div class="sp"><div class="l16">다음 장소</div><div class="l18" style="font-weight:700">만선 광장</div></div><span class="obtn">변경</span></div>
+  <div class="srow"><span class="fbtn">취소</span><span class="primary">방문 결과·다음 약속 저장</span></div></div>`);
+
+let probe;
+const width = (t, font) => { probe.style.font = font; probe.textContent = t; return probe.getBoundingClientRect().width; };
+// 글자를 자르지 않는다: 자리가 모자라면 뒤쪽 조각부터 통째로 빼고, 품목은 "외 N종"으로 끝낸다.
+function fitParts(parts, avail, font, joiner, tail) {
+  for (let k = parts.length; k >= 1; k--) { const t = parts.slice(0, k).join(joiner) + (k < parts.length && tail ? tail(parts.length - k) : ""); if (width(t, font) <= avail) return t; }
+  return tail ? "품목 " + parts.length + "종" : parts[0];
+}
+document.fonts.load("700 18px 'Pretendard Variable'").then(() => document.fonts.ready).then(() => {
+  document.getElementById("app").innerHTML = list + task + stock + sheet;
+  probe = document.createElement("span"); probe.style.cssText = "position:absolute;visibility:hidden;white-space:nowrap;letter-spacing:-0.02em"; document.body.appendChild(probe);
+  const notes = [];
+  // 목록: 줄마다 실제 폭으로 맞춘다. 글자는 자르지 않는다.
+  //  1) "시간 · 팀"이 한 줄에 안 들어가면 시간을 둘째 줄(장소 앞)로 내린다. 팀 이름만으로도 넘치면 제목을 두 줄로 줄바꿈한다.
+  //  2) 장소가 한 줄에 안 들어가면 두 줄로 줄바꿈한다(줄 높이가 늘어난다).  3) 품목은 들어가는 종류까지만 적고 "외 N종".
+  const F22 = "700 22px 'Pretendard Variable'", F16 = "400 16px 'Pretendard Variable'";
+  document.querySelectorAll("#jobs .job").forEach((el, i) => {
+    const j = JOBS[i], slot = k => el.querySelector(`[data-k="${k}"]`), av = k => slot(k).getBoundingClientRect().width;
+    const [time, team] = j[0].split(" · ");
+    let title = j[0], pre = "";
+    if (width(title, F22) > av("job title")) { title = team; pre = time + " · "; notes.push(`줄 ${i + 1}: "${j[0]}"이 ${av("job title").toFixed(0)}px에 안 들어가 시간을 둘째 줄로 내림`); }
+    if (width(title, F22) > av("job title")) { slot("job title").classList.add("wrap"); notes.push(`줄 ${i + 1}: 팀 이름이 길어 제목을 두 줄로 줄바꿈`); }
+    slot("job title").textContent = title;
+    slot("place").textContent = pre + j[2];
+    if (width(pre + j[2], F16) > av("place")) { slot("place").classList.add("wrap"); notes.push(`줄 ${i + 1}: 장소(${width(pre + j[2], F16).toFixed(0)}px)가 ${av("place").toFixed(0)}px에 안 들어가 두 줄로 줄바꿈`); }
+    slot("items").textContent = fitParts(j[3].split(" · "), av("items"), F16, " · ", n => " 외 " + n + "종");
+  });
+  // 가로 잘림은 쪽을 나누기 전에 모든 줄에서 잰다.
+  const listClipped = [...document.querySelectorAll("#jobs .fit")].filter(e => !e.classList.contains("wrap") && e.scrollWidth > e.clientWidth + 1).map(e => e.dataset.k + " " + e.scrollWidth + ">" + e.clientWidth);
+  // 쪽 나눔: 줄 높이가 서로 다를 수 있으므로 위에서부터 높이로 채운다.
+  const body = document.getElementById("jobs"), rows = [...body.children], gap = 8, availH = body.clientHeight - 8;
+  const heights = rows.map(r => r.offsetHeight), pages = [[]]; let used = 0;
+  heights.forEach((h, i) => { if (pages[pages.length - 1].length && used + h > availH) { pages.push([]); used = 0; } pages[pages.length - 1].push(i); used += h + gap; });
+  rows.forEach((r, i) => { if (!pages[0].includes(i)) r.remove(); });
+  const fitRows = pages[0].length, rowH = heights[0];
+  document.getElementById("pg").textContent = "1 / " + pages.length + "쪽";
+  // 배달 처리: 팀 카드·경고 띠·버튼 영역을 빼고 품목 줄이 스크롤 없이 몇 종 들어가는지 계산한다.
+  const tb = document.getElementById("taskBody"), teamH = tb.querySelector(".team").offsetHeight, warnH = tb.querySelector(".warn").offsetHeight;
+  const itemsAvail = tb.clientHeight - 8 - teamH - 8 - warnH - 8, kindsFit = Math.floor((itemsAvail + 8) / (76 + 8)), kindsFitNoWarn = Math.floor((itemsAvail + warnH + 8 + 8) / (76 + 8));
+
+  const rep = [`표시 영역 ${W}×${H} · 품목 ${ITEMS}종`];
+  const check = (id, name, contentSel) => {
+    const f = document.getElementById(id), fr = f.getBoundingClientRect();
+    const clipped = [...f.querySelectorAll(".fit, .bar, .fbtn, .primary, .opt, .team, .item .txt, .stock .txt, .warn, .info, .head, .job .txt")].filter(e => e.scrollWidth > e.clientWidth + 1).map(e => (e.dataset.k || e.className.split(" ")[0]) + " " + e.scrollWidth + ">" + e.clientWidth);
+    let v = "";
+    if (contentSel) { const c = f.querySelector(contentSel), kids = [...c.children], last = kids[kids.length - 1].getBoundingClientRect(), box = c.getBoundingClientRect(); const over = last.bottom - box.bottom; v = over > 0.5 ? ` · 세로: 내용이 ${over.toFixed(0)}px 넘침` : ` · 세로: 온전 (여유 ${(-over).toFixed(0)}px)`; }
+    rep.push(`${name}: 가로 ${clipped.length ? "잘림 → " + clipped.join(", ") : "잘린 글자 0"}${v}`);
+    return clipped.length;
+  };
+  check("f1", "D11 차량 운행", "#jobs"); if (listClipped.length) rep.push("  모든 줄 가로 검사: 잘림 → " + listClipped.join(", ")); else rep.push("  모든 줄(7건, 긴 팀 이름·긴 장소 포함) 가로 검사: 잘린 글자 0");
+  rep.push(`  첫 쪽 ${fitRows}줄 (기본 줄 높이 ${rowH}px · 줄 높이 ${heights.join("/")} · 목록 영역 ${body.clientHeight}px) → ${JOBS.length}건이면 ${pages.length}쪽`);
+  check("f2", "D12 배달 처리", "#taskBody"); rep.push(`  품목 줄(76px)은 스크롤 없이 ${kindsFit}종까지 (미수 경고 띠가 없으면 ${kindsFitNoWarn}종)`);
+  check("f3", "D13 차량 보관", "#stockBody");
+  const sh = document.getElementById("sheet").getBoundingClientRect(), fr4 = document.getElementById("f4").getBoundingClientRect();
+  check("f4", "D14 못 받음·방문 결과"); rep.push(`  아래 판 높이 ${sh.height.toFixed(0)}px / 화면 ${H}px → ${sh.top - fr4.top >= 56 ? "헤더 아래로 들어감 (위 여유 " + (sh.top - fr4.top).toFixed(0) + "px)" : "화면보다 큼: " + (56 - (sh.top - fr4.top)).toFixed(0) + "px 넘침"}`);
+  rep.push(...notes);
+  document.getElementById("report").textContent = rep.join("\n");
+  window.__fit = { W, H, rep, fitRows, kindsFit, kindsFitNoWarn };
+});
+</script>
+</body>
+</html>
