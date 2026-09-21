@@ -51,17 +51,17 @@
       "geometry": {
         "dialog": {
           "x": 152,
-          "y": 50.609375,
+          "y": 27.40625,
           "width": 720,
-          "height": 498.78125,
-          "top": 50.609375,
+          "height": 545.171875,
+          "top": 27.40625,
           "right": 872,
-          "bottom": 549.390625,
+          "bottom": 572.578125,
           "left": 152
         },
         "body": {
-          "client": 351,
-          "scroll": 351
+          "client": 397,
+          "scroll": 397
         },
         "outside": []
       }
@@ -163,17 +163,17 @@
       "geometry": {
         "dialog": {
           "x": 152,
-          "y": 63,
+          "y": 63.5,
           "width": 720,
-          "height": 474,
-          "top": 63,
+          "height": 473,
+          "top": 63.5,
           "right": 872,
-          "bottom": 537,
+          "bottom": 536.5,
           "left": 152
         },
         "body": {
-          "client": 326,
-          "scroll": 326
+          "client": 325,
+          "scroll": 325
         },
         "outside": []
       }
@@ -275,17 +275,17 @@
       "geometry": {
         "dialog": {
           "x": 152,
-          "y": 35.40625,
+          "y": 35.90625,
           "width": 720,
-          "height": 529.1875,
-          "top": 35.40625,
+          "height": 528.1875,
+          "top": 35.90625,
           "right": 872,
-          "bottom": 564.59375,
+          "bottom": 564.09375,
           "left": 152
         },
         "body": {
-          "client": 381,
-          "scroll": 381
+          "client": 380,
+          "scroll": 380
         },
         "outside": []
       }
@@ -369,17 +369,17 @@
       "geometry": {
         "dialog": {
           "x": 152,
-          "y": 134.609375,
+          "y": 111.40625,
           "width": 720,
-          "height": 498.78125,
-          "top": 134.609375,
+          "height": 545.171875,
+          "top": 111.40625,
           "right": 872,
-          "bottom": 633.390625,
+          "bottom": 656.578125,
           "left": 152
         },
         "body": {
-          "client": 351,
-          "scroll": 351
+          "client": 397,
+          "scroll": 397
         },
         "outside": []
       }
@@ -453,17 +453,17 @@
       "geometry": {
         "dialog": {
           "x": 152,
-          "y": 147,
+          "y": 147.5,
           "width": 720,
-          "height": 474,
-          "top": 147,
+          "height": 473,
+          "top": 147.5,
           "right": 872,
-          "bottom": 621,
+          "bottom": 620.5,
           "left": 152
         },
         "body": {
-          "client": 326,
-          "scroll": 326
+          "client": 325,
+          "scroll": 325
         },
         "outside": []
       }
@@ -603,17 +603,17 @@
       "geometry": {
         "dialog": {
           "x": 323,
-          "y": 134.609375,
+          "y": 111.40625,
           "width": 720,
-          "height": 498.78125,
-          "top": 134.609375,
+          "height": 545.171875,
+          "top": 111.40625,
           "right": 1043,
-          "bottom": 633.390625,
+          "bottom": 656.578125,
           "left": 323
         },
         "body": {
-          "client": 351,
-          "scroll": 351
+          "client": 397,
+          "scroll": 397
         },
         "outside": []
       }
@@ -687,17 +687,17 @@
       "geometry": {
         "dialog": {
           "x": 323,
-          "y": 147,
+          "y": 147.5,
           "width": 720,
-          "height": 474,
-          "top": 147,
+          "height": 473,
+          "top": 147.5,
           "right": 1043,
-          "bottom": 621,
+          "bottom": 620.5,
           "left": 323
         },
         "body": {
-          "client": 326,
-          "scroll": 326
+          "client": 325,
+          "scroll": 325
         },
         "outside": []
       }
@@ -837,17 +837,17 @@
       "geometry": {
         "dialog": {
           "x": 93.5,
-          "y": 74.609375,
+          "y": 51.40625,
           "width": 720,
-          "height": 498.78125,
-          "top": 74.609375,
+          "height": 545.171875,
+          "top": 51.40625,
           "right": 813.5,
-          "bottom": 573.390625,
+          "bottom": 596.578125,
           "left": 93.5
         },
         "body": {
-          "client": 351,
-          "scroll": 351
+          "client": 397,
+          "scroll": 397
         },
         "outside": []
       }
@@ -921,17 +921,17 @@
       "geometry": {
         "dialog": {
           "x": 93.5,
-          "y": 87,
+          "y": 87.5,
           "width": 720,
-          "height": 474,
-          "top": 87,
+          "height": 473,
+          "top": 87.5,
           "right": 813.5,
-          "bottom": 561,
+          "bottom": 560.5,
           "left": 93.5
         },
         "body": {
-          "client": 326,
-          "scroll": 326
+          "client": 325,
+          "scroll": 325
         },
         "outside": []
       }
@@ -1071,17 +1071,17 @@
       "geometry": {
         "dialog": {
           "x": 77.5,
-          "y": 50.609375,
+          "y": 27.40625,
           "width": 720,
-          "height": 498.78125,
-          "top": 50.609375,
+          "height": 545.171875,
+          "top": 27.40625,
           "right": 797.5,
-          "bottom": 549.390625,
+          "bottom": 572.578125,
           "left": 77.5
         },
         "body": {
-          "client": 351,
-          "scroll": 351
+          "client": 397,
+          "scroll": 397
         },
         "outside": []
       }
@@ -1155,17 +1155,17 @@
       "geometry": {
         "dialog": {
           "x": 77.5,
-          "y": 63,
+          "y": 63.5,
           "width": 720,
-          "height": 474,
-          "top": 63,
+          "height": 473,
+          "top": 63.5,
           "right": 797.5,
-          "bottom": 537,
+          "bottom": 536.5,
           "left": 77.5
         },
         "body": {
-          "client": 326,
-          "scroll": 326
+          "client": 325,
+          "scroll": 325
         },
         "outside": []
       }

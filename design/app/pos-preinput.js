@@ -49,11 +49,11 @@
     const formIds = linkedForms(current).map(form => form.id), deliveries = (D.snapshot.deliveries || []).filter(row => formIds.includes(row.formId));
     const sent = deliveries.filter(row => ['sent', 'delivered'].includes(row.status)).length;
     const row = (name, value, action = '') => '<div><dt>' + name + '</dt><dd data-fit="words" title="' + e(value) + '">' + e(value) + '</dd>' + action + '</div>';
-    P.modal(current.customer.name + ' · 사이즈 요청 ' + chosen.length + '명', '<section class="pos-a3-form"><dl class="pos-a3-ledger">'
+    P.modal(current.customer.name + (current.customer.name.endsWith(' 팀') ? '' : ' 팀') + ' · 사이즈 요청 ' + chosen.length + '명', '<section class="pos-a3-form"><dl class="pos-a3-ledger">'
       + row('대상 일행', chosen.map(person => person.preinput?.name || person.name).join(' · ') || (people.length ? '선택 없음' : '대표자 접수 · 개인별 대상 없음'), button('대상 선택', 'pos-preinput-people'))
       + row('접수 차수', batchLabel(current, draft.batchId), button('차수 선택', 'pos-preinput-batches'))
       + row('받는 번호', current.customer.phone || '연락처 미입력') + row('발송 기록', sent ? '발송 기록 ' + sent + '건' : '자동 발송 안 함 · 링크만 준비') + '</dl>'
-      + '<div class="pos-a3-note"><strong>안내 문구</strong><p>[' + e(P.storeName()) + '] ' + e(current.customer.name) + ' 님, 일행 사이즈를 미리 입력해 주세요.</p></div></section>' + errorBox(),
+      + '<div class="pos-a3-note"><strong>안내 문구</strong><p>[' + e(P.storeName()) + '] ' + e(current.customer.name) + ' 님, 일행 사이즈를 미리 입력해 주세요.</p></div><p class="pos-a3-warn">사이즈 미입력 · 미입력 시 현장 측정</p></section>' + errorBox(),
       button('취소', 'close') + button(draft.personIds.length + '명 입력 링크 준비', 'pos-preinput-create', '', 'primary'), (current.receiptNo || current.id) + ' · 이미 아는 규격은 다시 묻지 않습니다');
     S.$('#so-dialog .pos-modal-sub').dataset.fit = 'auto'; P.fitPage(S.$('#so-dialog'));
     S.$('[data-action="pos-preinput-create"]').disabled = !draft.personIds.length;

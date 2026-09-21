@@ -56,7 +56,7 @@
       const service = serviceCount(row), lost = row.conditions.lost, cleaning = row.conditions.cleaning;
       return P.tile({ name: row.label, action: 'pm-inventory-open', id: row.sku, open: '상태 변경', tone: lost ? 'red' : service || cleaning ? 'orange' : '',
         badge: lost ? ['분실 ' + lost, 'red'] : service ? ['정비 중 ' + service, 'orange'] : cleaning ? ['세척 대기 ' + cleaning, 'orange'] : ['정상', 'green'], figures: [{ label: '대여 가능', value: row.available }],
-        lines: [['보유 ' + row.total + ' · 대여 중 ' + row.customer + (row.vehicle ? ' · 차량 ' + row.vehicle : '') + (row.partnerOut ? ' · 거래처 ' + row.partnerOut : ''), ''], ['세척 ' + cleaning + ' · 정비 ' + service + ' · 분실 ' + lost, '']] });
+        wide: true, lines: [[['보유 ' + row.total + ' · 대여 중 ' + row.customer + (row.vehicle ? ' · 차량 ' + row.vehicle : '') + (row.partnerOut ? ' · 거래처 ' + row.partnerOut : '') + (cleaning ? ' · 세척 대기 ' + cleaning : '') + (service ? ' · 정비 중 ' + service : '') + (lost ? ' · 분실 ' + lost : ''), '보유 ' + row.total + ' · 대여 중 ' + row.customer + (service ? ' · 정비 중 ' + service : cleaning ? ' · 세척 대기 ' + cleaning : lost ? ' · 분실 ' + lost : ''), '보유 ' + row.total + ' · 대여 중 ' + row.customer], '']] });
     });
     const filters = [['', '전체'], ['available', '대여 가능'], ['cleaning', '세척 대기'], ['service', '정비 중'], ['lost', '분실']];
     return P.page('재고·정비', '', '<div class="pm-inventory-tiles">' + P.cards([{ cards }], { fixed: true, cols: 3, cardHeight: 180, signature: 'inventory|' + state.inventoryFilter + '|' + query, empty: '해당 품목 없음' }) + '</div>',
@@ -101,7 +101,8 @@
   const detailInfo = rows => '<dl class="pos-detail-info">' + rows.map(([label, parts]) => '<div><dt>' + e(label) + '</dt><dd data-fit="parts" data-parts="' + e(JSON.stringify(parts)) + '">' + e(parts.join(' · ')) + '</dd></div>').join('') + '</dl>';
   const detailSums = rows => '<div class="pm-detail-totals">' + rows.map(([label, value, tone]) => '<span class="pos-sum"><span>' + e(label) + '</span><strong data-tone="' + e(tone || '') + '">' + e(value) + '</strong></span>').join('') + '</div>';
   function transferCard(name, note, labels, values) {
-    return '<article class="pos-card pos-item-card pm-transfer-card"><span class="pos-item-copy"><strong>' + e(name) + '</strong><span data-fit="auto">' + e(note) + '</span></span><span class="pos-item-figures">' + labels.map((label, index) => '<span><small>' + e(label) + '</small><b' + (index === 2 && values[index] ? ' data-tone="orange"' : '') + '>' + values[index] + '</b></span>').join('') + '</span></article>';
+    const open = values[2] > 0;
+    return '<article class="pos-card pos-item-card pm-transfer-card" data-tone="' + (open ? 'orange' : 'green') + '"><span class="pos-card-legend">' + e(open ? labels[1] + ' 전' : labels[1] + ' 완료') + '</span><span class="pos-item-copy"><strong>' + e(name) + '</strong><span data-fit="auto">' + e(note) + '</span></span><span class="pos-item-figures">' + labels.map((label, index) => '<span><small>' + e(label) + '</small><b' + (index === 2 && values[index] ? ' data-tone="orange"' : '') + '>' + values[index] + '</b></span>').join('') + '</span></article>';
   }
   function partnerDetail() {
     const p = partner(S.state.params.id); if (!p) return partners();
@@ -109,7 +110,7 @@
     const side = '<aside class="pos-panel pos-detail-side"><div class="pos-detail-name"><strong data-fit="words">' + e(p.name) + '</strong>' + P.badge(p.receivableWon ? '미수' : p.payableWon ? '미지급' : '정산 확인', p.receivableWon ? 'red' : p.payableWon ? 'orange' : 'grey') + '</div>'
       + detailInfo([['연락처', [p.phone || '미등록']], ['미수', [won0(p.receivableWon)]], ['미지급', [won0(p.payableWon)]], ['돌려줄', [borrowed + '개']], ['돌려받을', [lent + '개']], ['약정', [p.agreements.length ? p.agreements.length + '건 · 상계 ' + won0(p.offsetWon) : '금액 확인 필요']]])
       + '<div class="pos-detail-actions pos-shortcuts">' + b('연락처', 'pm-partner-edit', p.id) + b('실제 금액 기록', 'pm-partner-money', p.id) + b('물품 빌려오기', 'pm-partner-borrow', p.id) + b('실제 반환', 'pm-partner-return', p.id) + b('물품 빌려주기', 'pm-partner-lend', p.id) + b('실제 회수', 'pm-partner-receive', p.id) + '</div></aside>';
-    let cards, summary = '', actions;
+    let cards, summary = '', actions, note = '';
     const loanTab = state.partnerTab === 'loans' || state.partnerTab === 'lendings', lending = state.partnerTab === 'lendings';
     if (loanTab) {
       cards = lending ? p.lendings.map(row => transferCard([...new Set(row.assetIds.map(id => product(m().assets.find(a => a.id === id)?.sku)?.label || '물품'))].join(' · ') + ' ' + row.assetIds.length + '개', '돌려받을 날 ' + row.dueDate, ['대여', '회수', '미회수'], [row.assetIds.length, row.receivedQuantity, row.outstandingQuantity]))
@@ -117,7 +118,9 @@
       const agreements = p.agreements.filter(row => row.kind === (lending ? 'receivable' : 'payable'));
       const figures = [[lending ? '받을 약정' : '줄 약정', agreements.length ? won(agreements.reduce((sum, row) => sum + row.amountWon, 0)) : '미등록', ''], [lending ? '실제 받음' : '실제 지급', won0(lending ? p.receivedWon : p.paidWon), 'green'], [lending ? '미수' : '미지급', won0(lending ? p.receivableWon : p.payableWon), 'red']];
       summary = '<div class="pos-panel pm-balance-lines">' + figures.map(([label, amount, tone]) => '<div><span>' + label + '</span><b data-tone="' + tone + '">' + e(amount) + '</b></div>').join('') + '</div><p class="pos-detail-hint" data-fit="auto">거래처 전체 금액 · 미배분·상계는 별도 확인</p>';
-      actions = b(lending ? '물품 빌려주기' : '물품 빌려오기', lending ? 'pm-partner-lend' : 'pm-partner-borrow', p.id, 'primary');
+      const openWon = lending ? p.receivableWon : p.payableWon, rows = lending ? p.lendings : p.loans, nextDue = rows.filter(row => row.outstandingQuantity).map(row => row.dueDate).sort()[0];
+      note = [(lending ? '미수 ' : '미지급 ') + won0(openWon), (lending ? '미회수 ' : '미반환 ') + (lending ? lent : borrowed) + '개', nextDue ? (lending ? '회수일 ' : '반환일 ') + Number(nextDue.slice(5, 7)) + '/' + Number(nextDue.slice(8, 10)) : ''].filter(Boolean).join(' · ');
+      actions = openWon ? b((lending ? '수납 ' : '지급 ') + won(openWon), 'pm-partner-money', p.id, 'primary') : b(lending ? '물품 빌려주기' : '물품 빌려오기', lending ? 'pm-partner-lend' : 'pm-partner-borrow', p.id, 'primary');
     } else if (state.partnerTab === 'agreements') {
       cards = p.agreements.map(row => P.orderCard({ name: (row.kind === 'receivable' ? '받을 약정 ' : '줄 약정 ') + won(row.amountWon), metaParts: [row.reason], itemFit: 'parts', itemParts: ['실제 배분 ' + won(row.paidWon), '상계 ' + won(row.offsetWon)], money: ['남음 ' + won(row.outstandingWon), row.outstandingWon ? 'red' : 'green'], actions: row.outstandingWon ? b('실제 금액 기록', 'pm-agreement-money', row.id) : '' }));
       actions = b('상계 이력', 'pm-offset-history', p.id) + b('상계 확인', 'pm-partner-offset', p.id) + b('약정 금액 기록', 'pm-partner-agreement', p.id, 'primary');
@@ -127,7 +130,7 @@
     }
     const list = P.cards([{ cards }], { fixed: true, cols: 1, cardHeight: loanTab ? 108 : 171, signature: p.id + '|' + state.partnerTab, empty: '기록 없음' });
     const tabBar = P.group([['loans', '빌린 물품'], ['lendings', '빌려준 물품'], ['agreements', '약정·상계'], ['money', '실제 금액']].map(([id, label]) => P.chip(label, 'pm-partner-tab', id, state.partnerTab === id)).join(''));
-    return P.page('거래처 장부', '', '<div class="pos-detail pm-detail">' + side + '<div class="pos-detail-main">' + list + summary + '</div></div>', go('거래처 목록', 'partners') + '<div class="so-actions">' + actions + '</div>',
+    return P.page('거래처 장부', '', '<div class="pos-detail pm-detail' + (loanTab && cards.length < 2 ? ' is-single' : '') + '">' + side + '<div class="pos-detail-main">' + list + summary + '</div></div>', (note ? '<span data-fit="auto">' + e(note) + '</span>' : '') + '<div class="so-actions">' + go('거래처 목록', 'partners') + actions + '</div>',
       { toolbar: go('목록', 'partners') + tabBar + detailSums([['미수', won0(p.receivableWon), 'red'], ['미지급', won0(p.payableWon), '']]), wait: p.receivableWon || p.payableWon ? '미정산' : '없음' });
   }
   S.action('pm-partner-tab', id => { state.partnerTab = id; S.render(); });

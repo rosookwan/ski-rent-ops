@@ -113,10 +113,10 @@
   function tile(c) {
     const tone = c.tone || '', strong = ['red', 'orange', 'green'].includes(tone);
     const line = row => { const alts = [].concat(row?.[0] || []); return '<span class="pos-tile-line" data-tone="' + e(row?.[1] || '') + '" ' + (alts.length > 1 ? 'data-fit="alts" data-alts="' + partsAttr(alts) + '"' : 'data-fit="auto"') + '>' + e(alts[0] || '') + '</span>'; };
-    return '<button type="button" class="pos-tile" ' + (c.action ? 'data-action="' + e(c.action) + '" data-id="' + e(c.id ?? '') + '"' : 'data-go="' + e(c.route) + '"') + (tone ? ' data-tone="' + e(tone) + '"' : '') + '>' + (strong && c.badge ? '<span class="pos-card-legend">' + e(c.badge[0]) + '</span>' : '')
+    return '<button type="button" class="pos-tile" ' + (c.action ? 'data-action="' + e(c.action) + '" data-id="' + e(c.id ?? '') + '"' : 'data-go="' + e(c.route) + '"') + (tone ? ' data-tone="' + e(tone) + '"' : '') + (c.wide ? ' data-wide="true"' : '') + '>' + (strong && c.badge ? '<span class="pos-card-legend">' + e(c.badge[0]) + '</span>' : '')
       + '<span class="pos-tile-head"><strong>' + e(c.name) + '</strong>' + (!strong && c.badge ? badge(c.badge[0], c.badge[1] || 'grey') : '') + '</span>'
       + (c.figures ? '<span class="pos-tile-figures">' + c.figures.map(f => '<span><small>' + e(f.label) + '</small><b' + (f.when ? ' class="is-when"' : '') + ' data-tone="' + e(f.tone || '') + '">' + e(f.value) + '</b></span>').join('') + '</span>' : '')
-      + (c.figures ? line(c.lines?.[0]) + '<span class="pos-tile-last">' + line(c.lines?.[1]) : '<span class="pos-tile-text">' + line(c.lines?.[0]) + line(c.lines?.[1]) + '</span><span class="pos-tile-last"><span class="pos-tile-line"></span>') + '<span class="pos-tile-open">' + e(c.open || '열기') + ' ›</span></span></button>';
+      + (c.wide ? line(c.lines?.[0]) + '<span class="pos-tile-open is-wide">' + e(c.open || '열기') + '</span></button>' : (c.figures ? line(c.lines?.[0]) + '<span class="pos-tile-last">' + line(c.lines?.[1]) : '<span class="pos-tile-text">' + line(c.lines?.[0]) + line(c.lines?.[1]) + '</span><span class="pos-tile-last"><span class="pos-tile-line"></span>') + '<span class="pos-tile-open">' + e(c.open || '열기') + ' ›</span></span></button>');
   }
   // One-line list row (52px): the whole row is the touch target, the label at the end only names what a tap does.
   function lineRow(c) {

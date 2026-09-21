@@ -22,7 +22,8 @@
 #ski-ops[data-pos="true"] .pos-fulfillment-row p{white-space:nowrap;overflow:hidden}
 #ski-ops[data-pos="true"] .pos-fulfillment-row output{display:flex;justify-content:center;min-width:40px}
 #ski-ops[data-pos="true"] .pos-fulfillment-money{display:flex;align-items:center;gap:12px;min-height:56px;padding:0 8px 0 16px;border-radius:10px;background:var(--so-bg)}
-#ski-ops[data-pos="true"] .pos-fulfillment-money b{margin-left:auto;font-size:var(--pos-fs-title);font-variant-numeric:tabular-nums}
+#ski-ops[data-pos="true"] .pos-fulfillment-money b{margin-right:auto;font-size:var(--pos-fs-title);font-variant-numeric:tabular-nums}
 #ski-ops[data-pos="true"] .pos-fulfillment-money b[data-tone="red"]{color:var(--tone-red)}
+#ski-ops[data-pos="true"] .pos-fulfillment-money .pos-btn{min-width:112px}
 #ski-ops[data-pos="true"] .pos-fulfillment-money b[data-tone="green"]{color:var(--tone-green)}
 #ski-ops[data-pos="true"] .pos-fulfillment-extra{margin-right:auto}

@@ -44,4 +44,8 @@
 #ski-ops[data-pos="true"] .pm-balance-lines [data-tone="green"]{color:var(--tone-green)}
 #ski-ops[data-pos="true"] .pm-customer-actions{grid-template-columns:1fr}
 #ski-ops[data-pos="true"] .pm-customer-note{margin:0;font-size:var(--pos-fs-min);line-height:22px;max-height:44px;overflow:hidden;color:var(--so-muted)}
-@media(max-width:1100px){#ski-ops[data-pos="true"] .pm-detail-totals{display:none}}
+@media(max-width:880px){#ski-ops[data-pos="true"] .pm-detail-totals{display:none}}
+#ski-ops[data-pos="true"] .pm-detail.is-single .pos-detail-main>.pos-cards{flex:0 0 136px}
+#ski-ops[data-pos="true"] .pm-transfer-card{position:relative;overflow:visible}
+#ski-ops[data-pos="true"] .pos-card.pm-transfer-card[data-tone]>.pos-card-legend{top:-12px;left:auto;right:16px;padding:1px 10px;border-radius:6px;color:#fff;line-height:22px}
+#ski-ops[data-pos="true"] .pm-detail.is-single .pos-detail-main>.pos-cards{padding-top:12px;overflow:visible}

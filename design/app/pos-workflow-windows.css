@@ -35,3 +35,6 @@
 #ski-ops[data-pos="true"] .pos-a3-ledger [data-tone="green"]{color:var(--tone-green)}
 #ski-ops[data-pos="true"] #so-dialog:has(.pos-a3-form) .pos-fulfillment-extra{display:flex;align-items:center;gap:8px}
 #ski-ops[data-pos="true"] .pos-modal-body:has(.pos-error:not([hidden])) .pos-a3-ticket .pos-a3-summary{display:none}
+#ski-ops[data-pos="true"] .pos-toolbar .pos-size-tabs{margin-left:auto}
+#ski-ops[data-pos="true"] .pos-a3-difference .pos-option{flex:1 1 0;min-width:0}
+#ski-ops[data-pos="true"] .pos-a3-warn{margin:0;padding:8px 16px;border-radius:10px;background:var(--tone-orange-bg,#fff1e3);color:var(--tone-orange,#b45309);font-size:var(--pos-fs-min);font-weight:650}

@@ -205,6 +205,8 @@
 #ski-ops[data-pos="true"] .pos-tile-last{display:flex;align-items:center;gap:10px;min-width:0}
 #ski-ops[data-pos="true"] .pos-tile-last .pos-tile-line{flex:1 1 0}
 #ski-ops[data-pos="true"] .pos-tile-open{flex:0 0 auto;font-size:var(--pos-fs-body);font-weight:700;line-height:22px;color:var(--so-accent-dark)}
+#ski-ops[data-pos="true"] .pos-tile-open.is-wide{display:flex;align-items:center;justify-content:center;min-height:44px;border-radius:10px;box-shadow:inset 0 0 0 1px var(--so-line-strong,#cfcfcf);color:var(--so-ink);font-weight:650}
+#ski-ops[data-pos="true"] .pos-tile[data-wide] .pos-badge[data-tone="green"]{border-radius:999px;padding:2px 12px;background:var(--tone-green);color:#fff}
 #ski-ops[data-pos="true"] .pos-tile .pos-card-legend,
 #ski-ops[data-pos="true"] .pos-card.is-fixed .pos-card-legend{top:-12px;left:auto;right:16px;padding:1px 10px;border-radius:6px;color:#fff;line-height:22px}
 #ski-ops[data-pos="true"] [data-tone="red"]>.pos-card-legend{background:var(--tone-red)}

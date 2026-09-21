@@ -5,6 +5,8 @@
   const settings = () => D.snapshot.management?.settings || {};
   const day = (date, n = 0) => { const value = new Date(date + 'T00:00:00Z'); value.setUTCDate(value.getUTCDate() + n); return value.toISOString().slice(0, 10); };
   const short = date => Number(date.slice(5, 7)) + '/' + Number(date.slice(8, 10));
+  const dated = date => short(date) + ' (' + '일월화수목금토'[new Date(date + 'T00:00:00Z').getUTCDay()] + ')';
+  const team = order => order.customer.name + (order.customer.name.endsWith(' 팀') ? '' : ' 팀');
   const label = line => line.label || D.snapshot.catalog.find(item => item.id === line.sku)?.label || line.sku;
   const hidden = (name, value, title = '') => '<input type="hidden" data-pos-input="' + e(name) + '" aria-label="' + e(title) + '" value="' + e(value) + '">';
   const option = (field, value, text, selected, disabled = false) => '<button type="button" class="so-button pos-button pos-option" data-action="pos-a2-pick" data-field="' + field + '" data-id="' + e(value) + '" aria-pressed="' + selected + '"' + (disabled ? ' disabled' : '') + '><span data-fit="words">' + e(text) + '</span></button>';
@@ -16,7 +18,7 @@
     api.state.request.revision = draft.revision; fit();
   }
   function dates(field, dates) {
-    return [...new Set(dates)].map(date => option(field, date, short(date), draft[field] === date)).join('') + b('달력', 'pos-a2-calendar', field);
+    return [...new Set(dates)].map(date => option(field, date, dated(date), draft[field] === date)).join('') + b('달력', 'pos-a2-calendar', field);
   }
   function extension(order, line, terms, amount, services) {
     api = services; const last = terms.slice().sort().at(-1) || line.end;
@@ -37,8 +39,8 @@
   function render() {
     const d = draft, { order, line } = d, sub = (order.receiptNo || order.id) + ' · ' + label(line);
     if (d.type === 'extension') {
-      request(order.customer.name + ' · 기간 연장', row('이용 종료일', dates('end', [d.min, day(d.min, 1), ...(d.end > day(d.min, 1) ? [d.end] : [])]))
-        + info([['연장 대상', line.customerQuantity ? '남은 ' + d.terms.length + '개만 이용 연장' : '미지급 ' + d.terms.length + '개'], ['변경 후 종료', d.end], ['추가 금액', S.money(d.amountWon)]])
+      request(team(order) + ' · 기간 연장', row('이용 종료일', dates('end', [d.min, day(d.min, 1), ...(d.end > day(d.min, 1) ? [d.end] : [])]))
+        + info([['연장 대상', line.customerQuantity ? '남은 ' + d.terms.length + '개만 이용 연장' : '미지급 ' + d.terms.length + '개'], ['변경 후 종료', dated(d.end)], ['추가 금액', S.money(d.amountWon)]])
         + hidden('fulfillment-end', d.end, '새 이용 종료일') + hidden('fulfillment-amount', d.amountWon, '이번 추가 청구액 (원)') + hidden('fulfillment-reason', d.reason)
         + '<div class="pos-a2-tools">' + b('금액·사유 확인', 'pos-a2-edit', 'extension') + '<span>반납한 실물의 기간은 유지</span></div>', 'ops.extend',
         () => ({ orderId: order.id, lineIds: [line.id], end: d.end, amountWon: Number(d.amountWon), reason: d.reason }), null, '확인하고 저장', sub);
@@ -46,17 +48,17 @@
       const places = [...new Set([d.place, ...(settings().places || [])])].filter(Boolean), times = settings().returnTimes || [], preset = times.find(t => t.time === d.time && (t.dayOffset || 0) === d.offset);
       const timeChoices = [preset, ...times.filter(t => t !== preset)].filter(Boolean).slice(0, 2);
       const vehicles = api.vehicleNames;
-      request(order.customer.name + ' · ' + d.title, row('수거일', dates('date', [d.date, day(d.date, 1)]))
+      request(team(order) + ' · ' + d.title, row('수거일', dates('date', [d.date, day(d.date, 1)]))
         + row('수거 장소', places.slice(0, 2).map(place => option('place', place, place, d.place === place)).join('') + b('더 보기', 'pos-a2-options', 'place'))
         + row('수거 시각', timeChoices.map(t => option('timePreset', t.id, t.label + ' ' + t.time, preset === t)).join('') + b(preset ? '더 보기' : d.time + ' · 더 보기', 'pos-a2-options', 'time'))
         + row('담당 차량', vehicles.slice(0, 2).map(([id, name]) => option('vehicleId', id, name, id === d.vehicleId)).join('') + (vehicles.length > 2 ? b('더 보기', 'pos-a2-options', 'vehicle') : ''))
-        + info([['변경 후 약속', d.date + ' ' + d.time + ' · ' + d.place + ' · ' + (api.vehicleName(d.vehicleId) || '차량 선택')]])
+        + info([['변경 후 약속', short(d.date) + ' ' + d.time + ' · ' + d.place + ' · ' + (api.vehicleName(d.vehicleId) || '차량 선택')], ['추가 금액', '없음']])
         + Object.entries(d.fields).map(([field, name]) => hidden(name, d[field])).join(''), d.command, () => d.payload(d), d.done, d.confirmLabel || '확인하고 저장', sub + ' · 차량 수거 약속');
     } else {
       const sizes = [...new Set([d.oldSize, ...D.snapshot.assets.filter(asset => asset.sku === d.kind && asset.location.kind === 'shop' && asset.condition === 'ready' && !asset.orderPreparation && !asset.exchangeReservationId).map(asset => asset.size), d.newSize])].filter(Boolean).sort((a, b) => a.localeCompare(b, 'ko', { numeric: true }));
       const picked = sizes.includes(d.newSize) && sizes.indexOf(d.newSize) >= 7 ? [d.newSize, ...sizes.filter(size => size !== d.newSize)] : sizes;
       const hiddenFields = { 'exchange-base': d.baseId, 'exchange-kind': d.kind, 'exchange-old-size': d.oldSize, 'exchange-new-size': d.newSize, 'exchange-reason': d.reason, 'exchange-method': d.method };
-      P.modal(order.customer.name + ' · 교환 1개', '<section class="pos-a2-form pos-a2-exchange">'
+      P.modal(team(order) + ' · 교환 1개', '<section class="pos-a2-form pos-a2-exchange">'
         + row('교환 품목', d.kinds.map(([id, name]) => option('kind', id, name, id === d.kind)).join(''))
         + '<div class="pos-a2-size-head"><strong>교환 사이즈</strong><span>현재 ' + e(d.oldSize || '규격 확인 필요') + '</span>' + b('현재 장비·규격', 'pos-a2-edit', 'base') + '</div>'
         + '<div class="pos-a2-size-grid">' + picked.slice(0, 7).map(size => option('newSize', size, size + (size === d.oldSize ? ' 현재' : ''), d.newSize === size, size === d.oldSize && d.reason === 'size')).join('') + b(sizes.length > 7 ? '더 보기·입력' : '직접 입력', 'pos-a2-options', 'size') + '</div>'

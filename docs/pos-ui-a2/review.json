@@ -53,12 +53,12 @@
         "height": 600,
         "dialog": {
           "x": 152,
-          "y": 57.40625,
+          "y": 40.8125,
           "width": 720,
-          "height": 485.1875,
-          "top": 57.40625,
+          "height": 518.375,
+          "top": 40.8125,
           "right": 872,
-          "bottom": 542.59375,
+          "bottom": 559.1875,
           "left": 152
         },
         "bodies": [
@@ -69,8 +69,8 @@
           },
           {
             "className": "pos-modal-body",
-            "clientHeight": 337,
-            "scrollHeight": 337
+            "clientHeight": 370,
+            "scrollHeight": 370
           }
         ],
         "title": "박준호 팀 · 수거 약속 변경"
@@ -205,12 +205,12 @@
         "height": 768,
         "dialog": {
           "x": 152,
-          "y": 141.40625,
+          "y": 124.8125,
           "width": 720,
-          "height": 485.1875,
-          "top": 141.40625,
+          "height": 518.375,
+          "top": 124.8125,
           "right": 872,
-          "bottom": 626.59375,
+          "bottom": 643.1875,
           "left": 152
         },
         "bodies": [
@@ -221,8 +221,8 @@
           },
           {
             "className": "pos-modal-body",
-            "clientHeight": 337,
-            "scrollHeight": 337
+            "clientHeight": 370,
+            "scrollHeight": 370
           }
         ],
         "title": "박준호 팀 · 수거 약속 변경"
@@ -357,12 +357,12 @@
         "height": 768,
         "dialog": {
           "x": 323,
-          "y": 141.40625,
+          "y": 124.8125,
           "width": 720,
-          "height": 485.1875,
-          "top": 141.40625,
+          "height": 518.375,
+          "top": 124.8125,
           "right": 1043,
-          "bottom": 626.59375,
+          "bottom": 643.1875,
           "left": 323
         },
         "bodies": [
@@ -373,8 +373,8 @@
           },
           {
             "className": "pos-modal-body",
-            "clientHeight": 337,
-            "scrollHeight": 337
+            "clientHeight": 370,
+            "scrollHeight": 370
           }
         ],
         "title": "박준호 팀 · 수거 약속 변경"
@@ -509,12 +509,12 @@
         "height": 648,
         "dialog": {
           "x": 93.5,
-          "y": 81.40625,
+          "y": 64.8125,
           "width": 720,
-          "height": 485.1875,
-          "top": 81.40625,
+          "height": 518.375,
+          "top": 64.8125,
           "right": 813.5,
-          "bottom": 566.59375,
+          "bottom": 583.1875,
           "left": 93.5
         },
         "bodies": [
@@ -525,8 +525,8 @@
           },
           {
             "className": "pos-modal-body",
-            "clientHeight": 337,
-            "scrollHeight": 337
+            "clientHeight": 370,
+            "scrollHeight": 370
           }
         ],
         "title": "박준호 팀 · 수거 약속 변경"
@@ -661,12 +661,12 @@
         "height": 600,
         "dialog": {
           "x": 77.5,
-          "y": 57.40625,
+          "y": 40.8125,
           "width": 720,
-          "height": 485.1875,
-          "top": 57.40625,
+          "height": 518.375,
+          "top": 40.8125,
           "right": 797.5,
-          "bottom": 542.59375,
+          "bottom": 559.1875,
           "left": 77.5
         },
         "bodies": [
@@ -677,8 +677,8 @@
           },
           {
             "className": "pos-modal-body",
-            "clientHeight": 337,
-            "scrollHeight": 337
+            "clientHeight": 370,
+            "scrollHeight": 370
           }
         ],
         "title": "박준호 팀 · 수거 약속 변경"
