@@ -43,7 +43,8 @@ function measure(options) {
   const clippedText = group(all.filter(el => {
     if (!(ownText(el) || el.tagName === 'BUTTON')) return false;
     const s = getComputedStyle(el), hidesX = ['hidden', 'clip'].includes(s.overflowX) || s.textOverflow === 'ellipsis', hidesY = ['hidden', 'clip'].includes(s.overflowY);
-    return hidesX && el.scrollWidth > el.clientWidth + 1 || hidesY && el.scrollHeight > el.clientHeight + 2;
+    const spills = el.tagName === 'BUTTON' && el.id !== 'pos-notice-bell' && el.scrollWidth > el.clientWidth + 1; // text running past a button edge overlaps its neighbour
+    return spills || hidesX && el.scrollWidth > el.clientWidth + 1 || hidesY && el.scrollHeight > el.clientHeight + 2;
   }).map(el => ({ sel: signature(el), sample: sample(el), need: el.scrollWidth, has: el.clientWidth })), row => row.sel);
 
   const halfCut = group([...root.querySelectorAll('[data-pos-scroll],.pos-list,.pos-page-body,.pos-modal-body')].filter(el => el.getClientRects().length).flatMap(container => {

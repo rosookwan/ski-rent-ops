@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-21T04:10:12.778Z",
+  "generatedAt": "2026-09-21T04:38:54.832Z",
   "mode": "static memory demonstration; screenshots are not evidence of physical hardware",
   "checks": [
     {
@@ -1155,6 +1155,56 @@
       }
     },
     {
+      "key": "intake-customer",
+      "viewport": [
+        1024,
+        600
+      ],
+      "overflow": [],
+      "bodyScroll": false,
+      "rules": {
+        "minFont": 16,
+        "minTarget": 52,
+        "smallText": [],
+        "clippedText": [],
+        "halfCut": [],
+        "shortTargets": [],
+        "scrolling": []
+      },
+      "ruleTotals": {
+        "smallText": 0,
+        "clippedText": 0,
+        "halfCut": 0,
+        "shortTargets": 0,
+        "scrolling": 0
+      }
+    },
+    {
+      "key": "intake-items",
+      "viewport": [
+        1024,
+        600
+      ],
+      "overflow": [],
+      "bodyScroll": false,
+      "rules": {
+        "minFont": 16,
+        "minTarget": 52,
+        "smallText": [],
+        "clippedText": [],
+        "halfCut": [],
+        "shortTargets": [],
+        "scrolling": []
+      },
+      "ruleTotals": {
+        "smallText": 0,
+        "clippedText": 0,
+        "halfCut": 0,
+        "shortTargets": 0,
+        "scrolling": 0
+      }
+    },
+    {
       "key": "group-30",
       "viewport": [
         1024,
@@ -1205,6 +1255,31 @@
       }
     },
     {
+      "key": "intake-done",
+      "viewport": [
+        1024,
+        600
+      ],
+      "overflow": [],
+      "bodyScroll": false,
+      "rules": {
+        "minFont": 16,
+        "minTarget": 52,
+        "smallText": [],
+        "clippedText": [],
+        "halfCut": [],
+        "shortTargets": [],
+        "scrolling": []
+      },
+      "ruleTotals": {
+        "smallText": 0,
+        "clippedText": 0,
+        "halfCut": 0,
+        "shortTargets": 0,
+        "scrolling": 0
+      }
+    },
+    {
       "key": "order-detail",
       "viewport": [
         1024,
@@ -1217,34 +1292,16 @@
         "minTarget": 52,
         "smallText": [],
         "clippedText": [],
-        "halfCut": [
-          {
-            "sel": "div.pos-page-body article.pos-card",
-            "sample": "스키 1대지급 전일행 2 · 첫 접수 · 9/21실제 지급0대예정1대고객",
-            "count": 1
-          },
-          {
-            "sel": "div.pos-cards article.pos-card",
-            "sample": "스키 1대지급 전일행 2 · 첫 접수 · 9/21실제 지급0대예정1대고객",
-            "count": 1
-          }
-        ],
+        "halfCut": [],
         "shortTargets": [],
-        "scrolling": [
-          {
-            "sel": "div.pos-cards",
-            "need": 8135,
-            "has": 384,
-            "allowed": false
-          }
-        ]
+        "scrolling": []
       },
       "ruleTotals": {
         "smallText": 0,
         "clippedText": 0,
-        "halfCut": 2,
+        "halfCut": 0,
         "shortTargets": 0,
-        "scrolling": 1
+        "scrolling": 0
       }
     },
     {
@@ -1360,34 +1417,16 @@
         "minTarget": 52,
         "smallText": [],
         "clippedText": [],
-        "halfCut": [
-          {
-            "sel": "div.pos-page-body article.pos-card",
-            "sample": "오후권 성인 4매대여 중팀 공용 · 기존 대여 · 9/21실제 지급4매예",
-            "count": 1
-          },
-          {
-            "sel": "div.pos-cards article.pos-card",
-            "sample": "오후권 성인 4매대여 중팀 공용 · 기존 대여 · 9/21실제 지급4매예",
-            "count": 1
-          }
-        ],
+        "halfCut": [],
         "shortTargets": [],
-        "scrolling": [
-          {
-            "sel": "div.pos-cards",
-            "need": 813,
-            "has": 384,
-            "allowed": false
-          }
-        ]
+        "scrolling": []
       },
       "ruleTotals": {
         "smallText": 0,
         "clippedText": 0,
-        "halfCut": 2,
+        "halfCut": 0,
         "shortTargets": 0,
-        "scrolling": 1
+        "scrolling": 0
       }
     }
   ],
@@ -1658,15 +1697,33 @@
       "size": "907×648"
     },
     {
+      "title": "새 접수 1 · 고객 찾기",
+      "detail": "연락처 끝 4자리로 기존 고객을 찾고, 처음 온 고객은 이름과 연락처만 입력합니다.",
+      "file": "intake-customer-1024x600.png",
+      "size": "1024×600"
+    },
+    {
+      "title": "새 접수 2 · 품목",
+      "detail": "품목을 누르면 1개씩 늘어나고, 오른쪽에서 수량·이용 일수·합계를 확인합니다.",
+      "file": "intake-items-1024x600.png",
+      "size": "1024×600"
+    },
+    {
       "title": "30명 일행 한 번에 접수",
-      "detail": "실명 입력 없이 30명에게 사람별 품목 행을 생성합니다. 목록은 페이지로 나누고 합계와 확정은 고정합니다.",
+      "detail": "실명 없이 30명을 만들고, 한 사람의 품목을 남은 일행 모두에게 같게 넣습니다. 일행 목록은 쪽으로 나눕니다.",
       "file": "group-30-1024x600.png",
       "size": "1024×600"
     },
     {
-      "title": "추가 전 최종 확인",
-      "detail": "이번 인원·품목·기간·청구액을 확인한 뒤 저장합니다.",
+      "title": "새 접수 3 · 일정·장소",
+      "detail": "수령일·이용 일수·수령 시간·장소·반납 시간을 버튼으로 고르고 합계를 확인합니다.",
       "file": "group-review-1024x600.png",
+      "size": "1024×600"
+    },
+    {
+      "title": "접수 완료",
+      "detail": "접수번호와 품목·일정·합계를 보여 주고 다음 할 일로 이어집니다.",
+      "file": "intake-done-1024x600.png",
       "size": "1024×600"
     },
     {

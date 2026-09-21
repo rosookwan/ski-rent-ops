@@ -46,10 +46,11 @@
       if (!left.querySelector('.pos-mark')) { const mark = document.createElement('span'); mark.className = 'pos-mark'; mark.textContent = '스키노트'; left.insertBefore(mark, shop); }
       shop.textContent = storeName();
     }
+    if (options.title && S.$('#so-breadcrumb')) S.$('#so-breadcrumb').textContent = options.title;
     if (!tools) return;
     const D = S.posData;
     let html = D?.pending ? '<button type="button" class="pos-search-entry" data-action="pos-retry">앞선 처리 다시 확인</button>' : '';
-    if (options.wait != null) html += '<span class="pos-wait"><span>처리 대기</span><strong>' + e(options.wait) + '</strong></span>';
+    if (options.wait != null) html += '<span class="pos-wait">' + (options.waitLabel === '' ? '' : '<span>' + e(options.waitLabel || '처리 대기') + '</span>') + '<strong>' + e(options.wait) + '</strong></span>';
     for (const [label, value, tone] of options.sums || []) html += '<span class="pos-sum"><span>' + e(label) + '</span><strong' + (tone ? ' data-tone="' + e(tone) + '"' : '') + '>' + e(value) + '</strong></span>';
     if (options.wait == null && !options.sums && !D?.pending) html += '<button type="button" data-go="rentals" class="pos-search-entry">' + S.icon('search') + '고객 찾기</button>';
     tools.innerHTML = html; tools.hidden = false;
@@ -65,7 +66,7 @@
     afterRender();
     return '<section class="pos-page" aria-label="' + e(title) + '"><header class="pos-page-heading"><h1>' + e(title) + '</h1>'
       + (meaningful(options.toolbar) ? '<div class="pos-toolbar">' + options.toolbar + '</div>' : '') + (description ? '<p>' + e(description) + '</p>' : '')
-      + '</header><div class="pos-page-body' + (body.includes('data-pos-cards=') ? ' is-cards' : '') + '">' + body + '</div>' + (footer ? '<footer class="pos-page-footer">' + footer + '</footer>' : '') + '</section>';
+      + '</header><div class="pos-page-body' + (body.includes('data-pos-cards=') || body.includes('class="pos-split') ? ' is-cards' : '') + '">' + body + '</div>' + (footer ? '<footer class="pos-page-footer">' + footer + '</footer>' : '') + '</section>';
   }
   function row(title, description, actions = '') {
     return '<article class="pos-row"><div class="pos-row-copy"><strong>' + e(title) + '</strong>'
@@ -99,8 +100,8 @@
       // UI v4 list: same-height cards, laid out after insertion by layoutCards(). The first rows are rendered right away as a fallback.
       const key = pageKey('cards'), signature = filled.map(g => g.title + ':' + g.cards.length).join('|') + '|' + (options.signature || '');
       if (cardSets.get(key)?.signature !== signature) pages.set(key, 0);
-      cardSets.set(key, { groups: filled, signature });
-      return '<div class="pos-cards" data-pos-scroll data-pos-cards="' + e(key) + '"' + (options.lines ? ' data-lines' : '') + '><section class="pos-group"><div class="' + (options.lines ? 'pos-line-list' : 'pos-card-grid') + '">' + filled.flatMap(g => g.cards).slice(0, 4).join('') + '</div></section></div>';
+      cardSets.set(key, { groups: filled, signature, focus: options.focus });
+      return '<div class="pos-cards" data-pos-scroll data-pos-cards="' + e(key) + '"' + (options.lines ? ' data-lines' : '') + (options.cardHeight ? ' data-card-h="' + Number(options.cardHeight) + '"' : '') + (options.cols ? ' data-cols="' + Number(options.cols) + '"' : '') + '><section class="pos-group"><div class="' + (options.lines ? 'pos-line-list' : 'pos-card-grid') + '">' + filled.flatMap(g => g.cards).slice(0, 4).join('') + '</div></section></div>';
     }
     if (!filled.length) return '<div class="pos-cards" data-pos-scroll><div class="pos-empty"><strong>' + e(options.empty || '항목 없음') + '</strong>' + (options.emptyNote ? '<span>' + e(options.emptyNote) + '</span>' : '') + (options.emptyAction || '') + '</div></div>';
     return '<div class="pos-cards" data-pos-scroll>' + filled.map(g => '<section class="pos-group">' + (g.title ? '<div class="pos-group-head">' + e(g.title) + (g.sub ? '<small>' + e(g.sub) + '</small>' : '') + '</div>' : '')
@@ -135,10 +136,14 @@
   // One-line list row (52px): the whole row is the touch target, the label at the end only names what a tap does.
   function lineRow(c) {
     const target = c.go ? 'data-go="' + e(c.go.page) + '" data-id="' + e(c.go.id ?? '') + '"' : 'data-action="' + e(c.action) + '" data-id="' + e(c.id ?? '') + '"';
-    return '<button type="button" class="pos-line-row" ' + target + '><strong>' + e(c.name) + '</strong><span class="pos-line-note" data-fit="parts" data-parts="' + partsAttr(c.noteParts || []) + '">' + e((c.noteParts || []).filter(Boolean).join(' · ')) + '</span>'
+    return '<button type="button" class="pos-line-row" ' + target + (c.selected == null ? '' : ' aria-pressed="' + (c.selected ? 'true' : 'false') + '"') + '><strong>' + e(c.name) + '</strong><span class="pos-line-note" data-fit="parts" data-parts="' + partsAttr(c.noteParts || []) + '">' + e((c.noteParts || []).filter(Boolean).join(' · ')) + '</span>'
       + '<b data-tone="' + e(c.tone || '') + '">' + e(c.amount || '') + '</b><span class="pos-line-do">' + e(c.label) + '</span></button>';
   }
   function fitParts(el) {
+    if (el.dataset.fit === 'words') { // long names: whole words drop from the end until the text fits its one or two lines
+      const full = el.dataset.full || (el.dataset.full = el.textContent), words = full.split(' '); el.textContent = full;
+      while (words.length > 1 && (el.scrollWidth > el.clientWidth + 1 || el.scrollHeight > el.clientHeight + 2)) { words.pop(); el.textContent = words.join(' '); } return;
+    }
     if (el.dataset.fit === 'alts') { let alts; try { alts = JSON.parse(el.dataset.alts || '[]'); } catch { return; } for (const text of alts) { el.textContent = text; if (el.scrollWidth <= el.clientWidth + 1) return; } return; }
     let parts; try { parts = JSON.parse(el.dataset.parts || '[]'); } catch { return; }
     const items = el.dataset.fit === 'items';
@@ -171,8 +176,9 @@
     const pageEl = scope || S.$('.pos-page'); if (!pageEl) return;
     const auto = el => { if (el && !el.dataset.parts) { el.dataset.fit = 'parts'; el.dataset.parts = JSON.stringify(el.textContent.split(' · ')); } };
     auto(pageEl.querySelector('.pos-page-footer > span:first-child')); pageEl.querySelectorAll('[data-fit="auto"]').forEach(auto);
-    pageEl.querySelectorAll('.pos-page-footer [data-fit], .pos-group-head [data-fit], .pos-now [data-fit], .pos-tile [data-fit]').forEach(fitParts);
+    pageEl.querySelectorAll('[data-fit]').forEach(el => { if (!el.closest('.pos-card.is-fixed,.pos-line-row')) fitParts(el); });
     pageEl.querySelectorAll('.pos-line-row').forEach(fitLine);
+    pageEl.querySelectorAll('.pos-item-card').forEach(card => { const name = card.querySelector('strong'); card.classList.remove('is-longname'); if (name && name.scrollWidth > name.clientWidth + 1) card.classList.add('is-longname'); });
     // Search hints are fitted the same way: whole words drop from the end instead of being cut by the field.
     pageEl.querySelectorAll('.pos-search input[placeholder]').forEach(input => {
       const full = input.dataset.hint || (input.dataset.hint = input.placeholder), parts = full.split(' · ');
@@ -218,10 +224,12 @@
     const flat = set.groups.flatMap((g, gi) => g.cards.map(html => ({ html, gi })));
     const css = getComputedStyle(container), num = name => parseFloat(css.getPropertyValue(name)) || 0;
     const lines = container.hasAttribute('data-lines');
-    const gap = lines ? 0 : num('--pos-card-gap') || 12, cardHeight = lines ? num('--pos-line-h') || 52 : num('--pos-card-h') || 171, headHeight = lines ? 0 : num('--pos-group-head') || 34;
-    const cols = lines ? 1 : Math.max(1, Math.min(3, Math.floor((container.clientWidth + gap) / (360 + gap))));
+    const gap = lines ? 0 : num('--pos-card-gap') || 12, cardHeight = lines ? num('--pos-line-h') || 52 : Number(container.dataset.cardH) || num('--pos-card-h') || 171, headHeight = lines || !set.groups.some(g => g.title) ? 0 : num('--pos-group-head') || 34;
+    const cols = lines ? 1 : Number(container.dataset.cols) || Math.max(1, Math.min(3, Math.floor((container.clientWidth + gap) / (360 + gap))));
     const list = paginate(flat, cols, container.clientHeight, cardHeight, headHeight, gap);
-    const index = Math.min(getPage('cards'), list.length - 1); limits.set(pageKey('cards'), list.length - 1); pages.set(pageKey('cards'), index);
+    // A caller may ask for the page that holds one item (the selected person); paging by hand afterwards stays free.
+    const wanted = set.focus == null ? -1 : list.findIndex(page => page.sections.some(section => section.from <= set.focus && set.focus < section.to)); set.focus = null;
+    const index = Math.min(wanted >= 0 ? wanted : getPage('cards'), list.length - 1); limits.set(pageKey('cards'), list.length - 1); pages.set(pageKey('cards'), index);
     container.style.setProperty('--pos-cols', cols);
     container.innerHTML = list[index].sections.map(section => {
       const groupIds = [...new Set(flat.slice(section.from, section.to).map(item => item.gi))], groups = groupIds.map(gi => set.groups[gi]);

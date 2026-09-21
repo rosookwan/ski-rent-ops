@@ -49,15 +49,16 @@ async function main() {
   }
   await page.locator('[data-action="pos-new"]').click();
   await page.locator('[data-pos-input="name"]').fill('통합접수 검증팀'); await page.locator('[data-pos-input="phone"]').fill('010-1234-5678');
-  await page.locator('[data-action="pos-draft-next"]').click(); await page.locator('[data-action="pos-person-add"]').click();
+  await page.locator('[data-action="pos-draft-next"]').click(); await page.locator('[data-action="pos-line-detail"]').click(); await page.locator('[data-action="pos-person-add"]').click();
   await page.locator('[data-pos-input="unitWon"]').fill('10000'); await page.locator('[data-action="pos-line-add"]').click();
   await page.locator('[data-action="pos-draft-next"]').click(); await geometry('01-intake-review-1024x600');
-  await page.locator('[data-action="pos-draft-save"]').click(); await page.locator('[data-action="pos-add"]').waitFor();
+  await page.locator('[data-action="pos-draft-save"]').click(); await page.locator('#so-dialog[open] [data-go="intake"]').waitFor(); assert.match(await page.locator('#so-dialog-title').innerText(), /^접수 완료 · /);
+  await page.locator('#so-dialog [data-action="close"]').last().click(); await page.locator('[data-action="pos-add"]').waitFor();
   let order = (await client.snapshot()).orders[0], originalLine = structuredClone(order.lines[0]);
   await page.locator('[data-action="pos-issue"]').click(); await page.locator('[data-action="pos-fulfillment-confirm"]').click();
   await page.locator('[data-action="pos-add"]').waitFor(); assert.equal((await client.snapshot()).orders[0].totals.customerQuantity, 1); checks.push('New reception and physical issue persist through operating UI');
   await page.locator('[data-action="pos-add"]').click(); await page.locator('[data-action="pos-date"][data-id="tomorrow"]').click(); await page.locator('[data-action="pos-draft-next"]').click();
-  await page.locator('[data-action="pos-person-add"]').click(); await page.locator('[data-pos-input="unitWon"]').fill('12000'); await page.locator('[data-action="pos-line-add"]').click();
+  await page.locator('[data-action="pos-line-detail"]').click(); await page.locator('[data-pos-input="unitWon"]').fill('12000'); await page.locator('[data-action="pos-line-add"]').click();
   await page.locator('[data-action="pos-draft-next"]').click(); await page.locator('[data-action="pos-draft-save"]').click(); await page.locator('[data-action="pos-add"]').waitFor();
   order = (await client.snapshot()).orders[0]; assert.equal(order.people.length, 2); assert.equal(order.lines.length, 2); assert.deepEqual(order.lines[0].price, originalLine.price); assert.equal(order.lines[1].start, '2026-09-14'); checks.push('Next-day companion adds independent dates and price under same number');
   await geometry('02-late-arrival-detail-1024x600');
@@ -90,7 +91,7 @@ async function main() {
   await page.waitForFunction(() => !window.SkiOps.posData.busy);
   await page.evaluate(() => window.SkiOps.go('intake')); await page.locator('[data-action="pos-new"]').click();
   await page.locator('[data-pos-input="name"]').fill('응답 유실 신규 접수'); await page.locator('[data-pos-input="phone"]').fill('010-4321-8765'); await page.locator('[data-action="pos-draft-next"]').click();
-  await page.locator('[data-pos-input="unitWon"]').fill('10000'); await page.locator('[data-action="pos-line-add"]').click(); await page.locator('[data-action="pos-draft-next"]').click();
+  await page.locator('[data-action="pos-line-detail"]').click(); await page.locator('[data-pos-input="unitWon"]').fill('10000'); await page.locator('[data-action="pos-line-add"]').click(); await page.locator('[data-action="pos-draft-next"]').click();
   await page.route('**/api/workflows/commands', async route => { const response = await route.fetch(); assert.equal(response.status(), 200); await route.abort('failed'); });
   await page.locator('[data-action="pos-draft-save"]').click(); await page.waitForFunction(() => window.SkiOps.posData.pending && !window.SkiOps.posData.busy);
   assert.equal((await client.snapshot()).orders.length, 2); await page.unroute('**/api/workflows/commands');

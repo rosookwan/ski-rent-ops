@@ -81,7 +81,7 @@ async function main() {
   assert.match(await keypad.locator('[data-keypad-error]').innerText(), /1 이상/); assert.equal(await field('moneyAmount').inputValue(), '25000');
   await page.setViewportSize({ width: 1024, height: 600 }); await layout('minimum-error-1024x600');
   await keypad.press('Escape'); await action('close').last().click();
-  await action('pos-add').click(); await action('pos-draft-next').click();
+  await action('pos-add').click(); await action('pos-draft-next').click(); await action('pos-line-detail').click();
   await field('unitWon').fill('40000'); const draft = await frame.evaluate(() => structuredClone(SkiOps.posOrders.state.draft));
   await trigger(field('quantity')).click(); await digits('501'); await apply();
   assert.match(await keypad.locator('[data-keypad-error]').innerText(), /500 이하/);
@@ -94,11 +94,12 @@ async function main() {
   checks.push('Quantity bounds are enforced; editing or cancelling preserves the existing added-person draft and other fields');
   await action('pos-line-add').click();
   assert.equal(await frame.evaluate(() => SkiOps.posOrders.state.draft.lines[0].quantity), 12);
+  await action('pos-line-detail').click(); // the numeric inputs live in the 직접 입력 window
   await frame.evaluate(() => { for (let count = 0; count < 50; count++) SkiOps.posKeypad.scan(); });
   const numericCount = await frame.locator('input[type="number"]').count();
   assert.equal(await frame.locator('.pos-keypad-trigger').count(), numericCount);
   assert.equal(await frame.locator('.pos-keypad-control .pos-keypad-control').count(), 0);
-  await trigger(field('quantity')).click(); await frame.evaluate(() => SkiOps.go('order-detail', { id: 'keypad-team' }));
+  assert.ok(numericCount >= 3); await trigger(field('quantity')).click(); await frame.evaluate(() => SkiOps.go('order-detail', { id: 'keypad-team' }));
   assert.equal(await keypad.count(), 0);
   checks.push('Normal re-rendering creates one button per new input; repeated scans and navigation create no nested controls or orphan dialog');
   await action('pos-add').click(); await action('pos-draft-next').click(); await frame.locator('[data-action="pos-draft-plan"][data-id="pickup"]').click();

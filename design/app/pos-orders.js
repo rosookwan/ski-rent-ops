@@ -189,76 +189,184 @@
     return person + ' · ' + batch + ' · ' + l.start.slice(5) + (l.end !== l.start ? '~' + l.end.slice(5) : '') + (extended.length ? ' · 남은 ' + extended.length + '개 ' + l.currentEnd.slice(5) + '까지 연장' : '') + ' · ' + (l.cancelledQuantity ? '취소' : '미지급 ' + l.unissuedQuantity + ' / 보유 ' + l.customerQuantity + ' / 차량 ' + l.vehicleQuantity);
   }
   const movementNames = { load: '차량 적재', deliver: '고객 지급', collect: '차량 수거', receive: '매장 입고', directReturn: '직접 반납', opening: '이관 보관 확인', stock: '재고 입고', ticketIssue: '발권', refund: '발권처 환불', found: '발견 확인' };
+  // Item cards on the detail screen: lines of the same product and dates are shown as one card (30 people → one card, not 30).
+  const lineGroups = lines => { const map = new Map(); for (const l of lines) { const key = [l.sku, l.start, l.currentEnd || l.end].join('|'); if (!map.has(key)) map.set(key, []); map.get(key).push(l); } return [...map.values()]; };
+  const sumOf = (group, key) => group.reduce((n, l) => n + (l[key] || 0), 0);
+  function itemCard(o, group) {
+    const first = group[0], people = [...new Set(group.map(l => o.people.find(p => p.id === l.personId)?.name).filter(Boolean))];
+    const who = !people.length ? '팀 공용' : people.length <= 2 ? people.join(' · ') : people[0] + ' 외 ' + (people.length - 1) + '명';
+    const state = group.map(lineState).sort((x, y) => stateRanks.out.indexOf(x[0]) - stateRanks.out.indexOf(y[0]))[0], last = first.currentEnd || first.end;
+    const meta = [who, short(first.start) + (last !== first.start ? '~' + short(last) : ''), first.pickupPlan?.method === 'delivery' ? '차량 배달' : ''].filter(Boolean);
+    const figure = (label, value, tone = '') => '<span><small>' + e(label) + '</small><b data-tone="' + tone + '">' + value + '</b></span>';
+    const target = group.length === 1 ? 'data-action="pos-line" data-id="' + e(first.id) + '"' : 'data-action="pos-line-group" data-id="' + e(group.map(l => l.id).join(',')) + '"';
+    return '<button type="button" class="pos-card pos-item-card" ' + target + '><span class="pos-item-copy"><strong>' + e(labelOf(first) + ' ' + sumOf(group, 'quantity') + unitOf(first)) + '</strong>'
+      + '<span data-fit="parts" data-parts="' + e(JSON.stringify(meta)) + '">' + e(meta.join(' · ')) + '</span></span>'
+      + '<span class="pos-item-figures">' + figure('예정', sumOf(group, 'quantity')) + figure('지급', sumOf(group, 'issuedQuantity')) + figure(sumOf(group, 'vehicleQuantity') && !sumOf(group, 'customerQuantity') ? '차량 보관' : '고객 보유', sumOf(group, 'customerQuantity') || sumOf(group, 'vehicleQuantity'), sumOf(group, 'customerQuantity') ? 'orange' : sumOf(group, 'vehicleQuantity') ? 'purple' : '') + '</span>'
+      + '<span class="pos-item-state"><span class="pos-state" data-tone="' + e(state[1] || 'grey') + '">' + e(state[0]) + '</span></span></button>';
+  }
   function detail() {
     const o = D.order(); if (!o) return P.page('접수 상세', '', '<div class="pos-empty"><strong>접수 없음</strong><span>목록에서 다시 선택</span>' + go('접수 목록', 'intake', '', 'primary') + '</div>', '', { wait: '없음' });
     const f = o.finance, [badgeText, tone] = badgeOf(o, o.totals.customerQuantity || o.totals.vehicleQuantity ? 'returns' : 'preparation');
-    const lines = activeLines(o), phone = (o.customer.phone || '').replace(/[^0-9+]/g, '');
-    const info = [['연락처', o.customer.phone || '미입력'], ['접수번호', o.receiptNo || o.id], ['이용', useRange(o) + ' · ' + o.people.length + '명'], ['수령', short(pickupDate(o)) + ' ' + (pickupTime(o) || '') + ' · ' + placeOf(o)], ['반납', short(returnDate(o)) + ' ' + (returnTime(o) || '') + ' · ' + (returnPlace(o) || '매장 직접')]];
-    const side = '<aside class="pos-detail-side"><div class="pos-detail-name"><strong>' + e(o.customer.name) + ' 팀</strong>' + P.badge(badgeText, tone) + '</div>'
-      + '<dl class="pos-detail-info">' + info.map(([k, v]) => '<div><dt>' + e(k) + '</dt><dd>' + e(v) + '</dd></div>').join('') + '</dl>'
-      + '<div class="pos-detail-actions pos-shortcuts">' + btn('일행·장비 추가', 'pos-add', o.id) + btn('사이즈 요청' + (sizePending(o) ? ' ' + sizePending(o) + '명' : ''), 'pos-preinput', o.id) + btn('기간·수거 변경', 'pos-change', o.id) + btn('수납·환불', 'pos-money', o.id) + btn('문제 해결·정정', 'pos-problems', o.id) + (phone ? '<a class="so-button pos-button" href="tel:' + e(phone) + '">' + S.icon('phone') + '전화</a>' : '<button type="button" class="so-button pos-button" disabled>전화 · 연락처 없음</button>') + '</div></aside>';
-    const tabs = [['items', '품목', lines.length], ['money', '수납·환불', null], ['history', '이력', null]];
+    const lines = activeLines(o), phone = (o.customer.phone || '').replace(/[^0-9+]/g, ''), pending = sizePending(o);
+    const info = [['연락처', [o.customer.phone || '미입력']], ['접수번호', [o.receiptNo || o.id, o.batches.length > 1 ? o.batches.length + '개 접수 내역' : '']], ['이용', [useRange(o), o.people.length ? o.people.length + '명' : '']], ['수령', [(short(pickupDate(o)) + ' ' + (pickupTime(o) || '')).trim(), placeOf(o)]], ['반납', [(short(returnDate(o)) + ' ' + (returnTime(o) || '')).trim(), returnPlace(o) || '매장 직접']]];
+    const side = '<aside class="pos-panel pos-detail-side"><div class="pos-detail-name"><strong data-fit="words">' + e(o.customer.name) + ' 팀</strong><span class="pos-state" data-tone="' + e(tone) + '">' + e(badgeText) + '</span></div>'
+      + '<dl class="pos-detail-info">' + info.map(([k, parts]) => '<div><dt>' + e(k) + '</dt><dd data-fit="parts" data-parts="' + e(JSON.stringify(parts.filter(Boolean))) + '">' + e(parts.filter(Boolean).join(' · ')) + '</dd></div>').join('') + '</dl>'
+      + '<div class="pos-detail-actions pos-shortcuts">' + btn('일행·장비 추가', 'pos-add', o.id) + btn('사이즈 요청' + (pending ? ' ' + pending + '명' : ''), 'pos-preinput', o.id) + btn('기간·수거 변경', 'pos-change', o.id) + btn('수납·환불', 'pos-money', o.id) + btn('문제 해결·정정', 'pos-problems', o.id) + (phone ? '<a class="so-button pos-button" href="tel:' + e(phone) + '">' + S.icon('phone') + '전화</a>' : '<button type="button" class="so-button pos-button" disabled>연락처 없음</button>') + '</div></aside>';
+    const groups = lineGroups(lines), tabs = [['items', '품목', groups.length], ['money', '수납·환불', null], ['history', '이력', null]];
     const tabBar = '<div class="pos-toolbar-group">' + tabs.map(([id, label, count]) => P.chip(label, 'pos-detail-tab', id, state.detailTab === id, count)).join('') + '</div>'
       + '<span class="pos-toolbar-spacer"></span>' + [['청구', won(f.chargedWon), ''], ['수납', won(f.netPaidWon || 0), 'green'], ['미수', won(f.dueWon), f.dueWon ? 'red' : '']].map(([label, value, tone]) => '<span class="pos-sum"><span>' + e(label) + '</span><strong' + (tone ? ' data-tone="' + tone + '"' : '') + '>' + e(value) + '</strong></span>').join('');
     let content;
     if (state.detailTab === 'money') {
-      const rowsHtml = [['청구 금액', won(f.chargedWon), ''], ['수납', won(f.netPaidWon || 0), 'green'], ['고객 환불', won(f.refundWon || 0), ''], ['보증금 보관', won(f.depositHeldWon || 0), 'blue'], ['초과 수납', won(f.creditWon || 0), ''], ['미수', won(f.dueWon), f.dueWon ? 'red' : 'green']]
-        .map(([k, v, t]) => '<div class="pos-info-line" data-tone="' + t + '"><strong>' + e(k) + '</strong><b>' + e(v) + '</b></div>').join('');
-      content = '<div class="pos-cards" data-pos-scroll><div class="pos-info-lines">' + rowsHtml + '</div><div class="so-actions">' + btn('수납 ' + won(f.dueWon), 'pos-money', o.id, 'soft') + btn('금액 조정', 'pos-adjust', o.id) + '</div></div>';
+      const rowsHtml = [['대여 요금', won(f.chargedWon), ''], ['수납', won(f.netPaidWon || 0), 'green'], ['환불', won(f.refundWon || 0), ''], ['보증금', won(f.depositHeldWon || 0), 'blue'], ['미수', won(f.dueWon), f.dueWon ? 'red' : 'green']]
+        .map(([k, v, t]) => '<div class="pos-money-line"><span>' + e(k) + '</span><b data-tone="' + t + '">' + e(v) + '</b></div>').join('');
+      content = '<div class="pos-panel pos-money-panel">' + rowsHtml + '<div class="pos-money-foot"><span data-fit="auto">' + e((f.payments?.length ? '수납 기록 ' + f.payments.length + '건' : '수납 기록 없음') + (f.creditWon ? ' · 초과 수납 ' + won(f.creditWon) : '')) + '</span>' + btn('금액 조정', 'pos-adjust', o.id) + (f.depositHeldWon ? btn('보증금 반환', 'pos-deposit-out', o.id) : '') + '</div></div>';
     } else if (state.detailTab === 'history') {
       const list = (D.history.movements || []).filter(m => m.orderId === o.id || m.from?.kind === 'customer' && m.from.id === o.id || m.to?.kind === 'customer' && m.to.id === o.id).slice().sort((a, b) => b.revision - a.revision);
       const loc = l => !l ? '기록' : l.kind === 'vehicle' ? (S.posFulfillment?.vehicleName(l.id) || l.id) : { customer: '고객', shop: '매장', vendor: '발권처' }[l.kind] || l.kind;
-      content = '<div class="pos-cards" data-pos-scroll>' + (list.length ? '<div class="pos-info-lines">' + list.map(m => '<div class="pos-info-line"><strong>' + e((movementNames[m.kind] || '물품 기록') + ' · ' + m.assetIds.filter(id => !(m.reversedAssetIds || []).includes(id)).length + '개') + '</strong><span>' + e(new Date(Date.parse(m.at) + 9 * 3600000).toISOString().slice(5, 16).replace('T', ' ') + ' · ' + loc(m.from) + ' → ' + loc(m.to)) + '</span></div>').join('') + '</div>' : '<div class="pos-empty"><strong>이동 기록 없음</strong></div>') + '<div class="so-actions">' + btn('문제 해결·정정', 'pos-problems', o.id) + '</div></div>';
-    } else {
-      const cards = lines.map(l => {
-        const [text, t] = lineState(l), person = o.people.find(p => p.id === l.personId)?.name || '팀 공용', batch = o.batches.find(b => b.id === l.batchId)?.label || '';
-        return P.card({ tone: '', badge: [text, t], name: itemText(l), meta: person + ' · ' + batch + ' · ' + short(l.start) + (l.end !== l.start ? '~' + short(l.currentEnd || l.end) : '') + (l.pickupPlan?.method === 'delivery' ? ' · 차량 배달' : ''),
-          figures: [{ label: '실제 지급', value: l.issuedQuantity + unitOf(l), tone: l.issuedQuantity ? '' : 'grey' }, { label: '예정', value: l.quantity + unitOf(l), when: true }],
-          lines: [['고객 보유 ' + l.customerQuantity + ' · 차량 보관 ' + l.vehicleQuantity + ' · 매장 확인 ' + l.shopQuantity, l.customerQuantity ? 'orange' : l.vehicleQuantity ? 'purple' : 'green'], [l.price?.source ? '기존 접수 금액 포함' : '단가 ' + won(l.price.unitWon) + ' · 청구 ' + won(l.price.amountWon), '']],
-          actions: btn('품목 보기', 'pos-line', l.id) });
-      });
-      content = P.cards([{ cards }]);
-    }
-    const next = o.exchangeOpenQuantity ? btn('교환 진행 확인', 'pos-problems', o.id, 'primary') : o.totals.customerQuantity ? btn('모두 받음', 'pos-return-all', o.id, 'primary') : o.totals.vehicleQuantity ? btn('차량에서 받은 물품 입고', 'pos-receive', o.id, 'primary') : o.totals.unissuedQuantity ? btn('준비·지급하기', 'pos-issue', o.id, 'primary') : btn('남은 정산 확인', 'pos-money', o.id, 'primary');
+      const rowsHtml = list.map(m => '<div class="pos-line-row is-static"><strong>' + e((movementNames[m.kind] || '물품 기록') + ' · ' + m.assetIds.filter(id => !(m.reversedAssetIds || []).includes(id)).length + '개') + '</strong><span class="pos-line-note" data-fit="parts" data-parts="' + e(JSON.stringify([loc(m.from) + ' → ' + loc(m.to)])) + '">' + e(loc(m.from) + ' → ' + loc(m.to)) + '</span><b>' + e(new Date(Date.parse(m.at) + 9 * 3600000).toISOString().slice(5, 16).replace('T', ' ')) + '</b></div>');
+      content = '<div class="pos-panel">' + P.cards([{ cards: rowsHtml }], { fixed: true, lines: true, signature: o.id + '|history', empty: '이동 기록 없음' }) + '</div>';
+    } else content = P.cards([{ cards: groups.map(group => itemCard(o, group)) }], { fixed: true, cardHeight: 108, cols: 1, signature: o.id + '|items', empty: '품목 없음' }) + '<p class="pos-detail-hint">단가와 청구 내역은 수납·환불 탭에서 확인</p>';
+    const next = o.exchangeOpenQuantity ? btn('교환 진행 확인', 'pos-problems', o.id, 'primary') : o.totals.customerQuantity ? btn('모두 받음', 'pos-return-all', o.id, 'primary') : o.totals.vehicleQuantity ? btn('차량에서 받은 물품 입고', 'pos-receive', o.id, 'primary') : o.totals.unissuedQuantity ? btn('준비·지급하기', 'pos-issue', o.id, 'primary') : btn(f.dueWon ? '수납 ' + won(f.dueWon) : '남은 정산 확인', 'pos-money', o.id, 'primary');
+    const plain = text => text.replaceAll(' · ', ' ');
+    const foot = [o.totals.unissuedQuantity ? '미지급 ' + plain(unissuedText(o)) : '', o.totals.customerQuantity ? '고객 보유 ' + plain(customerText(o)) : '', o.totals.vehicleQuantity ? '차량 보관 ' + plain(vehicleText(o)) : '', f.dueWon ? '미수 ' + won(f.dueWon) : '수납 완료', o.source ? '이관 접수' : ''].filter(Boolean).join(' · ');
     return P.page('접수 상세', '', '<div class="pos-detail">' + side + '<div class="pos-detail-main">' + content + '</div></div>',
-      '<div>' + (o.totals.customerQuantity ? btn('일부만 받음', 'pos-return-some', o.id) : go('목록으로', 'intake')) + '</div><div class="so-actions">' + (o.totals.unissuedQuantity && o.totals.customerQuantity ? btn('남은 장비 지급', 'pos-issue', o.id) : '') + next + '</div>',
-      { toolbar: '<button type="button" class="so-button pos-button" data-action="back">' + S.icon('chevron-left') + '목록</button>' + tabBar + '<span class="pos-toolbar-spacer"></span>' + (o.source ? P.toolbarLabel('이관 접수 · 수납 내역 별도 확인') : '') + P.toolbarLabel(o.batches.length + '개 접수 내역'),
+      '<span>' + e(foot) + '</span><div class="so-actions">' + (o.totals.customerQuantity ? btn('일부만 받음', 'pos-return-some', o.id) : go('목록으로', 'intake')) + (o.totals.unissuedQuantity && o.totals.customerQuantity ? btn('남은 장비 지급', 'pos-issue', o.id) : '') + next + '</div>',
+      { toolbar: '<button type="button" class="so-button pos-button" data-action="back">' + S.icon('chevron-left') + '목록</button>' + tabBar,
         wait: o.totals.unissuedQuantity ? '지급 ' + unissuedText(o) : o.totals.customerQuantity ? '반납 ' + customerText(o) : o.totals.vehicleQuantity ? '입고 ' + vehicleText(o) : f.dueWon ? '수납 ' + won(f.dueWon) : '없음',
         sums: [['고객 보유', o.totals.customerQuantity + '개', o.totals.customerQuantity ? 'orange' : ''], ['차량 보관', o.totals.vehicleQuantity + '개', o.totals.vehicleQuantity ? 'purple' : ''], ['미수', won(f.dueWon), f.dueWon ? 'red' : '']] });
   }
+  // ---- New intake (UI v4 · docs/42 M4): 1 고객(대상) → 2 품목 → 3 일정·장소. One draft shares its dates; lines follow them. ----
+  const settingsOf = () => D.snapshot.management?.settings || { rates: [], places: [], vehicles: [], returnTimes: [] };
+  const rateOf = id => settingsOf().rates.find(r => r.sku === id)?.unitWon;
+  const addDays = (date, n) => new Date(Date.parse(date + 'T00:00:00Z') + n * 86400000).toISOString().slice(0, 10);
+  const dayCount = d => Math.round((Date.parse(d.end) - Date.parse(d.start)) / 86400000) + 1;
+  const products = () => D.snapshot.catalog.filter(s => !s.id.startsWith('legacy-'));
   function startDraft(id) {
     const o = id ? D.order(id) : null;
     if (state.draft && state.draft.orderId === (id || null)) { S.go('order-intake'); return; }
-    state.draft = { orderId: id || null, customer: o?.customer || { name: '', phone: '' }, people: [], lines: [], start: D.today, end: D.today, personId: o?.people[0]?.id || '', sku: 'ski', unitWon: D.snapshot.management?.settings.rates.find(r => r.sku === 'ski')?.unitWon, step: 0 };
+    state.draft = { orderId: id || null, customer: o?.customer || { name: '', phone: '' }, people: [], lines: [], start: D.today, end: D.today, personId: '', sku: 'ski', unitWon: rateOf('ski'), step: 0, find: { digits: '', results: null }, gridPage: 0, linePage: 0, returnOffset: 0 };
+    if (o?.people.length) addPerson(); // adding to a team that already has people starts with one new companion
     S.go('order-intake', id ? { id } : {});
   }
   function captureDraft() {
-    const d = state.draft;
-    for (const key of ['start', 'end']) if (read(key) !== undefined) d[key] = read(key);
+    const d = state.draft; if (!d) return;
     if (!d.orderId) { if (read('name') !== undefined) d.customer.name = read('name'); if (read('phone') !== undefined) d.customer.phone = read('phone'); }
   }
   function draftPeople() { const d = state.draft; return [...(d.orderId ? D.order(d.orderId).people : []), ...d.people]; }
+  function addPerson() { const d = state.draft, id = D.id('person'); d.people.push({ id, name: '일행 ' + (draftPeople().length + 1) }); d.personId = id; return id; }
+  // Dates live on the draft; every line and both plans follow them.
+  function syncDates() {
+    const d = state.draft, first = settingsOf().returnTimes[0];
+    for (const l of d.lines) { l.start = d.start; l.end = sku(l.sku)?.kind === 'liftTicket' ? d.start : d.end; }
+    d.pickupPlan = d.pickupPlan || { method: 'shop', date: d.start, time: d.start === D.today ? null : '09:00', place: '매장' };
+    d.returnPlan = d.returnPlan || { method: 'direct', date: d.end, time: first?.time || '16:30', place: '매장' };
+    if (!d.returnPlan.time) d.returnPlan.time = first?.time || '16:30';
+    if (d.pickupPlan.date > d.start || d.pickupPlan.auto !== false) d.pickupPlan.date = d.start;
+    if (d.returnPlan.date < d.end || d.returnPlan.auto !== false) d.returnPlan.date = addDays(d.end, d.returnOffset || 0);
+  }
+  const setDates = (start, days) => { const d = state.draft; d.start = start; d.end = addDays(start, Math.max(1, days) - 1); syncDates(); };
+  const planOut = plan => { const { auto, now, ...rest } = plan; if (!['delivery', 'vehicle'].includes(rest.method)) { delete rest.vehicleId; rest.place = '매장'; if (!rest.time) delete rest.time; } return rest; };
+  const nowTime = () => { const t = new Date(Date.now() + 9 * 3600000 + 600000 - 1); return String(t.getUTCHours()).padStart(2, '0') + ':' + String(Math.floor(t.getUTCMinutes() / 10) * 10).padStart(2, '0'); };
+  const amount = l => l.quantity * l.price.unitWon * (sku(l.sku)?.kind === 'liftTicket' ? 1 : (Date.parse(l.end) - Date.parse(l.start)) / 86400000 + 1) - (l.price.discountWon || 0);
+  const draftTotal = () => state.draft.lines.reduce((n, l) => n + amount(l), 0);
+  const quantityOf = (id, personId) => state.draft.lines.filter(l => l.sku === id && (personId === undefined || (l.personId || '') === personId)).reduce((n, l) => n + l.quantity, 0);
+  const itemsSummary = lines => { const map = new Map(); for (const l of lines) map.set(l.sku, (map.get(l.sku) || 0) + l.quantity); return [...map].map(([id, n]) => (sku(id)?.label || id) + ' ' + n); };
+  // Customers already known to the shop (registered contacts and earlier receptions), looked up by the last digits of the phone.
+  function findCustomers(digits) {
+    const tail = phone => (phone || '').replace(/\D/g, ''), seen = new Map();
+    const add = (name, phone, orders) => { const key = name + '|' + tail(phone), row = seen.get(key) || { name, phone, orders: [] }; row.orders.push(...orders); seen.set(key, row); };
+    for (const p of D.snapshot.management?.customerProfiles || []) add(p.name, p.phone, p.visits || []);
+    for (const o of D.snapshot.orders) add(o.customer.name, o.customer.phone, [o]);
+    return [...seen.values()].filter(row => digits && tail(row.phone).endsWith(digits)).map(row => {
+      const orders = [...new Map(row.orders.map(o => [o.id, o])).values()], last = orders.flatMap(o => (o.lines || []).map(l => l.start)).sort().at(-1) || '';
+      return { name: row.name, phone: row.phone, last, people: Math.max(0, ...orders.map(o => o.people?.length || 0)), visits: orders.length };
+    }).sort((a, b) => b.last.localeCompare(a.last) || a.name.localeCompare(b.name));
+  }
+  const option = (label, action, id, on, sub = '') => '<button type="button" class="so-button pos-button pos-option' + (sub ? ' is-two' : '') + '" data-action="' + e(action) + '" data-id="' + e(id) + '" aria-pressed="' + (on ? 'true' : 'false') + '">' + (sub ? '<span>' + e(label) + '</span><b>' + e(sub) + '</b>' : e(label)) + '</button>';
+  const panelHead = (title, sub = '', extra = '') => '<div class="pos-panel-head"><strong>' + e(title) + '</strong>' + (sub ? '<span data-fit="auto">' + e(sub) + '</span>' : '<span></span>') + extra + '</div>';
+  const miniPager = (action, index, count) => count < 2 ? '' : '<span class="pos-mini-pager"><button type="button" class="so-button pos-button" data-action="' + action + '" data-id="-1" aria-label="이전 쪽"' + (index ? '' : ' disabled') + '>‹</button><span>' + (index + 1) + ' / ' + count + '</span><button type="button" class="so-button pos-button" data-action="' + action + '" data-id="1" aria-label="다음 쪽"' + (index < count - 1 ? '' : ' disabled') + '>›</button></span>';
+  function customerStep(d) {
+    const digits = d.find.digits, keys = ['1', '2', '3', '4', '5', '6', '7', '8', '9'].map(n => '<button type="button" class="so-button pos-button pos-find-key" data-action="pos-find-key" data-id="' + n + '">' + n + '</button>').join('')
+      + '<button type="button" class="so-button pos-button pos-find-key is-word" data-action="pos-find-key" data-id="clear">지우기</button><button type="button" class="so-button pos-button pos-find-key" data-action="pos-find-key" data-id="0">0</button><button type="button" class="so-button pos-button pos-find-key is-word is-dark" data-action="pos-find-key" data-id="find">찾기</button>';
+    const left = '<section class="pos-panel pos-find">' + panelHead('고객 찾기', '연락처 끝 4자리') + '<div class="pos-find-display" aria-live="polite" aria-label="입력한 끝자리">' + [0, 1, 2, 3].map(i => '<span>' + e(digits[i] || '·') + '</span>').join('') + '</div><div class="pos-find-keys">' + keys + '</div></section>';
+    const results = d.find.results;
+    let right;
+    if (results?.length) {
+      const rows = results.map((c, i) => P.lineRow({ name: c.name, noteParts: [c.phone, c.last ? '최근 ' + short(c.last) : '', c.people ? '일행 ' + c.people + '명' : '', c.visits > 1 ? '방문 ' + c.visits + '회' : ''], label: d.customer.name === c.name && d.customer.phone === c.phone ? '선택됨' : '선택', action: 'pos-find-pick', id: String(i), selected: d.customer.name === c.name && d.customer.phone === c.phone }));
+      right = '<section class="pos-panel">' + panelHead('찾은 고객', results.length + '명 · 끝자리 ' + d.find.shown) + P.cards([{ cards: rows }], { fixed: true, lines: true, signature: 'find|' + d.find.shown }) + '<div class="pos-panel-foot"><span data-fit="auto">' + e(results.length > 1 ? '같은 끝자리 ' + results.length + '명 · 이름 확인' : '이름과 연락처 확인') + '</span>' + btn('새 고객 등록', 'pos-find-new') + '</div>' + errorBox() + '</section>';
+    } else right = '<section class="pos-panel">' + panelHead('새 고객', results ? '끝자리 ' + d.find.shown + ' 고객 없음' : '처음 오신 고객') + '<div class="pos-form-grid is-single">' + input('대표자 이름', 'name', d.customer.name, 'text', 'maxlength="60" autocomplete="name"') + input('대표자 연락처', 'phone', d.customer.phone, 'tel', 'autocomplete="tel"') + '</div><p class="pos-panel-note">대표자 정보는 한 번만 입력 · 일행 실명은 선택</p>' + errorBox() + '</section>';
+    return '<div class="pos-split is-even">' + left + right + '</div>';
+  }
+  function targetStep(d, o) {
+    const [badgeText, tone] = badgeOf(o, o.totals.customerQuantity || o.totals.vehicleQuantity ? 'returns' : 'preparation'), existing = activeLines(o).at(-1), fresh = d.people.length;
+    const row = (label, html) => '<div class="pos-option-row"><span>' + e(label) + '</span><div>' + html + '</div></div>';
+    const left = '<section class="pos-panel pos-options"><div class="pos-target-head"><strong data-fit="words">' + e(o.customer.name) + ' 팀</strong><span class="pos-state" data-tone="' + e(tone) + '">' + e(badgeText) + '</span><small data-fit="auto">' + e((o.receiptNo || o.id) + ' · ' + (o.customer.phone || '연락처 없음')) + '</small></div>'
+      + row('추가 대상', option('새 일행', 'pos-draft-target', 'new', fresh > 0) + option('기존 일행에 추가', 'pos-draft-target', 'existing', !fresh))
+      + row('수령일', option('오늘 ' + short(D.today), 'pos-date', 'today', d.start === D.today) + option('내일 ' + short(nextDate(D.today)), 'pos-date', 'tomorrow', d.start === nextDate(D.today)) + (existing ? option('기존 일정과 같게', 'pos-date', 'same', d.same === true) : ''))
+      + (fresh ? row('새 일행 수', '<div class="pos-stepper"><button type="button" class="so-button pos-button" data-action="pos-person-remove" aria-label="새 일행 줄이기"' + (fresh > 1 ? '' : ' disabled') + '>−</button><b>' + fresh + '</b><button type="button" class="so-button pos-button" data-action="pos-person-add" aria-label="새 일행 늘리기">+</button><span>명</span></div>' + btn('여러 명', 'pos-people-many')) : row('추가 방식', '<span class="pos-option-note">기존 일행이나 팀 공용으로 품목만 추가</span>')) + errorBox() + '</section>';
+    const info = [['일행', o.people.length ? o.people.length + '명' : '팀 공용'], ['대여 품목', itemsSummary(activeLines(o))], ['이용', [useRange(o)]], ['반납', [(short(returnDate(o)) + ' ' + (returnTime(o) || '')).trim(), returnPlace(o) || '매장 직접']]];
+    const right = '<section class="pos-panel pos-summary">' + panelHead('현재 접수') + '<dl class="pos-summary-list">' + info.map(([k, v]) => '<div><dt>' + e(k) + '</dt><dd data-fit="' + (k === '대여 품목' ? 'items' : 'parts') + '" data-parts="' + e(JSON.stringify([].concat(v))) + '">' + e([].concat(v).join(' · ')) + '</dd></div>').join('') + '</dl>'
+      + '<div class="pos-summary-total"><span>' + (o.finance.dueWon ? '미수' : '수납') + '</span><b data-tone="' + (o.finance.dueWon ? 'red' : 'green') + '">' + e(o.finance.dueWon ? won(o.finance.dueWon) : '완료') + '</b></div><p class="pos-panel-note">기존 기록은 그대로 · 추가분만 따로 계산</p></section>';
+    return '<div class="pos-split">' + left + right + '</div>';
+  }
+  function grid(d, personId) {
+    const list = products(), tickets = list.filter(s => s.kind === 'liftTicket'), goods = list.filter(s => s.kind !== 'liftTicket');
+    const tiles = goods.map(s => { const n = quantityOf(s.id, personId), rate = rateOf(s.id); return '<button type="button" class="pos-pick" data-action="pos-grid-add" data-id="' + e(s.id) + '" aria-pressed="' + (n ? 'true' : 'false') + '"><strong>' + e(s.label) + '</strong><span>' + e(rate == null ? '요금 확인' : won(rate)) + '</span>' + (n ? '<b>' + n + '</b>' : '') + '</button>'; });
+    if (tickets.length) { const n = tickets.reduce((m, s) => m + quantityOf(s.id, personId), 0); tiles.push('<button type="button" class="pos-pick is-ticket" data-action="pos-grid-tickets" aria-pressed="' + (n ? 'true' : 'false') + '"><strong>리프트권</strong><span>권종 선택 ›</span>' + (n ? '<b>' + n + '</b>' : '') + '</button>'); }
+    const count = Math.max(1, Math.ceil(tiles.length / 9)), index = Math.min(d.gridPage || 0, count - 1); d.gridPage = index;
+    return { html: '<div class="pos-pick-grid">' + tiles.slice(index * 9, index * 9 + 9).join('') + '</div>', pager: miniPager('pos-grid-page', index, count) };
+  }
+  function itemsStep(d) {
+    const people = draftPeople();
+    if (!people.length) {
+      const g = grid(d, ''), per = 3, count = Math.max(1, Math.ceil(d.lines.length / per)), index = Math.min(d.linePage || 0, count - 1); d.linePage = index;
+      const days = dayCount(d), formula = l => won(l.price.unitWon) + ' × ' + l.quantity + (sku(l.sku)?.kind === 'liftTicket' ? '' : ' × ' + days + '일') + (l.price.discountWon ? ' − ' + won(l.price.discountWon) : '');
+      const rows = d.lines.slice(index * per, index * per + per).map(l => { const product = sku(l.sku);
+        return '<div class="pos-draft-row"><div><strong>' + e(product?.label || l.sku) + '</strong><span data-fit="alts" data-alts="' + e(JSON.stringify([formula(l) + ' = ' + won(amount(l)), formula(l), won(amount(l))])) + '">' + e(formula(l)) + '</span></div><div class="pos-stepper"><button type="button" class="so-button pos-button" data-action="pos-line-step" data-id="' + e(l.id) + ':-1" aria-label="' + e((product?.label || l.sku) + ' 줄이기') + '">−</button><b>' + l.quantity + '</b><button type="button" class="so-button pos-button" data-action="pos-line-step" data-id="' + e(l.id) + ':1" aria-label="' + e((product?.label || l.sku) + ' 늘리기') + '">+</button></div></div>'; }).join('');
+      const discount = d.lines.reduce((n, l) => n + (l.price.discountWon || 0), 0);
+      return '<div class="pos-split is-items"><section class="pos-panel">' + panelHead('품목 선택', '누르면 1개씩 늘어납니다', g.pager) + g.html + '<div class="pos-panel-foot">' + btn('일행마다 다르게 입력', 'pos-people-many') + btn('직접 입력', 'pos-line-detail') + '</div></section>'
+        + '<section class="pos-panel pos-summary">' + panelHead('이번 접수 내역', '', miniPager('pos-draft-line-page', index, count)) + '<div class="pos-draft-rows">' + (rows || '<p class="pos-panel-note">왼쪽에서 품목을 누르세요</p>') + '</div>'
+        + '<div class="pos-option-row is-tight"><span>이용 일수</span><div>' + [1, 2, 3].map(n => option(n + '일', 'pos-plan-pick', 'days:' + n, days === n)).join('') + (days > 3 ? option(days + '일', 'pos-draft-dates', '', true) : '') + '</div></div>'
+        + (discount ? '<div class="pos-summary-line"><span>할인</span><b>' + e(won(discount)) + '</b></div>' : '') + '<div class="pos-summary-total"><span>합계</span><b>' + e(won(draftTotal())) + '</b></div>' + errorBox() + '</section></div>';
+    }
+    const rowsOf = [{ id: '', name: '팀 공용' }, ...people], current = rowsOf.find(p => p.id === d.personId) || rowsOf[1] || rowsOf[0]; d.personId = current.id;
+    const done = people.filter(p => d.lines.some(l => l.personId === p.id)).length, g = grid(d, current.id), at = people.findIndex(p => p.id === current.id), empty = people.filter(p => p.id !== current.id && !d.lines.some(l => l.personId === p.id)).length;
+    const list = rowsOf.map((p, i) => { const own = d.lines.filter(l => (l.personId || '') === p.id), on = p.id === current.id; return P.lineRow({ name: (i ? i + ' ' : '') + p.name, noteParts: own.length ? itemsSummary(own) : [p.id ? '미선택' : '함께 쓰는 품목'], label: on ? '선택 중' : own.length ? '입력됨' : '선택', action: 'pos-draft-pick-person', id: p.id || '__team', selected: on }); });
+    return '<div class="pos-split is-narrow"><section class="pos-panel">' + panelHead('일행 ' + people.length + '명', '입력 ' + done + '명') + P.cards([{ cards: list }], { fixed: true, lines: true, signature: 'people|' + people.length, focus: rowsOf.indexOf(current) })
+      + '<div class="pos-panel-foot">' + btn('일행 추가', 'pos-person-add') + btn('여러 명', 'pos-people-many') + (d.people.length ? btn('빼기', 'pos-person-remove') : '') + '</div></section>'
+      + '<section class="pos-panel">' + panelHead((at >= 0 ? (at + 1) + ' ' : '') + current.name, '품목 선택', g.pager) + g.html + '<div class="pos-panel-foot">' + (at > 0 ? btn('앞사람과 같게', 'pos-person-copy', 'prev') : '') + (at >= 0 && empty ? btn('남은 ' + empty + '명 모두 같게', 'pos-person-copy', 'rest') : '') + btn('직접 입력', 'pos-line-detail') + '</div>' + errorBox() + '</section></div>';
+  }
+  function scheduleStep(d, name) {
+    syncDates();
+    const settings = settingsOf(), days = dayCount(d), pick = d.pickupPlan, back = d.returnPlan, places = settings.places || [], shown = places.slice(0, places.length > 3 ? 2 : 3);
+    const row = (label, html) => '<div class="pos-option-row"><span>' + e(label) + '</span><div>' + html + '</div></div>';
+    const times = ['09:00', '12:00', '17:00'], customTime = pick.time && !times.includes(pick.time), customPlace = pick.method === 'delivery' && !shown.includes(pick.place);
+    const preset = settings.returnTimes.find(t => t.time === back.time && (t.dayOffset || 0) === (d.returnOffset || 0) && back.date === addDays(d.end, t.dayOffset || 0));
+    const left = '<section class="pos-panel pos-options">'
+      + row('수령일', option('오늘 ' + short(D.today), 'pos-plan-pick', 'day:' + D.today, d.start === D.today) + option('내일 ' + short(nextDate(D.today)), 'pos-plan-pick', 'day:' + nextDate(D.today), d.start === nextDate(D.today)) + option(d.start > nextDate(D.today) || d.start < D.today ? short(d.start) : '달력', 'pos-draft-dates', '', d.start > nextDate(D.today) || d.start < D.today))
+      + row('이용 일수', [1, 2, 3].map(n => option(n + '일', 'pos-plan-pick', 'days:' + n, days === n)).join('') + option(days > 3 ? days + '일' : '직접', 'pos-draft-dates', '', days > 3))
+      + row('수령 시간', (d.start === D.today ? option('지금', 'pos-plan-pick', 'time:now', !pick.time || pick.now === true) : '') + times.map(t => option(t, 'pos-plan-pick', 'time:' + t, pick.time === t && !pick.now)).join('') + option(customTime && !pick.now ? pick.time : '직접', 'pos-draft-plan', 'pickup', !!customTime && !pick.now))
+      + row('수령 장소', option('매장 수령', 'pos-plan-pick', 'place:', pick.method === 'shop') + shown.map(place => option(place, 'pos-plan-pick', 'place:' + place, pick.method === 'delivery' && pick.place === place)).join('') + (places.length > 3 || customPlace ? option(customPlace ? pick.place : '더 보기', 'pos-draft-plan', 'pickup-place', customPlace) : ''))
+      + row('반납 시간', settings.returnTimes.slice(0, 3).map(t => option(t.label, 'pos-plan-pick', 'return:' + t.id, preset?.id === t.id, t.time)).join('') + (preset ? option('직접', 'pos-draft-plan', 'return', false) : option(short(back.date), 'pos-draft-plan', 'return', true, back.time))) + '</section>';
+    const discount = d.lines.reduce((n, l) => n + (l.price.discountWon || 0), 0);
+    const info = [['대표자', [name, d.customer.phone]], ['대여 품목', itemsSummary(d.lines)], ['이용', [short(d.start) + (d.end !== d.start ? '~' + short(d.end) : ''), days + '일', draftPeople().length ? '일행 ' + draftPeople().length + '명' : '']], ['수령', [(short(pick.date) + ' ' + (pick.time || '')).trim(), pick.method === 'delivery' ? pick.place : '매장 수령']], ['반납', [short(back.date) + ' ' + back.time, back.method === 'vehicle' ? '차량 수거' : '매장 직접']]];
+    const right = '<section class="pos-panel pos-summary">' + panelHead(d.orderId ? '추가 요약' : '접수 요약') + '<dl class="pos-summary-list">' + info.map(([k, v]) => '<div><dt>' + e(k) + '</dt><dd data-fit="' + (k === '대여 품목' ? 'items' : 'parts') + '" data-parts="' + e(JSON.stringify(v.filter(Boolean))) + '">' + e(v.filter(Boolean).join(' · ')) + '</dd></div>').join('') + '</dl>'
+      + (discount ? '<div class="pos-summary-line"><span>할인</span><b>' + e(won(discount)) + '</b></div>' : '') + '<div class="pos-summary-total"><span>' + (d.orderId ? '이번 청구' : '합계') + '</span><b>' + e(won(draftTotal())) + '</b></div>' + errorBox() + '</section>';
+    return '<div class="pos-split is-wide">' + left + right + '</div>';
+  }
   function intake() {
     const d = state.draft; if (!d) return listing('intake');
-    const o = d.orderId ? D.order(d.orderId) : null, name = o?.customer.name || d.customer.name || '새 팀';
-    let body;
-    if (d.step === 0) body = '<div class="pos-form-grid">' + (o ? '<div class="pos-info"><strong>' + e(o.customer.name) + ' 팀에 추가</strong><p>' + e(o.receiptNo || o.id) + ' · ' + e(o.customer.phone) + '</p></div>' : input('대표자 이름', 'name', d.customer.name, 'text', 'maxlength="60" autocomplete="name"') + input('대표자 연락처', 'phone', d.customer.phone, 'tel', 'autocomplete="tel"')) + input('이용 시작일', 'start', d.start, 'date') + input('이용 종료일', 'end', d.end, 'date') + '</div><div class="so-actions">' + btn('오늘', 'pos-date', 'today') + btn('내일', 'pos-date', 'tomorrow') + (o ? btn('기존 일행과 같은 일정', 'pos-date', 'same') : '') + '</div><div class="pos-info">' + (o ? '기존 가격·지급·반납 유지 · 이번 내역만 추가' : '대표자 정보는 한 번만 입력 · 일행 실명은 선택') + '</div>' + errorBox();
-    else if (d.step === 1) {
-      const people = draftPeople();
-      body = '<div class="pos-add-layout"><div class="pos-entry-panel"><div class="pos-form-grid">' + select('대상 일행', 'personId', [['', '팀 공용'], ...people.map(p => [p.id, p.name]), ...(people.length > 1 ? [['__all', '전체 일행 · 사람마다 같은 품목']] : []), ['__many', '일행 여러 명 한 번에 추가…']], d.personId) + btn('새 일행 추가', 'pos-person-add') + select('추가할 품목', 'sku', D.snapshot.catalog.filter(s => !s.id.startsWith('legacy-')).map(s => [s.id, s.label]), d.sku || 'ski') + input(d.personId === '__all' ? '일행 한 명당 수량' : '실제 물품 수량', 'quantity', d.quantity || 1, 'number', 'min="1" max="500" inputmode="numeric"') + input('단가 (원)', 'unitWon', d.unitWon ?? '', 'number', 'min="0" inputmode="numeric" placeholder="요금 확인"') + input(d.personId === '__all' ? '일행 한 명당 할인 (원)' : '이번 품목 할인 (원)', 'discountWon', d.discountWon || 0, 'number', 'min="0" inputmode="numeric"') + '</div>' + btn('이번 내역에 담기', 'pos-line-add', '', 'primary') + '</div><div class="pos-draft-lines">' + P.pager(d.lines, 'draft-lines', l => P.row((sku(l.sku)?.label || l.sku) + ' ' + l.quantity + (sku(l.sku)?.unit || '개'), (people.find(p => p.id === l.personId)?.name || '팀 공용') + ' · ' + l.start.slice(5) + '~' + l.end.slice(5), btn('빼기', 'pos-line-remove', l.id)), 2) + '</div></div>' + errorBox();
-    } else {
-      const total = d.lines.reduce((n, l) => n + amount(l), 0);
-      body = '<div class="pos-confirm-summary"><strong>' + e(name) + ' · ' + (d.orderId ? '기존 접수에 추가' : '새 접수') + '</strong><span>새 일행 ' + d.people.length + '명 · ' + d.lines.length + '개 품목 행</span><span>이번 청구액 <b>' + won(total) + '</b></span><span>수령 ' + e(d.pickupPlan ? d.pickupPlan.date + ' · ' + (d.pickupPlan.method === 'delivery' ? '차량 배달' : '매장') : '이용 시작일 매장') + ' / 반납 ' + e(d.returnPlan ? d.returnPlan.date + ' · ' + (d.returnPlan.method === 'vehicle' ? '차량 수거' : '매장 직접') : '이용 종료일 매장 직접') + '</span></div>' + P.pager(d.lines, 'review-lines', l => P.row((sku(l.sku)?.label || l.sku) + ' ' + l.quantity + (sku(l.sku)?.unit || '개'), l.start + '~' + l.end + ' · ' + won(amount(l))), 2);
-      body += errorBox();
-    }
-    const steps = [['고객', d.orderId ? '기존 팀' : (d.customer.name || '미입력')], ['품목', d.lines.length ? d.lines.length + '행' : '미선택'], ['일정·장소', d.start.slice(5) + (d.end !== d.start ? '~' + d.end.slice(5) : '')]];
-    const toolbar = '<button type="button" class="so-button pos-button" data-action="pos-draft-back">' + S.icon('chevron-left') + (d.step ? '이전' : '닫기') + '</button>'
-      + '<div class="pos-toolbar-group">' + steps.map(([label, value], i) => P.chip((i + 1) + ' ' + label + ' · ' + value, 'pos-draft-step', String(i), d.step === i)).join('') + '</div><span class="pos-toolbar-spacer"></span>' + P.toolbarLabel(name + (o ? ' · 일행·장비 추가' : ' · 새 접수'));
-    return P.page(o ? '일행·장비 추가' : '새 접수', '', body,
-      '<span>' + e(['대표자·이용일', '일행·품목', '이번 내역 확인'][d.step] + ' · ' + (d.step + 1) + '/3') + '</span><div class="so-actions">' + (d.step === 2 ? btn('수령·반납 일정', 'pos-draft-plan', 'pickup') : '') + (d.step < 2 ? btn('다음', 'pos-draft-next', '', 'primary') : btn(o ? '추가 확정' : '접수 확정', 'pos-draft-save', '', 'primary')) + '</div>',
-      { toolbar, wait: (d.step + 1) + '/3', sums: [['이번 청구', won(d.lines.reduce((n, l) => n + amount(l), 0))]] });
+    const o = d.orderId ? D.order(d.orderId) : null, name = o?.customer.name || d.customer.name || '새 팀', quantity = d.lines.reduce((n, l) => n + l.quantity, 0), people = draftPeople();
+    const body = d.step === 0 ? (o ? targetStep(d, o) : customerStep(d)) : d.step === 1 ? itemsStep(d) : scheduleStep(d, name);
+    const stepNames = [[o ? '대상' : '고객', d.step > 0 ? name + ' 팀' : ''], ['품목', quantity ? quantity + '개' : ''], ['일정·장소', '']];
+    const toolbar = '<button type="button" class="so-button pos-button" data-action="pos-draft-back">' + S.icon('chevron-left') + (d.step ? '이전' : o ? '접수 상세' : '목록') + '</button>'
+      + '<div class="pos-toolbar-group pos-steps">' + stepNames.map(([label, value], i) => '<button type="button" class="pos-chip" data-action="pos-draft-step" data-id="' + i + '" aria-pressed="' + (d.step === i) + '">' + (i < d.step ? S.icon('circle-check') : '') + '<span data-fit="alts" data-alts="' + e(JSON.stringify([(i + 1) + ' ' + label + (value ? ' · ' + value : ''), (i + 1) + ' ' + label])) + '">' + e((i + 1) + ' ' + label + (value ? ' · ' + value : '')) + '</span></button>').join('') + '</div>';
+    const next = d.step === 0 ? btn('다음 · 품목', 'pos-draft-next', '', 'primary') : d.step === 1 ? btn('다음 · 일정·장소', 'pos-draft-next', '', 'primary') : btn((o ? '추가 확정' : '접수 확정') + ' · ' + won(draftTotal()), 'pos-draft-save', '', 'primary');
+    const at = people.findIndex(p => p.id === d.personId), following = d.step === 1 && people.length > 1 ? people[(at + 1) % people.length] : null;
+    const foot = d.step === 0 && !o ? [d.customer.name || '고객을 찾거나 새로 입력', d.customer.phone] : d.step === 1 && people.length ? ['입력 ' + people.filter(p => d.lines.some(l => l.personId === p.id)).length + ' / ' + people.length + '명', '합계 ' + won(draftTotal())] : [name + ' 팀', people.length ? (o ? '새 일행 ' + d.people.length + '명' : '일행 ' + people.length + '명') : '', d.step === 2 ? '품목 ' + quantity + '개' : short(d.start) + ' 수령'];
+    return P.page(o ? '일행·장비 추가' : '새 접수', '', body, '<span>' + e(foot.filter(Boolean).join(' · ')) + '</span><div class="so-actions">' + btn('취소', 'pos-draft-cancel') + (following ? btn('다음 일행 · ' + following.name, 'pos-draft-pick-person', following.id) : '') + next + '</div>',
+      { toolbar, title: o ? '일행·장비 추가' : '', wait: (d.step + 1) + ' / 3 단계', waitLabel: '', sums: [['이번 청구', won(draftTotal())]] });
   }
-  const amount = l => l.quantity * l.price.unitWon * (sku(l.sku)?.kind === 'liftTicket' ? 1 : (Date.parse(l.end) - Date.parse(l.start)) / 86400000 + 1) - (l.price.discountWon || 0);
   S.search('pos-orders', value => { state.query = value; P.setPage('orders', 0, { render: false }); const cursor = S.$('[data-search="pos-orders"]')?.selectionStart; S.render(); const el = S.$('[data-search="pos-orders"]'); el?.focus(); if (el && cursor != null) el.setSelectionRange(cursor, cursor); });
   S.action('pos-period', value => { state.period = value; state.date = ''; P.setPage('orders', 0, { render: false }); S.render(); });
   S.action('pos-sort', value => { state.sort = value; S.render(); });
@@ -270,13 +378,64 @@
   S.action('pos-find', () => S.go('intake'));
   S.action('pos-new', () => startDraft()); S.action('pos-add', startDraft);
   S.action('pos-draft-step', value => { captureDraft(); const target = Number(value); if (target <= state.draft.step) { state.draft.step = target; S.render(); } else S.toast('다음 버튼으로 진행'); });
-  S.action('pos-draft-next', () => { captureDraft(); const d = state.draft; try { if (!d.step) { if (!d.orderId) window.SkiWorkflowCommon.customer(d.customer); window.SkiWorkflowCommon.date(d.start); window.SkiWorkflowCommon.date(d.end); if (d.end < d.start) throw new Error('종료일을 시작일 이후로 선택해 주세요.'); } else if (!d.lines.length) throw new Error('품목을 하나 이상 담아 주세요.'); d.step++; S.render(); } catch (err) { error(err); } });
+  S.action('pos-draft-next', () => { captureDraft(); const d = state.draft; try { if (!d.step) { if (!d.orderId) window.SkiWorkflowCommon.customer(d.customer); } else if (!d.lines.length) throw new Error('품목을 하나 이상 담아 주세요.'); d.step++; syncDates(); S.render(); } catch (err) { error(err); } });
   S.action('pos-draft-back', () => { captureDraft(); if (state.draft.step) { state.draft.step--; S.render(); } else S.go(state.draft.orderId ? 'order-detail' : 'intake', state.draft.orderId ? { id: state.draft.orderId } : {}); });
-  S.action('pos-date', kind => { captureDraft(); const d = state.draft, existing = d.orderId ? D.order(d.orderId).lines.filter(l => !l.cancelledQuantity).at(-1) : null; d.start = kind === 'same' && existing ? (existing.start < D.today ? D.today : existing.start) : kind === 'tomorrow' ? nextDate(D.today) : D.today; d.end = kind === 'same' && existing && existing.end >= d.start ? existing.end : d.start; S.render(); });
-  S.change('pos-draft-person', value => { const d = state.draft; d.sku = read('sku'); d.unitWon = read('unitWon') === '' ? undefined : Number(read('unitWon')); d.quantity = Number(read('quantity')) || 1; d.discountWon = Number(read('discountWon')) || 0; if (value !== '__many') { d.personId = value; S.render(); return; } P.modal('일행 인원 추가', '<p class="pos-info">실명 없이 일행 번호로 등록 · 사람별 규격은 사전입력으로 수집</p><div class="so-actions">' + [2,3,5,10,30].map(n => btn(n + '명', 'pos-people-add', String(n))).join('') + '</div>' + errorBox(), btn('취소', 'close')); });
-  S.action('pos-people-add', value => { const d = state.draft, n = Number(value); try { if (draftPeople().length + n > 100) throw new Error('한 접수에는 최대 100명까지 등록할 수 있습니다.'); const start = draftPeople().length; for (let i = 0; i < n; i++) d.people.push({ id: D.id('person'), name: '일행 ' + (start + i + 1) }); d.personId = '__all'; S.close(); S.render(); } catch (err) { error(err); } });
-  S.action('pos-person-add', () => { const d = state.draft, id = D.id('person'); d.people.push({ id, name: '일행 ' + (draftPeople().length + 1) }); d.personId = id; S.render(); });
-  S.change('pos-draft-sku', value => { const d = state.draft; d.sku = value; d.personId = read('personId') || ''; d.quantity = Number(read('quantity')) || 1; d.discountWon = Number(read('discountWon')) || 0; d.unitWon = D.snapshot.management?.settings.rates.find(r => r.sku === value)?.unitWon; S.render(); });
+  S.action('pos-draft-cancel', () => { const id = state.draft?.orderId; state.draft = null; S.go(id ? 'order-detail' : 'intake', id ? { id } : {}); });
+  S.action('pos-date', kind => {
+    captureDraft(); const d = state.draft, existing = d.orderId ? D.order(d.orderId).lines.filter(l => !l.cancelledQuantity).at(-1) : null, same = kind === 'same' && existing;
+    d.start = same ? (existing.start < D.today ? D.today : existing.start) : kind === 'tomorrow' ? nextDate(D.today) : D.today; d.end = same && existing.end >= d.start ? existing.end : d.start; d.same = !!same;
+    if (same) { d.pickupPlan = { ...structuredClone(existing.pickupPlan), auto: true }; d.returnPlan = { ...structuredClone(existing.returnPlan), auto: true }; d.returnOffset = Math.max(0, Math.round((Date.parse(existing.returnPlan.date) - Date.parse(existing.end)) / 86400000)); } else { delete d.pickupPlan; delete d.returnPlan; d.returnOffset = 0; }
+    syncDates(); S.render();
+  });
+  S.action('pos-draft-target', kind => { const d = state.draft; if (kind === 'new') { if (!d.people.length) addPerson(); } else { const ids = d.people.map(p => p.id); d.people = []; d.lines = d.lines.filter(l => !ids.includes(l.personId)); d.personId = ''; } S.render(); });
+  // Customer lookup by the last digits of the phone number.
+  S.action('pos-find-key', key => {
+    captureDraft(); const d = state.draft, f = d.find;
+    if (key === 'clear') { f.digits = ''; f.results = null; }
+    else if (key === 'find') { if (f.digits.length < 2) { S.toast('끝자리 숫자를 2자리 이상 눌러 주세요'); return; } f.results = findCustomers(f.digits); f.shown = f.digits; }
+    else { f.digits = (f.digits.length >= 4 ? '' : f.digits) + key; if (f.digits.length === 4) { f.results = findCustomers(f.digits); f.shown = f.digits; } }
+    S.render();
+  });
+  S.action('pos-find-pick', index => { const d = state.draft, c = d.find.results?.[Number(index)]; if (!c) return; d.customer = { name: c.name, phone: c.phone }; S.render(); });
+  S.action('pos-find-new', () => { const d = state.draft; d.find = { digits: '', results: null }; d.customer = { name: '', phone: '' }; S.render(); S.$('[data-pos-input="name"]')?.focus(); });
+  // People: one at a time, or many at once for groups (names stay optional).
+  const peopleModal = () => P.modal('일행 인원 추가', '<p class="pos-info">실명 없이 일행 번호로 등록 · 사람별 규격은 사전입력으로 수집</p><div class="so-actions">' + [1, 2, 3, 5, 10, 30].map(n => btn(n + '명', 'pos-people-add', String(n))).join('') + '</div>' + errorBox(), btn('취소', 'close'));
+  S.action('pos-people-many', peopleModal);
+  S.change('pos-draft-person', value => { const d = state.draft; d.sku = read('sku'); d.unitWon = read('unitWon') === '' ? undefined : Number(read('unitWon')); d.quantity = Number(read('quantity')) || 1; d.discountWon = Number(read('discountWon')) || 0; if (value !== '__many') { d.personId = value; detailModal(); return; } d.detailAfterPeople = true; peopleModal(); });
+  S.action('pos-people-add', value => { const d = state.draft, n = Number(value); try { if (draftPeople().length + n > 100) throw new Error('한 접수에는 최대 100명까지 등록할 수 있습니다.'); const first = draftPeople().length; for (let i = 0; i < n; i++) addPerson(); d.personId = d.detailAfterPeople ? '__all' : draftPeople()[first].id; S.close(); S.render(); if (d.detailAfterPeople) { d.detailAfterPeople = false; detailModal(); } } catch (err) { error(err); } });
+  S.action('pos-person-add', () => { const open = !!S.$('#so-dialog[open] [data-pos-input="personId"]'); if (open) { const d = state.draft; d.sku = read('sku'); d.unitWon = read('unitWon') === '' ? undefined : Number(read('unitWon')); d.quantity = Number(read('quantity')) || 1; d.discountWon = Number(read('discountWon')) || 0; } addPerson(); S.render(); if (open) detailModal(); });
+  S.action('pos-person-remove', () => { const d = state.draft, gone = d.people.pop(); if (gone) { d.lines = d.lines.filter(l => l.personId !== gone.id); if (d.personId === gone.id) d.personId = draftPeople().at(-1)?.id || ''; } S.render(); });
+  S.action('pos-draft-pick-person', id => { state.draft.personId = id === '__team' ? '' : id; state.draft.gridPage = 0; S.render(); });
+  S.action('pos-person-copy', kind => {
+    const d = state.draft, people = draftPeople(), at = people.findIndex(p => p.id === d.personId), copy = (from, to) => { d.lines = d.lines.filter(l => l.personId !== to); for (const l of d.lines.filter(l => l.personId === from)) d.lines.push({ ...structuredClone(l), id: D.id('line'), personId: to }); };
+    if (at < 0) return;
+    if (kind === 'prev') { if (!d.lines.some(l => l.personId === people[at - 1]?.id)) { S.toast('앞사람이 고른 품목이 없습니다'); return; } copy(people[at - 1].id, people[at].id); }
+    else { if (!d.lines.some(l => l.personId === d.personId)) { S.toast('먼저 이 일행의 품목을 골라 주세요'); return; } for (const p of people) if (p.id !== d.personId && !d.lines.some(l => l.personId === p.id)) copy(d.personId, p.id); }
+    S.render();
+  });
+  // Item grid: a tap adds one. For a person the tile is on/off; custom prices, discounts and bigger numbers go through 직접 입력.
+  function gridAdd(id, delta) {
+    const d = state.draft, product = sku(id), personId = draftPeople().length ? d.personId || null : null, line = d.lines.find(l => l.sku === id && (l.personId || null) === personId && !l.price.discountWon);
+    if (line) { line.quantity += personId && delta > 0 ? -line.quantity : delta; if (line.quantity < 1) d.lines = d.lines.filter(l => l !== line); return true; }
+    if (delta < 0) return true;
+    const unitWon = rateOf(id); if (unitWon == null) { d.sku = id; d.unitWon = undefined; d.quantity = 1; d.discountWon = 0; return false; }
+    d.lines.push({ id: D.id('line'), sku: id, personId, quantity: 1, start: d.start, end: product.kind === 'liftTicket' ? d.start : d.end, price: { unitWon, discountWon: 0 } }); return true;
+  }
+  const ticketModal = () => { const d = state.draft, personId = draftPeople().length ? d.personId || '' : ''; P.modal('리프트권 · 권종 선택', '<div class="pos-draft-rows">' + products().filter(s => s.kind === 'liftTicket').map(s => { const n = quantityOf(s.id, personId), rate = rateOf(s.id); return '<div class="pos-draft-row"><div><strong>' + e(s.label) + '</strong><span>' + e(rate == null ? '요금 확인' : won(rate)) + '</span></div><div class="pos-stepper"><button type="button" class="so-button pos-button" data-action="pos-ticket-step" data-id="' + e(s.id) + ':-1" aria-label="' + e(s.label + ' 줄이기') + '"' + (n ? '' : ' disabled') + '>−</button><b>' + n + '</b><button type="button" class="so-button pos-button" data-action="pos-ticket-step" data-id="' + e(s.id) + ':1" aria-label="' + e(s.label + ' 늘리기') + '">+</button></div></div>'; }).join('') + '</div>' + errorBox(), btn('닫기', 'close', '', 'primary')); };
+  S.action('pos-grid-add', id => { if (gridAdd(id, 1)) S.render(); else { S.render(); detailModal(); error('요금표에 단가가 없습니다. 단가를 입력해 주세요.'); } });
+  S.action('pos-grid-tickets', ticketModal);
+  S.action('pos-ticket-step', value => { const [id, delta] = value.split(':'), d = state.draft, personId = draftPeople().length ? d.personId || null : null, line = d.lines.find(l => l.sku === id && (l.personId || null) === personId); if (line && Number(delta) < 0) { line.quantity--; if (line.quantity < 1) d.lines = d.lines.filter(l => l !== line); } else if (Number(delta) > 0) { if (line) line.quantity++; else if (!gridAdd(id, 1)) { S.render(); detailModal(); return; } } S.render(); ticketModal(); });
+  S.action('pos-grid-page', delta => { state.draft.gridPage = Math.max(0, (state.draft.gridPage || 0) + Number(delta)); S.render(); });
+  S.action('pos-draft-line-page', delta => { state.draft.linePage = Math.max(0, (state.draft.linePage || 0) + Number(delta)); S.render(); });
+  S.action('pos-line-step', value => { const [id, delta] = value.split(':'), d = state.draft, line = d.lines.find(l => l.id === id); if (!line) return; line.quantity += Number(delta); if (line.quantity < 1) d.lines = d.lines.filter(l => l !== line); if (line.quantity > 500) line.quantity = 500; S.render(); });
+  // 직접 입력: the full form (target, product, quantity, unit price, discount) for anything the grid cannot express.
+  function detailModal() {
+    const d = state.draft, people = draftPeople();
+    P.modal('품목 직접 입력', '<div class="pos-form-grid">' + select('대상 일행', 'personId', [['', '팀 공용'], ...people.map(p => [p.id, p.name]), ...(people.length > 1 ? [['__all', '전체 일행 · 사람마다 같은 품목']] : []), ['__many', '일행 여러 명 한 번에 추가…']], d.personId) + select('추가할 품목', 'sku', products().map(s => [s.id, s.label]), d.sku || 'ski')
+      + input(d.personId === '__all' ? '일행 한 명당 수량' : '실제 물품 수량', 'quantity', d.quantity || 1, 'number', 'min="1" max="500" inputmode="numeric"') + input('단가 (원)', 'unitWon', d.unitWon ?? '', 'number', 'min="0" inputmode="numeric" placeholder="요금 확인"') + input(d.personId === '__all' ? '일행 한 명당 할인 (원)' : '이번 품목 할인 (원)', 'discountWon', d.discountWon || 0, 'number', 'min="0" inputmode="numeric"') + '</div>' + errorBox(), btn('취소', 'close') + btn('새 일행 추가', 'pos-person-add') + btn('이번 내역에 담기', 'pos-line-add', '', 'primary'));
+  }
+  S.action('pos-line-detail', () => { const d = state.draft; if (d.unitWon === undefined) d.unitWon = rateOf(d.sku || 'ski'); detailModal(); });
+  S.change('pos-draft-sku', value => { const d = state.draft; d.sku = value; d.personId = read('personId') || ''; d.quantity = Number(read('quantity')) || 1; d.discountWon = Number(read('discountWon')) || 0; d.unitWon = rateOf(value); detailModal(); });
   S.action('pos-line-add', () => {
     try {
       const d = state.draft, product = sku(read('sku')), quantity = Number(read('quantity')), unitWon = Number(read('unitWon')), discountWon = Number(read('discountWon'));
@@ -284,9 +443,22 @@
       window.SkiWorkflowCommon.integer(quantity, 1, 500); window.SkiWorkflowCommon.integer(unitWon, 0, Number.MAX_SAFE_INTEGER); window.SkiWorkflowCommon.integer(discountWon, 0, Number.MAX_SAFE_INTEGER);
       const line = { id: D.id('line'), sku: product.id, personId: read('personId') || null, quantity, start: d.start, end: product.kind === 'liftTicket' ? d.start : d.end, price: { unitWon, discountWon } };
       if (amount(line) < 0 || !Number.isSafeInteger(amount(line))) throw new Error('수량·기간·금액과 할인을 확인해 주세요.');
-      const targets = line.personId === '__all' ? draftPeople().map(p => p.id) : [line.personId]; if (!targets.length || line.personId === '__many') throw new Error('대상 일행을 선택해 주세요.'); for (const personId of targets) d.lines.push({ ...line, id: D.id('line'), personId }); d.personId = line.personId || ''; d.sku = line.sku; d.unitWon = unitWon; d.quantity = 1; S.render();
+      const targets = line.personId === '__all' ? draftPeople().map(p => p.id) : [line.personId]; if (!targets.length || line.personId === '__many') throw new Error('대상 일행을 선택해 주세요.'); for (const personId of targets) d.lines.push({ ...line, id: D.id('line'), personId });
+      d.personId = line.personId === '__all' ? draftPeople()[0].id : line.personId || ''; d.sku = line.sku; d.unitWon = unitWon; d.quantity = 1; d.discountWon = 0; S.close(); S.render();
     } catch (err) { error(err); }
   });
+  // Step 3 options. Anything beyond the buttons (another date, time, vehicle or place) opens the existing schedule window.
+  S.action('pos-plan-pick', value => {
+    const d = state.draft, at = value.indexOf(':'), kind = value.slice(0, at), id = value.slice(at + 1), settings = settingsOf(); syncDates();
+    if (kind === 'day') { setDates(id, dayCount(d)); if (id !== D.today && (!d.pickupPlan.time || d.pickupPlan.now)) { d.pickupPlan.time = '09:00'; d.pickupPlan.now = false; } d.same = false; }
+    else if (kind === 'days') setDates(d.start, Number(id));
+    else if (kind === 'time') { const now = id === 'now', vehicle = d.pickupPlan.method === 'delivery'; d.pickupPlan.now = now; d.pickupPlan.time = now ? (vehicle ? nowTime() : null) : id; }
+    else if (kind === 'place') { const p = d.pickupPlan, r = d.returnPlan; if (!id) { p.method = 'shop'; p.place = '매장'; delete p.vehicleId; if (p.now) p.time = null; r.method = 'direct'; r.place = '매장'; delete r.vehicleId; } else { const vehicleId = p.vehicleId || settings.vehicles[0]?.id; if (!vehicleId) { S.toast('매장 설정에 차량을 먼저 등록해 주세요'); return; } p.method = 'delivery'; p.place = id; p.vehicleId = vehicleId; if (!p.time) p.time = nowTime(); r.method = 'vehicle'; r.place = id; r.vehicleId = r.vehicleId || vehicleId; } }
+    else if (kind === 'return') { const t = settings.returnTimes.find(row => row.id === id); if (!t) return; d.returnOffset = t.dayOffset || 0; d.returnPlan.time = t.time; d.returnPlan.auto = true; d.returnPlan.date = addDays(d.end, d.returnOffset); }
+    S.render();
+  });
+  S.action('pos-draft-dates', () => { const d = state.draft; P.modal('이용 날짜', '<div class="pos-form-grid">' + input('이용 시작일', 'start', d.start, 'date') + input('이용 종료일', 'end', d.end, 'date') + '</div>' + errorBox(), btn('취소', 'close') + btn('날짜 적용', 'pos-draft-dates-save', '', 'primary')); });
+  S.action('pos-draft-dates-save', () => { try { const d = state.draft, start = read('start'), end = read('end'); window.SkiWorkflowCommon.date(start); window.SkiWorkflowCommon.date(end); if (end < start) throw new Error('종료일을 시작일 이후로 선택해 주세요.'); d.start = start; d.end = end; d.same = false; if (start !== D.today && d.pickupPlan && (!d.pickupPlan.time || d.pickupPlan.now)) { d.pickupPlan.time = '09:00'; d.pickupPlan.now = false; } syncDates(); S.close(); S.render(); } catch (err) { error(err); } });
   let planEdit = null;
   function planModal(kind) {
     const d = state.draft;
@@ -300,22 +472,37 @@
     const body = '<div class="pos-info">이번에 담은 품목의 ' + (pickup ? '수령' : '반납') + ' 일정만 적용 · 기존 대여 유지</div><div class="pos-form-grid">' + method + input('예정일', 'planDate', v.date, 'date') + input('예정 시간', 'planTime', v.time, 'time') + (vehicle ? select('담당 차량', 'planVehicle', (settings?.vehicles || []).map(row => [row.id,row.name]), v.vehicleId) + input('약속 장소', 'planPlace', v.place === '매장' ? settings?.places?.[0] || '' : v.place) : '<div class="pos-info">매장에서 확인</div>') + '</div>' + errorBox();
     P.modal(pickup ? '수령 일정' : '반납 일정', body, btn('취소', 'close') + btn(pickup ? '반납 일정도 확인' : '수령 일정 확인', 'pos-plan-switch', pickup ? 'return' : 'pickup') + btn('이번 일정 적용', 'pos-plan-save', '', 'primary'));
   }
-  function applyPlan() { capturePlan(); const v = planEdit.value, pickup = planEdit.kind === 'pickup'; window.SkiWorkflowCommon.date(v.date); window.SkiWorkflowCommon.time(v.time); const dates = state.draft.lines.map(l => pickup ? l.start : l.end).sort(); if (pickup ? v.date > dates[0] : v.date < dates.at(-1)) throw new Error(pickup ? '이용 시작일 이전으로 수령일을 선택하세요.' : '이용 종료일 이후로 반납일을 선택하세요.'); if (['delivery','vehicle'].includes(v.method)) { window.SkiWorkflowCommon.id(v.vehicleId); window.SkiWorkflowCommon.string(v.place); } else { delete v.vehicleId; v.place = '매장'; } state.draft[planEdit.kind + 'Plan'] = structuredClone(v); }
-  S.action('pos-draft-plan', planModal);
+  function applyPlan() { capturePlan(); const v = planEdit.value, pickup = planEdit.kind === 'pickup'; window.SkiWorkflowCommon.date(v.date); window.SkiWorkflowCommon.time(v.time); const dates = state.draft.lines.map(l => pickup ? l.start : l.end).sort(); if (pickup ? v.date > dates[0] : v.date < dates.at(-1)) throw new Error(pickup ? '이용 시작일 이전으로 수령일을 선택하세요.' : '이용 종료일 이후로 반납일을 선택하세요.'); if (['delivery','vehicle'].includes(v.method)) { window.SkiWorkflowCommon.id(v.vehicleId); window.SkiWorkflowCommon.string(v.place); } else { delete v.vehicleId; v.place = '매장'; } v.auto = false; v.now = false; state.draft[planEdit.kind + 'Plan'] = structuredClone(v); if (planEdit.kind === 'return') state.draft.returnOffset = Math.max(0, Math.round((Date.parse(v.date) - Date.parse(state.draft.end)) / 86400000)); }
+  S.action('pos-draft-plan', id => planModal(id === 'return' ? 'return' : 'pickup'));
   S.change('pos-plan-method', value => { capturePlan(); planEdit.value.method = value; drawPlan(); });
   S.action('pos-plan-switch', kind => { try { applyPlan(); planModal(kind); } catch (err) { error(err); } });
   S.action('pos-plan-save', () => { try { applyPlan(); S.close(); S.render(); } catch (err) { error(err); } });
   S.action('pos-line-remove', id => { state.draft.lines = state.draft.lines.filter(l => l.id !== id); S.render(); });
+  // 접수 완료 창 (P33): the receipt number and what was booked, with the usual next steps.
+  function doneModal(id, summary) {
+    const o = D.order(id); if (!o) return; const pending = sizePending(o);
+    const row = (k, parts, fit = 'parts', tone = '') => '<div><dt>' + e(k) + '</dt><dd data-tone="' + tone + '" data-fit="' + fit + '" data-parts="' + e(JSON.stringify(parts.filter(Boolean))) + '">' + e(parts.filter(Boolean).join(' · ')) + '</dd></div>';
+    P.modal('접수 완료 · ' + (o.receiptNo || o.id), '<dl class="pos-summary-list is-done">' + row('대표자', [o.customer.name + ' 팀', o.people.length ? o.people.length + '명' : '']) + row('대여 품목', summary.items, 'items') + row('일정', [summary.pickup + ' 수령', summary.back + ' 반납']) + row('사이즈 입력', [pending ? pending + '명 미입력' : '입력할 일행 없음'], 'parts', pending ? 'orange' : '') + '</dl>'
+      + '<div class="pos-summary-total"><span>합계</span><b>' + e(won(summary.total)) + '</b></div>', (pending ? btn('사이즈 입력 요청', 'pos-preinput', o.id) : '') + btn('접수 상세', 'close') + go('접수 목록', 'intake', '', 'primary'));
+    P.fitPage(S.$('#so-dialog'));
+  }
   S.action('pos-draft-save', async () => {
     const d = state.draft; if (!d) return;
-    try { const batch = { id: D.id('batch'), label: d.orderId ? '추가 접수 · ' + d.start : '첫 접수', lines: d.lines.map(l => ({ ...l, ...(d.pickupPlan ? { pickupPlan: d.pickupPlan } : {}), ...(d.returnPlan ? { returnPlan: d.returnPlan } : {}) })) };
+    try { syncDates(); const pickupPlan = planOut(d.pickupPlan), returnPlan = planOut(d.returnPlan);
+      const batch = { id: D.id('batch'), label: d.orderId ? '추가 접수 · ' + d.start : '첫 접수', lines: d.lines.map(l => ({ ...l, pickupPlan, ...(sku(l.sku)?.kind === 'liftTicket' ? {} : { returnPlan }) })) };
+      const summary = { items: itemsSummary(d.lines), total: draftTotal(), pickup: (short(pickupPlan.date) + ' ' + (pickupPlan.time || '')).trim(), back: short(returnPlan.date) + ' ' + returnPlan.time };
       const result = await D.execute(d.orderId ? 'order.add' : 'order.create', { ...(d.orderId ? { orderId: d.orderId } : { id: D.id('R'), customer: d.customer }), people: d.people, batch });
-      state.draft = null; state.detailTab = 'items'; S.go('order-detail', { id: result.orderId }); S.toast('같은 접수에 저장 완료 · 준비·지급으로 이어서 진행');
+      const created = !d.orderId; state.draft = null; state.detailTab = 'items'; S.go('order-detail', { id: result.orderId });
+      if (created) doneModal(result.orderId, summary); else S.toast('같은 접수에 저장 완료 · 준비·지급으로 이어서 진행');
     } catch (err) { error(err); }
   });
   S.action('pos-line', id => {
     const o = D.order(), l = o.lines.find(l => l.id === id);
     P.modal(labelOf(l) + ' · 품목 내역', '<div class="pos-confirm-summary"><strong>' + e(lineDescription(o, l)) + '</strong><span>지급 예정 ' + l.quantity + ' · 실제 지급 ' + l.issuedQuantity + ' · 매장 확인 ' + l.shopQuantity + '</span><span>수령 ' + e(l.pickupPlan.date) + ' ' + e(l.pickupPlan.method === 'shop' ? '매장' : l.pickupPlan.place) + '</span><span>반납 ' + e(l.returnPlan.date) + ' ' + e(l.returnPlan.method === 'direct' ? '매장 직접' : l.returnPlan.place) + '</span><span>' + (l.price.source ? '기존 접수 전체금액에 포함 · 행별 요금 확인 필요' : '단가 ' + won(l.price.unitWon) + ' · 확정 청구 ' + won(l.price.amountWon)) + '</span></div>', btn('닫기', 'close') + (l.unissuedQuantity ? btn('이 추가분 취소', 'pos-cancel-line', l.id) : ''));
+  });
+  S.action('pos-line-group', ids => {
+    const o = D.order(), list = o.lines.filter(l => ids.split(',').includes(l.id));
+    P.modal(labelOf(list[0]) + ' · ' + list.length + '개 행', P.pager(list, 'line-group', l => P.row((o.people.find(p => p.id === l.personId)?.name || '팀 공용') + ' · ' + itemText(l), lineState(l)[0] + ' · ' + short(l.start) + (l.end !== l.start ? '~' + short(l.currentEnd || l.end) : ''), btn('품목 보기', 'pos-line', l.id)), 4), btn('닫기', 'close'));
   });
   S.action('pos-cancel-line', async id => { try { await D.execute('order.cancel', { orderId: D.order().id, lineIds: [id], reason: '미도착·미지급 추가분 취소' }); S.close(); S.render(); S.toast('선택한 미지급 품목 취소 완료'); } catch (err) { error(err); } });
   S.posOrders = { state, labels, rows, orderList, lineDescription, lineState, itemText, items, badgeOf, cardOf, pickupDate, pickupTime, returnDate, returnTime, activeLines, sizePending, ticketsToIssue, error, errorBox, input, select, read, go, pageSize, short };

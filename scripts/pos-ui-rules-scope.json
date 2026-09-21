@@ -32,6 +32,22 @@
       ],
       "metrics": "*",
       "viewports": "*"
+    },
+    {
+      "since": "M4 (2026-09-21)",
+      "keys": [
+        "intake-customer",
+        "intake-items",
+        "group-30",
+        "group-review",
+        "intake-done",
+        "order-detail",
+        "twelve-products",
+        "preinput",
+        "notifications"
+      ],
+      "metrics": "*",
+      "viewports": "*"
     }
   ]
 }
