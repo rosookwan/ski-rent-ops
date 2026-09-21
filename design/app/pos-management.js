@@ -3,10 +3,19 @@
   const S = window.SkiOps, P = S.pos, D = S.posData, U = S.posOrders, e = S.esc, won = S.money, b = P.button;
   const { input, select, read, error, errorBox, go } = U;
   const conditions = [['ready', '준비 완료'], ['cleaning', '세척 중'], ['inspection', '점검 대기'], ['repair', '수리 중'], ['lost', '분실']];
-  const settingTabs = [['rates', '요금'], ['places', '장소'], ['vehicles', '차량'], ['returnTimes', '반납 타임'], ['staff', '직원'], ['store', '매장 정보'], ['nightCutoff', '야간 기준']];
-  const state = { sku: '', condition: '', assetQuery: '', selected: new Set(), partnerTab: 'loans', settingTab: 'rates', draft: null, customerQuery: '' };
+  const settingTabs = [['store', '매장 정보'], ['places', '수령 장소'], ['rates', '장비 요금'], ['discounts', '할인'], ['returnTimes', '반납 타임'], ['staff', '직원'], ['vehicles', '차량'], ['nightCutoff', '야간 기준']];
+  const addLabels = { places: '장소 추가', discounts: '할인 추가', returnTimes: '반납 타임 추가', staff: '직원 추가', vehicles: '차량 추가' };
+  const discountKinds = [['perUnit', '장비당 할인'], ['percent', '% 할인'], ['amount', '금액 할인'], ['liftPercent', '리프트권 할인']];
+  // Starting values per ski resort (docs/44). Sample lists until the real database is connected; rates and discounts are never touched.
+  const resortTemplates = [
+    { id: 'muju', name: '무주덕유산리조트', areas: [['만선', ['만선 티롤 앞', '만선 광장', '만선 매표소 앞', '만선 주차장 입구', '만선 셔틀 정류장']], ['설천', ['설천 주차장', '설천 매표소 앞', '설천 곤도라 앞', '설천 셔틀 정류장']], ['기타', ['리조트 웰컴센터', '가족호텔 로비', '국민호텔 로비']]], tickets: [['오전권', 4], ['오후권', 4], ['야간권', 4], ['심야권', 3], ['주간권', 8], ['종일권', 12]] },
+    { id: 'jisan', name: '지산포레스트리조트', areas: [['정문', ['정문 매표소 앞', '정문 주차장']], ['기타', ['콘도 로비', '셔틀 정류장']]], tickets: [['오전권', 4], ['오후권', 4], ['야간권', 4], ['심야권', 3]] },
+    { id: 'konjiam', name: '곤지암리조트', areas: [['스키하우스', ['스키하우스 정문', '스키하우스 주차장']], ['기타', ['콘도 로비']]], tickets: [['4시간권', 4], ['6시간권', 6], ['야간권', 4]] }
+  ];
+  const templateTimes = [['오전타임 후', '12:00', 0], ['오후타임 후', '16:30', 0], ['야간타임 후', '22:00', 0], ['익일 오전', '09:00', 1]];
+  const state = { sku: '', condition: '', assetQuery: '', selected: new Set(), partnerTab: 'loans', settingTab: 'store', area: '', discountKind: 'perUnit', template: 'muju', draft: null, customerQuery: '' };
   const m = () => D.snapshot.management, product = id => D.snapshot.catalog.find(row => row.id === id), partner = id => m().partners.find(row => row.id === id);
-  const size = () => innerHeight < 700 ? 4 : 6, sizeStrip = () => innerHeight < 700 ? 3 : 5;
+  const size = () => innerHeight < 700 ? 4 : 6, sizeStrip = () => innerHeight < 700 ? 3 : 5, settingSize = () => innerHeight < 700 ? 5 : 7; // the settings screen has no toolbar row, so one more row fits
   const info = text => '<p class="pos-info">' + e(text) + '</p>';
   const form = html => '<div class="pos-form-grid">' + html + '</div>';
   const back = () => go('관리 목록', 'management');
@@ -140,42 +149,89 @@
   S.action('pm-customer-link', id => { state.draft = { profileId: id, orderIds: new Set() }; renderCustomerLink(); });
   S.action('pm-link-select', id => { const ids = state.draft.orderIds; ids.has(id) ? ids.delete(id) : ids.add(id); renderCustomerLink(); });
   S.action('pm-link-save', () => save('management.customer.link', { profileId: state.draft.profileId, orderIds: [...state.draft.orderIds] }, '선택한 방문을 고객 연락처에 연결했습니다.'));
+  const areaOf = () => m().settings.areas.find(area => area.id === state.area) || m().settings.areas[0];
+  const discountText = d => d.kind === 'perUnit' ? [(product(d.sku)?.label || d.sku) + ' 할인', (product(d.sku)?.label || d.sku) + ' 1' + (product(d.sku)?.unit || '개') + '마다 · 하루 기준', '−' + won(d.amountWon)] : d.kind === 'amount' ? [won(d.amountWon) + ' 할인', '장비 총 금액에서', '−' + won(d.amountWon)] : d.kind === 'percent' ? ['장비 ' + d.percent + '% 할인', '장비 합계에서', d.percent + '%'] : ['리프트권 ' + d.percent + '% 할인', '리프트권 합계에서', d.percent + '%'];
   function settingRows() {
     const key = state.settingTab, values = m().settings[key];
     if (key === 'store') { const store = values || {}; return [['name', '매장명', store.name || '미등록 · 화면 상단에 표시'], ['phone', '매장 전화', store.phone || '미등록 · 고객 안내에 표시'], ['address', '주소', store.address || '미등록'], ['link', '안내 주소', store.link || '미등록 · QR 안내 주소']].map(([id, title, description]) => ({ id, title, description })); }
     if (key === 'rates') return D.snapshot.catalog.filter(s => !s.id.startsWith('legacy-')).map(s => ({ id: s.id, title: s.label, description: values.some(v => v.sku === s.id) ? '신규 접수 단가 ' + won(values.find(v => v.sku === s.id).unitWon) : '요금 미등록 · 접수 시 확인' }));
     if (key === 'nightCutoff') return [{ id: 'nightCutoff', title: values == null ? '야간 기준 미확정' : '보관한 기준 ' + values, description: '업무 정책 보류 · 날짜 계산에 자동 적용되지 않습니다.' }];
-    return values.map((v, index) => ({ id: String(index), title: typeof v === 'string' ? v : v.name || v.label, description: key === 'returnTimes' ? (v.dayOffset ? '익일 ' : '당일 ') + v.time : key === 'staff' ? ({ manager: '관리자', counter: '카운터', driver: '기사' }[v.role]) + ' · ' + (v.phone || '연락처 미등록') : key === 'vehicles' ? '준비·배차에서 선택할 차량' : '수령·반납 약속 장소' }));
+    if (key === 'places') { const area = areaOf(); return area ? area.places.map((place, index) => ({ id: area.id + '|' + index, title: place, description: area.name + ' · 차량 배달·수거' })) : []; }
+    if (key === 'discounts') return values.filter(d => d.kind === state.discountKind).map(d => { const [title, description, amount] = discountText(d); return { id: d.id, title, description, amount }; });
+    return values.map((v, index) => ({ id: String(index), title: typeof v === 'string' ? v : v.name || v.label, description: key === 'returnTimes' ? (v.dayOffset ? '익일 ' : '당일 ') + v.time : key === 'staff' ? ({ manager: '관리자', counter: '카운터', driver: '기사' }[v.role]) + ' · ' + (v.phone || '연락처 미등록') : '준비·배차에서 선택할 차량' }));
   }
   function settings() {
-    const counts = key => key === 'store' ? (m().settings.store?.name ? '' : '!') : key === 'nightCutoff' ? (m().settings.nightCutoff == null ? '보류' : m().settings.nightCutoff) : key === 'rates' ? m().settings.rates.length : m().settings[key].length;
-    const side = '<nav class="pos-settings-tabs" aria-label="설정 항목">' + settingTabs.map(([id, text]) => '<button type="button" class="pos-settings-tab" data-action="pm-settings-tab" data-id="' + id + '" aria-pressed="' + (id === state.settingTab) + '"><span>' + e(text) + '</span><b>' + e(counts(id)) + '</b></button>').join('') + '</nav>';
-    const footerAction = state.settingTab === 'store' ? b('매장 정보 수정', 'pm-setting-edit', 'store', 'primary') : state.settingTab === 'rates' ? b('품목 추가', 'pm-catalog-add', '', 'primary') : state.settingTab === 'nightCutoff' ? '<span>기존 접수의 가격·약속은 보존</span>' : b(settingTabs.find(t => t[0] === state.settingTab)[1] + ' 추가', 'pm-setting-edit', 'new', 'primary');
-    return P.page('매장 설정', '', '<div class="pos-settings">' + side + '<div class="pos-settings-main">' + P.pager(settingRows(), 'management-settings-' + state.settingTab, row => P.row(row.title, row.description, b('수정', 'pm-setting-edit', state.settingTab === 'store' ? 'store' : row.id)), size()) + '</div></div>', back() + (state.settingTab === 'store' ? '<span class="pos-screen-size">이 화면 크기 ' + innerWidth + '×' + innerHeight + '</span>' : '') + '<div class="so-actions">' + footerAction + '</div>', { toolbar: P.toolbarLabel('설정 ' + m().settingsVersion + '판') + P.toolbarLabel('요금 변경은 새로 접수하는 품목에만 적용'), wait: m().settings.store?.name ? '없음' : '매장 정보', sums: [['요금', m().settings.rates.length + '건'], ['차량', m().settings.vehicles.length + '대'], ['직원', m().settings.staff.length + '명']] });
+    const st = m().settings, key = state.settingTab;
+    const counts = id => id === 'store' ? (st.store?.name ? '' : '!') : id === 'nightCutoff' ? (st.nightCutoff == null ? '보류' : st.nightCutoff) : st[id].length;
+    const side = '<nav class="pos-settings-tabs" aria-label="설정 항목">' + settingTabs.map(([id, text]) => '<button type="button" class="pos-settings-tab" data-action="pm-settings-tab" data-id="' + id + '" aria-pressed="' + (id === key) + '"><span>' + e(text) + '</span><b>' + e(counts(id)) + '</b></button>').join('') + '</nav>';
+    // Places are shown one area at a time and discounts one kind at a time, so long lists never crowd the screen.
+    const chips = key === 'places' ? '<div class="pos-setting-chips">' + st.areas.map(area => P.chip(area.name, 'pm-area', area.id, area.id === areaOf()?.id, area.places.length)).join('') + '<button type="button" class="pos-chip" data-action="pm-area-edit" data-id="new">' + S.icon('plus') + '구역 추가</button></div>'
+      : key === 'discounts' ? '<div class="pos-setting-chips">' + discountKinds.map(([id, text]) => P.chip(text, 'pm-discount-kind', id, id === state.discountKind, st.discounts.filter(d => d.kind === id).length)).join('') + '</div>' : '';
+    const footerAction = key === 'store' ? b('매장 정보 수정', 'pm-setting-edit', 'store', 'primary') : key === 'rates' ? b('품목 추가', 'pm-catalog-add', '', 'primary') : key === 'nightCutoff' ? '' : (key === 'places' ? b('스키장 템플릿', 'pm-template') + (areaOf() ? b('구역 수정', 'pm-area-edit', areaOf().id) : '') : '') + b(addLabels[key], 'pm-setting-edit', 'new', 'primary');
+    const summary = key === 'places' ? '수령 장소 ' + st.places.length + '곳 · 구역 ' + st.areas.length + '개' : key === 'discounts' ? '할인 ' + st.discounts.length + '개 · 접수 확정 창의 할인 버튼으로 나옵니다' : key === 'store' ? '이 화면 크기 ' + innerWidth + '×' + innerHeight + ' · 설정 ' + m().settingsVersion + '판' : key === 'nightCutoff' ? '기존 접수의 가격·약속은 보존' : '설정 ' + m().settingsVersion + '판 · 요금 변경은 새로 접수하는 품목에만 적용';
+    return P.page('매장 설정', '', '<div class="pos-settings">' + side + '<div class="pos-settings-main">' + chips + P.pager(settingRows(), 'management-settings-' + key + (key === 'places' ? '-' + (areaOf()?.id || '') : key === 'discounts' ? '-' + state.discountKind : ''), row => P.row(row.title, row.description, (row.amount ? '<b class="pos-row-amount">' + e(row.amount) + '</b>' : '') + b('수정', 'pm-setting-edit', key === 'store' ? 'store' : row.id)), settingSize() - (chips ? 1 : 0)) + '</div></div>',
+      '<span>' + e(summary) + '</span><div class="so-actions">' + back() + footerAction + '</div>', { wait: st.store?.name ? '없음' : '매장 정보', sums: [['요금', st.rates.length + '건'], ['차량', st.vehicles.length + '대'], ['직원', st.staff.length + '명']] });
   }
+  S.action('pm-area', id => { state.area = id; S.render(); });
+  S.action('pm-discount-kind', id => { state.discountKind = id; S.render(); });
+  S.action('pm-area-edit', id => { const area = m().settings.areas.find(row => row.id === id); state.draft = { key: 'areas', id, revision: D.snapshot.revision }; P.modal(area ? '구역 수정' : '구역 추가', input('구역 이름 (예: 만선 · 설천 · 기타)', 'pmAreaName', area?.name || '', 'text', 'maxlength="30"') + (area ? info('이 구역의 장소 ' + area.places.length + '곳' + (area.places.length ? ' · 장소가 있는 구역은 지울 수 없습니다' : '')) : '') + errorBox(), b('취소', 'close') + (area && !area.places.length ? b('구역 삭제', 'pm-area-delete', area.id) : '') + b('구역 저장', 'pm-area-save', '', 'primary')); });
+  S.action('pm-area-save', () => { try { const d = state.draft, areas = structuredClone(m().settings.areas), name = read('pmAreaName'), id = d.id === 'new' ? D.id('area') : d.id; if (d.id === 'new') areas.push({ id, name, places: [] }); else areas.find(row => row.id === id).name = name; state.area = id; save('management.settings', { patch: { areas } }, '구역을 저장했습니다.'); } catch (err) { error(err); } });
+  S.action('pm-area-delete', id => { state.area = ''; save('management.settings', { patch: { areas: m().settings.areas.filter(row => row.id !== id) } }, '구역을 삭제했습니다.'); });
+  // Resort template: fills areas, places, return times and lift ticket kinds that are missing; never removes or changes what is already there.
+  function templateWindow() {
+    const t = resortTemplates.find(row => row.id === state.template) || resortTemplates[0], line = (k, v) => '<div><dt>' + e(k) + '</dt><dd data-fit="parts" data-parts="' + e(JSON.stringify(v)) + '">' + e(v.join(' · ')) + '</dd></div>';
+    P.modal('스키장 템플릿', '<div class="pos-template"><div class="pos-template-list">' + resortTemplates.map(row => '<button type="button" class="so-button pos-button pos-option" data-action="pm-template-pick" data-id="' + row.id + '" aria-pressed="' + (row.id === t.id) + '">' + e(row.name) + '</button>').join('') + '</div>'
+      + '<div class="pos-template-preview"><strong>' + e(t.name + ' · 채워지는 값') + '</strong><dl class="pos-summary-list">' + line('구역', t.areas.map(([name]) => name)) + line('수령 장소', t.areas.map(([name, places]) => name + ' ' + places.length + '곳')) + line('반납 타임', [templateTimes[0][0] + ' ' + templateTimes[0][1], '외 ' + (templateTimes.length - 1) + '개']) + line('리프트권 권종', [t.tickets.slice(0, 3).map(([label]) => label).join(' · '), '외 ' + Math.max(0, t.tickets.length - 3) + '종']) + '</dl><span>요금과 할인은 바뀌지 않습니다 · 목록은 예시 값</span></div></div>'
+      + info('이미 있는 값은 지우지 않고 없는 항목만 추가합니다') + errorBox(), b('취소', 'close') + b('이 템플릿으로 채우기', 'pm-template-apply', '', 'primary'), '스키장을 고르면 처음 값이 채워집니다');
+  }
+  S.action('pm-template', templateWindow);
+  S.action('pm-template-pick', id => { state.template = id; templateWindow(); });
+  S.action('pm-template-apply', async () => {
+    try { const t = resortTemplates.find(row => row.id === state.template), st = m().settings, areas = structuredClone(st.areas), times = structuredClone(st.returnTimes);
+      for (const [name, places] of t.areas) { let area = areas.find(row => row.name === name); if (!area) { area = { id: D.id('area'), name, places: [] }; areas.push(area); } for (const place of places) if (!areas.some(row => row.places.includes(place))) area.places.push(place); }
+      for (const [label, time, dayOffset] of templateTimes) if (!times.some(row => row.time === time && (row.dayOffset || 0) === dayOffset)) times.push({ id: D.id('time'), label, time, dayOffset });
+      times.sort((x, y) => (x.dayOffset || 0) - (y.dayOffset || 0) || x.time.localeCompare(y.time));
+      for (const [label, hours] of t.tickets) if (!D.snapshot.catalog.some(row => row.kind === 'liftTicket' && row.label === label)) await D.execute('catalog.add', { id: D.id('sku'), label, kind: 'liftTicket', unit: '매', hours });
+      await D.execute('management.settings', { patch: { areas, returnTimes: times } }); state.area = ''; S.close(); S.render(); S.toast(t.name + ' 값으로 채웠습니다. 리프트권 요금은 장비 요금에서 넣어 주세요.');
+    } catch (err) { error(err); }
+  });
   S.action('pm-catalog-add', () => P.modal('대여 품목 추가', form(input('품목 이름', 'pmCatalogLabel', '', 'text', 'maxlength="60"') + select('품목 종류', 'pmCatalogKind', [['equipment', '장비'], ['clothing', '의류'], ['helmet', '헬멧'], ['liftTicket', '리프트권']], 'equipment') + select('수량 단위', 'pmCatalogUnit', [['개', '개'], ['벌', '벌'], ['매', '매'], ['켤레', '켤레']], '개') + select('리프트권 사용 시간', 'pmCatalogHours', [['1', '1시간'], ['2', '2시간'], ['3', '3시간'], ['4', '4시간'], ['5', '5시간'], ['6', '6시간'], ['8', '8시간'], ['12', '12시간'], ['24', '24시간']], '4')) + info('품목을 저장한 뒤 신규 접수 단가를 설정합니다. 사용 시간은 리프트권에만 적용합니다.') + errorBox(), b('취소', 'close') + b('품목 저장', 'pm-catalog-save', '', 'primary')));
-  S.action('pm-catalog-save', () => { const kind = read('pmCatalogKind'); save('catalog.add', { id: D.id('sku'), label: read('pmCatalogLabel'), kind, unit: read('pmCatalogUnit'), ...(kind === 'liftTicket' ? { hours: Number(read('pmCatalogHours')) } : {}) }, '새 품목을 저장했습니다. 접수 단가를 설정해 주세요.', () => { state.settingTab = 'rates'; S.render(); P.setPage('management-settings-rates', Math.floor((settingRows().length - 1) / size())); }); });
+  S.action('pm-catalog-save', () => { const kind = read('pmCatalogKind'); save('catalog.add', { id: D.id('sku'), label: read('pmCatalogLabel'), kind, unit: read('pmCatalogUnit'), ...(kind === 'liftTicket' ? { hours: Number(read('pmCatalogHours')) } : {}) }, '새 품목을 저장했습니다. 접수 단가를 설정해 주세요.', () => { state.settingTab = 'rates'; S.render(); P.setPage('management-settings-rates', Math.floor((settingRows().length - 1) / settingSize())); }); });
   S.action('pm-settings-tab', key => { state.settingTab = key; S.render(); });
   S.action('pm-setting-edit', id => {
     const key = state.settingTab, values = m().settings[key], current = key === 'store' ? values || {} : key === 'rates' ? values.find(v => v.sku === id) : key === 'nightCutoff' ? values : values[Number(id)];
     state.draft = { key, id, current, revision: D.snapshot.revision }; let body;
     if (key === 'store') body = form(input('매장명 (화면 상단 표시)', 'pmStoreName', current?.name || '', 'text', 'maxlength="60"') + input('매장 전화', 'pmStorePhone', current?.phone || '', 'tel', 'maxlength="24"') + input('주소', 'pmStoreAddress', current?.address || '', 'text', 'maxlength="160"') + input('고객 안내 주소 (QR)', 'pmStoreLink', current?.link || '', 'text', 'maxlength="200"'));
     else if (key === 'rates') body = info(product(id)?.label || id) + input('신규 접수 단가 (원)', 'pmSettingAmount', current?.unitWon ?? '', 'number', 'min="0" inputmode="numeric"') + info('이미 접수한 품목의 확정 요금은 바꾸지 않습니다.');
-    else if (key === 'places') body = input('수령·반납 장소 이름', 'pmSettingName', current || '');
+    else if (key === 'places') { const [areaId, index] = String(id).split('|'), area = m().settings.areas.find(row => row.id === areaId) || areaOf(); state.draft.current = id === 'new' ? null : area?.places[Number(index)]; state.draft.areaId = area?.id || ''; body = input('수령·반납 장소 이름', 'pmSettingName', state.draft.current || '') + (m().settings.areas.length ? '<div class="so-field">구역' + P.choice('pmSettingArea', m().settings.areas.map(row => [row.id, row.name]), area?.id || '') + '</div>' : info('구역이 없으면 이름에 맞춰 자동으로 나눕니다(그 밖에는 기타)')); }
+    else if (key === 'discounts') { const d = m().settings.discounts.find(row => row.id === id), kind = d?.kind || state.discountKind; state.draft.current = d || null; state.draft.kind = kind; const free = D.snapshot.catalog.filter(row => row.kind !== 'liftTicket' && !row.id.startsWith('legacy-') && (row.id === d?.sku || !m().settings.discounts.some(x => x.kind === 'perUnit' && x.sku === row.id)));
+      body = kind === 'perUnit' ? form(select('품목', 'pmDiscountSku', free.map(row => [row.id, row.label]), d?.sku || free[0]?.id) + input('1개마다 하루 할인 (원)', 'pmDiscountAmount', d?.amountWon ?? '', 'number', 'min="1" inputmode="numeric"')) + info('수량 × 이용 일수만큼 빼 줍니다')
+        : kind === 'amount' ? input('총 금액에서 뺄 금액 (원)', 'pmDiscountAmount', d?.amountWon ?? '', 'number', 'min="1" inputmode="numeric"') + info('장비 합계에서 뺍니다 · 리프트권은 리프트권 할인(%)으로')
+        : input((kind === 'percent' ? '장비 합계' : '리프트권 합계') + ' 할인율 (%)', 'pmDiscountPercent', d?.percent ?? '', 'number', 'min="1" max="100" inputmode="numeric"') + info('할인은 한 번에 하나만 적용됩니다 · 10원 미만은 버립니다'); }
     else if (key === 'vehicles') body = input('차량 이름', 'pmSettingName', current?.name || '');
     else if (key === 'returnTimes') body = form(input('타임 이름', 'pmSettingName', current?.label || '') + select('기준 날짜', 'pmSettingDay', [['0', '당일'], ['1', '다음날']], String(current?.dayOffset || 0)) + input('약속 시간', 'pmSettingTime', current?.time || '17:00', 'time'));
     else if (key === 'staff') body = form(input('직원 이름', 'pmSettingName', current?.name || '') + input('연락처 (선택)', 'pmSettingPhone', current?.phone || '', 'tel') + select('업무 역할', 'pmSettingRole', [['counter', '카운터'], ['driver', '기사'], ['manager', '관리자']], current?.role || 'counter') + select('기사 담당 차량', 'pmSettingVehicle', [['', '담당 차량 없음'], ...m().settings.vehicles.map(v => [v.id, v.name])], current?.vehicleId || '')) + info('직원 목록 설정입니다. 로그인 계정이나 접근 권한은 별도로 관리합니다.');
     else body = form(select('정책 상태', 'pmSettingPolicy', [['pending', '미확정으로 보관'], ['saved', '기준 시각만 보관']], current == null ? 'pending' : 'saved') + input('야간 기준 시각', 'pmSettingTime', current || '02:00', 'time')) + info('야간 영업일 처리 정책이 확정되기 전에는 날짜 계산에 자동 적용하지 않습니다.');
-    P.modal(settingTabs.find(t => t[0] === key)[1] + (id === 'new' ? ' 추가' : ' 설정'), body + errorBox(), b('취소', 'close') + b('설정 저장', 'pm-setting-save', '', 'primary'));
+    P.modal((key === 'discounts' ? discountKinds.find(k => k[0] === state.draft.kind)[1] : settingTabs.find(t => t[0] === key)[1]) + (id === 'new' ? ' 추가' : ' 설정'), body + errorBox(), b('취소', 'close') + (id !== 'new' && ['places', 'discounts', 'returnTimes'].includes(key) ? b('삭제', 'pm-setting-delete') : '') + b('설정 저장', 'pm-setting-save', '', 'primary'));
   });
   S.action('pm-setting-save', () => {
     try { const d = state.draft, key = d.key; if (d.revision !== D.snapshot.revision) throw new Error('설정이 변경되었습니다. 최신 내용을 다시 확인해 주세요.'); let value, row;
       if (key === 'store') value = { name: read('pmStoreName'), phone: read('pmStorePhone'), address: read('pmStoreAddress'), link: read('pmStoreLink') };
       else if (key === 'nightCutoff') value = read('pmSettingPolicy') === 'pending' ? null : read('pmSettingTime');
       else { value = structuredClone(m().settings[key]); if (key === 'rates') { if (read('pmSettingAmount') === '') throw new Error('단가를 입력해 주세요. 무료는 0원으로 저장합니다.'); row = { sku: d.id, unitWon: Number(read('pmSettingAmount')) }; const index = value.findIndex(v => v.sku === d.id); if (index < 0) value.push(row); else value[index] = row; }
+        else if (key === 'places') { const name = read('pmSettingName'); if (!name?.trim()) throw new Error('장소 이름을 입력해 주세요.'); const areas = structuredClone(m().settings.areas), target = read('pmSettingArea') || d.areaId;
+          for (const area of areas) area.places = area.places.map(place => place === d.current ? null : place).filter(Boolean);
+          if (!areas.length) { save('management.settings', { patch: { places: [...m().settings.places.filter(place => place !== d.current), name] } }, '새 설정을 저장했습니다. 이전 접수 내용은 보존됩니다.'); return; }
+          (areas.find(area => area.id === target) || areas[0]).places.push(name); state.area = target || areas[0].id; save('management.settings', { patch: { areas } }, '새 설정을 저장했습니다. 이전 접수 내용은 보존됩니다.'); return; }
+        else if (key === 'discounts') { row = d.kind === 'perUnit' ? { id: d.current?.id || D.id('discount'), kind: d.kind, sku: read('pmDiscountSku'), amountWon: Number(read('pmDiscountAmount')) } : d.kind === 'amount' ? { id: d.current?.id || D.id('discount'), kind: d.kind, amountWon: Number(read('pmDiscountAmount')) } : { id: d.current?.id || D.id('discount'), kind: d.kind, percent: Number(read('pmDiscountPercent')) }; const index = value.findIndex(v => v.id === row.id); if (index < 0) value.push(row); else value[index] = row; }
         else { if (key === 'places') row = read('pmSettingName'); if (key === 'vehicles') row = { id: d.current?.id || D.id('vehicle'), name: read('pmSettingName') }; if (key === 'returnTimes') row = { id: d.current?.id || D.id('time'), label: read('pmSettingName'), time: read('pmSettingTime'), dayOffset: Number(read('pmSettingDay')) }; if (key === 'staff') row = { id: d.current?.id || D.id('staff'), name: read('pmSettingName'), phone: read('pmSettingPhone'), role: read('pmSettingRole'), vehicleId: read('pmSettingVehicle') || null }; if (d.id === 'new') value.push(row); else value[Number(d.id)] = row; }
       } save('management.settings', { patch: { [key]: value } }, '새 설정을 저장했습니다. 이전 접수 내용은 보존됩니다.');
     } catch (err) { error(err); }
+  });
+  S.action('pm-setting-delete', () => { const d = state.draft, key = d.key, st = m().settings;
+    if (key === 'places') save('management.settings', { patch: { areas: st.areas.map(area => ({ ...area, places: area.places.filter(place => place !== d.current) })) } }, '장소를 삭제했습니다. 이전 접수의 약속 장소는 그대로입니다.');
+    else if (key === 'discounts') save('management.settings', { patch: { discounts: st.discounts.filter(row => row.id !== d.current.id) } }, '할인을 삭제했습니다.');
+    else save('management.settings', { patch: { returnTimes: st.returnTimes.filter((row, index) => index !== Number(d.id)) } }, '반납 타임을 삭제했습니다.');
   });
   function guide() {
     const store = m().settings.store || {};

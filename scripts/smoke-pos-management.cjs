@@ -14,7 +14,7 @@ const { chooseTime } = require('./time-picker-helper.cjs');
   const field = name => f.locator('#so-dialog [data-pos-input="' + name + '"]');
   const nav = (route, id) => raw.evaluate(({ route, id }) => { window.SkiOps.close(); window.SkiOps.go(route, id ? { id } : {}); }, { route, id });
   const snapshot = () => raw.evaluate(() => window.SkiOps.posData.snapshot);
-  const saved = async () => { await f.locator('#so-dialog').waitFor({ state: 'hidden' }); };
+  const saved = async () => { try { await f.locator('#so-dialog').waitFor({ state: 'hidden', timeout: 8000 }); } catch (error) { console.error('DIALOG STILL OPEN · ' + await f.locator('#so-dialog-title').innerText() + ' · ' + await f.locator('#so-dialog #pos-error').innerText().catch(() => '') + ' · ' + JSON.stringify((await snapshot()).management.settings.discounts)); throw error; } };
   const test = async (name, run) => { await run(); checks.push(name); console.log('PASS ' + name); };
   const uiRules = require('./pos-ui-rules.cjs').recorder('management');
   async function geometry(label, modal = false) {
@@ -107,14 +107,23 @@ const { chooseTime } = require('./time-picker-helper.cjs');
     });
     await test('all setting tabs persist versions while existing charges stay unchanged', async () => {
       const charge = (await snapshot()).orders.find(o => o.id === firstOrder).finance.chargedWon;
-      await nav('settings'); await action('pm-setting-edit', 'ski'); await field('pmSettingAmount').fill('23000'); await action('pm-setting-save'); await saved();
-      await action('pm-settings-tab', 'places'); await action('pm-setting-edit', 'new'); await field('pmSettingName').fill('검증 주차장'); await action('pm-setting-save'); await saved();
+      await nav('settings'); await action('pm-settings-tab', 'rates'); await action('pm-setting-edit', 'ski'); await field('pmSettingAmount').fill('23000'); await action('pm-setting-save'); await saved();
+      // Places are kept by area: add an area, put a place in it, then fill the rest from a resort template (docs/44).
+      await action('pm-settings-tab', 'places'); await geometry('settings places by area'); await action('pm-area-edit', 'new'); await field('pmAreaName').fill('검증 구역'); await geometry('area modal', true); await action('pm-area-save'); await saved();
+      await action('pm-setting-edit', 'new'); await field('pmSettingName').fill('검증 주차장'); await geometry('place modal', true); await action('pm-setting-save'); await saved();
+      let areas = (await snapshot()).management.settings.areas; assert.deepEqual(areas.find(a => a.name === '검증 구역').places, ['검증 주차장']);
+      await action('pm-template'); await geometry('resort template modal', true); await action('pm-template-apply'); await saved();
+      areas = (await snapshot()).management.settings.areas; assert.ok(areas.find(a => a.name === '만선').places.includes('만선 매표소 앞')); assert.deepEqual(areas.find(a => a.name === '검증 구역').places, ['검증 주차장'], 'template never removes existing places');
+      assert.ok((await snapshot()).management.settings.returnTimes.some(t => t.time === '12:00'), 'template adds the morning return time');
+      await action('pm-settings-tab', 'discounts'); await geometry('settings discounts'); await action('pm-setting-edit', 'new'); await field('pmDiscountAmount').fill('5000'); await geometry('discount modal', true); await action('pm-setting-save'); await saved();
+      await action('pm-discount-kind', 'liftPercent'); await action('pm-setting-edit', 'new'); await field('pmDiscountPercent').fill('33'); await action('pm-setting-save'); await saved();
+      const discounts = (await snapshot()).management.settings.discounts; assert.ok(discounts.some(d => d.kind === 'perUnit' && d.amountWon === 5000)); assert.ok(discounts.some(d => d.kind === 'liftPercent' && d.percent === 33));
       await action('pm-settings-tab', 'vehicles'); await action('pm-setting-edit', 'new'); await field('pmSettingName').fill('검증 차량'); await action('pm-setting-save'); await saved();
       await action('pm-settings-tab', 'returnTimes'); await action('pm-setting-edit', 'new'); await field('pmSettingName').fill('익일 오전'); await field('pmSettingDay').selectOption('1'); await chooseTime(f, '[data-pos-input="pmSettingTime"]', '09:30'); await geometry('return time modal', true); await action('pm-setting-save'); await saved();
       const vehicle = (await snapshot()).management.settings.vehicles.find(v => v.name === '검증 차량');
       await action('pm-settings-tab', 'staff'); await action('pm-setting-edit', 'new'); await field('pmSettingName').fill('검증 기사'); await field('pmSettingPhone').fill('010-1234-9876'); await field('pmSettingRole').selectOption('driver'); await field('pmSettingVehicle').selectOption(vehicle.id); await geometry('staff modal', true); await page.screenshot({ path: 'work/screens/pos-management/staff-dialog-1024-600.png' }); await action('pm-setting-save'); await saved();
       await action('pm-settings-tab', 'nightCutoff'); await action('pm-setting-edit', 'nightCutoff'); await field('pmSettingPolicy').selectOption('saved'); await chooseTime(f, '[data-pos-input="pmSettingTime"]', '03:00'); await action('pm-setting-save'); await saved();
-      const s = await snapshot(); assert.equal(s.management.settings.rates.find(r => r.sku === 'ski').unitWon, 23000); assert.ok(s.management.settings.places.includes('검증 주차장')); assert.equal(s.management.settings.returnTimes.at(-1).dayOffset, 1); assert.equal(s.management.settings.returnTimes.at(-1).time, '09:30'); assert.equal(s.management.settings.staff.at(-1).vehicleId, vehicle.id); assert.equal(s.management.settings.nightCutoff, '03:00'); assert.equal(s.orders.find(o => o.id === firstOrder).finance.chargedWon, charge); assert.ok(s.management.settingVersions.length >= 6);
+      const s = await snapshot(); assert.equal(s.management.settings.rates.find(r => r.sku === 'ski').unitWon, 23000); assert.ok(s.management.settings.places.includes('검증 주차장')); assert.ok(s.management.settings.returnTimes.some(t => t.dayOffset === 1 && t.time === '09:30')); assert.equal(s.management.settings.staff.at(-1).vehicleId, vehicle.id); assert.equal(s.management.settings.nightCutoff, '03:00'); assert.equal(s.orders.find(o => o.id === firstOrder).finance.chargedWon, charge); assert.ok(s.management.settingVersions.length >= 6);
     });
     await test('new equipment and lift ticket catalogs can be added without changing existing items', async () => {
       await nav('settings'); await action('pm-settings-tab', 'rates'); const before = (await snapshot()).catalog.length;

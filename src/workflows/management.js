@@ -6,7 +6,41 @@
   const LIMIT = Number.MAX_SAFE_INTEGER;
   const conditions = ['ready', 'cleaning', 'inspection', 'repair', 'lost'];
   const lists = ['assetEvents', 'customerProfiles', 'settingVersions', 'partners', 'partnerLoans', 'partnerReturns', 'partnerMoney', 'partnerLendings', 'partnerReceipts', 'partnerAgreements', 'partnerOffsets'];
-  const defaults = () => ({ rates: [], places: [], vehicles: [], returnTimes: [], staff: [], nightCutoff: null, store: { name: '', phone: '', address: '', link: '' } });
+  const defaults = () => ({ rates: [], places: [], areas: [], discounts: [], vehicles: [], returnTimes: [], staff: [], nightCutoff: null, store: { name: '', phone: '', address: '', link: '' } });
+  // Pickup places are grouped by area (만선 · 설천 · 기타). `places` stays the flat list every other screen reads; `areas` is where they are edited.
+  // Settings saved before areas existed are read through normalize(): a place goes to the area its name starts with, otherwise to 기타.
+  function groupPlaces(places, areas) {
+    const next = (areas || []).map(area => ({ id: area.id, name: area.name, places: area.places.filter(place => places.includes(place)) }));
+    for (const place of places) {
+      if (next.some(area => area.places.includes(place))) continue;
+      let area = next.find(row => row.name !== '기타' && place.startsWith(row.name)) || next.find(row => row.id === 'area-etc');
+      if (!area) { const head = place.split(' ')[0]; area = places.filter(row => row.startsWith(head + ' ')).length > 1 && head !== place ? { id: 'area-' + (next.length + 1), name: head, places: [] } : { id: 'area-etc', name: '기타', places: [] }; next.push(area); }
+      area.places.push(place);
+    }
+    return next;
+  }
+  function normalize(settings) {
+    const next = { ...defaults(), ...C.copy(settings || {}) };
+    if (!settings?.areas) next.areas = groupPlaces(next.places, []);
+    return next;
+  }
+  // Discounts never stack (docs/44): gear takes one of per-item-per-day, percent or an amount off the total; lift tickets take a percent of their own.
+  // Returns the discount of every line (whole won, percent results drop below 10 won) so it can be stored on the line price.
+  function applyDiscounts(lines, choice) {
+    const gross = line => line.quantity * line.unitWon * (line.ticket ? 1 : line.days), floor10 = value => Math.floor(value / 10) * 10, result = Object.fromEntries(lines.map(line => [line.id, 0]));
+    const spread = (group, total) => {
+      const base = group.reduce((n, line) => n + gross(line), 0); let left = Math.min(total, base); if (!base || left <= 0) return;
+      for (const line of group) { const part = Math.min(gross(line), floor10(total * gross(line) / base)); result[line.id] = part; left -= part; }
+      for (const line of group.slice().sort((a, b) => gross(b) - gross(a))) { const room = gross(line) - result[line.id], add = Math.min(room, left); result[line.id] += add; left -= add; if (!left) break; }
+    };
+    const gear = lines.filter(line => !line.ticket), lift = lines.filter(line => line.ticket), g = choice?.gear || { kind: 'none' };
+    if (g.kind === 'perUnit') for (const line of gear) result[line.id] = Math.min(gross(line), (g.perUnit?.[line.sku] || 0) * line.quantity * line.days);
+    else if (g.kind === 'percent') spread(gear, floor10(gear.reduce((n, line) => n + gross(line), 0) * C.integer(g.percent, 1, 100) / 100));
+    else if (g.kind === 'amount') spread(gear, C.integer(g.amountWon, 1, LIMIT));
+    if (choice?.lift?.percent) spread(lift, floor10(lift.reduce((n, line) => n + gross(line), 0) * C.integer(choice.lift.percent, 1, 100) / 100));
+    const total = group => group.reduce((n, line) => n + gross(line), 0), cut = group => group.reduce((n, line) => n + result[line.id], 0);
+    return { lines: result, gearGrossWon: total(gear), gearDiscountWon: cut(gear), liftGrossWon: total(lift), liftDiscountWon: cut(lift) };
+  }
   const sum = values => values.reduce((total, value) => C.integer(total + value, 0, LIMIT), 0);
   function initialize(state) {
     for (const key of lists) {
@@ -101,10 +135,23 @@
   function settings(state, p, context) {
     C.keys(p, ['patch']); C.keys(p.patch, Object.keys(defaults()));
     if (!Object.keys(p.patch).length) C.fail('NO_CHANGE', '변경할 설정을 입력해 주세요.');
-    const next = C.copy(state.settingVersions.at(-1)?.settings || defaults());
+    const next = normalize(state.settingVersions.at(-1)?.settings);
     for (const [key, value] of Object.entries(p.patch)) {
       if (key === 'rates') next.rates = unique(C.list(value, 500, true).map(row => { C.keys(row, ['sku', 'unitWon']); return { sku: C.find(state.catalog, row.sku, '품목').id, unitWon: C.integer(row.unitWon, 0, LIMIT) }; }), 'sku', '품목 요금');
-      if (key === 'places') next.places = unique(C.list(value, 100, true).map(row => C.string(row, 160)), null, '장소');
+      if (key === 'places') { next.places = unique(C.list(value, 100, true).map(row => C.string(row, 160)), null, '장소'); if (!('areas' in p.patch)) next.areas = groupPlaces(next.places, next.areas); }
+      if (key === 'areas') {
+        next.areas = unique(unique(C.list(value, 30, true).map(row => { C.keys(row, ['id', 'name', 'places']); return { id: C.id(row.id), name: C.string(row.name, 30), places: C.list(row.places, 100, true).map(place => C.string(place, 160)) }; }), 'id', '구역'), 'name', '구역');
+        next.places = unique(next.areas.flatMap(area => area.places), null, '장소'); if (next.places.length > 100) C.fail('INVALID_INPUT', '수령 장소는 100곳까지 등록할 수 있습니다.');
+      }
+      if (key === 'discounts') {
+        next.discounts = unique(C.list(value, 40, true).map(row => {
+          C.keys(row, ['id', 'kind', 'sku', 'amountWon', 'percent']); const kind = C.oneOf(row.kind, ['perUnit', 'percent', 'amount', 'liftPercent']), id = C.id(row.id);
+          if (kind === 'perUnit') { const product = C.find(state.catalog, row.sku, '품목'); if (product.kind === 'liftTicket') C.fail('INVALID_INPUT', '리프트권은 리프트권 할인(%)으로 설정해 주세요.'); return { id, kind, sku: product.id, amountWon: C.integer(row.amountWon, 1, LIMIT) }; }
+          return kind === 'amount' ? { id, kind, amountWon: C.integer(row.amountWon, 1, LIMIT) } : { id, kind, percent: C.integer(row.percent, 1, 100) };
+        }), 'id', '할인');
+        unique(next.discounts.filter(row => row.kind === 'perUnit').map(row => row.sku), null, '장비당 할인 품목');
+        for (const kind of ['percent', 'amount', 'liftPercent']) unique(next.discounts.filter(row => row.kind === kind).map(row => row.percent ?? row.amountWon), null, '할인 값');
+      }
       if (key === 'vehicles') next.vehicles = unique(C.list(value, 100, true).map(row => { C.keys(row, ['id', 'name']); return { id: C.id(row.id), name: C.string(row.name, 60) }; }), 'id', '차량');
       if (key === 'returnTimes') next.returnTimes = unique(C.list(value, 100, true).map(row => { C.keys(row, ['id', 'label', 'time', 'dayOffset']); return { id: C.id(row.id), label: C.string(row.label, 60), time: C.time(row.time), dayOffset: C.integer(row.dayOffset ?? 0, 0, 1) }; }), 'id', '반납 타임');
       if (key === 'staff') next.staff = unique(C.list(value, 100, true).map(row => {
@@ -245,7 +292,7 @@
   function summary(state) {
     const stored = key => state[key] || [], orders = state.orders || [], normalizePhone = value => String(value || '').replace(/\D/g, '');
     const settingsVersion = stored('settingVersions').at(-1);
-    return { settings: C.copy(settingsVersion?.settings || defaults()), settingsVersion: settingsVersion?.version || 0, settingVersions: C.copy(stored('settingVersions')),
+    return { settings: normalize(settingsVersion?.settings), settingsVersion: settingsVersion?.version || 0, settingVersions: C.copy(stored('settingVersions')),
       inventory: state.catalog.map(sku => { const assets = state.assets.filter(asset => asset.sku === sku.id && (asset.location.kind !== 'vendor' || asset.activePartnerLendingId));
         return { sku: sku.id, label: sku.label, unit: sku.unit, total: assets.length, available: assets.filter(asset => asset.location.kind === 'shop' && I.allocatable(state, asset)).length,
           partnerOut: assets.filter(asset => asset.activePartnerLendingId).length, customer: assets.filter(asset => asset.location.kind === 'customer').length, vehicle: assets.filter(asset => asset.location.kind === 'vehicle').length,
@@ -266,5 +313,5 @@
           unallocatedPaymentWon: sum(payments.filter(row => !row.agreementId && row.kind === 'payment').map(row => row.amountWon)), unallocatedReceiptWon: sum(payments.filter(row => !row.agreementId && row.kind === 'receipt').map(row => row.amountWon)), agreedChargeWon: agreements.some(row => row.kind === 'payable') ? sum(agreements.filter(row => row.kind === 'payable').map(row => row.amountWon)) : null };
       }), partnerReturns: C.copy(stored('partnerReturns')) };
   }
-  return { initialize, handle, summary };
+  return { initialize, handle, summary, applyDiscounts };
 });

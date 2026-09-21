@@ -41,8 +41,10 @@
       for (const [id, label, kind, unit] of [['visor','바이저 헬멧','helmet','개'],['goggles','고글','equipment','개'],['pads','보호대','equipment','개']]) if (!S.workflow.snap().catalog.some(s => s.id === id)) S.workflow.run('catalog.add', { id, label, kind, unit });
       S.workflow.run('management.settings', { patch: {
         rates: [['ski',20000],['board',20000],['clothing',10000],['visor',10000],['helmet',5000],['goggles',5000],['pads',5000],['ticket-3h',35000],['ticket-4h',45000],['ticket-6h',55000]].map(([sku,unitWon]) => ({sku,unitWon})),
-        places: ['만선 티롤 앞','설천 주차장','만선 광장'], vehicles: [{id:'demo-van-1',name:'1호 차량'},{id:'demo-van-2',name:'2호 차량'}],
-        returnTimes: [{id:'afternoon',label:'오후타임 후',time:'16:30',dayOffset:0},{id:'night',label:'야간타임 후',time:'22:00',dayOffset:0},{id:'next-morning',label:'익일 오전',time:'09:00',dayOffset:1}], staff: [], nightCutoff: null, store: { name: '우리 스키샵', phone: '033-000-0000', address: '', link: '' }
+        areas: [{id:'area-manseon',name:'만선',places:['만선 티롤 앞','만선 광장']},{id:'area-seolcheon',name:'설천',places:['설천 주차장']},{id:'area-etc',name:'기타',places:[]}],
+        discounts: [{id:'d-ski',kind:'perUnit',sku:'ski',amountWon:5000},{id:'d-board',kind:'perUnit',sku:'board',amountWon:5000},{id:'d-clothing',kind:'perUnit',sku:'clothing',amountWon:3000},{id:'d-p10',kind:'percent',percent:10},{id:'d-p20',kind:'percent',percent:20},{id:'d-p30',kind:'percent',percent:30},{id:'d-a5',kind:'amount',amountWon:5000},{id:'d-a10',kind:'amount',amountWon:10000},{id:'d-l20',kind:'liftPercent',percent:20},{id:'d-l25',kind:'liftPercent',percent:25},{id:'d-l27',kind:'liftPercent',percent:27}],
+        vehicles: [{id:'demo-van-1',name:'1호 차량'},{id:'demo-van-2',name:'2호 차량'}],
+        returnTimes: [{id:'morning',label:'오전타임 후',time:'12:00',dayOffset:0},{id:'afternoon',label:'오후타임 후',time:'16:30',dayOffset:0},{id:'night',label:'야간타임 후',time:'22:00',dayOffset:0},{id:'next-morning',label:'익일 오전',time:'09:00',dayOffset:1}], staff: [], nightCutoff: null, store: { name: '우리 스키샵', phone: '033-000-0000', address: '', link: '' }
       } });
     }
     await refresh();

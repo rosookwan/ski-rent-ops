@@ -12,5 +12,18 @@
 #ski-ops[data-pos="true"] .pos-settings-tab[aria-pressed="true"] b{color:var(--so-soft-ink)}
 #ski-ops[data-pos="true"] .pos-settings-main{display:flex;flex-direction:column;min-height:0;min-width:0}
 #ski-ops[data-pos="true"] .pos-screen-size{font-size:var(--pos-fs-min);color:var(--so-muted);font-variant-numeric:tabular-nums}
-@media(max-height:680px){#ski-ops[data-pos="true"] .pos-settings-tab{font-size:16px}#ski-ops[data-pos="true"] .pos-settings-tabs{gap:4px}}
+@media(max-height:680px){#ski-ops[data-pos="true"] .pos-settings-tab{font-size:16px}#ski-ops[data-pos="true"] .pos-settings-tabs{gap:3px}}
 @media(max-width:1100px){#ski-ops[data-pos="true"] .pos-settings{grid-template-columns:184px minmax(0,1fr)}}
+/* Settings v4 (docs/44): area / discount-kind chips above the rows, amounts in the rows, the resort template window */
+#ski-ops[data-pos="true"] .pos-settings-main{gap:8px}
+#ski-ops[data-pos="true"] .pos-setting-chips{flex:0 0 auto;display:flex;gap:8px;min-width:0}
+#ski-ops[data-pos="true"] .pos-setting-chips .pos-chip{flex:1 1 0;min-width:0;justify-content:center;padding:0 8px;white-space:nowrap}
+#ski-ops[data-pos="true"] .pos-setting-chips .pos-chip[aria-pressed="true"]{background:#1f2329;border-color:#1f2329;color:#fff}
+#ski-ops[data-pos="true"] .pos-setting-chips .pos-chip svg{width:18px;height:18px}
+#ski-ops[data-pos="true"] .pos-row-amount{font-size:var(--pos-fs-title);font-weight:700;color:var(--tone-red);white-space:nowrap;font-variant-numeric:tabular-nums}
+#ski-ops[data-pos="true"] .pos-template{display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1fr);gap:12px}
+#ski-ops[data-pos="true"] .pos-template-list{display:flex;flex-direction:column;gap:6px}
+#ski-ops[data-pos="true"] .pos-template-list .pos-option{flex:0 0 auto;justify-content:flex-start;padding:0 14px;font-size:var(--pos-fs-body)}
+#ski-ops[data-pos="true"] .pos-template-preview{display:flex;flex-direction:column;gap:8px;min-width:0;padding:12px 14px;border-radius:12px;background:var(--so-bg)}
+#ski-ops[data-pos="true"] .pos-template-preview strong{font-size:var(--pos-fs-body);font-weight:700;white-space:nowrap;overflow:hidden}
+#ski-ops[data-pos="true"] .pos-template-preview>span{font-size:var(--pos-fs-min);color:var(--so-muted)}

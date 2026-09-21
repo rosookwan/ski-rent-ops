@@ -107,6 +107,45 @@ test('settings are versioned; changing rates, staff or return presets leaves exi
   assert.throws(() => f.call('management.settings', { patch: { staff: [{ id: 'admin', name: '관리자', role: 'manager', permissions: ['closing.reopen'] }] } }), errorCode('INVALID_INPUT'));
 });
 
+test('pickup places are grouped by area; the flat place list stays in step and older settings are read without areas', () => {
+  const f = fixture();
+  f.call('management.settings', { patch: { places: ['만선 티롤 앞', '만선 광장', '설천 주차장', '곤도라 앞'] } });
+  let settings = Management.summary(raw(f)).settings;
+  assert.deepEqual(settings.areas.map(area => [area.name, area.places]), [['만선', ['만선 티롤 앞', '만선 광장']], ['기타', ['설천 주차장', '곤도라 앞']]]);
+  f.call('management.settings', { patch: { areas: [{ id: 'a1', name: '만선', places: ['만선 티롤 앞', '만선 광장'] }, { id: 'a2', name: '설천', places: ['설천 주차장'] }, { id: 'area-etc', name: '기타', places: ['곤도라 앞'] }] } });
+  settings = Management.summary(raw(f)).settings;
+  assert.deepEqual(settings.places, ['만선 티롤 앞', '만선 광장', '설천 주차장', '곤도라 앞']);
+  f.call('management.settings', { patch: { places: ['만선 티롤 앞', '설천 주차장', '설천 셔틀 정류장'] } });
+  settings = Management.summary(raw(f)).settings;
+  assert.deepEqual(settings.areas.map(area => [area.name, area.places]), [['만선', ['만선 티롤 앞']], ['설천', ['설천 주차장', '설천 셔틀 정류장']], ['기타', []]]);
+  assert.throws(() => f.call('management.settings', { patch: { areas: [{ id: 'a1', name: '만선', places: ['광장'] }, { id: 'a2', name: '설천', places: ['광장'] }] } }), errorCode('INVALID_INPUT'));
+  assert.throws(() => f.call('management.settings', { patch: { areas: [{ id: 'a1', name: '만선', places: [] }, { id: 'a2', name: '만선', places: [] }] } }), errorCode('INVALID_INPUT'));
+  const legacy = structuredClone(raw(f)); // saved before areas and discounts existed
+  legacy.settingVersions.at(-1).settings = { rates: [], places: ['만선 광장'], vehicles: [], returnTimes: [], staff: [], nightCutoff: null, store: { name: '', phone: '', address: '', link: '' } };
+  assert.deepEqual(Management.summary(legacy).settings.areas, [{ id: 'area-etc', name: '기타', places: ['만선 광장'] }]);
+  assert.deepEqual(Management.summary(legacy).settings.discounts, []);
+});
+
+test('discount presets are validated and one discount at a time is spread over the line prices', () => {
+  const f = fixture();
+  f.call('management.settings', { patch: { discounts: [{ id: 'd1', kind: 'perUnit', sku: 'ski', amountWon: 5000 }, { id: 'd2', kind: 'percent', percent: 10 }, { id: 'd3', kind: 'amount', amountWon: 10000 }, { id: 'd4', kind: 'liftPercent', percent: 27 }] } });
+  assert.equal(Management.summary(raw(f)).settings.discounts.length, 4);
+  assert.throws(() => f.call('management.settings', { patch: { discounts: [{ id: 'd1', kind: 'perUnit', sku: 'ski', amountWon: 5000 }, { id: 'd2', kind: 'perUnit', sku: 'ski', amountWon: 3000 }] } }), errorCode('INVALID_INPUT'));
+  assert.throws(() => f.call('management.settings', { patch: { discounts: [{ id: 'd1', kind: 'percent', percent: 101 }] } }), errorCode('INVALID_INPUT'));
+  assert.throws(() => f.call('management.settings', { patch: { discounts: [{ id: 'd1', kind: 'perUnit', sku: 'missing', amountWon: 1 }] } }), errorCode('NOT_FOUND'));
+  const lines = [{ id: 'ski', sku: 'ski', quantity: 3, unitWon: 20000, days: 2 }, { id: 'coat', sku: 'clothing', quantity: 2, unitWon: 10000, days: 2 }, { id: 'lift', sku: 'ticket', quantity: 2, unitWon: 35000, days: 2, ticket: true }];
+  const perUnit = Management.applyDiscounts(lines, { gear: { kind: 'perUnit', perUnit: { ski: 5000, clothing: 3000 } }, lift: { percent: 25 } });
+  assert.deepEqual(perUnit, { lines: { ski: 30000, coat: 12000, lift: 17500 }, gearGrossWon: 160000, gearDiscountWon: 42000, liftGrossWon: 70000, liftDiscountWon: 17500 });
+  const percent = Management.applyDiscounts(lines, { gear: { kind: 'percent', percent: 10 } });
+  assert.equal(percent.gearDiscountWon, 16000); assert.deepEqual(percent.lines, { ski: 12000, coat: 4000, lift: 0 });
+  const amount = Management.applyDiscounts(lines, { gear: { kind: 'amount', amountWon: 10000 }, lift: { percent: 27 } });
+  assert.equal(amount.gearDiscountWon, 10000); assert.equal(amount.lines.ski + amount.lines.coat, 10000); assert.equal(amount.liftDiscountWon, 18900);
+  assert.equal(Management.applyDiscounts(lines, { gear: { kind: 'amount', amountWon: 999999 } }).gearDiscountWon, 160000, 'never below zero');
+  assert.deepEqual(Management.applyDiscounts(lines, { gear: { kind: 'none' } }).lines, { ski: 0, coat: 0, lift: 0 });
+  const odd = Management.applyDiscounts([{ id: 'a', sku: 'ski', quantity: 1, unitWon: 33330, days: 1 }, { id: 'b', sku: 'board', quantity: 1, unitWon: 11110, days: 1 }], { gear: { kind: 'percent', percent: 27 } });
+  assert.equal(odd.gearDiscountWon, 11990); assert.equal(odd.lines.a + odd.lines.b, 11990);
+});
+
 test('borrowed stock keeps partner ownership through rental; partial physical return never implies settlement', () => {
   const f = fixture(); partner(f);
   const borrowed = f.call('partner.borrow', { id: 'loan', partnerId: 'partner', sku: 'ski', quantity: 2, size: '160', dueDate: '2026-09-10' });
