@@ -19,7 +19,7 @@
   function stockRow(asset) {
     const assigned = pending(asset), location = asset.location.kind === 'shop' ? '매장 보관' : F.vehicleName(asset.location.id);
     const order = assigned && D.order(assigned.reservationId);
-    const actions = asset.condition !== 'ready' ? '<button class="so-button pos-button" data-go="inventory">분실·상태 확인</button>' : asset.refundId ? '<button class="so-button pos-button" data-go="dispatch">발권처 반환 업무</button>' : assigned ? order ? O.go('연결 접수 확인', 'order-detail', order.id) : '<button class="so-button pos-button" data-go="lift-reservations">연결 예약 확인</button>'
+    const actions = asset.condition !== 'ready' ? '<button class="so-button pos-button" data-go="inventory">분실·상태 확인</button>' : asset.refundId ? '<button class="so-button pos-button" data-go="dispatch">발권처 반환 업무</button>' : assigned ? order ? O.go('연결 접수 확인', 'order-detail', order.id) : button('연결 예약 확인', 'pos-ticket-linked', assigned.reservationId)
       : (asset.location.kind === 'vehicle' ? button('실제 매장 입고', 'pos-ticket-receive', asset.id) : button('판매행에 배정', 'pos-ticket-target', asset.id))
         + button('예비 보관', 'pos-ticket-spare', asset.id) + button('발권처 반환', 'pos-ticket-refund', asset.id);
     return P.row(title(asset) + ' · ' + location, asset.id + ' · ' + period(asset) + ' · ' + (asset.condition !== 'ready' ? ({lost:'분실 · 발견 확인 필요',inspection:'점검 대기',repair:'수리 대기',cleaning:'세척 대기'}[asset.condition] || asset.condition) : asset.refundId ? '발권처 반환 대기' : assigned ? (order?.customer.name || assigned.reservationId) + ' 배정 중' : asset.ticket.transferable ? '양도 가능' : '양도 불가'), actions);
@@ -92,6 +92,7 @@
     const asset = D.snapshot.assets.find(a => a.id === id);
     request('차량의 권을 실제로 매장에 받았나요?', '<div class="pos-info"><strong>' + e(title(asset) + ' · ' + asset.id) + '</strong><p>' + e(F.vehicleName(asset.location.id)) + ' → 매장 보관</p></div>', '실물 1매 매장 입고', 'tickets.receive', { assetIds: [id] });
   });
+  S.action('pos-ticket-linked', id => P.modal('연결 예약 확인', '<div class="pos-confirm-summary"><strong>예약 번호 ' + e(id) + '</strong><span>이 권은 포스 접수가 아닌 예전 예약에 묶여 있습니다</span><span>예약을 바꾸려면 접수·예약에서 같은 고객을 찾아 주세요</span></div>', button('닫기', 'close') + O.go('1 접수·예약 열기', 'intake', '', 'primary')));
   S.action('pos-ticket-spare', id => {
     const asset = D.snapshot.assets.find(a => a.id === id);
     if (asset.purpose === 'spare' && !pending(asset) && !asset.refundId) { S.toast('현재 위치에 예비 보관 중입니다.'); return; }

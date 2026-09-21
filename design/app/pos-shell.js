@@ -78,21 +78,6 @@
   const chipGo = (label, route, id = '', on = false, extra = '') => '<button type="button" class="pos-chip' + (extra ? ' ' + e(extra) : '') + '" data-go="' + e(route) + '" data-id="' + e(id) + '" aria-pressed="' + (on ? 'true' : 'false') + '">' + e(label) + '</button>';
   const toolbarLabel = text => '<span class="pos-toolbar-label">' + e(text) + '</span>';
   const group = html => '<div class="pos-toolbar-group">' + html + '</div>';
-  // One card. Fields are optional; missing ones are skipped so the same builder serves every list screen.
-  function card(c) {
-    const tone = c.tone || '', strong = ['red', 'orange', 'green'].includes(tone);
-    const legend = strong && c.badge ? '<span class="pos-card-legend">' + e(c.badge[0]) + '</span>' : '';
-    const badgeHtml = !legend && c.badge ? badge(c.badge[0], c.badge[1] || 'grey') : '';
-    const head = '<span class="pos-card-head"><span class="pos-card-name">' + e(c.name) + '</span>' + (c.phone ? '<span class="pos-card-phone">' + e(c.phone) + '</span>' : '') + badgeHtml + '</span>';
-    const meta = c.meta ? '<span class="pos-card-meta">' + e(c.meta) + '</span>' : '';
-    const figures = c.figures?.length ? '<span class="pos-card-figures">' + c.figures.map(f => '<span><small>' + e(f.label) + '</small><strong' + (f.when ? ' class="is-when"' : '') + ' data-tone="' + e(f.tone || '') + '">' + e(f.value) + '</strong></span>').join('') + '</span>' : '';
-    const items = c.items?.length ? '<span class="pos-card-items">' + c.items.map(([text, state, t, done]) => '<span class="pos-card-item' + (done ? ' is-done' : '') + '"><span>' + e(text) + '</span><span data-tone="' + e(t || 'grey') + '">' + e(state || '') + '</span></span>').join('') + '</span>' : '';
-    const lines = c.lines?.length ? '<span class="pos-card-lines">' + c.lines.map(([text, t]) => '<span data-tone="' + e(t || '') + '">' + e(text) + '</span>').join('') + '</span>' : '';
-    const money = c.money?.length ? '<span class="pos-card-money">' + c.money.map(([text, t]) => '<span data-tone="' + e(t || 'ink') + '">' + e(text) + '</span>').join('') + '</span>' : '';
-    const inner = head + meta + figures + items + lines + money;
-    const open = c.go ? '<button type="button" class="pos-card-open" data-go="' + e(c.go.page) + '" data-id="' + e(c.go.id ?? '') + '">' + inner + '</button>' : '<div class="pos-card-open">' + inner + '</div>';
-    return '<article class="pos-card"' + (tone ? ' data-tone="' + e(tone) + '"' : '') + (c.id ? ' data-card-id="' + e(c.id) + '"' : '') + '>' + legend + open + (c.actions ? '<div class="pos-card-actions">' + c.actions + '</div>' : '') + '</article>';
-  }
   // Grouped card grid. Legacy mode scrolls inside this region; v4 lists pass { fixed: true } and page by height instead (no scrolling).
   function cards(groups, options = {}) {
     const filled = groups.filter(g => g.cards && g.cards.length);
@@ -105,7 +90,7 @@
     }
     if (!filled.length) return '<div class="pos-cards" data-pos-scroll><div class="pos-empty"><strong>' + e(options.empty || '항목 없음') + '</strong>' + (options.emptyNote ? '<span>' + e(options.emptyNote) + '</span>' : '') + (options.emptyAction || '') + '</div></div>';
     return '<div class="pos-cards" data-pos-scroll>' + filled.map(g => '<section class="pos-group">' + (g.title ? '<div class="pos-group-head">' + e(g.title) + (g.sub ? '<small>' + e(g.sub) + '</small>' : '') + '</div>' : '')
-      + '<div class="pos-card-grid' + (options.steps ? ' is-steps' : '') + '">' + g.cards.join('') + '</div></section>').join('') + '</div>';
+      + '<div class="pos-card-grid">' + g.cards.join('') + '</div></section>').join('') + '</div>';
   }
   // ---- UI v4 (docs/42 2-3 · 2-4): fixed four-row card, text that is fitted instead of clipped, paging by height ----
   // Rows are single lines. When a row is too narrow, whole low-priority parts are dropped (never an ellipsis):
@@ -315,7 +300,7 @@
     const container = S.$('.pos-cards[data-pos-cards]'); if (!container) return;
     setPage('cards', getPage('cards') + Number(delta), { render: false }); layoutCards(container, delta);
   });
-  S.pos = Object.freeze({ navigation, page, button, row, pager, getPage, setPage, modal, prepareModal, card, orderCard, tile, lineRow, cards, fitPage, choice, calendar, badge, search, chip, chipGo, toolbarLabel, group, terms, storeName, menus,
+  S.pos = Object.freeze({ navigation, page, button, row, pager, getPage, setPage, modal, prepareModal, orderCard, tile, lineRow, cards, fitPage, choice, calendar, badge, search, chip, chipGo, toolbarLabel, group, terms, storeName, menus,
     field: (label, value = '', type = 'text', attrs = '') => S.field(e(label), value, type, attrs),
     label: value => '<span class="pos-label">' + e(value) + '</span>'
   });
