@@ -26,7 +26,21 @@ const escape = value => String(value).replace(/[&<>\"]/g, ch => ({ '&': '&amp;',
         return { viewport: [innerWidth, innerHeight], overflow: boxes.filter(el => { const r = el.getBoundingClientRect(); return r.bottom > innerHeight + 1 || r.right > innerWidth + 1 || r.top < -1 || r.left < -1 || el.scrollHeight > el.clientHeight + 2 && ['auto', 'scroll'].includes(getComputedStyle(el).overflowY); }).map(el => ({ text: el.textContent.trim().slice(0, 70), tag: el.tagName })), bodyScroll: [...container.querySelectorAll('.pos-page-body,.pos-modal-body')].some(el => el.scrollHeight > el.clientHeight + 2) };
       });
       assert.deepEqual(geometry.overflow, [], key + ' overflow'); assert.equal(geometry.bodyScroll, false, key + ' core body scroll');
-      const rules = await frame.evaluate(measure, { minFont: 16, minTarget: 52 }); checks.push({ key, ...geometry, rules, ruleTotals: totals(rules) });
+      // The store header spans the full viewport; every rail item must remain below it and visible.
+      const shell = await frame.evaluate(() => {
+        if (document.querySelector('#ski-ops').dataset.actor === 'driver') return null;
+        const box = selector => document.querySelector(selector).getBoundingClientRect().toJSON();
+        return { header: box('.so-topbar'), rail: box('.so-sidebar'), main: box('#so-main'),
+          items: [...document.querySelectorAll('.pos-rail-item')].map(el => ({ label: el.textContent, ...el.getBoundingClientRect().toJSON() })) };
+      });
+      if (shell) {
+        assert.equal(shell.header.left, 0, key + ' header left'); assert.equal(shell.header.width, geometry.viewport[0], key + ' full-width header');
+        assert.equal(shell.rail.top, shell.header.bottom, key + ' rail below header');
+        assert.equal(shell.main.top, shell.header.bottom, key + ' main below header'); assert.equal(shell.main.left, shell.rail.right, key + ' main beside rail');
+        assert.ok(shell.items.length === 9 || shell.items.length === 7, key + ' complete store menu');
+        assert.deepEqual(shell.items.filter(r => r.top < shell.rail.top || r.bottom > geometry.viewport[1] + 1 || r.left < 0 || r.right > shell.rail.right + 1 || r.height < 52), [], key + ' fully visible rail targets');
+      }
+      const rules = await frame.evaluate(measure, { minFont: 16, minTarget: 52 }); checks.push({ key, ...geometry, shell, rules, ruleTotals: totals(rules) });
       const file = key + '-' + geometry.viewport.join('x') + '.png'; await page.screenshot({ path: path.join(out, file) }); screens.push({ title, detail, file, size: geometry.viewport.join('×') });
     }
     const menus = [['home', '오늘 할 일', '지금 급한 일 한 줄과 여섯 가지 업무 타일. 타일 전체가 누르는 곳입니다.'], ['intake', '1 접수·예약', '수령 시간대별 카드 · 오늘/내일/전체 · 달력 · 정렬.'], ['preparation', '2 준비·지급', '사이즈 요청·지급·수납 버튼을 카드마다 하나씩 둡니다.'], ['rentals', '3 이용 중·변경', '이용 중 팀의 기간·수거 변경과 교환 진행을 확인합니다.'], ['returns', '4 반납·회수', '반납 타임별 카드 · 모두 받음 · 차량 입고 확인.'], ['closing', '5 정산·마감', '왼쪽은 수납 대기 행(한 줄 전체가 누르는 곳), 오른쪽은 오늘 마감 준비.'], ['tickets', '리프트권', '발권 필요 · 지급 대기 · 사용 중 · 보관 권을 카드로 확인합니다.'], ['dispatch', '차량 운행', '차량별 배달·수거 카드와 보관 물품.'], ['management', '관리', '재고·거래처·고객·매장 설정·인쇄물·마감 이력 6장.'], ['settings', '매장 설정', '왼쪽 항목 탭 · 매장 정보 탭 추가.'], ['closing-history', '마감 이력', '날짜별 마감표 카드.']];

@@ -4,15 +4,16 @@
 
 ## 0. 지금 상태
 
-- **UI v4 + 매장 설정 · 접수 확정(M0~M9)과 예전 화면 정리가 `main`에 반영됐다**(2026-09-21 · 사용자 확인 "메인페이지까지 반영"). 작업 브랜치는 `feat/pos-ui-v4`이며, 아래 A1~A4 후속 변경은 아직 main에 반영하지 않았다. 공개 체험판은 GitHub Pages(`main` 푸시 → Actions가 검사 · 빌드 · 배포).
-- 기존 main의 확인된 수치: 업무 검사 6종 · `test:pwa` · 단위 180 · 반납 25 · 알림 18 · `check` 통과, **화면 규칙 다섯 가지 154곳 0건**, 번들 1,110,342바이트(가드 2,000,000).
+- **UI v4 + 매장 설정 · 접수 확정(M0~M9)과 예전 화면 정리가 `main`에 반영됐다**(2026-09-21 · 사용자 확인 "메인페이지까지 반영"). 작업 브랜치는 `feat/pos-ui-v4`이며, **2026-09-22에는 사용자 배포 요청으로 A1~A5 후속 변경 10개 커밋도 main·Pages에 반영했다(`55d16e9`)**. 공개 체험판은 GitHub Pages(`main` 푸시 → Actions가 검사 · 빌드 · 배포).
+- 2026-09-21 main 반영 당시 수치: 업무 검사 6종 · `test:pwa` · 단위 180 · 반납 25 · 알림 18 · `check` 통과, **화면 규칙 다섯 가지 154곳 0건**, 번들 1,110,342바이트(가드 2,000,000).
 - 시안 원본 PNG(약 150MB)는 브랜치 `claude/pos-ui-improvement-q9yqku`에만 있다. **이 브랜치는 `main`에 합치지 않는다.** `main`에는 가벼운 미리보기(.jpg)만 둔다.
 - 사용자 파일 `docs/25-label-printer-purchase-notes.md`는 추적하지 않는 파일이다. 건드리거나 커밋하지 않는다.
-- **후속 A1 지급·반납 정리:** 사용자 확인 뒤 `feat/pos-ui-v4`에서 구현했다. 검증·시안 비교는 [`docs/47`](47-pos-fulfillment-ui.md). A1의 `main`·Pages 반영은 확인 대기다.
-- **후속 A2 기간·수거 변경·교환·문제 해결:** 같은 브랜치에서 구현했다. 비교·검증은 [`docs/48`](48-pos-adjustments-ui.md). `main`·Pages 반영은 확인 대기다.
-- **후속 A3 발권·마감·사이즈 입력·알림:** 같은 브랜치에서 구현했다. 비교·검증은 [`docs/49`](49-pos-workflow-windows-ui.md). 전체 규칙 244곳 0건, `main`·Pages 반영은 확인 대기다.
+- **후속 A1 지급·반납 정리:** 사용자 확인 뒤 `feat/pos-ui-v4`에서 구현했다. 검증·시안 비교는 [`docs/47`](47-pos-fulfillment-ui.md). A1은 2026-09-22 `55d16e9`와 함께 main·Pages에 반영했다.
+- **후속 A2 기간·수거 변경·교환·문제 해결:** 같은 브랜치에서 구현했다. 비교·검증은 [`docs/48`](48-pos-adjustments-ui.md). 2026-09-22 `55d16e9`와 함께 main·Pages에 반영했다.
+- **후속 A3 발권·마감·사이즈 입력·알림:** 같은 브랜치에서 구현했다. 비교·검증은 [`docs/49`](49-pos-workflow-windows-ui.md). 전체 규칙 244곳 0건, 2026-09-22 `55d16e9`와 함께 main·Pages에 반영했다.
 - **후속 A4 재고·정비·거래처·고객 상세:** `aa1dae6`까지 구현·업무 검사를 마쳤지만 **시안 일치는 미완료**다. 사용자가 비교 그림의 차이를 지적했다. 전체 규칙 291곳 0건은 시안 일치의 근거가 아니다. 비교·검사는 [`docs/50`](50-pos-management-details-ui.md), 업무상 차이의 사유·미구현 기능·시안 불일치는 [`docs/51`](51-pos-ui-design-differences.md)에 구분했다.
-- **현재 상태(2026-09-22):** A1~A4 기준 `3636a02` 위에서 A5(1) 업무 처리를 `bcd67c8`로 수정·검증했다. (2) 차량 보관은 요소 표 작성 뒤 입고 권한 차이를 먼저 물었고, 사용자가 **"둘다 가능하게 해줘"**라고 확인해 D03·D13 배치와 기사 입고를 구현했다. **매장 직원과 기사 모두 입고 가능**하며 기사는 자기 차량의 수거 물품만 처리한다. 촘촘한 행·쪽 나눔과 기사 업무 목록 4줄@360×640을 유지했다. **(2) 비교 그림의 사용자 검토 대기이며 다음 화면은 시작하지 않는다.** (1)의 실제 문자 발송 미연결·예약금 미수 보류는 그대로다. 항목별 차이·검증·비교 그림은 [`docs/51`](51-pos-ui-design-differences.md) 문서 끝을 따른다. `main`·Pages·PR 없이 `feat/pos-ui-v4`에만 커밋·푸시한다.
+- **현재 배포(2026-09-22):** A1~A5의 `55d16e9`를 Pages에 반영했고 빌드·배포 성공과 공개 파일 네 개의 해시 일치를 확인했다. 매장·기사 입고가 모두 포함됐다. 상세 배포 기록은 [`docs/43` 14절](43-ui-v4-implementation.md#14-a1a5-기존-변경-배포-2026-09-22)이다. 실제 문자 발송 미연결·예약금 미수 보류는 그대로다.
+- **현재 작업:** 사용자 지시에 따라 남은 목록의 첫 항목인 A6 공통 바깥 배치(전체 폭 헤더·그 아래 왼쪽 메뉴)의 위치 수정·전체 검사·비교 그림을 마쳤다. **위치 수정의 사용자 검토 대기이며 전체 시안 일치는 미완료**다. 구현 전 요소 표는 [`docs/51`](51-pos-ui-design-differences.md) 문서 끝에 있다. 이 변경은 `feat/pos-ui-v4`에만 커밋·푸시한다. 헤더 상태 배지·메뉴 아이콘과 간격 등 남은 차이는 요소별 표를 따른다. 거래처 상세 등 다음 항목은 확인 전 시작하지 않는다.
 
 ## 1. 먼저 읽을 것
 
@@ -80,11 +81,12 @@ npm run test:pwa                   # 설치형 앱 흐름
 
 | # | 화면 | 시안 | 코드 | 할 일 |
 |---|---|---|---|---|
-| A1 | 지급 · 반납 화면과 확인 창 | `p20-popup-issue` · `p22-popup-return` | `pos-fulfillment-view.js` · `pos-fulfillment.js` | **구현·검증 완료, main 반영 확인 대기.** 대표자·수량 제목, 공용 −/+, 미수·수납, 높이별 쪽 나눔. 검사 19개 및 5개 크기 촬영. 비교·검증 기록은 [`docs/47`](47-pos-fulfillment-ui.md). |
-| A2 | 기간 · 수거 변경 · 교환 · 문제 해결 | `p24` · `p25` · `p26` | `pos-adjustment-forms.js` · `pos-problem-picker.js` · `pos-fulfillment.js` | **구현·검증 완료, main 반영 확인 대기.** 날짜·장소·시간·차량 선택과 달력, 실제 규격 버튼, 문제 해결 여섯 선택지. 부록 A 문구·기존 실물 확인 절차 유지. 지급/반납/변경 24개·전체 검증 통과, 규칙 195곳 0건. 비교·검증은 [`docs/48`](48-pos-adjustments-ui.md). |
-| A3 | 발권 창 · 마감 확정 3단계 · 사이즈 입력 현황 · 사이즈 요청 창 · 업무 알림 | `p27` · `p28` · `p14` · `p31` · `p32` | `pos-ticket-form.js` · `pos-finance.js showClosing()` · `pos-size-status.js` · `pos-preinput.js` · `pos-notifications.js` | **구현·검증 완료, main 반영 확인 대기.** 공용 수량 조절·요약, 마감 3단계 창, 팀별 사이즈·적용 규격 집계, 일행/차수 선택, 알림 선택 상태. 사전입력 10개·전체 검증 통과, 규칙 244곳 0건. 비교·검증은 [`docs/49`](49-pos-workflow-windows-ui.md). |
-| A4 | 재고 · 정비, 거래처 상세, 고객 상세 | `m02-inventory` · `m04-partner-detail` · 고객은 P04 배치 기준 | `pos-management.js inventory()`·`inventoryAssets()`·`partnerDetail()`·`customerDetail()` | **업무 검사 통과, 시안 일치 미완료.** `aa1dae6` 상태로 마무리. 관리 9개·전체 검사 통과, 규칙 291곳 0건. 버튼 형태·패널 비율·금액표 여백·하단 주 동작 등 시안 불일치는 [`docs/51`](51-pos-ui-design-differences.md). 기존 비교·검사는 [`docs/50`](50-pos-management-details-ui.md). |
-| A5 | 기사 태블릿 업무 처리 · 차량 보관 | `d02-driver-task` · `d03-driver-stock` | `pos-dispatch.js` `taskPage()` · `vehicleStock()` | **(1) `bcd67c8` 수정·검증. (2) 사용자 확인으로 매장·기사 입고를 연결하고 D03·D13 구현·비교·검증, 비교 그림 검토 대기.** 기사는 자기 차량의 수거 물품만 입고한다. 행·쪽 나눔과 기사 업무 목록 4줄@360×640 유지. 실제 문자 발송 미연결·예약금 미수 보류. 사용자 확인 전 다음 화면은 시작하지 않는다. [`docs/51`](51-pos-ui-design-differences.md) 문서 끝 참조. |
+| A1 | 지급 · 반납 화면과 확인 창 | `p20-popup-issue` · `p22-popup-return` | `pos-fulfillment-view.js` · `pos-fulfillment.js` | **구현·검증 통과, 2026-09-22 main·Pages 반영.** 대표자·수량 제목, 공용 −/+, 미수·수납, 높이별 쪽 나눔. 검사 19개 및 5개 크기 촬영. 비교·검증 기록은 [`docs/47`](47-pos-fulfillment-ui.md). |
+| A2 | 기간 · 수거 변경 · 교환 · 문제 해결 | `p24` · `p25` · `p26` | `pos-adjustment-forms.js` · `pos-problem-picker.js` · `pos-fulfillment.js` | **구현·검증 통과, 2026-09-22 main·Pages 반영.** 날짜·장소·시간·차량 선택과 달력, 실제 규격 버튼, 문제 해결 여섯 선택지. 부록 A 문구·기존 실물 확인 절차 유지. 지급/반납/변경 24개·전체 검증 통과, 규칙 195곳 0건. 비교·검증은 [`docs/48`](48-pos-adjustments-ui.md). |
+| A3 | 발권 창 · 마감 확정 3단계 · 사이즈 입력 현황 · 사이즈 요청 창 · 업무 알림 | `p27` · `p28` · `p14` · `p31` · `p32` | `pos-ticket-form.js` · `pos-finance.js showClosing()` · `pos-size-status.js` · `pos-preinput.js` · `pos-notifications.js` | **구현·검증 통과, 2026-09-22 main·Pages 반영.** 공용 수량 조절·요약, 마감 3단계 창, 팀별 사이즈·적용 규격 집계, 일행/차수 선택, 알림 선택 상태. 사전입력 10개·전체 검증 통과, 규칙 244곳 0건. 비교·검증은 [`docs/49`](49-pos-workflow-windows-ui.md). |
+| A4 | 재고 · 정비, 거래처 상세, 고객 상세 | `m02-inventory` · `m04-partner-detail` · 고객은 P04 배치 기준 | `pos-management.js inventory()`·`inventoryAssets()`·`partnerDetail()`·`customerDetail()` | **업무 검사 통과, 전체 시안 일치 미완료.** `3636a02` 재수정을 포함해 2026-09-22 main·Pages에 반영했다. M04 왼쪽 패널·여섯 버튼과 미구현 기능은 남아 있다. 차이·사유·재수정 내역은 [`docs/51`](51-pos-ui-design-differences.md). 기존 비교·검사는 [`docs/50`](50-pos-management-details-ui.md). |
+| A5 | 기사 태블릿 업무 처리 · 차량 보관 | `d02-driver-task` · `d03-driver-stock` | `pos-dispatch.js` `taskPage()` · `vehicleStock()` | **(1) `bcd67c8` 수정·검증. (2) `55d16e9` 매장·기사 입고 연결, D03·D13 비교·검증. 2026-09-22 두 화면 main·Pages 반영.** 기사는 자기 차량의 수거 물품만 입고한다. 행·쪽 나눔과 기사 업무 목록 4줄@360×640 유지. 실제 문자 발송 미연결·예약금 미수 보류. 후속은 사용자 요청한 공통 바깥 배치 한 항목이다. [`docs/51`](51-pos-ui-design-differences.md) 문서 끝 참조. |
+| A6 | 공통 바깥 배치 | `p02r-intake-cards` · `m02-inventory` | `pos-shell.css` · `capture-pos-release.cjs` | **전체 폭 헤더·그 아래 메뉴 위치 수정, 비교 그림 검토 대기.** 글꼴·줄바꿈·본문 유지. 전체 검사 통과·규칙 322곳 0건, 기사 37장 변경 없음. 헤더 내부·메뉴 세부 모양과 본문의 기존 차이는 [`docs/51`](51-pos-ui-design-differences.md). main·Pages 미반영. |
 
 ### B. 나눠서 결제 (시안만 있음 · `docs/44` 6-1)
 
