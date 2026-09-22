@@ -26,7 +26,7 @@ test('multi-day reservation totals, preissue, partial issue, cancellation and ex
   assert.throws(() => f.call('reservation.issueDate', { id: 'hong', lineIds: ['d10-6'], issueDate: '2026-09-11' }), errorCode('INVALID_INPUT'));
 });
 
-test('morning equipment + ticket collection, future recovery, afternoon ticket-only redelivery, store final receipt', () => {
+test('morning equipment + ticket collection, future recovery, afternoon ticket-only redelivery, driver and store final receipt', () => {
   const f = fixture();
   f.book('morning', [{ id: 'am', useDate: '2026-09-09', startTime: '09:00', endTime: '12:00', ticketType: 'ticket-3h', quantity: 1 }]);
   f.book('afternoon', [{ id: 'pm', useDate: '2026-09-09', startTime: '14:00', endTime: '18:00', ticketType: 'ticket-4h', quantity: 1 }]);
@@ -52,8 +52,9 @@ test('morning equipment + ticket collection, future recovery, afternoon ticket-o
   f.setTime('2026-09-09T16:00:00.000Z'); // Next calendar day in Seoul.
   assert.equal(f.driver.vehicle().equipmentCount, 2);
   assert.equal(f.driver.vehicle().totals.find(t => t.sku === 'ski').recoveredToday, 0);
-  assert.throws(() => f.move('receive', equipment, van, shop, {}, f.driver), errorCode('FORBIDDEN'));
-  f.move('receive', equipment, van, shop); assert.equal(f.driver.vehicle().equipmentCount, 0);
+  f.move('receive', equipment.slice(0, 1), van, shop, {}, f.driver);
+  assert.equal(f.driver.vehicle().equipmentCount, 1);
+  f.move('receive', equipment.slice(1), van, shop); assert.equal(f.driver.vehicle().equipmentCount, 0);
 });
 
 test('clothing/helmet counts, store refund preload, and same-day ticket expiry use actual custody and time', () => {

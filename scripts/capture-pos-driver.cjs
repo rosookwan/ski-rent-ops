@@ -15,6 +15,7 @@ const { measure, totals } = require('./pos-ui-rules.cjs');
 const OUT = path.resolve(process.env.SKI_DRIVER_OUT || 'docs/pos-ui-v4'); mkdirSync(OUT, { recursive: true });
 const temp = mkdtempSync(path.join(tmpdir(), 'ski-pos-driver-'));
 const token = 'local-driver-capture-store-'.padEnd(48, 'x'), driverToken = 'local-driver-capture-driver-'.padEnd(48, 'x');
+const stockToken = 'local-stock-capture-store-'.padEnd(48, 'x'), stockDriverToken = 'local-stock-capture-driver-'.padEnd(48, 'x');
 const hash = value => createHash('sha256').update(value).digest('hex');
 const sizes = [[1024, 520], [1024, 600], [1280, 720]];
 let server, repository, browser;
@@ -23,7 +24,9 @@ async function main() {
   repository = createSqliteRepository(path.join(temp, 'ops.sqlite'));
   server = createApiServer({ repository, authenticate: tokenAuthenticator([
     { tokenHash: hash(token), shopId: 'driver-capture-shop', actor: { id: 'manager', role: 'store', permissions: ['closing.reopen'] } },
-    { tokenHash: hash(driverToken), shopId: 'driver-capture-shop', actor: { id: 'driver-1', role: 'driver', vehicleId: 'van-1' } }
+    { tokenHash: hash(driverToken), shopId: 'driver-capture-shop', actor: { id: 'driver-1', role: 'driver', vehicleId: 'van-1' } },
+    { tokenHash: hash(stockToken), shopId: 'stock-capture-shop', actor: { id: 'manager', role: 'store' } },
+    { tokenHash: hash(stockDriverToken), shopId: 'stock-capture-shop', actor: { id: 'driver-1', role: 'driver', vehicleId: 'van-1' } }
   ]), clock: () => '2026-09-13T01:00:00.000Z', uiDirectory: path.resolve('dist') });
   server.listen(0, '127.0.0.1'); await once(server, 'listening');
   const baseUrl = 'http://127.0.0.1:' + server.address().port, client = createHttpClient({ baseUrl, token });
@@ -73,7 +76,7 @@ async function main() {
   assert.match(await page.locator('#so-dialog-body').innerText(), /고객에게 문자는 보내지 않습니다/);
   await page.locator('#so-dialog [data-action="close"]').last().click();
   assert.deepEqual(await client.snapshot(), beforeMessage, 'departure preview must not record SMS delivery or move stock');
-  await page.evaluate(() => window.SkiOps.go('vehicle')); await page.locator('[data-pos-list-key="vehicle-stock"]').waitFor(); await capture('stock', 1024, 520);
+  await page.evaluate(() => window.SkiOps.go('vehicle')); await page.locator('[data-pos-list-key="vehicle-stock"]').waitFor(); await capture('stock-delivery', 1024, 520);
   // Phones (docs/41): the same driver screens under 600px wide. 360×640 is the baseline; the list shows whole rows only.
   for (const [width, height] of [[360, 640], [390, 740], [412, 780]]) { await page.setViewportSize({ width, height }); await page.evaluate(() => window.SkiOps.go('dispatch')); await capture('phone-dispatch', width, height); }
   assert.equal(results.find(r => r.key === 'phone-dispatch' && r.viewport[1] === 640).rows, 4);
@@ -81,7 +84,7 @@ async function main() {
   await page.locator('[data-action="pos-task"]').first().click(); await page.locator('[data-action="pos-task-complete"]').waitFor(); await capture('phone-task', 360, 640);
   await page.locator('[data-action="pos-task-message"]:visible').click(); await capture('phone-message', 360, 640); await page.locator('#so-dialog [data-action="close"]').last().click();
   await page.locator('[data-action="pos-task-visit"]').click(); await page.locator('#so-dialog[open]').waitFor(); await capture('phone-visit', 360, 640); await page.locator('#so-dialog [data-action="close"]').first().click();
-  await page.evaluate(() => window.SkiOps.go('vehicle')); await page.locator('[data-pos-list-key="vehicle-stock"]').waitFor(); await capture('phone-stock', 360, 640);
+  await page.evaluate(() => window.SkiOps.go('vehicle')); await page.locator('[data-pos-list-key="vehicle-stock"]').waitFor(); await capture('phone-stock-delivery', 360, 640);
   // Four item kinds require another page on a phone. Selection must survive paging and a zero-count error.
   await command('stock.receive', { sku: 'board', quantity: 1, size: '150' });
   await command('stock.receive', { sku: 'helmet', quantity: 1, size: 'M' });
@@ -117,14 +120,67 @@ async function main() {
   assert.match(await page.locator('.pos-task-message-copy').innerText(), /수거 차량이 출발했습니다\. 10분 이내 도착 예정/);
   assert.match(await page.locator('.pos-task-message-copy').innerText(), /장비와 함께 기다려 주세요/);
   await capture('phone-collection-message', 360, 640); await page.locator('#so-dialog [data-action="close"]').last().click();
+  // D03/D13: actual loaded, recovered and spare items, isolated from the task-screen comparison fixtures.
+  const stockClient = createHttpClient({ baseUrl, token: stockToken });
+  const stockCommand = async (type, payload) => stockClient.execute(newCommand(type, await stockClient.snapshot(), payload));
+  await stockCommand('management.settings', { patch: { vehicles: [{ id: 'van-1', name: '1호 차량' }] } });
+  const stockIds = {};
+  for (const [sku, quantity] of [['ski', 6], ['board', 2], ['clothing', 6], ['helmet', 3]]) stockIds[sku] = (await stockCommand('stock.receive', { sku, quantity })).assetIds;
+  for (const [id, items] of [['stock-delivery', [['ski', stockIds.ski], ['clothing', stockIds.clothing.slice(0, 3)]]], ['stock-return', [['board', stockIds.board], ['clothing', stockIds.clothing.slice(3)], ['helmet', stockIds.helmet]]]]) {
+    await stockCommand('order.create', { id, customer: { name: '김민재', phone: '010-1234-1000' }, people: [], batch: { id: id + '-batch', lines: items.map(([sku, ids]) => ({ id: sku, sku, quantity: ids.length, start: '2026-09-13', end: '2026-09-13', price: { unitWon: 10000 } })) } });
+    const lineItems = items.map(([lineId, assetIds]) => ({ lineId, assetIds }));
+    if (id === 'stock-delivery') await stockCommand('ops.dispatch', { id: 'stock-trip', orderId: id, lineItems, vehicleId: 'van-1', date: '2026-09-13', time: '10:00', place: '만선 광장' });
+    else { await stockCommand('ops.issue', { orderId: id, lineItems }); await stockCommand('ops.return', { orderId: id, mode: 'collect', vehicleId: 'van-1', lineItems }); }
+  }
+  const spareTickets = (await stockCommand('ticket.issue', { sku: 'ticket-4h', quantity: 4, ticket: { validFrom: '2026-09-13T00:00:00.000Z', validTo: '2026-09-13T12:00:00.000Z', acceptedTypes: ['ticket-4h'], transferable: true, vendorId: 'resort-1' } })).assetIds;
+  await stockCommand('stock.move', { kind: 'load', assetIds: spareTickets, from: { kind: 'shop', id: 'stock-capture-shop' }, to: { kind: 'vehicle', id: 'van-1' }, purpose: 'spare' });
+  await page.goto(baseUrl + '/pos'); await page.locator('#pos-access-key').fill(stockDriverToken); await page.locator('[data-action="pos-connect"]').click(); await page.locator('.pos-page').waitFor();
+  await page.locator('[data-action="pos-vehicle-stock"]').click();
+  for (const [width, height] of sizes) await capture('stock', width, height);
+  for (const [width, height] of [[360, 640], [390, 740], [412, 780]]) await capture('phone-stock', width, height);
+  assert.equal(results.find(r => r.key === 'stock' && r.viewport[1] === 600).rows, 4);
+  assert.equal(results.find(r => r.key === 'phone-stock' && r.viewport[0] === 360).rows, 4);
+  assert.deepEqual(await page.locator('.pos-stock-metrics strong').allTextContents(), ['8', '6', '3', '4매']);
+  assert.equal(await page.locator('[data-action="pos-vehicle-receive"]').innerText(), '매장 입고 8개');
+  await page.setViewportSize({ width: 360, height: 640 }); await page.waitForFunction(() => document.querySelectorAll('.pos-row').length === 4);
+  await capture('phone-stock-resize', 360, 640);
+  await page.locator('[data-pos-key="vehicle-stock"][data-id="1"]').click();
+  assert.match(await page.locator('.pos-row').innerText(), /4시간권 4매/); assert.match(await page.locator('.pos-row').innerText(), /예비 보관 4/);
+  await capture('phone-stock-next', 360, 640); await page.locator('[data-pos-key="vehicle-stock"][data-id="-1"]').click();
+  // Stale data must not receive a single item. Both errors and uncertain-response retry stay within the phone.
+  await stockCommand('stock.receive', { sku: 'helmet', quantity: 1 });
+  const beforeStale = await stockClient.snapshot();
+  await page.locator('[data-action="pos-vehicle-receive"]').click(); await page.locator('#pos-error').waitFor();
+  assert.deepEqual(await stockClient.snapshot(), beforeStale);
+  await capture('stock-stale', 1024, 600); await capture('phone-stock-stale', 360, 640);
+  await page.evaluate(async () => { await window.SkiOps.posData.refresh(); window.SkiOps.render(); });
+  await page.route('**/api/workflows/commands', async route => { const response = await route.fetch(); assert.equal(response.status(), 200); await route.abort('failed'); });
+  await page.locator('[data-action="pos-vehicle-receive"]').click(); await page.waitForFunction(() => window.SkiOps.posData.pending && !window.SkiOps.posData.busy);
+  await capture('phone-stock-retry', 360, 640); await page.unroute('**/api/workflows/commands');
+  const onceReceived = await stockClient.snapshot();
+  await page.locator('#so-page-tools [data-action="pos-retry"]').click(); await page.waitForFunction(() => !window.SkiOps.posData.pending && !window.SkiOps.posData.busy);
+  assert.deepEqual(await stockClient.snapshot(), onceReceived);
+  assert.equal(onceReceived.orders.find(o => o.id === 'stock-return').totals.shopQuantity, 8);
+  assert.equal(onceReceived.assets.filter(a => a.location.kind === 'vehicle').length, 13);
+  assert.equal(await page.locator('[data-action="pos-vehicle-receive"]').innerText(), '매장 입고 0개');
+  assert.equal(await page.locator('[data-action="pos-vehicle-receive"]').isDisabled(), true);
+  await capture('stock-received', 1024, 600); await capture('phone-stock-received', 360, 640);
+  await stockCommand('ops.deliveryCancel', { taskId: 'stock-trip', reason: '촬영 종료 후 실물 내림 확인', unload: true });
+  await stockCommand('stock.move', { kind: 'receive', assetIds: spareTickets, from: { kind: 'vehicle', id: 'van-1' }, to: { kind: 'shop', id: 'stock-capture-shop' } });
+  await page.evaluate(async () => { await window.SkiOps.posData.refresh(); window.SkiOps.render(); });
+  await capture('stock-empty', 1024, 600); await capture('phone-stock-empty', 360, 640);
+  assert.deepEqual(await page.locator('.pos-stock-metrics strong').allTextContents(), ['0', '0', '0', '0매']);
   // Same comparison method as the A1-A4 scripts: original JPG and real browser capture, no generated UI images.
   const uri = file => 'data:image/' + (file.endsWith('.jpg') ? 'jpeg' : 'png') + ';base64,' + readFileSync(file).toString('base64');
   for (const [key, reference, actual, width, height, title] of [
     ['task', 'pos-rest-v1/d02-driver-task.jpg', 'driver-task-1024x600.png', 1024, 600, 'D02 · 기사 업무 처리'],
-    ['phone-task', 'driver-phone-v1/d12-phone-task.jpg', 'driver-phone-task-360x640.png', 360, 640, 'D12 · 휴대폰 업무 처리']
+    ['phone-task', 'driver-phone-v1/d12-phone-task.jpg', 'driver-phone-task-360x640.png', 360, 640, 'D12 · 휴대폰 업무 처리'],
+    ['stock', 'pos-rest-v1/d03-driver-stock.jpg', 'driver-stock-1024x600.png', 1024, 600, 'D03 · 기사 차량 보관'],
+    ['phone-stock', 'driver-phone-v1/d13-phone-stock.jpg', 'driver-phone-stock-360x640.png', 360, 640, 'D13 · 휴대폰 차량 보관']
   ]) {
+    const note = key.includes('stock') ? '사용자 결정: 촘촘한 행·쪽 나눔 유지. 매장·기사 모두 입고 가능하며 기사는 자기 차량의 수거 물품만 처리. 글꼴 유지, 누르는 곳 56px 이상.' : '사용자 결정: 촘촘한 행·쪽 나눔 유지, 예약금 미수 안내 보류. 글꼴 유지, 누르는 곳 56px 이상.';
     await page.setViewportSize({ width: width * 2 + 64, height: height + 190 });
-    await page.setContent('<!doctype html><html lang="ko"><meta charset="utf-8"><style>*{box-sizing:border-box}body{margin:0;padding:24px;font-family:system-ui,sans-serif;background:#f5f5f7;color:#222}h1{margin:0 0 8px;font-size:24px}p{margin:0 0 16px;font-size:16px}.pair{display:flex;gap:16px}figure{margin:0;background:#fff}figcaption{padding:10px 12px;font-size:18px;border:1px solid #ddd}img{display:block;width:' + width + 'px;height:' + height + 'px;object-fit:contain}footer{margin-top:14px;font-size:16px}</style><h1>' + title + '</h1><p>왼쪽: 기존 시안 / 오른쪽: 실제 화면 ' + width + '×' + height + '</p><div class="pair"><figure><figcaption>기존 시안</figcaption><img src="' + uri(path.resolve('design/higgsfield', reference)) + '"></figure><figure><figcaption>구현 · 가상 접수 자료</figcaption><img src="' + uri(path.join(OUT, actual)) + '"></figure></div><footer>사용자 결정: 촘촘한 행·쪽 나눔 유지, 예약금 미수 안내 보류. 글꼴 유지, 누르는 곳 56px 이상.</footer></html>');
+    await page.setContent('<!doctype html><html lang="ko"><meta charset="utf-8"><style>*{box-sizing:border-box}body{margin:0;padding:24px;font-family:system-ui,sans-serif;background:#f5f5f7;color:#222}h1{margin:0 0 8px;font-size:24px}p{margin:0 0 16px;font-size:16px}.pair{display:flex;gap:16px}figure{margin:0;background:#fff}figcaption{padding:10px 12px;font-size:18px;border:1px solid #ddd}img{display:block;width:' + width + 'px;height:' + height + 'px;object-fit:contain}footer{margin-top:14px;font-size:16px}</style><h1>' + title + '</h1><p>왼쪽: 기존 시안 / 오른쪽: 실제 화면 ' + width + '×' + height + '</p><div class="pair"><figure><figcaption>기존 시안</figcaption><img src="' + uri(path.resolve('design/higgsfield', reference)) + '"></figure><figure><figcaption>구현 · 가상 접수 자료</figcaption><img src="' + uri(path.join(OUT, actual)) + '"></figure></div><footer>' + note + '</footer></html>');
     await page.locator('img').evaluateAll(images => Promise.all(images.map(img => img.decode())));
     await page.screenshot({ path: path.join(OUT, 'driver-' + key + '-compare.png'), fullPage: true });
   }

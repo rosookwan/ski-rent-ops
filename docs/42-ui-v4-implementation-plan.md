@@ -293,6 +293,7 @@ npm run build && npm run pos:screens:driver
 | 2026-09-22 | A5(1) 구현 전 확인 | `3636a02`에서 D02·D12를 열고 `docs/51`에 시안 요소 표를 작성. 출발 문자 기능·예약금 미수 자료가 없어 사용자 공통 규칙 6번에 따라 코드 수정 전 중단. 화면 코드 변경·촬영·전체 검사 실행 없음, 시안 일치 미완료. (2) 차량 보관 미착수. 작업 브랜치의 문서만 변경, main·Pages·PR 반영 없음 |
 | 2026-09-22 | A5(1) 업무 처리 | 사용자가 출발 문구(차량 출발·10분 이내 도착)를 확인하고 예약금 미수를 보류해 재개. D02·D12 요소 표에 따라 제목·배지·전화·문자·목록·확정 수량을 맞춤. 촘촘한 행·쪽 나눔, 목록 4줄@360×640 유지. 문자 문구 확인은 연결, 실제 발송은 미연결. 업무 검사 6종 69개·단위 180·반납 25·알림 18·PWA 6·check·빌드 통과. 기사 22개 상태·기존 화면 재촬영 포함 **규칙 305곳 위반 0건**. 시안 항목별 같은 곳/다른 곳은 `docs/51`, 비교는 `docs/pos-ui-a5`. **(1) 사용자 검토 대기, (2) 차량 보관 미착수.** main·Pages·PR 반영 없음 |
 | 2026-09-22 | A5(2) 구현 전 확인 | 사용자의 "다음" 지시로 `bcd67c8`에서 D03·D13을 열고 `docs/51`에 시안 요소 표를 작성. 시안의 `매장 입고 N개`는 현재 기사에게 없는 권한(`ops.receive`·`stock.move(receive)` 모두 매장 직원 전용)이라 공통 규칙 6번에 따라 코드 수정 전 중단·처리 기준 질문. 기존 기사 입고 차단 검사 1개·빌드 통과. **화면 구현·시안 일치 미완료**, 전체 화면·업무 검사를 새로 통과한 기록이 아님. main·Pages·PR 반영 없음 |
+| 2026-09-22 | A5(2) 차량 보관 | 사용자 "둘다 가능하게 해줘" 확인 뒤 D03·D13 요소 표대로 제목·보관 배지·네 칸 집계·품목 상태·하단 버튼 구현. 매장 기존 입고와 기사 자기 차량 수거품 입고 모두 연결. 실제 위치·처리자 기록, 금액 보존·다른 차량/배달/예비/환불/분실 차단·중복 방지 확인. 업무 검사 6종 71개·단위 185·반납 25·알림 18·PWA 6·check·빌드 통과. 기사 37개 상태와 기존 130장 재촬영 포함 **규칙 322곳 위반 0건**. 차량 보관 외 기사 20장 변경 전후 해시 같음. 행·쪽 나눔과 업무 목록 4줄@360×640 유지. **시안 항목별 차이·사유는 `docs/51`, 비교 그림 사용자 검토 대기. 다음 화면 미착수.** feat/pos-ui-v4만 반영, main·Pages·PR 반영 없음 |
 
 ## 12. 결정 기록
 
@@ -306,6 +307,7 @@ npm run build && npm run pos:screens:driver
 | 2026-09-21 | 기사 화면은 휴대폰도 지원한다(기준 360×640) | 사용자 · `docs/41` |
 | 2026-09-21 | 할인은 중복 없이 하나만(장비당 하루 기준 · % · 총 금액에서 N원, 리프트권은 따로 %). 스키장 템플릿의 실제 값은 DB 연결 때. 나눠서 결제는 사람이 아니라 품목으로(현장 대여는 대표자 이름만 적음) · `똑같이 나누기` 유지 · 구현은 카드 단말 연동 때 | 사용자 · `docs/44` |
 | 2026-09-21 | 10절 1~5번 · 7번을 추천안으로 확정("추천대로 진행"). 구현 브랜치 `feat/pos-ui-v4`, 시안 원본은 `main`에 올리지 않음 | 사용자 |
+| 2026-09-22 | 매장 직원과 기사 모두 입고 확정 가능. 기사는 자기 차량에서 수거한 입고 대기 실물만 처리. 기사 촘촘한 행·쪽 나눔 유지, 출발 문자 실제 발송은 미연결·예약금 미수는 보류 | 사용자 "둘다 가능하게 해줘" · A5 작업 조건 · `docs/51` |
 
 ## 부록 A. 바꾸지 않는 화면 약속
 
@@ -321,6 +323,8 @@ npm run build && npm run pos:screens:driver
 **동작 이름(`data-action`)**: `login-shop` · `login-vehicle` · `logout` · `close` · `save` · `workspace-switch` · `pos-connect` · `pos-refresh` · `pos-retry` · `pos-new` · `pos-add` · `pos-date` · `pos-period` · `pos-draft-next` · `pos-draft-plan` · `pos-draft-save` · `pos-person-add` · `pos-people-add` · `pos-line-add` · `pos-issue` · `pos-money` · `pos-money-review` · `pos-money-save` · `pos-return-all` · `pos-fulfillment-confirm` · `pos-fulfillment-step` · `pos-problems` · `pos-line` · `pos-extend-line` · `pos-schedule-line` · `pos-condition-asset` · `pos-correct-movement` · `pos-task` · `pos-task-complete` · `pos-ticket-*` · `pos-closing-*` · `pos-preinput*` · `pm-*` 전체. 이동(`data-go`): `order-detail` · `guide` · `guest-guide`.
 
 **입력 이름(`data-pos-input`)**: `name` · `phone` · `personId` · `unitWon` · `quantity` · `discountWon` · `moneyAmount` · `planDate` · `planTime` · `pre-guest-foot` · `pm*` 전체.
+
+**A5(2) 추가 약속(2026-09-22)**: 기사 차량 보관의 `매장 입고 N개`는 `data-action="pos-vehicle-receive"`다. 매장 직원의 기존 `pos-receive`·`매장 입고 확정`과 구분하며 기존 이름을 바꾸지 않는다. `capture-pos-driver.cjs`와 `smoke-pos-operating.cjs`가 양쪽 동작을 확인한다.
 
 **이미 있는 크기 검사**: 관리 화면의 버튼·입력 높이 48px(주 버튼 56px)와 글자 16px(`smoke-pos-management.cjs:30`), 숫자판 키 48×48px(`smoke-pos-keypad.cjs:37`), 기사 주 버튼 72px(`smoke-pos-operating.cjs:107`), 기사 목록 줄 수 3줄@1024×520 · 4줄@1024×600(`capture-pos-driver.cjs:62`), `[data-pos-scroll]` 밖 스크롤 금지(검사 4개).
 
@@ -351,5 +355,7 @@ npm run build && npm run pos:screens:driver
 | M04 | 거래처 상세 `partner-detail` | `pos-management.js partnerDetail()` | M6 → 후속 A4. 업무 검사 통과·시안 일치 미완료 (`docs/50`·`docs/51`) |
 | P04 좌우 배치 기준 | 고객 상세 `customer-profile` (전용 시안 없음) | `pos-management.js customerDetail()` | M6 → 후속 A4. 업무 검사 통과·전용 시안 없음 (`docs/50`·`docs/51`) |
 | M08 | 마감 이력 `closing-history` | `pos-finance.js closingHistory :82` | M6 |
-| D01~D03 | 기사 태블릿 | `pos-dispatch.js render :43 · taskPage :58 · vehicleStock :108` | M7 |
-| D11~D14 | 기사 휴대폰 | 위와 같음 + 새 `@media (max-width: 599px)` | M7 |
+| D01 · D11 | 기사 업무 목록 `dispatch` | `pos-dispatch.js render() · taskCard()` | M7. 촘촘한 행·쪽 나눔·4줄@360×640 유지 |
+| D02 · D12 | 기사 업무 처리 `driver-task` | `pos-dispatch.js taskPage()` · `pos-shell.css`의 `driver-task` 배치 | M7 → 후속 A5(1). 비교·차이·검증은 `docs/51` |
+| D03 · D13 | 기사 차량 보관 `vehicle` | `pos-dispatch.js vehicleStock()` · `pos-shell.css`의 `driver-stock` 배치 · `inventory.js stock.move(receive)` | M7 → 후속 A5(2). 매장·기사 입고 연결, 비교 그림 사용자 검토 대기 (`docs/51`) |
+| D14 | 기사 방문 결과 창 | `pos-dispatch.js pos-task-visit` · 휴대폰 창 배치 | M7. 기존 동작 유지 |

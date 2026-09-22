@@ -2,7 +2,7 @@
   'use strict';
   const S = window.SkiOps, P = S.pos, D = S.posData, U = S.posOrders, e = S.esc, b = P.button;
   const active = task => ['waiting', 'in_progress'].includes(task.status), names = { delivery: '배달', collection: '수거', refund: '발권처 환불' }, tones = { delivery: 'blue', collection: 'orange', refund: 'purple' };
-  let period = 'today', date = '', vehicle = '', query = '', taskDraft = null;
+  let period = 'today', date = '', vehicle = '', query = '', taskDraft = null, stockError = '', stockErrorRevision = null, stockBusy = false;
   const nextDate = value => window.SkiWorkflowCommon.nextDate(value);
   const vehicles = () => D.snapshot.management?.settings.vehicles.length ? D.snapshot.management.settings.vehicles.map(v => [v.id, v.name]) : [...new Set(D.snapshot.tasks.map(t => t.vehicleId))].map(id => [id, id === 'demo-van-1' ? '1호 차량' : id === 'demo-van-2' ? '2호 차량' : id]);
   const vehicleName = id => vehicles().find(v => v[0] === id)?.[1] || id;
@@ -110,7 +110,7 @@
   let taskResizeTimer;
   window.addEventListener('resize', () => {
     clearTimeout(taskResizeTimer);
-    taskResizeTimer = setTimeout(() => { if (S.state.page === 'driver-task' && S.root.dataset.posLayout === 'driver-task') S.render(); }, 120);
+    taskResizeTimer = setTimeout(() => { if (['driver-task', 'vehicle'].includes(S.state.page) && ['driver-task', 'driver-stock'].includes(S.root.dataset.posLayout)) S.render(); }, 120);
   });
   S.action('pos-task', openTask); S.posDispatch = { openTask };
   S.action('pos-task-message', id => {
@@ -143,13 +143,40 @@
   S.action('pos-task-cancel-save', async id => { try { await D.execute('ops.deliveryCancel', { taskId: id, reason: '고객 매장 수령으로 변경', unload: true }); S.close(); S.go('dispatch'); } catch (err) { U.error(err); } });
   S.action('pos-dispatch-find', () => S.go('preparation'));
   S.action('pos-dispatch-order', id => S.posFulfillment.open('dispatch', id));
-  S.action('pos-vehicle-stock', () => S.go('vehicle'));
+  S.action('pos-vehicle-stock', () => { stockError = ''; S.go('vehicle'); });
+  S.action('pos-vehicle-receive', async () => {
+    if (stockBusy || D.busy) return;
+    const stock = D.snapshot.vehicle, ids = stock?.assets.filter(a => a.stockState === 'receive').map(a => a.id) || [];
+    if (!driver() || !ids.length) return;
+    stockBusy = true; stockError = ''; S.render();
+    try {
+      await D.execute('stock.move', { kind: 'receive', assetIds: ids, from: { kind: 'vehicle', id: stock.vehicleId }, to: { kind: 'shop', id: D.snapshot.shopId } });
+      S.toast('매장 입고 ' + ids.length + '개 기록 완료');
+    } catch (error) { stockError = error.message; stockErrorRevision = D.snapshot.revision; }
+    finally { stockBusy = false; S.render(); }
+  });
   function vehicleStock() {
     const assets = driver() ? D.snapshot.vehicle?.assets || [] : D.snapshot.assets.filter(a => a.location.kind === 'vehicle' && (!vehicle || a.location.id === vehicle));
+    if (driver()) {
+      if (stockError && stockErrorRevision !== D.snapshot.revision) stockError = '';
+      const stock = D.snapshot.vehicle, rows = stock.totals.filter(t => t.current), waiting = assets.filter(a => a.stockState === 'receive').length;
+      const metrics = [['장비', 'equipment'], ['의류', 'clothing'], ['헬멧', 'helmet'], ['리프트권', 'liftTicket']];
+      const summary = '<div class="pos-stock-metrics">' + metrics.map(([name, kind]) => P.tile({ name, metric: stock.totals.filter(t => t.kind === kind).reduce((sum, t) => sum + t.current, 0) + (kind === 'liftTicket' ? '매' : '') })).join('') + '</div>';
+      const row = t => {
+        const counts = Object.fromEntries(['delivery', 'receive', 'refund', 'spare', 'check'].map(state => [state, assets.filter(a => a.sku === t.sku && a.stockState === state).length]));
+        const both = counts.delivery && counts.receive;
+        const descriptions = [[phone() && both ? '배달' : '배달 예정', counts.delivery], [phone() && both ? '수거' : '수거 보관', counts.receive], ['환불 대기', counts.refund], ['예비 보관', counts.spare], ['분실 확인', counts.check]];
+        const [state, name, tone] = [['delivery', '배달 예정', 'blue'], ['receive', '매장 입고 대기', 'orange'], ['refund', '환불 대기', 'purple'], ['check', '분실 확인', 'red'], ['spare', '예비 보관', 'grey']].find(([key]) => counts[key]);
+        return P.row(t.label + ' ' + t.current + t.unit, descriptions.filter(([, n]) => n).map(([label, n]) => label + ' ' + n).join(' · '), '<span class="pos-stock-state" data-tone="' + tone + '" data-stock-state="' + state + '">' + name + '</span>', { fitDescription: true });
+      };
+      const size = Math.max(1, Math.floor((innerHeight - (phone() ? 378 + (D.pending ? 60 : 0) : 334) - (stockError ? phone() ? 88 : 44 : 0)) / (phone() ? 64 : 66)));
+      const receive = '<button type="button" class="so-button pos-button primary" data-action="pos-vehicle-receive"' + (!waiting || stockBusy || D.pending ? ' disabled' : '') + '>매장 입고 ' + waiting + '개</button>';
+      return P.page('차량 보관', '', summary + P.pager(rows, 'vehicle-stock', row, size) + (stockError ? '<p id="pos-error" class="pos-error" role="alert">' + e(stockError) + '</p>' : ''),
+        '<span>' + e(stock.name + ' · 보관 ' + assets.length + '개 · 매장 입고 대기 ' + waiting + '개') + '</span><div class="so-actions"><button type="button" class="so-button pos-button pos-stock-list" data-go="dispatch">업무 목록</button>' + receive + '</div>',
+        { layout: 'driver-stock', title: '차량 보관', phoneBack: 'dispatch', wait: '보관 ' + assets.length + '개', waitLabel: '' });
+    }
     const orders = (D.snapshot.orders || []).filter(o => o.totals.vehicleQuantity > 0);
-    const body = driver()
-      ? P.pager(D.snapshot.vehicle.totals.filter(t => t.current), 'vehicle-stock', t => P.row(t.label + ' ' + t.current + t.unit + ' · 차량 보관', '매장 적재 ' + t.fromShop + ' · 고객 회수 ' + t.fromCustomer + ' · 환불 대기 ' + t.refundPending + ' · 전달 가능 ' + t.availableToDeliver), driverRows())
-      : P.cards([{ title: '매장 입고 대기', sub: orders.length + '팀 · 차량 보관 ' + assets.length + '개', cards: orders.map(o => P.orderCard({ id: o.id, tone: 'orange', badge: ['차량 보관 중', 'purple'], name: o.customer.name + ' 팀', phone: o.customer.phone || '', metaParts: ['매장 입고 대기 ' + o.totals.vehicleQuantity + '개', o.receiptNo || o.id], itemParts: U.items(o).map(item => item[0]), state: ['차량 보관', 'purple'], money: [o.finance.dueWon ? '미수 ' + S.money(o.finance.dueWon) : '수납 완료', o.finance.dueWon ? 'red' : 'green'], actions: b('차량 입고 확인 ' + o.totals.vehicleQuantity + '개', 'pos-receive', o.id, 'primary'), go: { page: 'order-detail', id: o.id } })) }], { fixed: true, signature: 'vehicle-stock', empty: '매장 입고 대기 없음', emptyNote: '차량 보관 ' + assets.length + '개' });
+    const body = P.cards([{ title: '매장 입고 대기', sub: orders.length + '팀 · 차량 보관 ' + assets.length + '개', cards: orders.map(o => P.orderCard({ id: o.id, tone: 'orange', badge: ['차량 보관 중', 'purple'], name: o.customer.name + ' 팀', phone: o.customer.phone || '', metaParts: ['매장 입고 대기 ' + o.totals.vehicleQuantity + '개', o.receiptNo || o.id], itemParts: U.items(o).map(item => item[0]), state: ['차량 보관', 'purple'], money: [o.finance.dueWon ? '미수 ' + S.money(o.finance.dueWon) : '수납 완료', o.finance.dueWon ? 'red' : 'green'], actions: b('차량 입고 확인 ' + o.totals.vehicleQuantity + '개', 'pos-receive', o.id, 'primary'), go: { page: 'order-detail', id: o.id } })) }], { fixed: true, signature: 'vehicle-stock', empty: '매장 입고 대기 없음', emptyNote: '차량 보관 ' + assets.length + '개' });
     return P.page('차량 보관 물품', '', body, '<span>' + e('차량 보관 ' + assets.length + '개 · 입고 대기 ' + orders.length + '팀') + '</span><div class="so-actions">' + U.go('차량 업무', 'dispatch') + (!driver() ? b('리프트권 회수·재사용', 'pos-ticket-stock') : '') + '</div>', { wait: orders.length ? '입고 ' + orders.length + '팀' : '없음', sums: [['차량 보관', assets.length + '개', assets.length ? 'purple' : '']] });
   }
   S.action('pos-vendor-refund', id => { const task = D.snapshot.tasks.find(t => t.id === id); P.modal('발권처 환불 기록', '<div class="pos-info">실제로 발권처에 반환하고 확정한 금액만 기록</div>' + U.input('확정 환불 금액 (원)', 'vendorAmount', '', 'number', 'min="0" inputmode="numeric"') + U.errorBox(), b('취소', 'close') + b('발권처 반환·환불 확정', 'pos-vendor-refund-save', task.refundId, 'primary')); });

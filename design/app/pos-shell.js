@@ -75,7 +75,7 @@
   function row(title, description, actions = '', options = {}) {
     const text = (wide, small) => small == null ? e(wide) : '<span class="pos-row-wide">' + e(wide) + '</span><span class="pos-row-phone">' + e(small) + '</span>';
     return '<article class="pos-row' + (options.phone ? ' has-phone-copy' : '') + '"><div class="pos-row-copy"><strong>' + text(title, options.phone?.title) + '</strong>'
-      + (description ? '<p>' + text(description, options.phone?.description) + '</p>' : '') + '</div><div class="pos-row-actions">' + actions + '</div></article>';
+      + (description ? '<p' + (options.fitDescription ? ' data-fit="auto"' : '') + '>' + text(description, options.phone?.description) + '</p>' : '') + '</div><div class="pos-row-actions">' + actions + '</div></article>';
   }
   const badge = (text, tone = 'grey') => '<span class="pos-badge" data-tone="' + e(tone) + '">' + e(text) + '</span>';
   const search = (key, value, placeholder) => '<label class="pos-search">' + S.icon('search') + '<input type="text" data-search="' + e(key) + '" value="' + e(value) + '" placeholder="' + e(placeholder) + '" aria-label="' + e(placeholder) + '" autocomplete="off"></label>';
@@ -116,6 +116,7 @@
   }
   // Home tile: the whole tile is one touch target, "열기" is only a hint. Lines may carry shorter alternatives ([long, shorter, shortest]).
   function tile(c) {
+    if (c.metric != null) return '<article class="pos-tile is-metric"><span>' + e(c.name) + '</span><strong>' + e(c.metric) + '</strong></article>';
     const tone = c.tone || '', strong = ['red', 'orange', 'green'].includes(tone);
     const line = row => { const alts = [].concat(row?.[0] || []); return '<span class="pos-tile-line" data-tone="' + e(row?.[1] || '') + '" ' + (alts.length > 1 ? 'data-fit="alts" data-alts="' + partsAttr(alts) + '"' : 'data-fit="auto"') + '>' + e(alts[0] || '') + '</span>'; };
     return '<button type="button" class="pos-tile" ' + (c.action ? 'data-action="' + e(c.action) + '" data-id="' + e(c.id ?? '') + '"' : 'data-go="' + e(c.route) + '"') + (tone ? ' data-tone="' + e(tone) + '"' : '') + (c.wide ? ' data-wide="true"' : '') + '>' + (strong && c.badge ? '<span class="pos-card-legend">' + e(c.badge[0]) + '</span>' : '')

@@ -12,7 +12,7 @@
 - **후속 A2 기간·수거 변경·교환·문제 해결:** 같은 브랜치에서 구현했다. 비교·검증은 [`docs/48`](48-pos-adjustments-ui.md). `main`·Pages 반영은 확인 대기다.
 - **후속 A3 발권·마감·사이즈 입력·알림:** 같은 브랜치에서 구현했다. 비교·검증은 [`docs/49`](49-pos-workflow-windows-ui.md). 전체 규칙 244곳 0건, `main`·Pages 반영은 확인 대기다.
 - **후속 A4 재고·정비·거래처·고객 상세:** `aa1dae6`까지 구현·업무 검사를 마쳤지만 **시안 일치는 미완료**다. 사용자가 비교 그림의 차이를 지적했다. 전체 규칙 291곳 0건은 시안 일치의 근거가 아니다. 비교·검사는 [`docs/50`](50-pos-management-details-ui.md), 업무상 차이의 사유·미구현 기능·시안 불일치는 [`docs/51`](51-pos-ui-design-differences.md)에 구분했다.
-- **현재 상태(2026-09-22):** A1~A4 기준 `3636a02` 위에서 A5(1) 업무 처리를 수정·검증하고 `bcd67c8`로 작업 브랜치에 푸시했다. 사용자의 "다음" 지시로 **(2) 차량 보관의 D03·D13 시안 요소 표를 작성했으나, `매장 입고 N개`의 기사 처리 권한을 확인 중**이다. 현재 입고 확정은 매장 직원만 가능하며 기존 검사도 기사 입고를 차단한다. 사용자 공통 규칙 6번에 따라 다른 버튼으로 대체하거나 권한을 임의로 바꾸지 않고 코드 수정 전 멈췄다. (1)의 실제 문자 발송 미연결·예약금 미수 보류는 그대로다. 기준 표·차이·검증은 [`docs/51`](51-pos-ui-design-differences.md) 문서 끝을 따른다. `main`·Pages·PR 없이 `feat/pos-ui-v4`에만 커밋·푸시한다.
+- **현재 상태(2026-09-22):** A1~A4 기준 `3636a02` 위에서 A5(1) 업무 처리를 `bcd67c8`로 수정·검증했다. (2) 차량 보관은 요소 표 작성 뒤 입고 권한 차이를 먼저 물었고, 사용자가 **"둘다 가능하게 해줘"**라고 확인해 D03·D13 배치와 기사 입고를 구현했다. **매장 직원과 기사 모두 입고 가능**하며 기사는 자기 차량의 수거 물품만 처리한다. 촘촘한 행·쪽 나눔과 기사 업무 목록 4줄@360×640을 유지했다. **(2) 비교 그림의 사용자 검토 대기이며 다음 화면은 시작하지 않는다.** (1)의 실제 문자 발송 미연결·예약금 미수 보류는 그대로다. 항목별 차이·검증·비교 그림은 [`docs/51`](51-pos-ui-design-differences.md) 문서 끝을 따른다. `main`·Pages·PR 없이 `feat/pos-ui-v4`에만 커밋·푸시한다.
 
 ## 1. 먼저 읽을 것
 
@@ -35,7 +35,7 @@ npm run dev                        # http://127.0.0.1:58148/ 체험판 (촬영 �
 npm run test:pos:operating
 npm run test:pos:fulfillment && npm run test:pos:tickets && npm run test:pos:management && npm run test:pos:preinput && npm run test:pos:keypad  # 업무 검사 6종 전부
 npm run pos:rules                  # 포스 촬영(60장) + 규칙 검사   ← dev 서버가 켜져 있어야 한다
-npm run pos:screens:driver        # 기사 촬영(22개 상태) + D02·D12 비교
+npm run pos:screens:driver        # 기사 촬영(37개 상태) + D02·D03·D12·D13 비교
 npm run pos:screens:fulfillment   # 지급·반납 15장 + 시안 비교 2장 (work/pos-ui-a1)
 npm run pos:screens:adjustments   # A2 20장 + 시안 비교 3장 (work/pos-ui-a2)
 npm run pos:screens:windows       # A3 48장 + 시안 비교 5장 (work/pos-ui-a3)
@@ -84,7 +84,7 @@ npm run test:pwa                   # 설치형 앱 흐름
 | A2 | 기간 · 수거 변경 · 교환 · 문제 해결 | `p24` · `p25` · `p26` | `pos-adjustment-forms.js` · `pos-problem-picker.js` · `pos-fulfillment.js` | **구현·검증 완료, main 반영 확인 대기.** 날짜·장소·시간·차량 선택과 달력, 실제 규격 버튼, 문제 해결 여섯 선택지. 부록 A 문구·기존 실물 확인 절차 유지. 지급/반납/변경 24개·전체 검증 통과, 규칙 195곳 0건. 비교·검증은 [`docs/48`](48-pos-adjustments-ui.md). |
 | A3 | 발권 창 · 마감 확정 3단계 · 사이즈 입력 현황 · 사이즈 요청 창 · 업무 알림 | `p27` · `p28` · `p14` · `p31` · `p32` | `pos-ticket-form.js` · `pos-finance.js showClosing()` · `pos-size-status.js` · `pos-preinput.js` · `pos-notifications.js` | **구현·검증 완료, main 반영 확인 대기.** 공용 수량 조절·요약, 마감 3단계 창, 팀별 사이즈·적용 규격 집계, 일행/차수 선택, 알림 선택 상태. 사전입력 10개·전체 검증 통과, 규칙 244곳 0건. 비교·검증은 [`docs/49`](49-pos-workflow-windows-ui.md). |
 | A4 | 재고 · 정비, 거래처 상세, 고객 상세 | `m02-inventory` · `m04-partner-detail` · 고객은 P04 배치 기준 | `pos-management.js inventory()`·`inventoryAssets()`·`partnerDetail()`·`customerDetail()` | **업무 검사 통과, 시안 일치 미완료.** `aa1dae6` 상태로 마무리. 관리 9개·전체 검사 통과, 규칙 291곳 0건. 버튼 형태·패널 비율·금액표 여백·하단 주 동작 등 시안 불일치는 [`docs/51`](51-pos-ui-design-differences.md). 기존 비교·검사는 [`docs/50`](50-pos-management-details-ui.md). |
-| A5 | 기사 태블릿 업무 처리 · 차량 보관 | `d02-driver-task` · `d03-driver-stock` | `pos-dispatch.js` `taskPage()` · `vehicleStock()` | **(1) 수정·비교·검증 후 `bcd67c8` 푸시. 사용자의 "다음" 지시로 (2) 시안 요소 표 작성, 매장 입고 권한 확인 대기.** 현재 입고 확정은 매장 직원 전용이라 시안 버튼을 그대로 연결할 수 없다. (2) 화면 코드는 아직 수정하지 않았다. 행·쪽 나눔과 기사 업무 목록 4줄@360×640 유지. 실제 문자 발송 미연결·예약금 미수 보류. [`docs/51`](51-pos-ui-design-differences.md) 문서 끝 참조. |
+| A5 | 기사 태블릿 업무 처리 · 차량 보관 | `d02-driver-task` · `d03-driver-stock` | `pos-dispatch.js` `taskPage()` · `vehicleStock()` | **(1) `bcd67c8` 수정·검증. (2) 사용자 확인으로 매장·기사 입고를 연결하고 D03·D13 구현·비교·검증, 비교 그림 검토 대기.** 기사는 자기 차량의 수거 물품만 입고한다. 행·쪽 나눔과 기사 업무 목록 4줄@360×640 유지. 실제 문자 발송 미연결·예약금 미수 보류. 사용자 확인 전 다음 화면은 시작하지 않는다. [`docs/51`](51-pos-ui-design-differences.md) 문서 끝 참조. |
 
 ### B. 나눠서 결제 (시안만 있음 · `docs/44` 6-1)
 

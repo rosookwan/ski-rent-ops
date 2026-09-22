@@ -134,6 +134,32 @@ async function main() {
   assert.equal((await client.snapshot()).orders.find(o => o.id === order.id).totals.customerQuantity, 1);
   checks.push('Driver uses its 72px actual-delivery action to complete an assigned physical task through API');
 
+  await command('task.save', { id: 'driver-return-test', kind: 'collection', vehicleId: 'van-2', date: '2026-09-13', time: '16:00', place: '실제 차량 화면 확인', customerId: original.id, orderId: original.id, title: '차량 수거', assetIds: [available.id] });
+  await driverPage.evaluate(async () => { await window.SkiOps.posData.refresh(); window.SkiOps.posDispatch.openTask('driver-return-test'); });
+  await driverPage.locator('[data-action="pos-task-complete"]').click(); await driverPage.waitForFunction(() => !window.SkiOps.posData.busy && window.SkiOps.state.page === 'dispatch');
+  await driverPage.locator('[data-action="pos-vehicle-stock"]').click();
+  const receive = driverPage.locator('[data-action="pos-vehicle-receive"]');
+  assert.equal(await receive.innerText(), '매장 입고 1개'); assert.ok((await receive.boundingBox()).height >= 72);
+  await driverRules.add('vehicle-stock-1024x600', driverPage);
+  const beforeReceipt = await client.snapshot(); await receive.click(); await driverPage.waitForFunction(() => !window.SkiOps.posData.busy && window.SkiOps.posData.snapshot.vehicle.assets.length === 0);
+  const afterReceipt = await client.snapshot();
+  assert.deepEqual(afterReceipt.assets.find(a => a.id === available.id).location, { kind: 'shop', id: 'real-test-shop' });
+  assert.deepEqual(afterReceipt.orders.find(o => o.id === original.id).finance, beforeReceipt.orders.find(o => o.id === original.id).finance);
+  assert.equal(repository.workflows('real-test-shop').movements.at(-1).actor.role, 'driver');
+  assert.equal(await receive.isDisabled(), true); await driverRules.add('vehicle-stock-empty-1024x600', driverPage);
+  checks.push('Driver collects and receives its own van stock through API without changing finance; the recorded actor is the driver');
+
+  await command('order.create', { id: 'store-receipt-test', customer: { name: '매장 입고 확인', phone: '010-2222-3333' }, people: [], batch: { id: 'store-receipt-batch', lines: [{ id: 'ski', sku: 'ski', quantity: 1, start: '2026-09-13', end: '2026-09-13', price: { unitWon: 20000 } }] } });
+  const receiptLines = [{ lineId: 'ski', assetIds: [available.id] }];
+  await command('ops.issue', { orderId: 'store-receipt-test', lineItems: receiptLines });
+  await command('ops.return', { orderId: 'store-receipt-test', mode: 'collect', vehicleId: 'van-2', lineItems: receiptLines });
+  await page.evaluate(async () => { await window.SkiOps.posData.refresh(); window.SkiOps.go('vehicle'); });
+  await page.locator('[data-action="pos-receive"][data-id="store-receipt-test"]').click(); await page.locator('#so-dialog[open]').waitFor();
+  await page.getByRole('button', { name: '매장 입고 확정', exact: true }).click(); await page.waitForFunction(() => !window.SkiOps.posData.busy && !document.querySelector('#so-dialog[open]'));
+  assert.equal((await client.snapshot()).orders.find(o => o.id === 'store-receipt-test').totals.shopQuantity, 1);
+  assert.equal(repository.workflows('real-test-shop').movements.at(-1).actor.role, 'store');
+  checks.push('Store vehicle-stock screen retains its existing receipt confirmation and store actor history');
+
   await page.reload(); await page.locator('#pos-access-key').waitFor(); assert.equal(await page.locator('#pos-access-key').inputValue(), ''); checks.push('Refresh clears credential and requires authentication');
   const saved = repository.workflows('real-test-shop');
   await new Promise(resolve => server.close(resolve)); repository.close();
